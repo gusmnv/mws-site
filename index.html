@@ -794,7 +794,7 @@ function frame(){
   const g=cx.createRadialGradient(gx,gy,R*0.1,gx,gy,R*1.25);
   g.addColorStop(0,`rgba(0,226,255,${.10*dim})`);g.addColorStop(1,"rgba(0,226,255,0)");
   cx.fillStyle=g;cx.beginPath();cx.arc(gx,gy,R*1.25,0,7);cx.fill();
-  rot+=0.0005;
+  rot+=0.00017;
 }
 let heroVisible=true,rafOn=false;
 function loop(){

@@ -431,21 +431,21 @@
   @media(max-width:640px){
     .boot-mark{white-space:normal;text-align:center;font-size:clamp(20px,6.2vw,26px)}
     .boot-mark b{display:block;margin-top:.12em}
-    /* phone: ticker tape smaller & quieter so it never steals attention */
-    .tape{font-size:8.5px;padding:4px 0;opacity:.75}
-    .tape .itm{margin:0 10px}
+    /* phone: ticker tape tiny & quiet - always smaller than the wordmark */
+    .tape{font-size:7px;padding:3px 0;opacity:.6}
+    .tape .itm{margin:0 8px}
     /* phone: compact wordmark on one line next to the lion */
     .logo{font-size:11px;letter-spacing:.12em;gap:8px}
     .logo-mark{width:34px;height:34px}
     .logo b{display:none}
-    /* phone: compact feature cards - whole INSIDE list scannable in ~1 screen each */
-    .feats{gap:10px}
-    .feat{padding:14px 15px}
-    .fhead{gap:10px;margin-bottom:7px}
-    .fico{width:32px;height:32px;border-radius:8px;box-shadow:0 0 12px rgba(0,226,255,.15),inset 0 1px 0 rgba(255,255,255,.06)}
-    .fico svg{width:16px;height:16px;stroke-width:2}
-    .feat h3{font-size:12px;letter-spacing:.03em}
-    .feat li{font-size:12.3px;line-height:1.45;padding:3.5px 0 3.5px 15px}
+    /* phone: ultra-compact feature cards */
+    .feats{gap:8px}
+    .feat{padding:11px 12px}
+    .fhead{gap:8px;margin-bottom:5px}
+    .fico{width:26px;height:26px;border-radius:7px;box-shadow:0 0 10px rgba(0,226,255,.12),inset 0 1px 0 rgba(255,255,255,.05)}
+    .fico svg{width:14px;height:14px;stroke-width:2}
+    .feat h3{font-size:11.5px;letter-spacing:.02em}
+    .feat li{font-size:11.8px;line-height:1.4;padding:2.5px 0 2.5px 14px}
     /* phone: tighter review cards */
     .vcard{width:262px;padding:12px 13px}
     .vtext{font-size:11.6px;-webkit-line-clamp:5}
@@ -748,12 +748,12 @@ function sizes(){
      on ultra-wide screens the whole composition stays centered and the sphere is never cut */
   const vw=cv.offsetWidth, cw=Math.min(vw,1560), off=(vw-cw)/2;
   /* HARD RULE: the FULL circle stays inside the hero - never cut by any edge */
-  let r=Math.min(cv.offsetHeight*0.44, cw*0.30);
+  let r=Math.min(cv.offsetHeight*0.40, cw*0.26);   /* smaller: presence, not the main attraction */
   let gxc=desktop?off+cw*0.72:vw*0.5;
   gxc=Math.min(gxc, vw - r - 30);               /* right edge */
   gxc=Math.max(gxc, r + 30);                    /* left edge (mobile/narrow) */
   gx=gxc*DPR; gy=H*0.5; R=r*DPR;
-  dim=desktop?1:0.55;                              /* globe sits behind text on mobile — keep it quiet */
+  dim=desktop?0.85:0.55;                              /* globe sits behind text on mobile — keep it quiet */
   stars=[]; /* starfield removed - clean space around the globe */
 }
 sizes();

@@ -69,8 +69,8 @@
     radial-gradient(ellipse 90% 70% at 78% 45%,transparent 55%,var(--void) 92%),
     linear-gradient(180deg,transparent 70%,var(--void) 100%);pointer-events:none}
   .hero-in{position:relative;z-index:2;padding:72px 28px}
-  .kicker{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--cyan);font-size:17px;
-    letter-spacing:.42em;text-transform:uppercase;margin-bottom:16px;opacity:0;
+  .kicker{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--cyan);font-size:clamp(16px,1.6vw,23px);
+    letter-spacing:.34em;text-transform:uppercase;text-shadow:0 0 22px rgba(0,226,255,.35);margin-bottom:16px;opacity:0;
     text-shadow:0 0 18px rgba(0,226,255,.35)}
   h1{font-family:'Sora','Arial Black',sans-serif;font-weight:800;text-transform:uppercase;
     font-size:clamp(36px,5.8vw,76px);line-height:1.06;letter-spacing:.005em;opacity:0;
@@ -526,7 +526,6 @@
       <a class="btn btn-cyan btn-big" href="#join">Join the Syndicate</a>
       <a class="btn btn-line btn-big" href="#inside">See inside</a>
     </div>
-    <div class="hero-note">Instant access via Whop &amp; Discord · Cancel anytime</div>
   </div>
 </header>
 

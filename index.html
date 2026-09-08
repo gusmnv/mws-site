@@ -747,7 +747,7 @@ function sizes(){
   /* anchor the globe to the centered content column (max 1560px), not the full viewport -
      on ultra-wide screens the whole composition stays centered and the sphere is never cut */
   const vw=cv.offsetWidth, cw=Math.min(vw,1560), off=(vw-cw)/2;
-  gx=desktop?(off+cw*0.76)*DPR:W*0.5; gy=H*0.5;
+  gx=desktop?(off+cw*0.70)*DPR:W*0.5; gy=H*0.5;
   R=Math.min(cw,cv.offsetHeight)*0.54*DPR;
   dim=desktop?1:0.55;                              /* globe sits behind text on mobile — keep it quiet */
   stars=[]; /* starfield removed - clean space around the globe */

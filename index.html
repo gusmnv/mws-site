@@ -105,9 +105,14 @@
   .boot-mark b{color:var(--cyan);font-weight:800}
   @keyframes markin{from{opacity:0;letter-spacing:.18em;transform:translateY(8px)}
     to{opacity:1;letter-spacing:.1em;transform:translateY(0)}}
-  .boot-bar{width:min(320px,64vw);height:2px;background:var(--line);border-radius:2px;overflow:hidden}
-  .boot-bar i{display:block;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
-  .boot-meta{display:flex;justify-content:space-between;width:min(320px,64vw);
+  .boot-chart{width:min(260px,56vw);height:auto;margin-bottom:6px;overflow:visible}
+  .boot-chart .cnd{opacity:0;transform:translateY(6px);transform-origin:center bottom;
+    animation:cnd .5s calc(.15s + var(--i)*.19s) cubic-bezier(.16,1,.3,1) forwards}
+  @keyframes cnd{from{opacity:0;transform:translateY(6px) scaleY(.2)}to{opacity:1;transform:translateY(0) scaleY(1)}}
+  .boot-chart .body.up{fill:#12d98e}.boot-chart .wick.up{stroke:#12d98e;stroke-width:2}
+  .boot-chart .body.dn{fill:#ff5470}.boot-chart .wick.dn{stroke:#ff5470;stroke-width:2}
+  .boot-chart .body{rx:1.5;filter:drop-shadow(0 0 6px rgba(18,217,142,.35))}
+  .boot-meta{display:flex;justify-content:space-between;width:min(320px,64vw);margin-top:4px;
     font-size:10.5px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase}
   .boot-meta em{color:var(--cyan);font-style:normal}
 
@@ -470,8 +475,18 @@
 <body>
 
 <div id="boot" aria-hidden="true">
+  <svg class="boot-chart" viewBox="0 0 260 74" aria-hidden="true">
+    <line x1="0" y1="64" x2="260" y2="64" stroke="rgba(125,141,179,.25)" stroke-width="1"/>
+    <g class="cnd" style="--i:0"><line x1="14"  y1="34" x2="14"  y2="64" class="wick up"/><rect x="8"   y="42" width="12" height="16" class="body up"/></g>
+    <g class="cnd" style="--i:1"><line x1="44"  y1="28" x2="44"  y2="60" class="wick up"/><rect x="38"  y="34" width="12" height="18" class="body up"/></g>
+    <g class="cnd" style="--i:2"><line x1="74"  y1="30" x2="74"  y2="56" class="wick dn"/><rect x="68"  y="34" width="12" height="14" class="body dn"/></g>
+    <g class="cnd" style="--i:3"><line x1="104" y1="22" x2="104" y2="52" class="wick up"/><rect x="98"  y="27" width="12" height="18" class="body up"/></g>
+    <g class="cnd" style="--i:4"><line x1="134" y1="16" x2="134" y2="46" class="wick up"/><rect x="128" y="21" width="12" height="17" class="body up"/></g>
+    <g class="cnd" style="--i:5"><line x1="164" y1="20" x2="164" y2="42" class="wick dn"/><rect x="158" y="23" width="12" height="13" class="body dn"/></g>
+    <g class="cnd" style="--i:6"><line x1="194" y1="10" x2="194" y2="38" class="wick up"/><rect x="188" y="14" width="12" height="18" class="body up"/></g>
+    <g class="cnd" style="--i:7"><line x1="224" y1="4"  x2="224" y2="30" class="wick up"/><rect x="218" y="8"  width="12" height="16" class="body up"/></g>
+  </svg>
   <div class="boot-mark">MR. WALL STREET <b>SYNDICATE</b></div>
-  <div class="boot-bar"><i id="bootFill"></i></div>
   <div class="boot-meta mono"><span id="bootMsg">CONNECTING TO THE DESK</span><em id="bootPct">0%</em></div>
 </div>
 
@@ -690,12 +705,12 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduced||!boot){done();return}
   try{
     /* simple + clean: name fades in, progress bar fills, page slides up */
-    const fill=document.getElementById("bootFill"),pct=document.getElementById("bootPct"),
+    const pct=document.getElementById("bootPct"),
           msg=document.getElementById("bootMsg");
     const t0=performance.now(),DUR=1900;
     (function tick(now){
       const p=Math.min((now-t0)/DUR,1),v=Math.floor(100*(1-Math.pow(1-p,2.6)));
-      fill.style.width=v+"%";pct.textContent=v+"%";
+      pct.textContent=v+"%";
       if(p<1)requestAnimationFrame(tick);
       else{msg.textContent="WELCOME TO THE SYNDICATE";pct.textContent="100%";
         setTimeout(done,380)}
@@ -750,14 +765,15 @@ function paintGlobe(c,GX,GY,RR,rt,dm,reveal,lw){
     if(k>=Math.ceil(upto))return;
     const frac=k<Math.floor(upto)?1:Math.max(0,upto-k);
     const segs=Math.max(2,Math.round(160*frac));
-    let prev=null;
+    let prev=null,prevB=-1;
     for(let j=0;j<=segs;j++){
       const t=j/160;
       const p=rg[1]?P(rg[0],t*Math.PI*2):P((t-0.5)*Math.PI,rg[0]);
       if(prev){
         const z=(p.z+prev.z)/2;
         const bI=Math.max(0,Math.min(NB-1,Math.floor((z+1)/2*NB)));
-        paths[bI].moveTo(prev.x,prev.y);paths[bI].lineTo(p.x,p.y);
+        if(bI!==prevB){paths[bI].moveTo(prev.x,prev.y);prevB=bI}
+        paths[bI].lineTo(p.x,p.y);
       }
       prev=p;
     }

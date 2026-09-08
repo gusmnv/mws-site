@@ -747,9 +747,11 @@ function sizes(){
   /* anchor the globe to the centered content column (max 1560px), not the full viewport -
      on ultra-wide screens the whole composition stays centered and the sphere is never cut */
   const vw=cv.offsetWidth, cw=Math.min(vw,1560), off=(vw-cw)/2;
-  let r=Math.min(cw,cv.offsetHeight)*0.54;
-  let gxc=desktop?off+cw*0.70:vw*0.5;
-  if(desktop) gxc=Math.min(gxc, vw - r - 28);   /* HARD RULE: sphere never crosses the right edge */
+  /* HARD RULE: the FULL circle stays inside the hero - never cut by any edge */
+  let r=Math.min(cv.offsetHeight*0.44, cw*0.30);
+  let gxc=desktop?off+cw*0.72:vw*0.5;
+  gxc=Math.min(gxc, vw - r - 30);               /* right edge */
+  gxc=Math.max(gxc, r + 30);                    /* left edge (mobile/narrow) */
   gx=gxc*DPR; gy=H*0.5; R=r*DPR;
   dim=desktop?1:0.55;                              /* globe sits behind text on mobile — keep it quiet */
   stars=[]; /* starfield removed - clean space around the globe */

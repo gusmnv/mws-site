@@ -99,16 +99,11 @@
   .boot-mark{font-family:'Sora','Arial Black',sans-serif;font-weight:800;text-transform:uppercase;
     font-size:clamp(23px,5vw,46px);color:var(--white);white-space:nowrap;
     position:relative;overflow:hidden;padding:.1em .2em;
-    letter-spacing:.5em;opacity:0;animation:markin 1.6s .1s cubic-bezier(.16,1,.3,1) forwards;
-    text-indent:.5em}
+    letter-spacing:.18em;opacity:0;animation:markin 1.4s .1s cubic-bezier(.16,1,.3,1) forwards;
+    text-indent:.1em}
   .boot-mark b{color:var(--cyan);font-weight:800}
-  @keyframes markin{from{opacity:0;letter-spacing:.5em;filter:blur(8px)}
-    to{opacity:1;letter-spacing:.1em;filter:blur(0)}}
-  .boot-mark .sweep{position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(100deg,transparent 32%,rgba(255,255,255,.20) 50%,rgba(0,226,255,.10) 54%,transparent 68%);
-    transform:translateX(-130%);animation:sweep .9s 1.55s cubic-bezier(.4,0,.2,1) forwards}
-  @keyframes sweep{to{transform:translateX(130%)}}
-  #boot.go .boot-mark{text-shadow:0 0 44px rgba(0,226,255,.65)}
+  @keyframes markin{from{opacity:0;letter-spacing:.18em;transform:translateY(8px)}
+    to{opacity:1;letter-spacing:.1em;transform:translateY(0)}}
   .boot-bar{width:min(320px,64vw);height:2px;background:var(--line);border-radius:2px;overflow:hidden}
   .boot-bar i{display:block;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
   .boot-meta{display:flex;justify-content:space-between;width:min(320px,64vw);
@@ -678,38 +673,16 @@ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(boot){boot.classList.add("go");setTimeout(()=>boot.remove(),900)}};
   if(reduced||!boot){done();return}
   try{
-    /* decrypt effect: glyphs cycle and resolve left→right while the lockup compresses */
-    const mark=boot.querySelector(".boot-mark");
-    const nodes=[...mark.childNodes].filter(n=>n.nodeType===3||n.tagName==="B");
-    const orig=nodes.map(n=>n.textContent);
-    const total=orig.join("").length;
-    const CH="ABCDEFGHIJKLMNOPQRSTUVWXYZ#$0123456789";
-    const d0=performance.now(),DDUR=1150;
-    (function scr(){
-      const pr=Math.min((performance.now()-d0)/DDUR,1);
-      let gi=0;
-      nodes.forEach((n,k)=>{
-        n.textContent=[...orig[k]].map(c=>{
-          const idx=gi++;
-          if(c===" "||c===".")return c;
-          return (idx/total<pr)?c:CH[Math.random()*CH.length|0];
-        }).join("");
-      });
-      if(pr<1)requestAnimationFrame(scr);
-      else nodes.forEach((n,k)=>n.textContent=orig[k]);
-    })();
-    const sw=document.createElement("span");sw.className="sweep";mark.appendChild(sw);
+    /* simple + clean: name fades in, progress bar fills, page slides up */
     const fill=document.getElementById("bootFill"),pct=document.getElementById("bootPct"),
           msg=document.getElementById("bootMsg");
-    const MSGS=["CONNECTING TO THE DESK","SYNCING SEC EDGAR","LINKING BLS / BEA FEEDS","OPENING THE INNER CIRCLE"];
-    let mi=0;const iv=setInterval(()=>{msg.textContent=MSGS[++mi%MSGS.length]},430);
-    const t0=performance.now(),DUR=2050;
+    const t0=performance.now(),DUR=1900;
     (function tick(now){
       const p=Math.min((now-t0)/DUR,1),v=Math.floor(100*(1-Math.pow(1-p,2.6)));
       fill.style.width=v+"%";pct.textContent=v+"%";
       if(p<1)requestAnimationFrame(tick);
-      else{clearInterval(iv);msg.textContent="WELCOME TO THE SYNDICATE";pct.textContent="100%";
-        setTimeout(done,330)}
+      else{msg.textContent="WELCOME TO THE SYNDICATE";pct.textContent="100%";
+        setTimeout(done,380)}
     })(t0);
     setTimeout(done,4000); /* failsafe: never trap the visitor */
   }catch(e){done()}
@@ -794,7 +767,7 @@ function frame(){
   const g=cx.createRadialGradient(gx,gy,R*0.1,gx,gy,R*1.25);
   g.addColorStop(0,`rgba(0,226,255,${.10*dim})`);g.addColorStop(1,"rgba(0,226,255,0)");
   cx.fillStyle=g;cx.beginPath();cx.arc(gx,gy,R*1.25,0,7);cx.fill();
-  rot+=0.00017;
+  rot+=0.00006;  /* extremely slow drift - barely perceptible, alive but calm */
 }
 let heroVisible=true,rafOn=false;
 function loop(){

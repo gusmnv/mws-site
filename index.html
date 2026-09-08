@@ -748,11 +748,11 @@ function paintGlobe(c,GX,GY,RR,rt,dm,reveal,lw){
   });
   c.lineWidth=lw;
   for(let b=0;b<NB;b++){
-    const a=(0.05+0.30*Math.pow(b/(NB-1),1.55))*dm;
+    const a=(0.08+0.44*Math.pow(b/(NB-1),1.55))*dm;
     c.strokeStyle=`rgba(0,226,255,${a})`;c.stroke(paths[b]);
   }
   /* limb: a sphere's silhouette is always a perfect circle — draw it so the edge never dies */
-  c.strokeStyle=`rgba(0,226,255,${0.20*dm*reveal})`;
+  c.strokeStyle=`rgba(0,226,255,${0.32*dm*reveal})`;
   c.beginPath();c.arc(GX,GY,RR,0,7);c.stroke();
 }
 function frame(){
@@ -765,9 +765,9 @@ function frame(){
   }
   paintGlobe(cx,gx,gy,R,rot,dim,1,DPR);
   const g=cx.createRadialGradient(gx,gy,R*0.1,gx,gy,R*1.25);
-  g.addColorStop(0,`rgba(0,226,255,${.10*dim})`);g.addColorStop(1,"rgba(0,226,255,0)");
+  g.addColorStop(0,`rgba(0,226,255,${.15*dim})`);g.addColorStop(1,"rgba(0,226,255,0)");
   cx.fillStyle=g;cx.beginPath();cx.arc(gx,gy,R*1.25,0,7);cx.fill();
-  rot+=0.00006;  /* extremely slow drift - barely perceptible, alive but calm */
+  rot+=0.00012;  /* very slow, calm drift */
 }
 let heroVisible=true,rafOn=false;
 function loop(){

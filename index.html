@@ -911,9 +911,12 @@ function vcard([name,user,text,pic]){
   const r1=document.getElementById("vrow1"),r2=document.getElementById("vrow2");
   if(!r1)return;
   /* half the reviews on the top row, half on the bottom (both rows when the list is still small) */
-  const half=Math.ceil(REVIEWS.length/2);
-  const top=REVIEWS.length>=8?REVIEWS.slice(0,half):REVIEWS;
-  const bot=REVIEWS.length>=8?REVIEWS.slice(half):[...REVIEWS].reverse();
+  /* shuffle so pigs & photos mix naturally across both rows, different every visit */
+  const RVS=[...REVIEWS];
+  for(let i=RVS.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[RVS[i],RVS[j]]=[RVS[j],RVS[i]]}
+  const half=Math.ceil(RVS.length/2);
+  const top=RVS.length>=8?RVS.slice(0,half):RVS;
+  const bot=RVS.length>=8?RVS.slice(half):[...RVS].reverse();
   const copies=Math.max(2,Math.ceil(8400/(Math.max(top.length,1)*368))); /* seamless -50% loop even on 4K */
   for(let k=0;k<copies;k++){
     top.forEach(r=>r1.appendChild(vcard(r)));

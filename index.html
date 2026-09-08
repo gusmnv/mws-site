@@ -749,9 +749,11 @@ function sizes(){
   const vw=cv.offsetWidth, cw=Math.min(vw,1560), off=(vw-cw)/2;
   /* HARD RULE: the FULL circle stays inside the hero - never cut by any edge */
   let r=Math.min(cv.offsetHeight*0.40, cw*0.26);   /* smaller: presence, not the main attraction */
+  /* align with the CONTENT COLUMN: sphere's right edge = the .wrap right edge (same line the JOIN button ends on) */
+  const wrapW=Math.min(vw,1140), wrapRight=(vw-wrapW)/2 + wrapW - 28;
   let gxc=desktop?off+cw*0.72:vw*0.5;
-  gxc=Math.min(gxc, vw - r - 30);               /* right edge */
-  gxc=Math.max(gxc, r + 30);                    /* left edge (mobile/narrow) */
+  gxc=Math.min(gxc, wrapRight - r);             /* never past the content line on the right */
+  gxc=Math.max(gxc, r + 30);                    /* never past the left edge either */
   gx=gxc*DPR; gy=H*0.5; R=r*DPR;
   dim=desktop?0.85:0.55;                              /* globe sits behind text on mobile — keep it quiet */
   stars=[]; /* starfield removed - clean space around the globe */

@@ -235,6 +235,22 @@
     filter:drop-shadow(0 3px 12px rgba(3,40,58,.55))}
   .tier.best .price small{color:#02222f;font-weight:800;font-size:17px;
     -webkit-background-clip:initial;background-clip:initial;background:none;filter:none;opacity:1}
+  /* monthly: white card, black lettering (Dr-Profit-style light tier) */
+  .tier.silver{background:linear-gradient(165deg,#ffffff,#dde6f4 52%,#b9c7e0);
+    border-color:rgba(255,255,255,.55)}
+  .tier.silver:hover{transform:translateY(-7px);box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 60px rgba(190,215,255,.15)}
+  .tier.silver .t-name{color:#0b1430}
+  .tier.silver .price{background:linear-gradient(180deg,#0a1128,#2c3b5e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:none}
+  .tier.silver .price small{color:#101d3d;font-weight:800;
+    -webkit-background-clip:initial;background-clip:initial;background:none}
+  .tier.silver .p-per{color:#2a3a5e}
+  .tier.silver .t-sub{color:#2a3a5e}
+  .tier.silver .plist li{color:#16244a;border-bottom-color:rgba(10,20,40,.16)}
+  .tier.silver .plist li::before{color:#0679a0;text-shadow:none}
+  .tier.silver .btn-line.t-cta{background:#0b1430;color:#fff;border:1px solid #0b1430;
+    box-shadow:0 10px 28px rgba(6,12,32,.35)}
+  .tier.silver .btn-line.t-cta:hover{background:#152049;color:#fff;border-color:#152049}
   .price small{font-family:'Chivo',sans-serif;font-size:15px;color:var(--grey)}
   .t-sub{color:var(--grey);font-size:13px;margin-top:8px;min-height:20px}
   .plist{list-style:none;margin:28px 0;text-align:left;flex:1}
@@ -715,7 +731,7 @@
   <h2>Choose your entry.</h2>
   <p class="lead">Every tier unlocks everything. The only question is how long you're staying.</p></div>
   <div class="tiers">
-    <div class="tier">
+    <div class="tier silver">
       <div class="t-name">Monthly</div>
       <div class="price">$99<small>/mo</small></div>
       <div class="p-per">Billed monthly</div>

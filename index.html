@@ -46,13 +46,34 @@
   nav{position:sticky;top:0;background:rgba(0,3,29,.85);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
     border-bottom:1px solid var(--line);z-index:50}
   .nav-in{display:flex;align-items:center;justify-content:space-between;height:70px}
-  .logo{display:flex;align-items:center;gap:11px;font-family:'Sora','Arial Black',sans-serif;font-weight:800;font-size:15px;letter-spacing:.2em;text-decoration:none;color:inherit}.logo-mark{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid rgba(255,255,255,.08)}
+  .logo{display:flex;align-items:center;gap:11px;font-family:'Sora','Arial Black',sans-serif;font-weight:800;font-size:18px;letter-spacing:.2em;text-decoration:none;color:inherit}.logo-mark{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid rgba(255,255,255,.08)}
   .logo b{color:var(--cyan);font-weight:800}
   .nav-right{display:flex;align-items:center;gap:32px}
   .nav-links{display:flex;gap:30px;font-size:13px;letter-spacing:.08em;color:var(--grey);text-transform:uppercase}
   .jt-short{display:none}
   .nav-links a{text-decoration:none;transition:color .2s}
   .nav-links a:hover{color:var(--cyan)}
+
+  /* ── mobile side menu ─────────────────── */
+  .nav-burger{display:none;background:none;border:0;cursor:pointer;padding:8px 2px 8px 8px;margin-left:2px}
+  .nav-burger span{display:block;width:22px;height:2px;background:var(--white);margin:5px 0;border-radius:2px}
+  .mnav-ovl{position:fixed;inset:0;background:rgba(2,6,18,.62);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+  .mnav-ovl.show{opacity:1;pointer-events:auto}
+  .mnav{position:fixed;top:0;right:0;bottom:0;width:min(80vw,340px);background:#060c1e;border-left:1px solid var(--line2);
+    z-index:75;transform:translateX(105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+    display:flex;flex-direction:column;padding:70px 26px 22px;overflow-y:auto}
+  .mnav.open{transform:none}
+  .mnav-x{position:absolute;top:16px;right:16px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line2);
+    background:none;color:var(--white);font-size:20px;line-height:1;cursor:pointer}
+  .mnav-tag{color:var(--grey);font-size:11px;letter-spacing:.32em;text-transform:uppercase;margin-bottom:8px}
+  .mnav a{display:block;padding:17px 2px;font-family:'Sora',sans-serif;font-weight:600;font-size:17.5px;
+    color:#c9d4ef;text-decoration:none;border-bottom:1px solid var(--line);transition:color .2s}
+  .mnav a:hover{color:var(--cyan)}
+  .mnav a.mnav-join{margin-top:auto;text-align:center;background:#0b2c55;border:1px solid rgba(0,226,255,.4);
+    color:#eafcff;border-radius:9px;padding:16px 10px;font-size:13.5px;letter-spacing:.1em;text-transform:uppercase;
+    box-shadow:0 0 22px rgba(0,60,140,.45)}
+  .mnav a.mnav-join:hover{background:#0e3a6e;color:#fff}
   .btn{display:inline-block;text-decoration:none;font-weight:500;letter-spacing:.1em;
     text-transform:uppercase;transition:.25s;border-radius:2px}
   .btn-cyan{background:linear-gradient(180deg,#7deeff,var(--cyan) 60%,#00b5cc);color:var(--void)}
@@ -69,11 +90,11 @@
     radial-gradient(ellipse 90% 70% at 78% 45%,transparent 55%,var(--void) 92%),
     linear-gradient(180deg,transparent 70%,var(--void) 100%);pointer-events:none}
   .hero-in{position:relative;z-index:2;padding:72px 28px}
-  .kicker{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--cyan);font-size:clamp(16px,1.6vw,23px);
-    letter-spacing:.34em;text-transform:uppercase;text-shadow:0 0 22px rgba(0,226,255,.35);margin-bottom:16px;opacity:0;
+  .kicker{font-family:'Sora','Arial Black',sans-serif;font-weight:800;color:var(--cyan);font-size:clamp(18px,2vw,27px);
+    letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;opacity:0;
     text-shadow:0 0 18px rgba(0,226,255,.35)}
   h1{font-family:'Sora','Arial Black',sans-serif;font-weight:800;text-transform:uppercase;
-    font-size:clamp(36px,5.8vw,76px);line-height:1.06;letter-spacing:.005em;opacity:0;
+    font-size:clamp(43px,6.6vw,86px);line-height:1.06;letter-spacing:.005em;opacity:0;
     text-shadow:0 2px 34px rgba(0,0,0,.65),0 0 24px rgba(190,230,255,.14)}
   h1 .cy{color:var(--cyan);text-shadow:0 0 30px rgba(0,226,255,.45)}
   .sub{color:var(--grey);font-size:18.5px;line-height:1.6;max-width:58ch;margin-top:22px;font-weight:300;opacity:0;margin-left:auto;margin-right:auto}
@@ -435,17 +456,17 @@
     .tape{font-size:7px;padding:3px 0;opacity:.6}
     .tape .itm{margin:0 8px}
     /* phone: compact wordmark on one line next to the lion */
-    .logo{font-size:11px;letter-spacing:.12em;gap:8px}
-    .logo-mark{width:34px;height:34px}
+    .logo{font-size:13px;letter-spacing:.12em;gap:8px}
+    .logo-mark{width:36px;height:36px}
     .logo b{display:none}
-    /* phone: ultra-compact feature cards */
-    .feats{gap:8px}
-    .feat{padding:11px 12px}
-    .fhead{gap:8px;margin-bottom:5px}
-    .fico{width:26px;height:26px;border-radius:7px;box-shadow:0 0 10px rgba(0,226,255,.12),inset 0 1px 0 rgba(255,255,255,.05)}
-    .fico svg{width:14px;height:14px;stroke-width:2}
-    .feat h3{font-size:11.5px;letter-spacing:.02em}
-    .feat li{font-size:11.8px;line-height:1.4;padding:2.5px 0 2.5px 14px}
+    /* phone: compact feature cards */
+    .feats{gap:10px}
+    .feat{padding:14px 15px}
+    .fhead{gap:9px;margin-bottom:7px}
+    .fico{width:30px;height:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,226,255,.12),inset 0 1px 0 rgba(255,255,255,.05)}
+    .fico svg{width:16px;height:16px;stroke-width:2}
+    .feat h3{font-size:12.5px;letter-spacing:.03em}
+    .feat li{font-size:13px;line-height:1.45;padding:3.5px 0 3.5px 16px}
     /* phone: tighter review cards */
     .vcard{width:262px;padding:12px 13px}
     .vtext{font-size:11.6px;-webkit-line-clamp:5}
@@ -456,19 +477,20 @@
     .tape .itm{margin:0 14px}
     section{padding:52px 0}
     .nav-links{display:none}
+    .nav-burger{display:block}
     .assure{grid-template-columns:1fr}
     .asr+.asr{border-left:none;border-top:1px solid var(--line)}
     .jt-full{display:none}
     .jt-short{display:inline}
-    .kicker{font-size:12.5px;letter-spacing:.2em}
-    .logo{font-size:12.5px;letter-spacing:.14em}
+    .kicker{font-size:14.5px;letter-spacing:.16em}
+    .logo{font-size:14px;letter-spacing:.14em}
     .btn-nav{padding:10px 20px}
     .stats-in{grid-template-columns:1fr;row-gap:22px}
     .stat+.stat{border-left:none}
     .feats{grid-template-columns:1fr}
   }
   @media(max-width:380px){
-    .logo{font-size:10.5px;letter-spacing:.08em}
+    .logo{font-size:12px;letter-spacing:.08em}
     .btn-nav{padding:9px 15px;font-size:11px}
   }
 </style>
@@ -511,8 +533,21 @@
       <a href="#inside">Inside</a><a href="#join">Membership</a><a href="#voices">Reviews</a><a href="#faq">FAQ</a><a href="#socials">Socials</a>
     </div>
     <a class="btn btn-cyan btn-nav" href="#join"><span class="jt-full">Join the Syndicate</span><span class="jt-short">Join</span></a>
+    <button class="nav-burger" id="navBurger" aria-label="Open menu"><span></span><span></span><span></span></button>
   </div>
 </div></nav>
+
+<div class="mnav-ovl" id="mnavOvl"></div>
+<aside class="mnav" id="mnav">
+  <button class="mnav-x" id="mnavX" aria-label="Close menu">&#10005;</button>
+  <div class="mnav-tag mono">Menu</div>
+  <a href="#inside">Inside</a>
+  <a href="#join">Membership</a>
+  <a href="#voices">Reviews</a>
+  <a href="#faq">FAQ</a>
+  <a href="#socials">Socials</a>
+  <a class="mnav-join" href="#join">Join the Syndicate</a>
+</aside>
 
 <header class="hero">
   <div class="hero-grad"></div>
@@ -938,6 +973,20 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 /* ── reveals ── */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("in")}),{threshold:.12});
 document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+</script>
+<script>
+(function(){
+  var mb=document.getElementById('navBurger'),mn=document.getElementById('mnav'),
+      mo=document.getElementById('mnavOvl'),mx=document.getElementById('mnavX');
+  if(!mb||!mn)return;
+  function mset(o){mn.classList.toggle('open',o);mo.classList.toggle('show',o);
+    document.documentElement.style.overflow=o?'hidden':''}
+  mb.addEventListener('click',function(){mset(!mn.classList.contains('open'))});
+  mo.addEventListener('click',function(){mset(false)});
+  mx.addEventListener('click',function(){mset(false)});
+  var ls=mn.querySelectorAll('a');
+  for(var i=0;i<ls.length;i++){ls[i].addEventListener('click',function(){mset(false)});}
+})();
 </script>
 </body>
 </html>

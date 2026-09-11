@@ -24,6 +24,7 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
   section[id]{scroll-margin-top:92px}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{background:var(--void);color:var(--white);font-family:'Chivo',Arial,sans-serif;
     font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   ::selection{background:var(--cyan);color:var(--void)}
@@ -507,6 +508,25 @@
   @media(max-width:380px){
     .logo{font-size:12px;letter-spacing:.08em}
     .btn-nav{padding:9px 15px;font-size:11px}
+  }
+  /* phone: final overrides (placed last so they always win) */
+  @media(max-width:640px){
+    /* ticker tape: small and quiet, iOS boosting disabled via text-size-adjust */
+    .tape{font-size:8px;padding:3px 0;opacity:.55}
+    .tape .itm{margin:0 8px}
+    /* compact pricing: all 3 plans readable without endless scrolling */
+    .tiers{gap:14px}
+    .tier{padding:24px 20px 22px;border-radius:14px}
+    .t-name{font-size:13px;letter-spacing:.26em;margin-bottom:8px}
+    .price{font-size:44px}
+    .tier.golden .price{font-size:40px}
+    .price small{font-size:14px}
+    .p-per{font-size:10.5px;margin-top:4px}
+    .t-sub{font-size:13px;margin-top:4px;min-height:0}
+    .plist{margin:14px 0}
+    .plist li{font-size:13px;line-height:1.45;padding:7px 0}
+    .t-cta{padding:14px;font-size:12.5px;letter-spacing:.12em}
+    .badge{font-size:10.5px;padding:5px 12px}
   }
 </style>
 <noscript><style>.rv,.kicker,h1,.sub,.hero-ctas,.hero-note{opacity:1!important;transform:none!important}.tape{display:none}#boot{display:none}</style></noscript>

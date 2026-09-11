@@ -233,6 +233,7 @@
   .tier.best .price{background:linear-gradient(180deg,#ffffff,#d9fbff);
     -webkit-background-clip:text;background-clip:text;color:transparent;
     filter:drop-shadow(0 3px 12px rgba(3,40,58,.55))}
+  .tier.best .price small{color:#053648;-webkit-background-clip:initial;background-clip:initial;background:none}
   .price small{font-family:'Chivo',sans-serif;font-size:15px;color:var(--grey)}
   .t-sub{color:var(--grey);font-size:13px;margin-top:8px;min-height:20px}
   .plist{list-style:none;margin:28px 0;text-align:left;flex:1}
@@ -566,9 +567,10 @@
   .jm-opt.jm-best span{color:var(--cyan-soft)}
   .jm-opt.jm-gold{border-color:rgba(255,214,0,.35);background:linear-gradient(135deg,rgba(255,214,0,.09),rgba(255,214,0,.02))}
   .jm-opt.jm-gold em{color:var(--gold)}
-  .jm-opt .jm-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;color:#00171d;
-    background:var(--cyan);border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:2px}
-  .jm-opt.jm-gold .jm-tag{background:var(--gold);color:#1a1600}
+  .jm-opt b .jm-tag{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:9px;letter-spacing:.18em;
+    color:#00171d;background:var(--cyan);border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:2px;
+    display:inline-block;width:auto}
+  .jm-opt.jm-gold b .jm-tag{background:var(--gold);color:#1a1600}
 </style>
 <noscript><style>.rv,.kicker,h1,.sub,.hero-ctas,.hero-note{opacity:1!important;transform:none!important}.tape{display:none}#boot{display:none}</style></noscript>
 </head>

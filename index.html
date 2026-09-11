@@ -176,14 +176,20 @@
   .feats{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .feat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px 28px;transition:border-color .2s}
   .feat:hover{border-color:var(--cyan-dim)}
-  .fhead{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+  .fhead{display:flex;align-items:center;gap:13px;margin-bottom:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .fhead::after{content:"";margin-left:auto;flex:none;width:9px;height:9px;
+    border-right:2px solid var(--cyan);border-bottom:2px solid var(--cyan);
+    transform:rotate(45deg);transition:transform .25s;opacity:.8}
+  .feat.open .fhead::after{transform:rotate(225deg)}
+  .feat ul{max-height:0;overflow:hidden;transition:max-height .35s ease,margin .3s ease;margin-top:0}
+  .feat.open ul{max-height:420px;margin-top:14px}
   .fico{width:48px;height:48px;flex:none;border-radius:12px;border:1px solid var(--cyan-dim);
     background:linear-gradient(145deg,rgba(0,226,255,.16),rgba(0,226,255,.03));
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 0 22px rgba(0,226,255,.2),inset 0 1px 0 rgba(255,255,255,.07)}
   .fico svg{width:23px;height:23px;stroke:url(#icograd);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;
     filter:drop-shadow(0 0 6px rgba(0,226,255,.55))}
-  .feat h3{font-family:'Sora',sans-serif;font-weight:600;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+  .feat h3{font-family:'Sora',sans-serif;font-weight:600;font-size:15.5px;letter-spacing:.04em;text-transform:uppercase}
   .soon{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.18em;
     color:var(--cyan);border:1px solid var(--cyan-dim);border-radius:999px;padding:3px 11px;
     background:rgba(0,226,255,.06);text-transform:uppercase;flex:none}
@@ -463,7 +469,7 @@
     /* phone: compact feature cards */
     .feats{gap:10px}
     .feat{padding:14px 15px}
-    .fhead{gap:9px;margin-bottom:7px}
+    .fhead{gap:9px;margin-bottom:0}
     .fico{width:30px;height:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,226,255,.12),inset 0 1px 0 rgba(255,255,255,.05)}
     .fico svg{width:16px;height:16px;stroke-width:2}
     .feat h3{font-size:12.5px;letter-spacing:.03em}
@@ -527,7 +533,42 @@
     .plist li{font-size:13px;line-height:1.45;padding:7px 0}
     .t-cta{padding:14px;font-size:12.5px;letter-spacing:.12em}
     .badge{font-size:10.5px;padding:5px 12px}
+    /* phone: accordion cards - title is the content, so give it presence */
+    .feat{padding:15px 16px}
+    .feat h3{font-size:14px;letter-spacing:.04em}
+    .fico{width:34px;height:34px}
+    .fico svg{width:18px;height:18px}
+    .feat li{font-size:13.5px;line-height:1.5;padding:5px 0 5px 16px}
+    .feat.open ul{margin-top:10px}
   }
+
+  /* ── join chooser modal ───────────────── */
+  .jm-ovl{position:fixed;inset:0;background:rgba(2,6,18,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+    z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
+  .jm-ovl.show{opacity:1;pointer-events:auto}
+  .jmodal{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(92vw,420px);
+    background:#060c1e;border:1px solid var(--line2);border-radius:16px;padding:26px 22px 22px;z-index:95;
+    opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 40px 120px rgba(0,0,0,.7)}
+  .jmodal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  .jm-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);
+    background:none;color:var(--white);font-size:16px;line-height:1;cursor:pointer}
+  .jm-title{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--cyan);text-align:center;margin-bottom:18px;
+    text-shadow:0 0 16px rgba(0,226,255,.35)}
+  .jm-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border:1px solid var(--line2);border-radius:11px;padding:15px 16px;margin-top:10px;
+    text-decoration:none;color:var(--white);transition:border-color .2s,transform .15s;background:rgba(255,255,255,.02)}
+  .jm-opt:hover{border-color:var(--cyan);transform:translateY(-1px)}
+  .jm-opt b{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;display:block}
+  .jm-opt span{color:var(--grey);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;display:block;margin-top:3px}
+  .jm-opt em{font-style:normal;color:var(--cyan);font-size:16px}
+  .jm-opt.jm-best{border-color:var(--cyan-dim);background:linear-gradient(135deg,rgba(0,226,255,.1),rgba(0,226,255,.03))}
+  .jm-opt.jm-best span{color:var(--cyan-soft)}
+  .jm-opt.jm-gold{border-color:rgba(255,214,0,.35);background:linear-gradient(135deg,rgba(255,214,0,.09),rgba(255,214,0,.02))}
+  .jm-opt.jm-gold em{color:var(--gold)}
+  .jm-opt .jm-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;color:#00171d;
+    background:var(--cyan);border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+  .jm-opt.jm-gold .jm-tag{background:var(--gold);color:#1a1600}
 </style>
 <noscript><style>.rv,.kicker,h1,.sub,.hero-ctas,.hero-note{opacity:1!important;transform:none!important}.tape{display:none}#boot{display:none}</style></noscript>
 </head>
@@ -583,6 +624,18 @@
   <a href="#socials">Socials</a>
   <a class="mnav-join" href="#join">Join the Syndicate</a>
 </aside>
+
+<div class="jm-ovl" id="jmOvl"></div>
+<div class="jmodal" id="jModal" role="dialog" aria-label="Choose your entry">
+  <button class="jm-x" id="jmX" aria-label="Close">&#10005;</button>
+  <div class="jm-title">Choose your entry</div>
+  <a class="jm-opt" href="https://whop.com/checkout/plan_zKhMuAvHoXfE2" target="_blank" rel="noopener">
+    <div><b>Monthly</b><span>$99 / month · cancel anytime</span></div><em>→</em></a>
+  <a class="jm-opt jm-best" href="https://whop.com/checkout/plan_0LdJbWcZD6tGE" target="_blank" rel="noopener">
+    <div><b>Yearly<span class="jm-tag">BEST VALUE</span></b><span>$990 / year · two months free</span></div><em>→</em></a>
+  <a class="jm-opt jm-gold" href="https://whop.com/checkout/plan_vuo4wah1I85pO" target="_blank" rel="noopener">
+    <div><b>Lifetime<span class="jm-tag">GOLDEN ENTRY</span></b><span>$3,990 · one payment, forever</span></div><em>→</em></a>
+</div>
 
 <header class="hero">
   <div class="hero-grad"></div>
@@ -1021,6 +1074,28 @@ document.querySelectorAll(".rv").forEach(el=>io.observe(el));
   mx.addEventListener('click',function(){mset(false)});
   var ls=mn.querySelectorAll('a');
   for(var i=0;i<ls.length;i++){ls[i].addEventListener('click',function(){mset(false)});}
+  window.__closeMnav=function(){mset(false)};
+})();
+(function(){
+  /* feature cards: title-only, tap/click to expand */
+  var hs=document.querySelectorAll('.feat .fhead');
+  for(var i=0;i<hs.length;i++){hs[i].addEventListener('click',function(){
+    this.parentElement.classList.toggle('open');});}
+})();
+(function(){
+  /* join chooser: nav button + mobile-menu button open the plan modal */
+  var jm=document.getElementById('jModal'),jo=document.getElementById('jmOvl'),
+      jx=document.getElementById('jmX');
+  if(!jm)return;
+  function jset(o){jm.classList.toggle('show',o);jo.classList.toggle('show',o)}
+  var trigs=document.querySelectorAll('.btn-nav, .mnav-join');
+  for(var i=0;i<trigs.length;i++){trigs[i].addEventListener('click',function(e){
+    e.preventDefault();
+    if(window.__closeMnav)window.__closeMnav();
+    jset(true);});}
+  jo.addEventListener('click',function(){jset(false)});
+  jx.addEventListener('click',function(){jset(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')jset(false)});
 })();
 </script>
 </body>

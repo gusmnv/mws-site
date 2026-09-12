@@ -173,14 +173,17 @@
   .desk-foot em{color:var(--cyan);font-style:normal}
 
   /* ── inside: feature grid ─────────────── */
-  .feats{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .feats{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  /* align-items:start is the accordion fix: without it the neighbour card in
+     the same grid row stretched when one opened - looked like both opened */
   .feat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px 28px;transition:border-color .2s}
   .feat:hover{border-color:var(--cyan-dim)}
   .fhead{display:flex;align-items:center;gap:13px;margin-bottom:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .fhead::after{content:"";margin-left:auto;flex:none;width:9px;height:9px;
+  .fhead::after{content:"";margin-left:auto;flex:none;width:8px;height:8px;
     border-right:2px solid var(--cyan);border-bottom:2px solid var(--cyan);
-    transform:rotate(45deg);transition:transform .25s;opacity:.8}
-  .feat.open .fhead::after{transform:rotate(225deg)}
+    transform:translateY(-2px) rotate(45deg);transform-origin:center;
+    transition:transform .25s;opacity:.85}
+  .feat.open .fhead::after{transform:translateY(2px) rotate(225deg)}
   .feat ul{max-height:0;overflow:hidden;transition:max-height .35s ease,margin .3s ease;margin-top:0}
   .feat.open ul{max-height:420px;margin-top:14px}
   .fico{width:48px;height:48px;flex:none;border-radius:12px;border:1px solid var(--cyan-dim);
@@ -274,8 +277,11 @@
   .tier.golden .plist li::before{color:var(--gold);text-shadow:0 0 8px rgba(255,223,0,.6)}
   /* ── pricing v2: identical cards, only the ACCENT color changes ── */
   .pwrap{display:grid;grid-template-columns:1fr 1.15fr;gap:24px;max-width:1120px;margin:0 auto;align-items:start}
-  .pinc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:34px 32px}
-  .pinc-tag{color:var(--cyan);font-size:12px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:18px}
+  .pinc{background:#000318;border:1px solid var(--line2);border-radius:16px;padding:0 32px 20px;overflow:hidden;
+    box-shadow:0 0 0 1px rgba(0,226,255,.05),0 30px 80px rgba(0,0,0,.5)}
+  .pinc-bar{display:flex;align-items:center;gap:8px;background:#020a2e;border-bottom:1px solid var(--line);
+    padding:14px 20px;margin:0 -32px 14px}
+  .pinc-title{margin-left:10px;color:var(--grey);font-size:11px;letter-spacing:.18em}
   .pinc-list{list-style:none}
   .pinc-list li{padding:13px 0 13px 24px;border-bottom:1px dashed var(--line);color:#c7d3ec;font-size:15px;position:relative}
   .pinc-list li:last-child{border-bottom:none}
@@ -295,6 +301,10 @@
     font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;transition:filter .2s,transform .15s}
   .pc-cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
   /* accents — structure never changes, only these colors */
+  .pcard{border-left-width:3px}
+  .acc-w{border-left-color:#dfe8f7}
+  .acc-c{border-left-color:var(--cyan)}
+  .acc-g{border-left-color:var(--gold)}
   .acc-w .pc-price{color:#f2f6ff;text-shadow:0 0 26px rgba(210,225,255,.25)}
   .acc-w .pbadge{background:#e7edf9;color:#0b1430}
   .acc-w .pc-cta{background:linear-gradient(135deg,#ffffff,#c9d6ee);color:#0b1430}
@@ -305,9 +315,16 @@
   .acc-g .pc-price{color:var(--gold);text-shadow:0 0 30px rgba(255,214,0,.35)}
   .acc-g .pbadge{background:var(--gold);color:#1a1600}
   .acc-g .pc-cta{background:linear-gradient(135deg,#ffe97a,#f5c400);color:#1a1600}
+  .psteps{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px 14px;
+    max-width:1120px;margin:22px auto 0;color:var(--grey);font-size:11.5px;letter-spacing:.08em}
+  .psteps b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;
+    border:1px solid var(--cyan-dim);color:var(--cyan);font-size:10.5px;margin-right:7px}
+  .psteps i{color:var(--cyan-dim);font-style:normal}
   @media(max-width:900px){
     .pwrap{grid-template-columns:1fr}
     .pinc{order:2}
+    .psteps{flex-direction:column;gap:8px}
+    .psteps i{display:none}
   }
 
   .badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.22em;
@@ -768,7 +785,8 @@
   <p class="lead">Every tier unlocks everything. The only question is how long you're staying.</p></div>
   <div class="pwrap">
     <aside class="pinc">
-      <div class="pinc-tag mono">— Every tier includes</div>
+      <div class="pinc-bar"><span class="dot on"></span><span class="dot"></span><span class="dot"></span>
+        <span class="pinc-title mono">MWS://EVERY-TIER-INCLUDES</span></div>
       <ul class="pinc-list">
         <li>Every trade &amp; move, posted in real time</li>
         <li>Full Syndicate access — all channels</li>
@@ -802,6 +820,11 @@
         <a class="pc-cta" href="https://whop.com/checkout/plan_vuo4wah1I85pO" target="_blank" rel="noopener">Take the Golden Entry</a>
       </div>
     </div>
+  </div>
+  <div class="psteps mono">
+    <span><b>1</b> Checkout on Whop</span><i>→</i>
+    <span><b>2</b> Hit “Access” on the confirmation page</span><i>→</i>
+    <span><b>3</b> Connect Discord — you're in, in seconds</span>
   </div>
   <div class="assure">
     <div class="asr"><div class="asi"><svg viewBox="0 0 24 24"><rect class="draw" x="3" y="11" width="18" height="11" rx="2"/><path class="draw" d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>

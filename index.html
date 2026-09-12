@@ -528,10 +528,13 @@
 
   footer{border-top:1px solid var(--line);padding:44px 0;color:var(--grey);font-size:12.5px;text-align:center}
   .foot-ch{display:flex;justify-content:center;gap:12px;flex-wrap:nowrap;margin-bottom:28px}
-  .fchip{display:inline-flex;align-items:center;gap:14px;border:1px solid var(--line2);border-radius:14px;
-    padding:14px 20px;text-decoration:none;text-align:left;white-space:nowrap;
-    transition:transform .18s,box-shadow .25s,border-color .2s;
+  .fchip{display:inline-flex;align-items:center;justify-content:center;gap:11px;
+    border:1px solid var(--line2);border-radius:14px;padding:17px 20px;text-decoration:none;
+    white-space:nowrap;transition:transform .18s,box-shadow .25s,border-color .2s;
     box-shadow:0 12px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05)}
+  .fx{font-size:20px;color:var(--white);line-height:1;font-style:normal}
+  .fh{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--grey);letter-spacing:.05em}
+  .fs{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--white);letter-spacing:.07em}
   .fchip:hover{transform:translateY(-2px)}
   .fc-tile{width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;
     border:1px solid var(--line2);background:rgba(255,255,255,.03)}
@@ -620,12 +623,11 @@
     .asr+.asr b::before{content:"· ";color:var(--cyan-dim)}
     /* phone: footer chips side by side, compact, equal halves */
     .foot-ch{gap:9px;padding:0 4px}
-    .fchip,.fchip-x,.fchip-cy{width:auto;flex:1 1 0;min-width:0;justify-content:flex-start;
-      padding:9px 11px;gap:9px;border-radius:12px}
-    .fc-tile{width:28px;height:28px;border-radius:8px}
-    .fchip .fc-ic{width:14px;height:14px}
-    .fchip b{font-size:11.5px}
-    .fchip span{font-size:8px;letter-spacing:.03em}
+    .fchip,.fchip-x,.fchip-cy{width:auto;flex:1 1 0;min-width:0;
+      padding:13px 8px;gap:7px;border-radius:12px}
+    .fx{font-size:16px}
+    .fh{font-size:10px}
+    .fs{font-size:12.5px}
     .jt-full{display:none}
     .jt-short{display:inline}
     .kicker{font-size:14.5px;letter-spacing:.16em}
@@ -925,12 +927,8 @@
 
 <footer><div class="wrap">
   <div class="foot-ch">
-    <a class="fchip fchip-x" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">
-      <span class="fc-tile"><svg class="fc-ic" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zM17.083 19.77h1.833L7.084 4.126H5.117z"/></svg></span>
-      <div><b>X</b><span>@mrofwallstreet</span></div></a>
-    <a class="fchip fchip-cy jm-open" href="#join">
-      <span class="fc-tile"><svg class="fc-ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-      <div><b>The Syndicate</b><span>Members only · join now</span></div></a>
+    <a class="fchip fchip-x" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener"><b class="fx">&#120143;</b><span class="fh">@mrofwallstreet</span></a>
+    <a class="fchip fchip-cy jm-open" href="#join"><b class="fs">The Syndicate</b></a>
   </div>
   <div class="disc">Mr. Wall Street Syndicate provides educational content and market opinion only. Nothing here
   constitutes financial advice. Trading and investing involve substantial risk, including loss of capital.

@@ -588,8 +588,13 @@
     /* phone: no pills in the bar - the side menu carries login + join */
     .btn-nav{display:none}
     .btn-login{display:none}
-    .assure{grid-template-columns:1fr}
-    .asr+.asr{border-left:none;border-top:1px solid var(--line)}
+    /* phone: no box - clean items with a thin line underneath, like the PC strip */
+    .assure{grid-template-columns:1fr;border:none;background:none;box-shadow:none;border-radius:0;overflow:visible}
+    .asr{padding:18px 6px;border-bottom:1px solid var(--line)}
+    .asr:last-child{border-bottom:none}
+    .asr+.asr{border-left:none;border-top:none}
+    .asr::before{display:none}
+    .asr:hover{background:none}
     .jt-full{display:none}
     .jt-short{display:inline}
     .kicker{font-size:14.5px;letter-spacing:.16em}

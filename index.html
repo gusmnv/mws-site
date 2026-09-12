@@ -30,7 +30,7 @@
   ::selection{background:var(--cyan);color:var(--void)}
   .disp{font-family:'Sora','Arial Black',sans-serif}
   .mono{font-family:'IBM Plex Mono',monospace}
-  .wrap{max-width:1260px;margin:0 auto;padding:0 28px}
+  .wrap{max-width:1400px;margin:0 auto;padding:0 28px}
   a{color:inherit}
   :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 
@@ -82,6 +82,9 @@
   .btn-line{border:1px solid var(--line2);color:var(--white)}
   .btn-line:hover{border-color:var(--cyan);color:var(--cyan)}
   .btn-nav{padding:11px 26px;font-size:12px}
+  .btn-login{padding:10px 22px;font-size:12px;border:1px solid var(--line2);color:var(--white);
+    background:transparent;margin-right:2px}
+  .btn-login:hover{border-color:var(--cyan);color:var(--cyan)}
 
   /* ── hero ─────────────────────────────── */
   .hero{display:flex;align-items:center;position:relative;overflow:hidden}
@@ -276,7 +279,7 @@
   .tier.golden .t-sub{color:var(--gold-soft)}
   .tier.golden .plist li::before{color:var(--gold);text-shadow:0 0 8px rgba(255,223,0,.6)}
   /* ── pricing v2: identical cards, only the ACCENT color changes ── */
-  .pwrap{display:grid;grid-template-columns:1fr 1.15fr;gap:24px;max-width:1230px;margin:0 auto;align-items:start}
+  .pwrap{display:grid;grid-template-columns:1fr 1.15fr;gap:24px;max-width:1360px;margin:0 auto;align-items:start}
   .pinc{background:#000318;border:1px solid var(--line2);border-radius:16px;padding:0 32px 20px;overflow:hidden;
     box-shadow:0 0 0 1px rgba(0,226,255,.05),0 30px 80px rgba(0,0,0,.5)}
   .pinc-bar{display:flex;align-items:center;gap:8px;background:#020a2e;border-bottom:1px solid var(--line);
@@ -571,8 +574,9 @@
     section{padding:52px 0}
     .nav-links{display:none}
     .nav-burger{display:block}
-    /* phone: no JOIN pill in the bar - the side menu carries the join button */
+    /* phone: no pills in the bar - the side menu carries login + join */
     .btn-nav{display:none}
+    .btn-login{display:none}
     .assure{grid-template-columns:1fr}
     .asr+.asr{border-left:none;border-top:1px solid var(--line)}
     .jt-full{display:none}
@@ -681,7 +685,8 @@
     <div class="nav-links">
       <a href="#inside">Inside</a><a href="#join">Membership</a><a href="#voices">Reviews</a><a href="#faq">FAQ</a>
     </div>
-    <a class="btn btn-cyan btn-nav" href="#join"><span class="jt-full">Join the Syndicate</span><span class="jt-short">Join</span></a>
+    <a class="btn btn-login" href="https://whop.com/login" target="_blank" rel="noopener">Log in</a>
+    <a class="btn btn-cyan btn-nav" href="#join"><span class="jt-full">Join Now</span><span class="jt-short">Join</span></a>
     <button class="nav-burger" id="navBurger" aria-label="Open menu"><span></span><span></span><span></span></button>
   </div>
 </div></nav>
@@ -694,7 +699,8 @@
   <a href="#join">Membership</a>
   <a href="#voices">Reviews</a>
   <a href="#faq">FAQ</a>
-  <a class="mnav-join" href="#join">Join the Syndicate</a>
+  <a href="https://whop.com/login" target="_blank" rel="noopener">Log in</a>
+  <a class="mnav-join" href="#join">Join Now</a>
 </aside>
 
 <div class="jm-ovl" id="jmOvl"></div>

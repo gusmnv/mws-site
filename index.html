@@ -76,19 +76,22 @@
   .mnav a{display:block;padding:17px 2px;font-family:'Sora',sans-serif;font-weight:600;font-size:17.5px;
     color:#c9d4ef;text-decoration:none;border-bottom:1px solid var(--line);transition:color .2s}
   .mnav a:hover{color:var(--cyan)}
-  .mnav a.mnav-join{margin-top:auto;text-align:center;background:#0b2c55;border:1px solid rgba(0,226,255,.4);
-    color:#eafcff;border-radius:9px;padding:16px 10px;font-size:13.5px;letter-spacing:.1em;text-transform:uppercase;
-    box-shadow:0 0 22px rgba(0,60,140,.45)}
-  .mnav a.mnav-join:hover{background:#0e3a6e;color:#fff}
+  .mnav a.mnav-join{margin-top:auto;text-align:center;background:linear-gradient(180deg,#7deeff,var(--cyan) 60%,#00b5cc);
+    border:none;color:#00131a;border-radius:13px;padding:17px 10px;font-size:14px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 26px rgba(0,226,255,.3)}
+  .mnav a.mnav-join:hover{color:#00131a;filter:brightness(1.06)}
+  .mnav a.mnav-login{text-align:center;border:1px solid var(--line2);border-radius:13px;border-bottom:1px solid var(--line2);
+    padding:15px 10px;margin-top:12px;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
+  .mnav a.mnav-login:hover{border-color:var(--cyan);color:var(--cyan)}
   .btn{display:inline-block;text-decoration:none;font-weight:500;letter-spacing:.1em;
     text-transform:uppercase;transition:.25s;border-radius:2px}
   .btn-cyan{background:linear-gradient(180deg,#7deeff,var(--cyan) 60%,#00b5cc);color:var(--void)}
   .btn-cyan:hover{background:var(--cyan-soft);box-shadow:0 0 34px rgba(0,226,255,.35)}
   .btn-line{border:1px solid var(--line2);color:var(--white)}
   .btn-line:hover{border-color:var(--cyan);color:var(--cyan)}
-  .btn-nav{padding:11px 26px;font-size:12px}
+  .btn-nav{padding:11px 26px;font-size:12px;border-radius:12px}
   .btn-login{padding:10px 22px;font-size:12px;border:1px solid var(--line2);color:var(--white);
-    background:transparent;margin-right:2px}
+    background:transparent;margin-right:2px;border-radius:12px}
   .btn-login:hover{border-color:var(--cyan);color:var(--cyan)}
 
   /* ── hero ─────────────────────────────── */
@@ -109,7 +112,7 @@
   .sub{color:var(--grey);font-size:18.5px;line-height:1.6;max-width:58ch;margin-top:22px;font-weight:300;opacity:0;margin-left:auto;margin-right:auto}
   .sub b{color:var(--white);font-weight:400}
   .hero-ctas{display:flex;gap:16px;margin-top:22px;flex-wrap:wrap;opacity:0;justify-content:center}
-  .btn-big{padding:17px 42px;font-size:13.5px}
+  .btn-big{padding:21px 64px;font-size:15px;border-radius:14px;font-weight:700}
   .hero-note{font-family:'IBM Plex Mono',monospace;color:var(--grey);font-size:11.5px;
     letter-spacing:.06em;margin-top:10px;opacity:0}
   @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
@@ -706,8 +709,8 @@
   <a href="#join">Membership</a>
   <a href="#voices">Reviews</a>
   <a href="#faq">FAQ</a>
-  <a href="https://whop.com/mrwallstreet-syndicate/exp_0aqLNZ3eZRIkEf/app/" target="_blank" rel="noopener">Log in</a>
   <a class="mnav-join" href="#join">Join Now</a>
+  <a class="mnav-login" href="https://whop.com/mrwallstreet-syndicate/exp_0aqLNZ3eZRIkEf/app/" target="_blank" rel="noopener">Log in</a>
 </aside>
 
 <div class="jm-ovl" id="jmOvl"></div>
@@ -732,7 +735,6 @@
     and a private network of serious traders and investors.</p>
     <div class="hero-ctas">
       <a class="btn btn-cyan btn-big" href="#join">Join the Syndicate</a>
-      <a class="btn btn-line btn-big" href="#inside">See inside</a>
     </div>
   </div>
 </header>

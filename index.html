@@ -638,7 +638,8 @@
   .jm-ovl{position:fixed;inset:0;background:rgba(2,6,18,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
     z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
   .jm-ovl.show{opacity:1;pointer-events:auto}
-  .jmodal{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(92vw,420px);
+  .jmodal{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(92vw,440px);
+    max-height:88vh;overflow-y:auto;
     background:#060c1e;border:1px solid var(--line2);border-radius:16px;padding:26px 22px 22px;z-index:95;
     opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 40px 120px rgba(0,0,0,.7)}
   .jmodal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
@@ -647,21 +648,37 @@
   .jm-title{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;letter-spacing:.24em;
     text-transform:uppercase;color:var(--cyan);text-align:center;margin-bottom:18px;
     text-shadow:0 0 16px rgba(0,226,255,.35)}
-  .jm-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    border:1px solid var(--line2);border-radius:11px;padding:15px 16px;margin-top:10px;
-    text-decoration:none;color:var(--white);transition:border-color .2s,transform .15s;background:rgba(255,255,255,.02)}
-  .jm-opt:hover{border-color:var(--cyan);transform:translateY(-1px)}
-  .jm-opt b{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;display:block}
-  .jm-opt span{color:var(--grey);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;display:block;margin-top:3px}
-  .jm-opt em{font-style:normal;color:var(--cyan);font-size:16px}
-  .jm-opt.jm-best{border-color:var(--cyan-dim);background:linear-gradient(135deg,rgba(0,226,255,.1),rgba(0,226,255,.03))}
-  .jm-opt.jm-best span{color:var(--cyan-soft)}
-  .jm-opt.jm-gold{border-color:rgba(255,214,0,.35);background:linear-gradient(135deg,rgba(255,214,0,.09),rgba(255,214,0,.02))}
-  .jm-opt.jm-gold em{color:var(--gold)}
-  .jm-opt b .jm-tag{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:9px;letter-spacing:.18em;
-    color:#00171d;background:var(--cyan);border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:2px;
-    display:inline-block;width:auto}
-  .jm-opt.jm-gold b .jm-tag{background:var(--gold);color:#1a1600}
+  .jm-opt{position:relative;display:block;background:var(--panel);border:1px solid var(--line2);
+    border-left-width:3px;border-radius:13px;padding:18px 58px 16px 20px;margin-top:14px;
+    text-decoration:none;transition:border-color .2s,transform .18s,box-shadow .2s}
+  .jm-opt:hover{transform:translateY(-2px)}
+  .jm-name{font-family:'Sora',sans-serif;font-weight:800;font-size:13px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--white)}
+  .jm-price{font-family:'Sora',sans-serif;font-weight:800;font-size:31px;line-height:1.1;margin-top:5px;
+    font-variant-numeric:tabular-nums}
+  .jm-price small{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:11px;color:var(--grey);
+    margin-left:7px;letter-spacing:.05em}
+  .jm-sub{color:var(--grey);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.04em;margin-top:6px}
+  .jm-opt em{font-style:normal;position:absolute;right:20px;top:50%;transform:translateY(-50%);
+    font-size:19px;transition:transform .2s}
+  .jm-opt:hover em{transform:translateY(-50%) translateX(4px)}
+  .jm-badge{position:absolute;top:-10px;right:18px;font-family:'IBM Plex Mono',monospace;font-weight:700;
+    font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:4px 10px;border-radius:6px}
+  /* accents - same system as the pricing cards */
+  .jm-opt.acc-w .jm-price{color:#f2f6ff;text-shadow:0 0 18px rgba(210,225,255,.22)}
+  .jm-opt.acc-w .jm-badge{background:#e7edf9;color:#0b1430}
+  .jm-opt.acc-w em{color:#dfe8f7}
+  .jm-opt.acc-w:hover{border-color:#dfe8f7}
+  .jm-opt.acc-c .jm-price{color:var(--cyan);text-shadow:0 0 22px rgba(0,226,255,.4)}
+  .jm-opt.acc-c .jm-badge{background:var(--cyan);color:#00171d}
+  .jm-opt.acc-c em{color:var(--cyan)}
+  .jm-opt.acc-c:hover{border-color:var(--cyan);box-shadow:0 0 34px rgba(0,226,255,.16)}
+  .jm-opt.acc-g .jm-price{color:var(--gold);text-shadow:0 0 22px rgba(255,214,0,.32)}
+  .jm-opt.acc-g .jm-badge{background:var(--gold);color:#1a1600}
+  .jm-opt.acc-g em{color:var(--gold)}
+  .jm-opt.acc-g:hover{border-color:var(--gold);box-shadow:0 0 34px rgba(255,214,0,.14)}
+  .jm-foot{margin-top:18px;text-align:center;color:var(--grey);font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;letter-spacing:.16em;text-transform:uppercase}
 </style>
 <noscript><style>.rv,.kicker,h1,.sub,.hero-ctas,.hero-note{opacity:1!important;transform:none!important}.tape{display:none}#boot{display:none}</style></noscript>
 </head>
@@ -723,12 +740,25 @@
 <div class="jmodal" id="jModal" role="dialog" aria-label="Choose your entry">
   <button class="jm-x" id="jmX" aria-label="Close">&#10005;</button>
   <div class="jm-title">Choose your entry</div>
-  <a class="jm-opt" href="https://whop.com/checkout/plan_zKhMuAvHoXfE2" target="_blank" rel="noopener">
-    <div><b>Monthly</b><span>$99 / month · cancel anytime</span></div><em>→</em></a>
-  <a class="jm-opt jm-best" href="https://whop.com/checkout/plan_0LdJbWcZD6tGE" target="_blank" rel="noopener">
-    <div><b>Yearly<span class="jm-tag">BEST VALUE</span></b><span>$990 / year · two months free</span></div><em>→</em></a>
-  <a class="jm-opt jm-gold" href="https://whop.com/checkout/plan_vuo4wah1I85pO" target="_blank" rel="noopener">
-    <div><b>Lifetime<span class="jm-tag">GOLDEN ENTRY</span></b><span>$3,990 · one payment, forever</span></div><em>→</em></a>
+  <a class="jm-opt acc-w" href="https://whop.com/checkout/plan_zKhMuAvHoXfE2" target="_blank" rel="noopener">
+    <span class="jm-badge">Most popular</span>
+    <div class="jm-name">Monthly</div>
+    <div class="jm-price">$99<small>/ month</small></div>
+    <div class="jm-sub">Cancel anytime · the easiest way in</div>
+    <em>→</em></a>
+  <a class="jm-opt acc-c" href="https://whop.com/checkout/plan_0LdJbWcZD6tGE" target="_blank" rel="noopener">
+    <span class="jm-badge">Best value</span>
+    <div class="jm-name">Yearly</div>
+    <div class="jm-price">$990<small>/ year</small></div>
+    <div class="jm-sub">$82.50 /mo · two months free</div>
+    <em>→</em></a>
+  <a class="jm-opt acc-g" href="https://whop.com/checkout/plan_vuo4wah1I85pO" target="_blank" rel="noopener">
+    <span class="jm-badge">Golden entry</span>
+    <div class="jm-name">Lifetime</div>
+    <div class="jm-price">$3,990<small>one-time</small></div>
+    <div class="jm-sub">One payment · everything, forever</div>
+    <em>→</em></a>
+  <div class="jm-foot">Secure checkout via Whop · instant access</div>
 </div>
 
 <header class="hero">

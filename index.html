@@ -527,11 +527,20 @@
   .soc.hot em{color:var(--cyan)}
 
   footer{border-top:1px solid var(--line);padding:44px 0;color:var(--grey);font-size:12.5px;text-align:center}
-  .foot-ch{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;margin-bottom:20px;
-    display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
-  .foot-ch a{color:var(--cyan-soft);text-decoration:none}
-  .foot-ch a:hover{color:var(--cyan)}
-  .foot-ch span{color:var(--line2)}
+  .foot-ch{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+  .fchip{display:inline-flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line2);
+    border-radius:12px;padding:13px 22px;min-width:190px;text-decoration:none;text-align:left;
+    transition:border-color .2s,transform .18s,box-shadow .2s}
+  .fchip:hover{transform:translateY(-2px)}
+  .fchip .fc-ic{width:20px;height:20px;flex:none}
+  .fchip b{display:block;font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;
+    color:var(--white);letter-spacing:.05em}
+  .fchip span{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    color:var(--grey);letter-spacing:.05em;margin-top:3px}
+  .fchip-x .fc-ic{fill:var(--white)}
+  .fchip-x:hover{border-color:rgba(255,255,255,.55)}
+  .fchip-cy .fc-ic{fill:none;stroke:var(--cyan);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .fchip-cy:hover{border-color:var(--cyan);box-shadow:0 0 28px rgba(0,226,255,.16)}
   footer .disc{max-width:78ch;margin:0 auto 22px}
   footer a{color:var(--cyan);text-decoration:none}
 
@@ -902,9 +911,12 @@
 
 <footer><div class="wrap">
   <div class="foot-ch">
-    <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">𝕏 @mrofwallstreet</a>
-    <span>·</span>
-    <a href="#join">Discord — members only</a>
+    <a class="fchip fchip-x" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">
+      <svg class="fc-ic" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zM17.083 19.77h1.833L7.084 4.126H5.117z"/></svg>
+      <div><b>X</b><span>@mrofwallstreet</span></div></a>
+    <a class="fchip fchip-cy jm-open" href="#join">
+      <svg class="fc-ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <div><b>The Syndicate</b><span>Members only · join now</span></div></a>
   </div>
   <div class="disc">Mr. Wall Street Syndicate provides educational content and market opinion only. Nothing here
   constitutes financial advice. Trading and investing involve substantial risk, including loss of capital.
@@ -1177,7 +1189,7 @@ document.querySelectorAll(".rv").forEach(el=>io.observe(el));
       jx=document.getElementById('jmX');
   if(!jm)return;
   function jset(o){jm.classList.toggle('show',o);jo.classList.toggle('show',o)}
-  var trigs=document.querySelectorAll('.btn-nav, .mnav-join');
+  var trigs=document.querySelectorAll('.btn-nav, .mnav-join, .jm-open');
   for(var i=0;i<trigs.length;i++){trigs[i].addEventListener('click',function(e){
     e.preventDefault();
     if(window.__closeMnav)window.__closeMnav();

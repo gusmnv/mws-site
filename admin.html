@@ -85,6 +85,16 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
 .scrim.on{opacity:1;pointer-events:auto}
 .view{display:none}.view.on{display:block}
+.pf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;align-items:end}
+.pf .field{margin:0}.pf .field.w2{grid-column:span 2}.pf .field.w3{grid-column:span 3}.pf .field.w6{grid-column:span 6}
+.pf textarea{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:12px 14px;outline:none;border-radius:0;min-height:74px;resize:vertical;width:100%}
+.pf .acts{grid-column:span 6;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pf select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:16px;line-height:1.55;padding:14px 16px;outline:none;border-radius:0;-webkit-appearance:none;width:100%}
+@media (max-width:1100px){.pf{grid-template-columns:repeat(3,minmax(0,1fr))}.pf .field.w3,.pf .field.w6,.pf .acts{grid-column:span 3}}
+@media (max-width:640px){.pf{grid-template-columns:1fr}.pf .field.w2,.pf .field.w3,.pf .field.w6,.pf .acts{grid-column:span 1}}
+.tbl td.wrap{white-space:normal;min-width:200px;max-width:300px;color:var(--fg-3);font-size:13px}
+.tbl td.acts{white-space:normal;min-width:130px;line-height:1.9}
+.tbl .pos{color:var(--fg)}.tbl .neg{color:var(--bad)}
 .setrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0}
 .setrow+.setrow{border-top:1px solid var(--line)}
 .setrow>div:last-child{white-space:nowrap}
@@ -111,11 +121,12 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <a href="#telegram" data-v="telegram"><i>04</i>Telegram</a>
       <div class="grp">Manage</div>
       <a href="#access" data-v="access"><i>05</i>Grant access</a>
-      <a href="#settings" data-v="settings"><i>06</i>Settings</a>
+      <a href="#portfolio" data-v="portfolio"><i>06</i>Portfolio</a>
+      <a href="#settings" data-v="settings"><i>07</i>Settings</a>
       <div class="grp">Preview</div>
-      <a href="/account" id="va-member"><i>→</i>View site as member</a>
+      <a href="/app" id="va-member"><i>→</i>View site as member</a>
     </nav>
-    <div class="me"><span>Signed in as</span><b id="me-email">…</b><div class="row"><a class="link" href="/account">My account</a><button class="link" id="out" type="button">Log out</button></div></div>
+    <div class="me"><span>Signed in as</span><b id="me-email">…</b><div class="row"><a class="link" href="/app">Member area</a><button class="link" id="out" type="button">Log out</button></div></div>
   </aside>
 
   <main class="mainx">
@@ -170,6 +181,31 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <div class="card rv d1" style="margin-top:22px"><h3>Manual access</h3><div class="tblw"><table class="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Ends</th><th>Note</th><th></th></tr></thead><tbody id="mrows"></tbody></table></div></div>
     </section>
 
+    <!-- PORTFOLIO -->
+    <section class="view" data-v="portfolio">
+      <div class="card rv"><h3 id="pf-title">Add a position <button class="link" id="pf-cancel" type="button" hidden>Cancel edit</button></h3>
+        <p class="small muted" style="margin-bottom:16px">What members see in The Desk → Portfolio, live. Entry and target are free text (write "16-18K" if you want). Fill <b>Entry price</b> and <b>Mark</b> with numbers when you want the P&amp;L shown.</p>
+        <form class="pf" id="f-pos" novalidate>
+          <input type="hidden" id="p-id">
+          <div class="field"><label for="p-symbol">Symbol</label><input id="p-symbol" type="text" placeholder="BTC" autocapitalize="characters"></div>
+          <div class="field w2"><label for="p-name">Name</label><input id="p-name" type="text" placeholder="Bitcoin"></div>
+          <div class="field"><label for="p-side">Side</label><select id="p-side"><option value="long">Long</option><option value="short">Short</option></select></div>
+          <div class="field"><label for="p-class">Class</label><select id="p-class"><option value="crypto">Crypto</option><option value="equity">Equity</option><option value="etf">ETF</option><option value="fx">FX</option><option value="commodity">Commodity</option><option value="other">Other</option></select></div>
+          <div class="field"><label for="p-size">Size %</label><input id="p-size" type="number" step="0.1" min="0" max="100" placeholder="10"></div>
+          <div class="field"><label for="p-entry">Entry (text)</label><input id="p-entry" type="text" placeholder="16-18K"></div>
+          <div class="field"><label for="p-entryp">Entry price</label><input id="p-entryp" type="number" step="any" placeholder="17000"></div>
+          <div class="field"><label for="p-mark">Mark</label><input id="p-mark" type="number" step="any" placeholder="83000"></div>
+          <div class="field"><label for="p-target">Target</label><input id="p-target" type="text" placeholder="130K"></div>
+          <div class="field"><label for="p-opened">Opened</label><input id="p-opened" type="date"></div>
+          <div class="field"><label for="p-sort">Order</label><input id="p-sort" type="number" placeholder="100"></div>
+          <div class="field w6"><label for="p-thesis">Thesis</label><textarea id="p-thesis" placeholder="Why we hold it, in two or three lines."></textarea></div>
+          <div class="acts"><button class="btn acc" type="submit" data-busy="Saving">Publish <span class="ar"></span></button><span class="small muted" id="pf-hint">Members see it the second you publish.</span></div>
+        </form>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3>Open positions <span class="small muted" id="pf-open-n"></span></h3><div class="tblw"><table class="tbl"><thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>Mark</th><th>P&amp;L</th><th>Target</th><th>Size</th><th>Since</th><th>Thesis</th><th></th></tr></thead><tbody id="pf-open"></tbody></table></div></div>
+      <div class="card rv d2" style="margin-top:22px"><h3>Closed · track record <span class="small muted" id="pf-closed-n"></span></h3><div class="tblw"><table class="tbl"><thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>Exit</th><th>Result</th><th>Opened</th><th>Closed</th><th>Thesis</th><th></th></tr></thead><tbody id="pf-closed"></tbody></table></div></div>
+    </section>
+
     <!-- SETTINGS -->
     <section class="view" data-v="settings">
       <div class="two">
@@ -196,15 +232,16 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
   var s = await sb.auth.getSession(); var user = s.data.session && s.data.session.user;
   if (!user) { M.go('/login?next=/admin'); return; }
   var me = (await sb.from('profiles').select('role,email').eq('id', user.id).maybeSingle()).data;
-  if (!me || ['owner','admin'].indexOf(me.role) < 0) { $('#subtitle').textContent = 'This page is for the owner.'; setTimeout(function(){ M.go('/account'); }, 1200); return; }
+  if (!me || ['owner','admin'].indexOf(me.role) < 0) { $('#subtitle').textContent = 'This page is for the owner.'; setTimeout(function(){ M.go('/app'); }, 1200); return; }
   $('#me-email').textContent = me.email;
   M.viewAs.set('');
   $('#out').addEventListener('click', async function(){ await sb.auth.signOut(); M.go('/'); });
   /* preview the member experience: presets replace the data on /account; a bar brings you back */
-  function previewAs(key){ M.viewAs.set(key || 'active'); M.go('/account'); }
+  function previewAs(key){ M.viewAs.set(key || 'active'); M.go('/app'); }
   $('#va-member').addEventListener('click', function(ev){ ev.preventDefault(); previewAs('active'); });
   function presetFor(e){ var m = e.best; if (!m) return 'none'; if (!e.valid) return 'canceled'; if (m.status === 'past_due') return 'pastdue'; if (m.cancel_at_period_end || m.status === 'canceling') return 'ending'; if (m.plan_key === 'lifetime') return 'lifetime'; if (!e.link) return 'joined'; return 'active'; }
 
+  var X = M.esc; /* every value that came from a user, Whop or Telegram is escaped before innerHTML */
   var D = { profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {} };
   var filter = 'all', q = '';
   var PRICE = { monthly: 99, yearly: 990, lifetime: 3990 };
@@ -217,7 +254,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     if ((st === 'canceled' || st === 'cancelled' || st === 'expired') && end && end > now) return true;
     if (st === 'past_due') { var since = new Date(m.past_due_since || m.updated_at); return since > new Date(now.getTime() - Number(D.settings.grace_days || 3) * 86400000); }
     return false; }
-  function rank(m){ return valid(m) ? (m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2) : 10; }
+  function rank(m){ if (!valid(m)) return 30; var tier = m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2; var st = (m.status === 'active' || m.status === 'trialing' || m.status === 'completed') ? 0 : m.status === 'past_due' ? 1 : 2; return tier * 3 + st; } /* mirrors my_access() */
 
   async function load(){
     var r = await Promise.all([
@@ -249,7 +286,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
   }
   function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].title; return pid ? 'Test' : '–'; }
-  function tag(cls, text){ return '<span class="tag ' + cls + '">' + text + '</span>'; }
+  function tag(cls, text){ return '<span class="tag ' + cls + '">' + X(text) + '</span>'; }
 
   function render(){
     var rows = people(), now = Date.now(), d30 = now - 30 * 86400000;
@@ -264,12 +301,12 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     $('#k-tg').textContent = D.links.length; $('#k-tg-sub').textContent = active.filter(function(e){ return e.profile && !e.link; }).length + ' active without Telegram';
     // attention
     var attn = [];
-    rows.filter(function(e){ return e.valid && !e.profile; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('', 'paid on Whop · no account') + '</li>'); });
-    rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('warn', 'no Telegram') + '</li>'); });
-    rows.filter(function(e){ return e.best && e.best.status === 'past_due'; }).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('warn', 'card failing · grace') + '</li>'); });
-    rows.filter(function(e){ return e.best && e.best.cancel_at_period_end && e.valid; }).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('', 'ends ' + M.fmtDate(e.best.renewal_period_end)) + '</li>'); });
+    rows.filter(function(e){ return e.valid && !e.profile; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'paid on Whop · no account') + '</li>'); });
+    rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'no Telegram') + '</li>'); });
+    rows.filter(function(e){ return e.best && e.best.status === 'past_due'; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'card failing · grace') + '</li>'); });
+    rows.filter(function(e){ return e.best && e.best.cancel_at_period_end && e.valid; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'ends ' + M.fmtDate(e.best.renewal_period_end)) + '</li>'); });
     $('#attn').innerHTML = attn.join('') || '<li class="muted">Everything is in order.</li>';
-    $('#feed').innerHTML = D.log.slice(0, 30).map(function(l){ var t = new Date(l.at); return '<div><time>' + t.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</time><span><b>' + l.action + '</b> ' + (l.subject || '') + (l.detail && l.detail.email ? ' · ' + l.detail.email : '') + (l.detail && l.detail.to ? ' → ' + l.detail.to : '') + '</span></div>'; }).join('');
+    $('#feed').innerHTML = D.log.slice(0, 30).map(function(l){ var t = new Date(l.at); return '<div><time>' + t.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</time><span><b>' + X(l.action) + '</b> ' + X(l.subject || '') + (l.detail && l.detail.email ? ' · ' + X(l.detail.email) : '') + (l.detail && l.detail.to ? ' → ' + X(l.detail.to) : '') + '</span></div>'; }).join('');
 
     // members table
     var list = rows.filter(function(e){
@@ -287,45 +324,45 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       var st = !e.best ? tag('', 'no plan') : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
       var acct = e.profile ? tag('ok', 'on site') + (e.profile.role !== 'member' ? ' ' + tag('', e.profile.role) : '') : tag('', 'no account');
       var joined = e.acc.filter(function(a){ return a.status === 'joined'; }).length;
-      var tg = e.link ? tag('ok', '@' + (e.link.telegram_username || e.link.telegram_id)) + ' <span class="small muted">' + joined + ' ch</span>' : (e.profile ? tag('warn', 'not connected') : '<span class="muted">–</span>');
+      var tg = e.link ? tag('ok', '@' + X(e.link.telegram_username || e.link.telegram_id)) + ' <span class="small muted">' + joined + ' ch</span>' : (e.profile ? tag('warn', 'not connected') : '<span class="muted">–</span>');
       var when = m.plan_key === 'lifetime' ? 'Lifetime' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–');
-      return '<tr data-e="' + e.email + '"><td class="em">' + e.email + '</td><td>' + (m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
+      return '<tr data-e="' + X(e.email) + '"><td class="em">' + X(e.email) + '</td><td>' + X(m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
     }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
     $('#count').textContent = list.length + ' of ' + rows.length;
 
     // payments
     $('#p-n').textContent = p30.filter(function(p){ return p.ok; }).length; $('#p-rev').textContent = fmtMoney(rev30); $('#p-fail').textContent = p30.filter(function(p){ return p.type === 'failed'; }).length;
     $('#p-all').textContent = fmtMoney(pays.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0));
-    $('#prow').innerHTML = pays.slice(0, 200).map(function(p){ return '<tr><td>' + M.fmtDate(p.at) + ' ' + p.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + (p.email || '–') + '</td><td>' + planName(p.plan) + '</td><td class="num">' + fmtMoney(p.amount) + ' ' + p.currency + '</td><td>' + (p.ok ? tag('ok', 'paid') : tag(p.type === 'failed' ? 'bad' : '', p.type)) + '</td><td class="small muted">' + p.ref + '</td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No payments through the site yet.</td></tr>';
+    $('#prow').innerHTML = pays.slice(0, 200).map(function(p){ return '<tr><td>' + M.fmtDate(p.at) + ' ' + p.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + X(p.email || '–') + '</td><td>' + X(planName(p.plan)) + '</td><td class="num">' + fmtMoney(p.amount) + ' ' + X(p.currency) + '</td><td>' + (p.ok ? tag('ok', 'paid') : tag(p.type === 'failed' ? 'bad' : '', p.type)) + '</td><td class="small muted">' + X(p.ref) + '</td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No payments through the site yet.</td></tr>';
 
     // telegram
     var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
-    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + D.channels.map(function(c){ return '<li><span>' + (c.title || c.chat_id) + ' <span class="small muted">' + c.chat_id + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + '</span></li>'; }).join('') + '</ul>' : '<p class="muted">No channels registered yet. Edit the bot\'s admin rights in each channel once and they appear here.</p>';
-    $('#notg').innerHTML = rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 12).map(function(e){ return '<li><span>' + e.email + '</span><span class="small muted">' + (e.best.plan_key || '') + '</span></li>'; }).join('') || '<li class="muted">Everyone with access is connected.</li>';
+    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + D.channels.map(function(c){ return '<li><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + '</span></li>'; }).join('') + '</ul>' : '<p class="muted">No channels registered yet. Edit the bot\'s admin rights in each channel once and they appear here.</p>';
+    $('#notg').innerHTML = rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 12).map(function(e){ return '<li><span>' + X(e.email) + '</span><span class="small muted">' + X(e.best.plan_key || '') + '</span></li>'; }).join('') || '<li class="muted">Everyone with access is connected.</li>';
 
     // access (manual)
     var man = D.memberships.filter(function(m){ return m.id.indexOf('manual_') === 0; });
-    $('#mrows').innerHTML = man.map(function(m){ return '<tr><td class="em">' + m.email + '</td><td>' + m.plan_key + '</td><td>' + (valid(m) ? tag('ok', 'active') : tag('bad', m.status)) + '</td><td>' + (m.plan_key === 'lifetime' ? 'Never' : M.fmtDate(m.renewal_period_end)) + '</td><td class="small muted">' + ((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? '<button class="link bad" data-a="revoke" data-id="' + m.id + '">Revoke</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No manual access yet.</td></tr>';
+    $('#mrows').innerHTML = man.map(function(m){ return '<tr><td class="em">' + X(m.email) + '</td><td>' + X(m.plan_key) + '</td><td>' + (valid(m) ? tag('ok', 'active') : tag('bad', m.status)) + '</td><td>' + (m.plan_key === 'lifetime' ? 'Never' : M.fmtDate(m.renewal_period_end)) + '</td><td class="small muted">' + X((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? '<button class="link bad" data-a="revoke" data-id="' + X(m.id) + '">Revoke</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No manual access yet.</td></tr>';
 
     // settings
     $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; $('#s-ttl').value = D.settings.invite_ttl_hours || 24;
-    $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + p.email + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
+    $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + X(p.email) + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
   }
 
   // drawer
   function openDrawer(email){
     var e = people().filter(function(x){ return x.email === email; })[0]; if (!e) return;
     var m = e.best || {};
-    var html = '<p class="eyebrow">Member</p><h2>' + e.email + '</h2>';
-    html += '<dl class="kv"><dt>Status</dt><dd>' + (e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + (m.plan_key || '–') + (m.id ? ' <span class="small muted">' + m.id + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + e.profile.role : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + (e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
-    if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + (c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : (a.status === 'removed' || a.status === 'blocked' || a.status === 'kick_failed') ? 'bad' : 'warn', a.status === 'kick_failed' ? 'remove failed' : a.status) + '</li>'; }).join('') + '</ul>';
-    if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return x.plan_key + ' · ' + x.status; }).join(' / ') + '</p>';
+    var html = '<p class="eyebrow">Member</p><h2>' + X(e.email) + '</h2>';
+    html += '<dl class="kv"><dt>Status</dt><dd>' + X(e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + X(m.plan_key || '–') + (m.id ? ' <span class="small muted">' + X(m.id) + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + X(e.profile.role) : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + X(e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
+    if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + X(c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : (a.status === 'removed' || a.status === 'blocked' || a.status === 'kick_failed') ? 'bad' : 'warn', a.status === 'kick_failed' ? 'remove failed' : a.status) + '</li>'; }).join('') + '</ul>';
+    if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return X(x.plan_key) + ' · ' + X(x.status); }).join(' / ') + '</p>';
     html += '<div class="stack">';
     var blocked = e.acc.some(function(a){ return a.status === 'blocked'; });
     if (blocked) html += '<p class="small muted">Removed by you. Automatic invites are paused for this member until you resend.</p>';
     if (e.profile && e.link && e.valid) html += '<button class="btn ghost" data-a="resend" data-u="' + e.profile.id + '" data-busy="Sending">' + (blocked ? 'Let them back in (resend invites)' : 'Resend Telegram invites') + '</button>';
     if (e.profile && e.link && !blocked) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
-    if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + m.id + '" data-busy="Revoking">Revoke manual access</button>';
+    if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + X(m.id) + '" data-busy="Revoking">Revoke manual access</button>';
     if (!e.valid) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
     html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
     html += '</div>';
@@ -362,13 +399,60 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
   $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Math.max(0, parseInt($('#s-grace').value, 10) || 0)) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Math.max(1, parseInt($('#s-ttl').value, 10) || 24)) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
   $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); try { await M.fn('admin', { action: 'set_role', email: em, role: $('#r-role').value }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } });
 
+  // portfolio (The Desk): staff writes public.positions directly (RLS: owner/admin only), members read it in /app#portfolio
+  var POS = [];
+  function num(v){ v = String(v == null ? '' : v).trim(); if (!v) return null; var n = Number(v); return isNaN(n) ? null : n; }
+  function fmtN(n){ if (n == null) return '—'; n = Number(n); return n >= 1000 ? n.toLocaleString('en-US', { maximumFractionDigits: 0 }) : n.toLocaleString('en-US', { maximumFractionDigits: n < 1 ? 4 : 2 }); }
+  function pnl(p){ if (p.entry_price == null || p.mark == null || !Number(p.entry_price)) return null; var r = (Number(p.mark) - Number(p.entry_price)) / Number(p.entry_price) * 100; return p.side === 'short' ? -r : r; }
+  function pnlTxt(p){ var r = pnl(p); if (r == null) return '—'; return '<span class="' + (r >= 0 ? 'pos' : 'neg') + '">' + (r >= 0 ? '+' : '') + r.toFixed(1) + '%</span>'; }
+  async function loadPositions(){
+    var r = await sb.from('positions').select('*').order('status', { ascending: true }).order('sort', { ascending: true }).order('opened_at', { ascending: false });
+    if (r.error) { M.msg('#m', 'Positions: ' + M.human(r.error), 'bad'); return; }
+    POS = r.data || [];
+    var open = POS.filter(function(p){ return p.status === 'open'; }), closed = POS.filter(function(p){ return p.status === 'closed'; });
+    $('#pf-open-n').textContent = open.length ? '· ' + open.length : ''; $('#pf-closed-n').textContent = closed.length ? '· ' + closed.length : '';
+    $('#pf-open').innerHTML = open.length ? open.map(function(p){ return '<tr data-id="' + X(p.id) + '"><td class="em">' + X(p.symbol) + (p.name ? ' <span class="small muted">' + X(p.name) + '</span>' : '') + '</td><td>' + tag(p.side === 'short' ? 'warn' : 'ok', p.side) + '</td><td>' + X(p.entry || fmtN(p.entry_price)) + '</td><td>' + X(fmtN(p.mark)) + (p.mark_at ? ' <span class="small muted">' + X(M.fmtDate(p.mark_at)) + '</span>' : '') + '</td><td>' + pnlTxt(p) + '</td><td>' + X(p.target || '—') + '</td><td>' + (p.size_pct != null ? X(p.size_pct) + '%' : '—') + '</td><td>' + X(p.opened_at ? M.fmtDate(p.opened_at) : '—') + '</td><td class="wrap">' + X(p.thesis || '') + '</td><td class="acts"><button class="link" data-pa="edit">Edit</button> · <button class="link" data-pa="mark">Mark</button> · <button class="link" data-pa="close">Close</button> · <button class="link" data-pa="del">Delete</button></td></tr>'; }).join('') : '<tr><td colspan="10" class="muted">No open positions. Publish the first one above.</td></tr>';
+    $('#pf-closed').innerHTML = closed.length ? closed.map(function(p){ return '<tr data-id="' + X(p.id) + '"><td class="em">' + X(p.symbol) + (p.name ? ' <span class="small muted">' + X(p.name) + '</span>' : '') + '</td><td>' + tag(p.side === 'short' ? 'warn' : 'ok', p.side) + '</td><td>' + X(p.entry || fmtN(p.entry_price)) + '</td><td>' + X(p.exit || '—') + '</td><td class="em">' + X(p.result || '—') + '</td><td>' + X(p.opened_at ? M.fmtDate(p.opened_at) : '—') + '</td><td>' + X(p.closed_at ? M.fmtDate(p.closed_at) : '—') + '</td><td class="wrap">' + X(p.thesis || '') + '</td><td class="acts"><button class="link" data-pa="edit">Edit</button> · <button class="link" data-pa="reopen">Reopen</button> · <button class="link" data-pa="del">Delete</button></td></tr>'; }).join('') : '<tr><td colspan="9" class="muted">Nothing closed yet.</td></tr>';
+  }
+  function pfFill(p){
+    $('#p-id').value = p ? p.id : ''; $('#p-symbol').value = p ? p.symbol : ''; $('#p-name').value = p ? (p.name || '') : ''; $('#p-side').value = p ? p.side : 'long'; $('#p-class').value = p ? p.asset_class : 'crypto';
+    $('#p-size').value = p && p.size_pct != null ? p.size_pct : ''; $('#p-entry').value = p ? (p.entry || '') : ''; $('#p-entryp').value = p && p.entry_price != null ? p.entry_price : ''; $('#p-mark').value = p && p.mark != null ? p.mark : '';
+    $('#p-target').value = p ? (p.target || '') : ''; $('#p-opened').value = p && p.opened_at ? String(p.opened_at).slice(0, 10) : ''; $('#p-sort').value = p ? p.sort : ''; $('#p-thesis').value = p ? (p.thesis || '') : '';
+    $('#pf-title').childNodes[0].textContent = p ? 'Edit ' + p.symbol + ' ' : 'Add a position '; $('#pf-cancel').hidden = !p; $('#f-pos .btn').firstChild.textContent = p ? 'Save ' : 'Publish ';
+    if (p) window.scrollTo(0, 0);
+  }
+  $('#pf-cancel').addEventListener('click', function(){ pfFill(null); });
+  $('#f-pos').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var symbol = $('#p-symbol').value.trim().toUpperCase(); if (!symbol) return M.msg('#m', 'Symbol is required.', 'bad');
+    var id = $('#p-id').value, old = POS.filter(function(p){ return p.id === id; })[0];
+    var mark = num($('#p-mark').value);
+    var row = { symbol: symbol, name: $('#p-name').value.trim() || null, side: $('#p-side').value, asset_class: $('#p-class').value, size_pct: num($('#p-size').value), entry: $('#p-entry').value.trim() || null, entry_price: num($('#p-entryp').value), mark: mark, mark_at: mark == null ? null : (old && old.mark != null && Number(old.mark) === mark ? old.mark_at : new Date().toISOString()), target: $('#p-target').value.trim() || null, opened_at: $('#p-opened').value || (old ? old.opened_at : new Date().toISOString().slice(0, 10)), sort: parseInt($('#p-sort').value, 10) || 100, thesis: $('#p-thesis').value.trim() || null };
+    var btn = $('#f-pos .btn'); M.busy(btn, true);
+    try { var r = id ? await sb.from('positions').update(row).eq('id', id) : await sb.from('positions').insert(row); if (r.error) throw r.error; M.msg('#m', id ? symbol + ' updated.' : symbol + ' published.', 'ok'); pfFill(null); await loadPositions(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); }
+  });
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-pa]'); if (!b) return; ev.stopPropagation();
+    var tr = b.closest('tr'), p = POS.filter(function(x){ return x.id === tr.dataset.id; })[0]; if (!p) return;
+    var a = b.dataset.pa;
+    try {
+      if (a === 'edit') { pfFill(p); return; }
+      if (a === 'mark') { var v = prompt('Last mark for ' + p.symbol + ' (number):', p.mark != null ? p.mark : ''); if (v == null) return; var n = num(v); if (n == null) return M.msg('#m', 'Enter a number.', 'bad'); var r1 = await sb.from('positions').update({ mark: n, mark_at: new Date().toISOString() }).eq('id', p.id); if (r1.error) throw r1.error; }
+      if (a === 'close') { var ex = prompt('Exit for ' + p.symbol + ' (text, e.g. "100-126K"):', ''); if (ex == null) return; var res = prompt('Result (text, e.g. "x7" or "+70%"):', ''); if (res == null) return; var r2 = await sb.from('positions').update({ status: 'closed', exit: ex.trim() || null, result: res.trim() || null, closed_at: new Date().toISOString().slice(0, 10) }).eq('id', p.id); if (r2.error) throw r2.error; }
+      if (a === 'reopen') { var r3 = await sb.from('positions').update({ status: 'open', closed_at: null }).eq('id', p.id); if (r3.error) throw r3.error; }
+      if (a === 'del') { if (!confirm('Delete ' + p.symbol + ' for good? Closing keeps it in the track record; deleting removes it everywhere.')) return; var r4 = await sb.from('positions').delete().eq('id', p.id); if (r4.error) throw r4.error; }
+      await loadPositions();
+    } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+
   // routing
-  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], members: ['Members', 'Everyone who has, had or paid for access.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], settings: ['Settings', 'Rules and team.'] };
+  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], members: ['Members', 'Everyone who has, had or paid for access.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
   function route(){ var v = (location.hash || '#overview').slice(1); if (!TITLES[v]) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0); }
   window.addEventListener('hashchange', route);
   document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-f]'); if (a) setFilter(a.dataset.f); });
-  route(); await load();
-  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, function(){ load(); }).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, function(){ load(); }).subscribe(); } catch (e) {}
+  route(); await load(); loadPositions();
+  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, function(){ load(); }).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, function(){ load(); }).on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ loadPositions(); }).subscribe(); } catch (e) {}
 })();
 </script>
 </body></html>

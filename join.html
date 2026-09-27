@@ -65,12 +65,16 @@
 <footer><div class="wrap"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></span></div></footer>
 <script>
 (async function(){
-  var M = window.MWS, C = M.config, $ = M.$;
+  var M = window.MWS, C = M.config, $ = M.$, sb = M.sb();
   var user = await M.header();
   var state = M.signupState();
   var qsPlan = M.qs('plan');
   if (qsPlan && C.PLANS[qsPlan]) state.plan = qsPlan;
   if (user && user.email) state.email = user.email;
+  /* a logged-in member with a live recurring plan must not buy a second one by accident */
+  var access = null;
+  if (user) { try { var ac = await sb.rpc('my_access'); access = ac.data; } catch (e) {} }
+  function hasRecurring(){ return access && access.valid && (access.plan_key === 'monthly' || access.plan_key === 'yearly') && !/^(cancel|expir)/.test(access.status || '') && !access.cancel_at_period_end; }
 
   /* plans */
   var order = ['monthly','yearly','lifetime'];
@@ -95,19 +99,26 @@
   var loaded = false;
   function pay(){
     var p = C.PLANS[state.plan]; if (!p) { show('s-plan'); return; }
+    if (hasRecurring() && state.plan !== 'lifetime') {
+      show('s-pay');
+      $('#pay-title').textContent = 'You already have an active ' + (C.PLANS[access.plan_key] || {}).title + ' plan';
+      $('#sum-plan').textContent = (C.PLANS[access.plan_key] || {}).title || 'Active plan'; $('#sum-price').textContent = ''; $('#sum-sub').textContent = 'Renews ' + M.fmtDate(access.renewal_period_end); $('#sum-email').textContent = state.email;
+      $('#whop-checkout').innerHTML = '<div class="msg on">Nothing to pay. Your ' + M.esc((C.PLANS[access.plan_key] || {}).title || 'current') + ' membership is active and renews on ' + M.esc(M.fmtDate(access.renewal_period_end)) + '.</div><div class="row" style="margin-top:18px"><a class="btn acc" href="/app#membership">Go to my membership <span class="ar"></span></a>' + (access.manage_url ? '<a class="btn ghost" href="' + M.esc(access.manage_url) + '" target="_blank" rel="noopener">Manage subscription</a>' : '') + '</div><p class="small muted" style="margin-top:14px">Want Lifetime instead? <a href="/join?plan=lifetime">Upgrade here</a>, then cancel the current plan under Manage subscription.</p>';
+      return;
+    }
     $('#sum-price').innerHTML = p.price + '<small>' + p.per + '</small>';
     $('#sum-sub').textContent = p.sub;
     $('#sum-plan').textContent = p.title;
     $('#sum-email').textContent = state.email;
     $('#pay-title').textContent = p.title + ' · ' + p.price + ' ' + p.per.replace('/ ','per ');
     var box = $('#whop-checkout');
-    box.innerHTML = '<p class="small muted"><span class="spin"></span>Loading secure checkout…</p>';
     var el = document.createElement('div');
     el.id = 'whop-checkout';
+    el.innerHTML = '<p class="small muted" style="padding:24px 0"><span class="spin"></span>Loading secure checkout…</p>'; /* replaced by the Whop iframe when it mounts */
     el.setAttribute('data-whop-checkout-plan-id', p.id);
     el.setAttribute('data-whop-checkout-theme', 'dark');
     el.setAttribute('data-whop-checkout-prefill-email', state.email);
-    el.setAttribute('data-whop-checkout-return-url', C.SITE + (user ? '/account?paid=1' : '/signup?status=success'));
+    el.setAttribute('data-whop-checkout-return-url', C.SITE + (user ? '/app?paid=1' : '/signup?status=success'));
     el.setAttribute('data-whop-checkout-on-complete', 'onWhopComplete');
     box.replaceWith(el);
     show('s-pay');
@@ -117,7 +128,7 @@
 
   M.onPaid = function(planId, receiptId){
     state.paid = true; state.receipt = receiptId || null; state.paidAt = Date.now(); save();
-    M.go(user ? '/account?paid=1' : '/signup?status=success');
+    M.go(user ? '/app?paid=1' : '/signup?status=success');
   };
 
   /* entry */

@@ -38,6 +38,15 @@
     <div class="row"><button class="link" type="button" id="back">← Back to log in</button><button class="btn acc" type="submit" data-busy="Sending">Send reset link <span class="ar"></span></button></div>
   </form>
 
+  <form class="panel rv" id="f-otp" hidden novalidate>
+    <div class="ttl"><h3>Confirm your email</h3></div>
+    <p class="muted small" style="margin-bottom:16px">This account was never confirmed. We just sent a 6-digit code to <b id="otp-email"></b>. Enter it to finish.</p>
+    <div class="field"><label for="otp">Code</label><div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></div></div>
+    <div class="msg" id="m-otp"></div>
+    <button class="btn acc wide" type="submit" data-busy="Confirming">Confirm and log in <span class="ar"></span></button>
+    <p class="small muted" style="margin-top:14px">No email? Check spam, or <button class="link" type="button" id="resend">send a new code</button>.</p>
+  </form>
+
   <p class="small muted rv d2" style="margin-top:22px">Already a member through Whop? Log in with the same email, or <a href="/signup">create your account</a> with it and your membership is recognised automatically.</p>
 </div></div></main>
 <footer><div class="wrap"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></span></div></footer>
@@ -45,8 +54,8 @@
 (async function(){
   var M = window.MWS, $ = M.$, sb = M.sb();
   var user = await M.header();
-  if (user) { M.go('/account'); return; }
-  var next = M.qs('next') || '/account'; if (!/^\/(?!\/)/.test(next)) next = '/account';
+  if (user) { M.go(M.safeNext(M.qs('next'))); return; }
+  var next = M.safeNext(M.qs('next'));
 
   $('#f-login').addEventListener('submit', async function(e){
     e.preventDefault();
@@ -55,7 +64,23 @@
     if (!pw) return M.msg('#m', 'Enter your password.', 'bad');
     var btn = $('#f-login .btn'); M.busy(btn, true); M.msg('#m', '');
     try { var r = await sb.auth.signInWithPassword({ email: email, password: pw }); if (r.error) throw r.error; M.go(next); }
-    catch (err) { M.msg('#m', M.human(err), 'bad'); M.busy(btn, false); }
+    catch (err) {
+      if (/Email not confirmed/i.test(err && err.message || '')) { pending = email; await sendCode(); $('#f-login').hidden = true; $('#f-otp').hidden = false; $('#otp').focus(); M.busy(btn, false); return; }
+      M.msg('#m', M.human(err), 'bad'); M.busy(btn, false);
+    }
+  });
+
+  /* account created but never confirmed (the code never arrived, or expired): send a fresh code and confirm here */
+  var pending = null;
+  async function sendCode(){ $('#otp-email').textContent = pending; try { var r = await sb.auth.resend({ type: 'signup', email: pending }); if (r.error) throw r.error; M.msg('#m-otp', 'Code sent. It can take a few seconds.', 'ok'); } catch (e) { M.msg('#m-otp', M.human(e), 'bad'); } }
+  $('#resend').addEventListener('click', sendCode);
+  $('#f-otp').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var code = $('#otp').value.replace(/\D/g, '');
+    if (code.length !== 6) return M.msg('#m-otp', 'Enter the 6-digit code.', 'bad');
+    var btn = $('#f-otp .btn'); M.busy(btn, true); M.msg('#m-otp', '');
+    try { var r = await sb.auth.verifyOtp({ email: pending, token: code, type: 'signup' }); if (r.error) throw r.error; M.go(next); }
+    catch (err) { M.msg('#m-otp', M.human(err), 'bad'); M.busy(btn, false); }
   });
 
   $('#forgot').addEventListener('click', function(){ $('#femail').value = $('#email').value; $('#f-login').hidden = true; $('#f-forgot').hidden = false; $('#femail').focus(); });
@@ -65,7 +90,7 @@
     var email = $('#femail').value.trim().toLowerCase();
     if (!M.validEmail(email)) return M.msg('#m-forgot', 'Enter a valid email address.', 'bad');
     var btn = $('#f-forgot .btn'); M.busy(btn, true);
-    try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: M.config.SITE + '/account?reset=1' }); if (r.error) throw r.error; M.msg('#m-forgot', 'If that email has an account, a reset link is on its way.', 'ok'); }
+    try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: M.config.SITE + '/app?reset=1' }); if (r.error) throw r.error; M.msg('#m-forgot', 'If that email has an account, a reset link is on its way.', 'ok'); }
     catch (err) { M.msg('#m-forgot', M.human(err), 'bad'); }
     finally { M.busy(btn, false); }
   });

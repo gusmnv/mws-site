@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Join the Syndicate — Mr. Wall Street</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/mws.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/mws.js"></script>
+<script>window.onWhopComplete = function(planId, receiptId){ window.MWS.onPaid && window.MWS.onPaid(planId, receiptId); };</script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<a class="brand" href="/" aria-label="Mr. Wall Street"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
+<nav aria-label="Primary"><a href="/#inside">Inside</a><a href="/#membership">Membership</a><a href="/#reviews">Reviews</a><a href="/#faq">FAQ</a></nav>
+<div class="right" id="hdr-actions"></div>
+</div></header>
+<main><div class="wrap">
+<div class="stage wide" id="stage">
+
+  <!-- step 1: plan -->
+  <section id="s-plan">
+    <div class="head rv"><p class="eyebrow"><b>/01</b>Choose your entry</p><h1>Every plan unlocks the full Syndicate.</h1><p>The only difference is how long you stay, and Lifetime never pays again.</p></div>
+    <div class="steps rv d1"><span class="on">Plan</span><span>Email</span><span>Payment</span><span>Account</span></div>
+    <div class="plans rv d2" id="plans"></div>
+    <div class="assure rv d3"><span>Secure checkout</span><span>Apple Pay · Google Pay · Card</span><span>Telegram access in seconds</span></div>
+  </section>
+
+  <!-- step 2: email -->
+  <section id="s-email" hidden>
+    <div class="head"><p class="eyebrow"><b>/02</b>Your email</p><h1>Where should your access go?</h1><p>This email becomes your Mr. Wall Street account after payment. Use one you check.</p></div>
+    <div class="steps"><span class="done">Plan</span><span class="on">Email</span><span>Payment</span><span>Account</span></div>
+    <div class="stage" style="margin:0">
+      <form class="panel" id="f-email" novalidate>
+        <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required></div>
+        <div class="msg" id="m-email"></div>
+        <div class="row"><button class="link" type="button" id="back-plan">← Change plan</button><button class="btn acc" type="submit" data-busy="Preparing">Continue to payment <span class="ar"></span></button></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- step 3: payment -->
+  <section id="s-pay" hidden>
+    <div class="head"><p class="eyebrow"><b>/03</b>Payment</p><h1 id="pay-title">Secure checkout.</h1><p>Pay inside Mr. Wall Street. Your access unlocks the second the payment clears.</p></div>
+    <div class="steps"><span class="done">Plan</span><span class="done">Email</span><span class="on">Payment</span><span>Account</span></div>
+    <div class="co">
+      <div class="pay"><div id="whop-checkout"></div><div class="msg" id="m-pay"></div></div>
+      <aside class="sum">
+        <p class="eyebrow">Order</p>
+        <div><div class="big" id="sum-price"></div><p class="muted small" id="sum-sub" style="margin-top:10px"></p></div>
+        <dl class="kv"><dt>Plan</dt><dd id="sum-plan"></dd><dt>Email</dt><dd id="sum-email"></dd><dt>Access</dt><dd>All Syndicate Telegram channels</dd></dl>
+        <p class="small muted">After payment you will create your password and connect Telegram. Takes one minute.</p>
+        <button class="link" type="button" id="back-email">← Change email or plan</button>
+      </aside>
+    </div>
+  </section>
+
+</div>
+</div></main>
+<footer><div class="wrap"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></span></div></footer>
+<script>
+(async function(){
+  var M = window.MWS, C = M.config, $ = M.$;
+  var user = await M.header();
+  var state = M.store.get('mws_signup') || {};
+  var qsPlan = M.qs('plan');
+  if (qsPlan && C.PLANS[qsPlan]) state.plan = qsPlan;
+  if (user && user.email) state.email = user.email;
+
+  /* plans */
+  var order = ['monthly','yearly','lifetime'];
+  $('#plans').innerHTML = order.map(function(k){ var p = C.PLANS[k]; return '<div class="plan" data-k="'+k+'" role="button" tabindex="0"><span class="k">'+p.title+'<em>'+p.tag+'</em></span><div class="price">'+p.price+'<small>'+p.per+'</small></div><p class="sub">'+p.sub+'</p><ul><li>All Telegram channels'+(k==='lifetime'?', forever':'')+'</li><li>Every trade and investment, in real time</li><li>Direct access in the private chat</li></ul><span class="btn'+(k==='yearly'?' acc':'')+'">'+(k==='lifetime'?'Take the golden entry':'Join '+k)+' <span class="ar"></span></span></div>'; }).join('');
+  M.$$('.plan').forEach(function(el){ el.addEventListener('click', function(){ choose(el.dataset.k); }); el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') choose(el.dataset.k); }); });
+
+  function show(id){ ['s-plan','s-email','s-pay'].forEach(function(s){ $('#'+s).hidden = (s!==id); }); window.scrollTo({top:0,behavior:'smooth'}); }
+  function save(){ M.store.set('mws_signup', state); }
+
+  function choose(k){ state.plan = k; save(); M.$$('.plan').forEach(function(el){ el.classList.toggle('sel', el.dataset.k===k); }); if (state.email) { pay(); } else { $('#email').value = ''; show('s-email'); setTimeout(function(){ $('#email').focus(); }, 300); } }
+
+  $('#back-plan').addEventListener('click', function(){ show('s-plan'); });
+  $('#back-email').addEventListener('click', function(){ if (user) { show('s-plan'); } else { show('s-email'); } });
+
+  $('#f-email').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('#email').value.trim().toLowerCase();
+    if (!M.validEmail(v)) { M.msg('#m-email', 'Enter a valid email address.', 'bad'); $('#email').closest('.field').classList.add('err'); return; }
+    state.email = v; save(); pay();
+  });
+
+  var loaded = false;
+  function pay(){
+    var p = C.PLANS[state.plan]; if (!p) { show('s-plan'); return; }
+    $('#sum-price').innerHTML = p.price + '<small>' + p.per + '</small>';
+    $('#sum-sub').textContent = p.sub;
+    $('#sum-plan').textContent = p.title;
+    $('#sum-email').textContent = state.email;
+    $('#pay-title').textContent = p.title + ' · ' + p.price + ' ' + p.per.replace('/ ','per ');
+    var box = $('#whop-checkout');
+    box.innerHTML = '<p class="small muted"><span class="spin"></span>Loading secure checkout…</p>';
+    var el = document.createElement('div');
+    el.id = 'whop-checkout';
+    el.setAttribute('data-whop-checkout-plan-id', p.id);
+    el.setAttribute('data-whop-checkout-theme', 'dark');
+    el.setAttribute('data-whop-checkout-prefill-email', state.email);
+    el.setAttribute('data-whop-checkout-return-url', C.SITE + (user ? '/account?paid=1' : '/signup?status=success'));
+    el.setAttribute('data-whop-checkout-on-complete', 'onWhopComplete');
+    box.replaceWith(el);
+    show('s-pay');
+    if (!loaded) { loaded = true; var s = document.createElement('script'); s.src = C.WHOP_LOADER; s.async = true; s.defer = true; s.onerror = function(){ M.msg('#m-pay', 'The secure checkout could not load. Disable ad blockers for this page or try another browser.', 'bad'); }; document.head.appendChild(s); }
+    else if (window.wco && window.wco.load) { try { window.wco.load(); } catch(e){} }
+  }
+
+  M.onPaid = function(planId, receiptId){
+    state.paid = true; state.receipt = receiptId || null; state.paidAt = Date.now(); save();
+    M.go(user ? '/account?paid=1' : '/signup?status=success');
+  };
+
+  /* entry */
+  if (M.qs('status') === 'error') M.msg('#m-pay', 'The payment did not go through. You can try again.', 'bad');
+  if (state.plan && qsPlan) { choose(state.plan); }
+  else if (state.plan) { M.$$('.plan').forEach(function(el){ el.classList.toggle('sel', el.dataset.k===state.plan); }); }
+})();
+</script>
+</body></html>

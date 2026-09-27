@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Log in — Mr. Wall Street</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/mws.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/mws.js"></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<a class="brand" href="/" aria-label="Mr. Wall Street"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
+<nav aria-label="Primary"><a href="/#inside">Inside</a><a href="/#membership">Membership</a><a href="/#reviews">Reviews</a><a href="/#faq">FAQ</a></nav>
+<div class="right" id="hdr-actions"></div>
+</div></header>
+<main><div class="wrap"><div class="stage">
+  <div class="head rv"><p class="eyebrow"><b>/</b>Log in</p><h1>Welcome back.</h1><p>Your account, your plan, your access to the Syndicate.</p></div>
+
+  <form class="panel rv d1" id="f-login" novalidate>
+    <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com"></div>
+    <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Your password"></div>
+    <div class="msg" id="m"></div>
+    <button class="btn acc wide" type="submit" data-busy="Logging in">Log in <span class="ar"></span></button>
+    <div class="row" style="margin-top:16px"><button class="link" type="button" id="forgot">Forgot password?</button><a class="link" href="/join">No account yet? Join</a></div>
+  </form>
+
+  <form class="panel rv" id="f-forgot" hidden novalidate>
+    <div class="ttl"><h3>Reset your password</h3></div>
+    <p class="muted small" style="margin-bottom:16px">Enter your email and we will send you a link to set a new password.</p>
+    <div class="field"><label for="femail">Email</label><input id="femail" type="email" autocomplete="email" inputmode="email"></div>
+    <div class="msg" id="m-forgot"></div>
+    <div class="row"><button class="link" type="button" id="back">← Back to log in</button><button class="btn acc" type="submit" data-busy="Sending">Send reset link <span class="ar"></span></button></div>
+  </form>
+
+  <p class="small muted rv d2" style="margin-top:22px">Already a member through Whop? Log in with the same email, or <a href="/signup">create your account</a> with it and your membership is recognised automatically.</p>
+</div></div></main>
+<footer><div class="wrap"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></span></div></footer>
+<script>
+(async function(){
+  var M = window.MWS, $ = M.$, sb = M.sb();
+  var user = await M.header();
+  if (user) { M.go('/account'); return; }
+  var next = M.qs('next') || '/account';
+
+  $('#f-login').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var email = $('#email').value.trim().toLowerCase(), pw = $('#pw').value;
+    if (!M.validEmail(email)) return M.msg('#m', 'Enter a valid email address.', 'bad');
+    if (!pw) return M.msg('#m', 'Enter your password.', 'bad');
+    var btn = $('#f-login .btn'); M.busy(btn, true); M.msg('#m', '');
+    try { var r = await sb.auth.signInWithPassword({ email: email, password: pw }); if (r.error) throw r.error; M.go(next); }
+    catch (err) { M.msg('#m', M.human(err), 'bad'); M.busy(btn, false); }
+  });
+
+  $('#forgot').addEventListener('click', function(){ $('#femail').value = $('#email').value; $('#f-login').hidden = true; $('#f-forgot').hidden = false; $('#femail').focus(); });
+  $('#back').addEventListener('click', function(){ $('#f-forgot').hidden = true; $('#f-login').hidden = false; });
+  $('#f-forgot').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var email = $('#femail').value.trim().toLowerCase();
+    if (!M.validEmail(email)) return M.msg('#m-forgot', 'Enter a valid email address.', 'bad');
+    var btn = $('#f-forgot .btn'); M.busy(btn, true);
+    try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: M.config.SITE + '/account?reset=1' }); if (r.error) throw r.error; M.msg('#m-forgot', 'If that email has an account, a reset link is on its way.', 'ok'); }
+    catch (err) { M.msg('#m-forgot', M.human(err), 'bad'); }
+    finally { M.busy(btn, false); }
+  });
+})();
+</script>
+</body></html>

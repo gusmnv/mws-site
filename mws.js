@@ -8,7 +8,8 @@ window.MWS = window.MWS || {};
     PLANS: {
       monthly: { id: "plan_zKhMuAvHoXfE2", title: "Monthly", price: "$99", per: "/ month", tag: "Most popular", sub: "Cancel anytime. The easiest way in." },
       yearly:  { id: "plan_0LdJbWcZD6tGE", title: "Yearly",  price: "$990", per: "/ year", tag: "Best value", sub: "$82.50 a month, billed annually. Two months free." },
-      lifetime:{ id: "plan_vuo4wah1I85pO", title: "Lifetime", price: "$3,990", per: "one-time", tag: "Golden entry", sub: "One payment. Everything, forever. Immune to price rises." }
+      lifetime:{ id: "plan_vuo4wah1I85pO", title: "Lifetime", price: "$3,990", per: "one-time", tag: "Golden entry", sub: "One payment. Everything, forever. Immune to price rises." },
+      test:    { id: "plan_YLIcoMLF4LFih", title: "Test", price: "$1", per: "one-time", tag: "Internal", sub: "Internal test plan. Not for members.", hidden: true }
     },
     WHOP_LOADER: "https://js.whop.com/static/checkout/loader.js"
   };

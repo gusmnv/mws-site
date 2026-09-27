@@ -153,3 +153,15 @@ footer a{text-decoration:none;color:var(--fg-3)}footer a:hover{color:var(--fg)}
 .rv.d1{animation-delay:.08s}.rv.d2{animation-delay:.16s}.rv.d3{animation-delay:.24s}
 @keyframes rv{to{opacity:1;transform:none}}
 [hidden]{display:none!important}
+
+/* view-as-member bar (owners) */
+.viewbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:95;display:flex;align-items:center;gap:12px;background:var(--fg);color:#0A0A0B;padding:9px 10px 9px 16px;font-size:13px;box-shadow:0 12px 40px rgba(0,0,0,.55);max-width:calc(100% - 24px);white-space:nowrap}
+.viewbar .dot{width:8px;height:8px;border-radius:50%;background:#0A0A0B;animation:vpulse 1.6s ease-in-out infinite}
+@keyframes vpulse{0%,100%{opacity:1}50%{opacity:.25}}
+.viewbar .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.viewbar select{background:transparent;border:1px solid rgba(10,10,11,.35);color:#0A0A0B;font:inherit;font-size:13px;padding:6px 8px;outline:none;border-radius:0;max-width:56vw;text-overflow:ellipsis}
+.viewbar a{color:#0A0A0B;text-decoration:underline;text-underline-offset:3px;padding:0 4px}
+.viewbar button{background:#0A0A0B;color:var(--fg);border:0;font:inherit;font-size:13px;font-weight:500;padding:8px 12px;cursor:pointer}
+@media (max-width:600px){.viewbar{left:12px;right:12px;transform:none;flex-wrap:wrap;white-space:normal;justify-content:space-between;padding:10px 12px}.viewbar .lbl,.viewbar .dot{display:none}.viewbar select{max-width:100%;flex:1 1 100%}}
+.toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:96;background:var(--bg-3);border:1px solid var(--line-2);color:var(--fg);padding:10px 14px;font-size:13px;display:none;max-width:calc(100% - 24px);text-align:center}
+body.sim #grid .btn,body.sim #grid .link,body.sim #grid .tgl{cursor:not-allowed}

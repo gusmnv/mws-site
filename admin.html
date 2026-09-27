@@ -13,174 +13,353 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/mws.js"></script>
 <style>
-.adm-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:28px}
-.adm-kpis div{background:var(--bg);padding:22px 24px}
-.adm-kpis b{display:block;font-size:34px;line-height:1;letter-spacing:-.04em;font-weight:400;font-variant-numeric:tabular-nums}
-.adm-kpis span{display:block;margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
-.adm-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
-.adm-bar input{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:10px 14px;outline:none;min-width:260px;border-radius:0;-webkit-appearance:none}
-.adm-bar input:focus{border-color:var(--fg-2)}
-.adm-bar .seg{display:flex;border:1px solid var(--line-2)}
-.adm-bar .seg button{background:none;border:0;color:var(--fg-3);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 14px;cursor:pointer;border-right:1px solid var(--line-2)}
-.adm-bar .seg button:last-child{border-right:0}
-.adm-bar .seg button.on{color:var(--fg);background:var(--bg-3)}
-.adm-bar .sp{flex:1}
-.tbl{width:100%;border-collapse:collapse;border:1px solid var(--line);font-size:14px}
-.tbl th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg-2)}
-.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--fg-2)}
+body{display:block}
+header.top{display:none}
+.dash{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100svh}
+.side{border-right:1px solid var(--line);background:var(--bg);position:sticky;top:0;height:100svh;display:flex;flex-direction:column;padding:18px 14px}
+.side .brand{padding:6px 10px 22px}
+.side .brand span{font-size:12px;letter-spacing:.2em;white-space:nowrap}
+.side nav{display:flex;flex-direction:column;gap:2px}
+.side nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;color:var(--fg-2);text-decoration:none;font-size:14px;font-weight:500;border:1px solid transparent;transition:background .2s,color .2s}
+.side nav a i{font-family:var(--mono);font-size:11px;color:var(--fg-3);width:18px;text-align:center;font-style:normal}
+.side nav a:hover{color:var(--fg);background:var(--bg-2)}
+.side nav a.on{color:var(--fg);background:var(--bg-3);border-color:var(--line-2)}
+.side nav a.on i{color:var(--fg)}
+.side .grp{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:18px 12px 8px}
+.side .me{margin-top:auto;padding:14px 12px;border-top:1px solid var(--line);font-size:13px;color:var(--fg-2)}
+.side .me b{display:block;color:var(--fg);font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.side .me .row{margin-top:10px}
+.mainx{padding:26px clamp(20px,3vw,44px) 60px;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
+.topbar h1{font-size:28px;letter-spacing:-.03em}
+.topbar .sub{color:var(--fg-3);font-size:14px;margin-top:4px}
+.topbar .acts{display:flex;gap:10px;align-items:center}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:22px}
+.kpis>div{background:var(--bg);padding:20px 22px;min-height:118px;display:flex;flex-direction:column;min-width:0}
+.kpis b{display:block;font-size:32px;line-height:1;letter-spacing:-.04em;font-weight:400;font-variant-numeric:tabular-nums;margin-top:14px}
+.kpis span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+.kpis em{font-style:normal;font-size:12.5px;color:var(--fg-3);margin-top:auto;padding-top:8px;display:block}
+.two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
+.card{background:var(--bg);border:1px solid var(--line);padding:22px;min-width:0}
+.card h3{font-size:15px;font-weight:500;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.card h3 .link{font-size:13px;color:var(--fg-3)}
+.feed{font-size:13.5px}
+.feed div{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:9px 0;border-top:1px solid var(--line);color:var(--fg-2)}
+.feed div:first-child{border-top:0}
+.feed time{font-family:var(--mono);font-size:11px;color:var(--fg-3);padding-top:3px}
+.feed b{color:var(--fg);font-weight:500}
+.attn li{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.attn li>span:first-child{word-break:break-all}
+.attn li:first-child{border-top:0}
+.attn{list-style:none;margin:0;padding:0}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar input[type=search]{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:10px 14px;outline:none;width:280px;max-width:100%;border-radius:0;-webkit-appearance:none}
+.bar input:focus{border-color:var(--fg-2)}
+.seg{display:flex;border:1px solid var(--line-2);overflow:auto}
+.seg button{background:none;border:0;color:var(--fg-3);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 13px;cursor:pointer;border-right:1px solid var(--line-2);white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button.on{color:var(--fg);background:var(--bg-3)}
+.sp{flex:1}
+.tblw{overflow-x:auto;border:1px solid var(--line)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:820px}
+.tbl th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg-2);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--fg-2);white-space:nowrap}
 .tbl td.em{color:var(--fg);font-weight:500}
 .tbl tr:last-child td{border-bottom:0}
-.tbl .act{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover td{background:var(--bg-2)}
+.tbl .act{display:flex;gap:10px;justify-content:flex-end}
 .tbl .link{font-size:13px}
-.tbl .link.bad{color:var(--bad)}
+.link.bad{color:var(--bad)}
+.num{font-variant-numeric:tabular-nums;text-align:right}
 .grant{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,2fr) auto;gap:12px;align-items:end}
 .grant .field{margin:0}
-.grant select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:13px 14px;outline:none;border-radius:0;-webkit-appearance:none}
-.log{font-family:var(--mono);font-size:12px;color:var(--fg-3);line-height:1.7;max-height:320px;overflow:auto}
-.log b{color:var(--fg-2);font-weight:500}
-.wrapx{overflow-x:auto}
-@media (max-width:1000px){.adm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grant{grid-template-columns:1fr 1fr}.grant .field:first-child,.grant .field:nth-child(4){grid-column:1/-1}}
+select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:16px;line-height:1.55;padding:14px 16px;outline:none;border-radius:0;-webkit-appearance:none;width:100%;height:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--bg);border-left:1px solid var(--line-2);z-index:80;padding:26px;overflow:auto;transform:translateX(102%);transition:transform .35s var(--ease)}
+.drawer.on{transform:none}
+.drawer .x{position:absolute;top:18px;right:18px}
+.drawer h2{font-size:20px;letter-spacing:-.02em;word-break:break-all;margin:0 40px 6px 0}
+.drawer .kv{margin:18px 0}
+.drawer .stack{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.drawer .stack .btn{justify-content:center}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.view{display:none}.view.on{display:block}
+.setrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0}
+.setrow+.setrow{border-top:1px solid var(--line)}
+.setrow>div:last-child{white-space:nowrap}
+.team{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;margin-top:14px}
+.team input,.team select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:0 12px;height:42px;outline:none;border-radius:0;-webkit-appearance:none;min-width:0}
+.team .btn.sm{height:42px;padding-block:0}
+.setrow b{font-weight:500;display:block}
+.setrow span{font-size:13px;color:var(--fg-3)}
+.setrow input{width:90px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;padding:8px 10px;outline:none;text-align:right}
+.mob{display:none}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}.grant{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grant .field:first-child,.grant .field:nth-child(4),.grant .btn{grid-column:1/-1}}
+@media (max-width:860px){.dash{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}.side,.mainx{min-width:0}.topbar{flex-wrap:wrap}.topbar h1{font-size:24px}.bar input[type=search]{width:100%}.side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px 14px}.side nav{flex-direction:row;overflow:auto;gap:4px}.side nav a{white-space:nowrap;padding:9px 12px}.side .grp,.side .me,.side .brand span{display:none}.side .brand{padding:0 0 10px}.mob{display:block}}
+@media (max-width:600px){.kpis{grid-template-columns:minmax(0,1fr)}.kpis>div{min-height:0;padding:16px 18px}.kpis b{margin-top:8px}.kpis em{margin-top:6px}.mainx{padding:18px 16px 48px}.team{grid-template-columns:minmax(0,1fr) auto}.team .btn{grid-column:1/-1}.drawer{padding:22px 18px}}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap">
-<a class="brand" href="/" aria-label="Mr. Wall Street"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
-<nav aria-label="Primary"><a href="/#inside">Inside</a><a href="/#membership">Membership</a><a href="/#reviews">Reviews</a><a href="/#faq">FAQ</a></nav>
-<div class="right" id="hdr-actions"></div>
-</div></header>
-<main><div class="wrap"><div class="stage" style="max-width:1320px">
-  <div class="head rv"><p class="eyebrow"><b>/</b>Admin</p><h1 id="h">Syndicate desk.</h1><p id="sub">Loading…</p></div>
+<div class="dash">
+  <aside class="side">
+    <a class="brand" href="/"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
+    <nav id="nav">
+      <a href="#overview" data-v="overview"><i>01</i>Overview</a>
+      <a href="#members" data-v="members"><i>02</i>Members</a>
+      <a href="#payments" data-v="payments"><i>03</i>Payments</a>
+      <a href="#telegram" data-v="telegram"><i>04</i>Telegram</a>
+      <div class="grp">Manage</div>
+      <a href="#access" data-v="access"><i>05</i>Grant access</a>
+      <a href="#settings" data-v="settings"><i>06</i>Settings</a>
+      <div class="grp">Preview</div>
+      <a href="/account" id="va-member"><i>→</i>View site as member</a>
+    </nav>
+    <div class="me"><span>Signed in as</span><b id="me-email">…</b><div class="row"><a class="link" href="/account">My account</a><button class="link" id="out" type="button">Log out</button></div></div>
+  </aside>
 
-  <div id="adm" hidden>
-    <div class="adm-kpis rv d1">
-      <div><b id="k-active">–</b><span>Active access</span></div>
-      <div><b id="k-site">–</b><span>Accounts on the site</span></div>
-      <div><b id="k-whop">–</b><span>Paid on Whop, no account yet</span></div>
-      <div><b id="k-tg">–</b><span>Telegram connected</span></div>
-    </div>
+  <main class="mainx">
+    <div class="topbar"><div><h1 id="title">Overview</h1><div class="sub" id="subtitle">Loading…</div></div><div class="acts"><span class="small muted" id="upd"></span><button class="btn sm ghost" id="sync" type="button" data-busy="Syncing">Sync with Whop</button></div></div>
+    <div class="msg" id="m"></div>
 
-    <div class="panel rv d2" style="margin-bottom:28px">
-      <div class="ttl"><h3>Grant access manually</h3><span class="small muted">Crypto / wire / courtesy. The member creates the account with this email and gets access automatically.</span></div>
-      <form class="grant" id="f-grant" novalidate>
-        <div class="field"><label for="g-email">Email</label><input id="g-email" type="email" placeholder="member@email.com"></div>
-        <div class="field"><label for="g-plan">Plan</label><select id="g-plan"><option value="monthly">Monthly</option><option value="yearly">Yearly</option><option value="lifetime" selected>Lifetime</option></select></div>
-        <div class="field"><label for="g-months">Months</label><input id="g-months" type="number" min="1" max="120" placeholder="auto"></div>
-        <div class="field"><label for="g-note">Note</label><input id="g-note" type="text" placeholder="paid in USDT 27 Sep"></div>
-        <button class="btn acc" type="submit" data-busy="Granting">Grant <span class="ar"></span></button>
-      </form>
-      <div class="msg" id="m-grant"></div>
-    </div>
+    <!-- OVERVIEW -->
+    <section class="view" data-v="overview">
+      <div class="kpis rv">
+        <div><span>Active members</span><b id="k-active">–</b><em id="k-active-sub"></em></div>
+        <div><span>Monthly run-rate</span><b id="k-mrr">–</b><em>From active plans · est.</em></div>
+        <div><span>Revenue · 30 days</span><b id="k-rev">–</b><em id="k-rev-sub">Payments via the site</em></div>
+        <div><span>Telegram connected</span><b id="k-tg">–</b><em id="k-tg-sub"></em></div>
+      </div>
+      <div class="two">
+        <div class="card rv d1"><h3>Needs attention <a class="link" href="#members">All members</a></h3><ul class="attn" id="attn"></ul></div>
+        <div class="card rv d2"><h3>Recent activity</h3><div class="feed" id="feed"></div></div>
+      </div>
+    </section>
 
-    <div class="adm-bar rv d2">
-      <input id="q" type="search" placeholder="Search email…">
-      <div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ended">Ended</button></div>
-      <span class="sp"></span>
-      <button class="btn sm ghost" id="sync" type="button" data-busy="Syncing">Sync with Whop</button>
-    </div>
-    <div class="wrapx rv d3"><table class="tbl" id="tbl"><thead><tr><th>Email</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
-    <p class="small muted" id="count" style="margin-top:10px"></p>
+    <!-- MEMBERS -->
+    <section class="view" data-v="members">
+      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button></div><span class="sp"></span><span class="small muted" id="count"></span></div>
+      <div class="tblw"><table class="tbl" id="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th>Since</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </section>
 
-    <div class="panel rv d3" style="margin-top:28px">
-      <div class="ttl"><h3>Recent activity</h3></div>
-      <div class="log" id="log"></div>
-    </div>
-  </div>
-</div></div></main>
-<footer><div class="wrap"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></span></div></footer>
+    <!-- PAYMENTS -->
+    <section class="view" data-v="payments">
+      <div class="kpis rv"><div><span>Payments · 30 days</span><b id="p-n">–</b></div><div><span>Revenue · 30 days</span><b id="p-rev">–</b></div><div><span>Failed · 30 days</span><b id="p-fail">–</b></div><div><span>All-time via site</span><b id="p-all">–</b><em>Since 27 Sep 2026 — earlier payments live in Whop</em></div></div>
+      <div class="tblw"><table class="tbl"><thead><tr><th>When</th><th>Member</th><th>Plan</th><th class="num">Amount</th><th>Status</th><th>Reference</th></tr></thead><tbody id="prow"></tbody></table></div>
+    </section>
+
+    <!-- TELEGRAM -->
+    <section class="view" data-v="telegram">
+      <div class="two">
+        <div class="card rv"><h3>Channels the bot manages</h3><div id="chans"></div><p class="small muted" style="margin-top:14px">A channel appears here the moment @MrWallStreetBot is made admin in it (or when its admin rights are edited). The bot needs <b>Invite users via link</b> and <b>Ban users</b>.</p></div>
+        <div class="card rv d1"><h3>Members without Telegram <a class="link" href="#members" data-f="notg">See list</a></h3><ul class="attn" id="notg"></ul></div>
+      </div>
+    </section>
+
+    <!-- ACCESS -->
+    <section class="view" data-v="access">
+      <div class="card rv"><h3>Grant access manually</h3><p class="small muted" style="margin-bottom:16px">For crypto, wire or courtesy access. If the member already has an account with this email, access is live immediately; otherwise it activates the moment they create their account with it.</p>
+        <form class="grant" id="f-grant" novalidate>
+          <div class="field"><label for="g-email">Email</label><input id="g-email" type="email" placeholder="member@email.com"></div>
+          <div class="field"><label for="g-plan">Plan</label><select id="g-plan"><option value="monthly">Monthly</option><option value="yearly">Yearly</option><option value="lifetime" selected>Lifetime</option></select></div>
+          <div class="field"><label for="g-months">Months</label><input id="g-months" type="number" min="1" max="120" placeholder="auto"></div>
+          <div class="field"><label for="g-note">Note</label><input id="g-note" type="text" placeholder="paid in USDT · 27 Sep"></div>
+          <button class="btn acc" type="submit" data-busy="Granting">Grant <span class="ar"></span></button>
+        </form>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3>Manual access</h3><div class="tblw"><table class="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Ends</th><th>Note</th><th></th></tr></thead><tbody id="mrows"></tbody></table></div></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" data-v="settings">
+      <div class="two">
+        <div class="card rv"><h3>Rules</h3>
+          <div class="setrow"><div><b>Grace period after a failed payment</b><span>Days the member keeps access while Whop retries the card.</span></div><div><input id="s-grace" type="number" min="0" max="30"> <span>days</span></div></div>
+          <div class="setrow"><div><b>Invite link validity</b><span>Each Telegram invite works once and expires after this.</span></div><div><input id="s-ttl" type="number" min="1" max="168"> <span>hours</span></div></div>
+          <div class="row" style="margin-top:16px"><span></span><button class="btn sm acc" id="s-save" type="button" data-busy="Saving">Save rules</button></div>
+        </div>
+        <div class="card rv d1"><h3>Team</h3><div id="team"></div>
+          <form class="team" id="f-role" novalidate><input id="r-email" type="email" placeholder="email of an existing account"><select id="r-role"><option value="admin">Admin</option><option value="owner">Owner</option><option value="member">Member</option></select><button class="btn sm ghost" type="submit">Set</button></form>
+          <p class="small muted" style="margin-top:16px">Links: <a href="https://whop.com/dashboard/biz_RcxWC0ig56n1mw/" target="_blank" rel="noopener">Whop dashboard</a> · <a href="https://supabase.com/dashboard/project/rgvyyxphqhtedhgvwopy" target="_blank" rel="noopener">Database</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"><button class="link x" id="dx" type="button">Close</button><div id="dbody"></div></aside>
+
 <script>
 (async function(){
   var M = window.MWS, $ = M.$, sb = M.sb();
-  var user = await M.header();
+  var s = await sb.auth.getSession(); var user = s.data.session && s.data.session.user;
   if (!user) { M.go('/login?next=/admin'); return; }
-  var prof = (await sb.from('profiles').select('role,email').eq('id', user.id).maybeSingle()).data;
-  if (!prof || ['owner','admin'].indexOf(prof.role) < 0) { $('#sub').textContent = 'This page is for the owner.'; setTimeout(function(){ M.go('/account'); }, 1200); return; }
-  $('#sub').textContent = 'Every member, every access, in one place.';
-  $('#adm').hidden = false;
+  var me = (await sb.from('profiles').select('role,email').eq('id', user.id).maybeSingle()).data;
+  if (!me || ['owner','admin'].indexOf(me.role) < 0) { $('#subtitle').textContent = 'This page is for the owner.'; setTimeout(function(){ M.go('/account'); }, 1200); return; }
+  $('#me-email').textContent = me.email;
+  M.viewAs.set('');
+  $('#out').addEventListener('click', async function(){ await sb.auth.signOut(); M.go('/'); });
+  /* preview the member experience: presets replace the data on /account; a bar brings you back */
+  function previewAs(key){ M.viewAs.set(key || 'active'); M.go('/account'); }
+  $('#va-member').addEventListener('click', function(ev){ ev.preventDefault(); previewAs('active'); });
+  function presetFor(e){ var m = e.best; if (!m) return 'none'; if (!e.valid) return 'canceled'; if (m.status === 'past_due') return 'pastdue'; if (m.cancel_at_period_end || m.status === 'canceling') return 'ending'; if (m.plan_key === 'lifetime') return 'lifetime'; if (!e.link) return 'joined'; return 'active'; }
 
-  var data = { profiles: [], memberships: [], links: [], access: [], log: [] };
+  var D = { profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {} };
   var filter = 'all', q = '';
-  function valid(m){
-    var s = m.status; var end = m.renewal_period_end ? new Date(m.renewal_period_end) : null;
-    if (s === 'active' || s === 'trialing' || s === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < new Date());
-    if (s === 'completed' && m.plan_key === 'lifetime') return true;
-    if (s === 'past_due') return true;
-    return false;
-  }
+  var PRICE = { monthly: 99, yearly: 990, lifetime: 3990 };
+  var fmtMoney = function(n){ return '$' + (Math.round(n) === n ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); };
+
+  function valid(m){ var st = m.status, end = m.renewal_period_end ? new Date(m.renewal_period_end) : null; if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < new Date()); if (st === 'completed' && m.plan_key === 'lifetime') return true; return st === 'past_due'; }
+  function rank(m){ return valid(m) ? (m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2) : 10; }
+
   async function load(){
     var r = await Promise.all([
       sb.from('profiles').select('id,email,role,created_at').order('created_at', { ascending: false }),
-      sb.from('memberships').select('id,email,user_id,plan_key,status,renewal_period_end,cancel_at_period_end,updated_at,metadata').order('updated_at', { ascending: false }),
+      sb.from('memberships').select('id,email,user_id,plan_key,status,renewal_period_end,cancel_at_period_end,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
       sb.from('telegram_links').select('user_id,telegram_username,telegram_id,linked_at'),
       sb.from('telegram_access').select('user_id,chat_id,status'),
-      sb.from('audit_log').select('at,actor,action,subject,detail').order('at', { ascending: false }).limit(60)
+      sb.from('audit_log').select('at,actor,action,subject,detail').order('at', { ascending: false }).limit(80),
+      sb.from('channels').select('chat_id,title,username,enabled,sort').order('sort'),
+      sb.from('whop_events').select('id,type,received_at,payload').like('type', 'payment.%').order('received_at', { ascending: false }).limit(300),
+      sb.from('settings').select('key,value')
     ]);
-    data.profiles = r[0].data || []; data.memberships = r[1].data || []; data.links = r[2].data || []; data.access = r[3].data || []; data.log = r[4].data || [];
+    D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.events = r[6].data || [];
+    D.settings = {}; (r[7].data || []).forEach(function(x){ D.settings[x.key] = x.value; });
+    $('#upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     render();
   }
-  function rank(m){ return valid(m) ? (m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2) : 10; }
-  function build(){
-    var byEmail = {};
-    data.profiles.forEach(function(p){ byEmail[p.email] = byEmail[p.email] || { email: p.email }; byEmail[p.email].profile = p; });
-    data.memberships.forEach(function(m){ var e = byEmail[m.email] = byEmail[m.email] || { email: m.email }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
-    var linkBy = {}; data.links.forEach(function(l){ linkBy[l.user_id] = l; });
-    var accBy = {}; data.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
-    return Object.keys(byEmail).map(function(k){ var e = byEmail[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; return e; });
+
+  function people(){
+    var by = {};
+    D.profiles.forEach(function(p){ by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; });
+    D.memberships.forEach(function(m){ var e = by[m.email] = by[m.email] || { email: m.email }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
+    var linkBy = {}; D.links.forEach(function(l){ linkBy[l.user_id] = l; });
+    var accBy = {}; D.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
+    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; return e; });
   }
+  function payments(){
+    return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var amt = Number(d.total != null ? d.total : (d.amount != null ? d.amount : 0)); if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || '', amount: amt, currency: (d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
+  }
+  function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].title; return pid ? 'Test' : '–'; }
+  function tag(cls, text){ return '<span class="tag ' + cls + '">' + text + '</span>'; }
+
   function render(){
-    var rows = build();
-    $('#k-active').textContent = rows.filter(function(e){ return e.valid; }).length;
-    $('#k-site').textContent = data.profiles.length;
-    $('#k-whop').textContent = rows.filter(function(e){ return e.valid && !e.profile; }).length;
-    $('#k-tg').textContent = data.links.length;
+    var rows = people(), now = Date.now(), d30 = now - 30 * 86400000;
+    var active = rows.filter(function(e){ return e.valid; });
+    var mrr = active.reduce(function(s, e){ var k = e.best.plan_key; return s + (k === 'monthly' ? 99 : k === 'yearly' ? 990 / 12 : 0); }, 0);
+    var pays = payments(); var p30 = pays.filter(function(p){ return p.at.getTime() > d30; });
+    var rev30 = p30.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0);
+    var newMonth = rows.filter(function(e){ return e.since && new Date(e.since).getTime() > d30; }).length;
+    $('#k-active').textContent = active.length; $('#k-active-sub').textContent = newMonth + ' new in 30 days · ' + active.filter(function(e){ return e.best.plan_key === 'lifetime'; }).length + ' lifetime';
+    $('#k-mrr').textContent = fmtMoney(Math.round(mrr));
+    $('#k-rev').textContent = fmtMoney(rev30); $('#k-rev-sub').textContent = p30.filter(function(p){ return p.ok; }).length + ' payments via the site';
+    $('#k-tg').textContent = D.links.length; $('#k-tg-sub').textContent = active.filter(function(e){ return e.profile && !e.link; }).length + ' active without Telegram';
+    // attention
+    var attn = [];
+    rows.filter(function(e){ return e.valid && !e.profile; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('', 'paid on Whop · no account') + '</li>'); });
+    rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('warn', 'no Telegram') + '</li>'); });
+    rows.filter(function(e){ return e.best && e.best.status === 'past_due'; }).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('warn', 'card failing · grace') + '</li>'); });
+    rows.filter(function(e){ return e.best && e.best.cancel_at_period_end && e.valid; }).forEach(function(e){ attn.push('<li><span>' + e.email + '</span>' + tag('', 'ends ' + M.fmtDate(e.best.renewal_period_end)) + '</li>'); });
+    $('#attn').innerHTML = attn.join('') || '<li class="muted">Everything is in order.</li>';
+    $('#feed').innerHTML = D.log.slice(0, 30).map(function(l){ var t = new Date(l.at); return '<div><time>' + t.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</time><span><b>' + l.action + '</b> ' + (l.subject || '') + (l.detail && l.detail.email ? ' · ' + l.detail.email : '') + (l.detail && l.detail.to ? ' → ' + l.detail.to : '') + '</span></div>'; }).join('');
+
+    // members table
     var list = rows.filter(function(e){
       if (q && e.email.indexOf(q) < 0) return false;
       if (filter === 'active') return e.valid;
       if (filter === 'site') return !!e.profile;
       if (filter === 'whop') return e.valid && !e.profile;
       if (filter === 'notg') return e.valid && e.profile && !e.link;
+      if (filter === 'ending') return e.valid && e.best && (e.best.cancel_at_period_end || e.best.status === 'canceling' || e.best.status === 'past_due');
       if (filter === 'ended') return e.best && !e.valid;
       return true;
-    }).sort(function(a,b){ return (b.valid - a.valid) || a.email.localeCompare(b.email); });
+    }).sort(function(a, b){ return (b.valid - a.valid) || a.email.localeCompare(b.email); });
     $('#rows').innerHTML = list.map(function(e){
       var m = e.best || {};
-      var st = !e.best ? '<span class="tag">no plan</span>' : e.valid ? '<span class="tag ok">' + (m.status === 'past_due' ? 'grace' : m.status === 'canceling' ? 'ending' : 'active') + '</span>' : '<span class="tag bad">' + m.status + '</span>';
-      var acct = e.profile ? '<span class="tag ok">on site</span>' + (e.profile.role !== 'member' ? ' <span class="tag">' + e.profile.role + '</span>' : '') : '<span class="tag">no account</span>';
+      var st = !e.best ? tag('', 'no plan') : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
+      var acct = e.profile ? tag('ok', 'on site') + (e.profile.role !== 'member' ? ' ' + tag('', e.profile.role) : '') : tag('', 'no account');
       var joined = e.acc.filter(function(a){ return a.status === 'joined'; }).length;
-      var tg = e.link ? '<span class="tag ok">@' + (e.link.telegram_username || e.link.telegram_id) + '</span> <span class="small muted">' + joined + '/' + Math.max(e.acc.length, 1) + ' in</span>' : (e.profile ? '<span class="tag warn">not connected</span>' : '<span class="muted">–</span>');
+      var tg = e.link ? tag('ok', '@' + (e.link.telegram_username || e.link.telegram_id)) + ' <span class="small muted">' + joined + ' ch</span>' : (e.profile ? tag('warn', 'not connected') : '<span class="muted">–</span>');
       var when = m.plan_key === 'lifetime' ? 'Lifetime' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–');
-      var acts = [];
-      if (e.profile && e.link && e.valid) acts.push('<button class="link" data-a="resend" data-u="' + e.profile.id + '">Resend invites</button>');
-      if (e.profile && e.link) acts.push('<button class="link bad" data-a="kick" data-u="' + e.profile.id + '">Remove from Telegram</button>');
-      if (m.id && m.id.indexOf('manual_') === 0 && e.valid) acts.push('<button class="link bad" data-a="revoke" data-id="' + m.id + '">Revoke</button>');
-      var src = m.id ? (m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') : '';
-      return '<tr><td class="em">' + e.email + '</td><td>' + (m.plan_key || '–') + src + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td><div class="act">' + acts.join('') + '</div></td></tr>';
+      return '<tr data-e="' + e.email + '"><td class="em">' + e.email + '</td><td>' + (m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
     }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
-    $('#count').textContent = list.length + ' of ' + rows.length + ' people';
-    $('#log').innerHTML = data.log.map(function(l){ return '<div>' + M.fmtDate(l.at) + ' ' + new Date(l.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · <b>' + l.action + '</b> ' + (l.subject || '') + ' <span>' + (l.actor || '') + '</span></div>'; }).join('');
+    $('#count').textContent = list.length + ' of ' + rows.length;
+
+    // payments
+    $('#p-n').textContent = p30.filter(function(p){ return p.ok; }).length; $('#p-rev').textContent = fmtMoney(rev30); $('#p-fail').textContent = p30.filter(function(p){ return p.type === 'failed'; }).length;
+    $('#p-all').textContent = fmtMoney(pays.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0));
+    $('#prow').innerHTML = pays.slice(0, 200).map(function(p){ return '<tr><td>' + M.fmtDate(p.at) + ' ' + p.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + (p.email || '–') + '</td><td>' + planName(p.plan) + '</td><td class="num">' + fmtMoney(p.amount) + ' ' + p.currency + '</td><td>' + (p.ok ? tag('ok', 'paid') : tag(p.type === 'failed' ? 'bad' : '', p.type)) + '</td><td class="small muted">' + p.ref + '</td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No payments through the site yet.</td></tr>';
+
+    // telegram
+    var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
+    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + D.channels.map(function(c){ return '<li><span>' + (c.title || c.chat_id) + ' <span class="small muted">' + c.chat_id + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + '</span></li>'; }).join('') + '</ul>' : '<p class="muted">No channels registered yet. Edit the bot\'s admin rights in each channel once and they appear here.</p>';
+    $('#notg').innerHTML = rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 12).map(function(e){ return '<li><span>' + e.email + '</span><span class="small muted">' + (e.best.plan_key || '') + '</span></li>'; }).join('') || '<li class="muted">Everyone with access is connected.</li>';
+
+    // access (manual)
+    var man = D.memberships.filter(function(m){ return m.id.indexOf('manual_') === 0; });
+    $('#mrows').innerHTML = man.map(function(m){ return '<tr><td class="em">' + m.email + '</td><td>' + m.plan_key + '</td><td>' + (valid(m) ? tag('ok', 'active') : tag('bad', m.status)) + '</td><td>' + (m.plan_key === 'lifetime' ? 'Never' : M.fmtDate(m.renewal_period_end)) + '</td><td class="small muted">' + ((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? '<button class="link bad" data-a="revoke" data-id="' + m.id + '">Revoke</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No manual access yet.</td></tr>';
+
+    // settings
+    $('#s-grace').value = D.settings.grace_days || 3; $('#s-ttl').value = D.settings.invite_ttl_hours || 24;
+    $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + p.email + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
   }
+
+  // drawer
+  function openDrawer(email){
+    var e = people().filter(function(x){ return x.email === email; })[0]; if (!e) return;
+    var m = e.best || {};
+    var html = '<p class="eyebrow">Member</p><h2>' + e.email + '</h2>';
+    html += '<dl class="kv"><dt>Status</dt><dd>' + (e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + (m.plan_key || '–') + (m.id ? ' <span class="small muted">' + m.id + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + e.profile.role : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + (e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
+    if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + (c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : a.status === 'removed' ? 'bad' : 'warn', a.status) + '</li>'; }).join('') + '</ul>';
+    if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return x.plan_key + ' · ' + x.status; }).join(' / ') + '</p>';
+    html += '<div class="stack">';
+    if (e.profile && e.link && e.valid) html += '<button class="btn ghost" data-a="resend" data-u="' + e.profile.id + '" data-busy="Sending">Resend Telegram invites</button>';
+    if (e.profile && e.link) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
+    if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + m.id + '" data-busy="Revoking">Revoke manual access</button>';
+    if (!e.valid) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
+    html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
+    html += '</div>';
+    $('#dbody').innerHTML = html; $('#drawer').classList.add('on'); $('#scrim').classList.add('on');
+    var g = $('#d-grant'); if (g) g.addEventListener('click', function(){ closeDrawer(); $('#g-email').value = e.email; });
+    $('#d-preview').addEventListener('click', function(){ previewAs(this.dataset.p); });
+  }
+  function closeDrawer(){ $('#drawer').classList.remove('on'); $('#scrim').classList.remove('on'); }
+  $('#dx').addEventListener('click', closeDrawer); $('#scrim').addEventListener('click', closeDrawer);
+  $('#rows').addEventListener('click', function(ev){ var tr = ev.target.closest('tr[data-e]'); if (tr) openDrawer(tr.dataset.e); });
 
   async function act(a, body, btn){
     if (a === 'kick' && !confirm('Remove this member from every Telegram channel?')) return;
     if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
-    if (btn) M.busy(btn, true);
-    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m-grant', 'Synced ' + r.memberships + ' Whop memberships.', 'ok'); await load(); }
-    catch (e) { M.msg('#m-grant', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    if (btn) M.busy(btn, true); M.msg('#m', '');
+    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); closeDrawer(); await load(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     finally { if (btn) M.busy(btn, false); }
   }
-  $('#rows').addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
+  document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
   $('#sync').addEventListener('click', function(){ act('sync', {}, $('#sync')); });
   $('#q').addEventListener('input', function(){ q = $('#q').value.trim().toLowerCase(); render(); });
-  M.$$('#seg button').forEach(function(b){ b.addEventListener('click', function(){ M.$$('#seg button').forEach(function(x){ x.classList.remove('on'); }); b.classList.add('on'); filter = b.dataset.f; render(); }); });
+  M.$$('#seg button').forEach(function(b){ b.addEventListener('click', function(){ setFilter(b.dataset.f); }); });
+  function setFilter(f){ filter = f; M.$$('#seg button').forEach(function(x){ x.classList.toggle('on', x.dataset.f === f); }); render(); }
   $('#f-grant').addEventListener('submit', async function(ev){
     ev.preventDefault();
     var email = $('#g-email').value.trim().toLowerCase(), plan = $('#g-plan').value, months = $('#g-months').value ? Number($('#g-months').value) : null, note = $('#g-note').value.trim();
-    if (!M.validEmail(email)) return M.msg('#m-grant', 'Enter a valid email.', 'bad');
-    var btn = $('#f-grant .btn'); M.busy(btn, true); M.msg('#m-grant', '');
-    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note }); M.msg('#m-grant', 'Access granted to ' + email + (r.user_exists ? '. They already have an account — access is live.' : '. Ask them to create their account at mrofwallstreet.com/signup with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; await load(); }
-    catch (e) { M.msg('#m-grant', M.human(e), 'bad'); }
+    if (!M.validEmail(email)) return M.msg('#m', 'Enter a valid email.', 'bad');
+    var btn = $('#f-grant .btn'); M.busy(btn, true); M.msg('#m', '');
+    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note }); M.msg('#m', 'Access granted to ' + email + (r.user_exists ? ' — live now.' : ' — activates when they create their account with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; $('#g-months').value = ''; await load(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); }
     finally { M.busy(btn, false); }
   });
-  await load();
+  $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Number($('#s-grace').value) || 3) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Number($('#s-ttl').value) || 24) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
+  $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); try { await M.fn('admin', { action: 'set_role', email: em, role: $('#r-role').value }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } });
+
+  // routing
+  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], members: ['Members', 'Everyone who has, had or paid for access.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], settings: ['Settings', 'Rules and team.'] };
+  function route(){ var v = (location.hash || '#overview').slice(1); if (!TITLES[v]) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0); }
+  window.addEventListener('hashchange', route);
+  document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-f]'); if (a) setFilter(a.dataset.f); });
+  route(); await load();
+  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, function(){ load(); }).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, function(){ load(); }).subscribe(); } catch (e) {}
 })();
 </script>
 </body></html>

@@ -98,12 +98,18 @@
     var s = await sb.auth.getSession(); user = s.data.session && s.data.session.user; if (!user) { M.go('/login'); return; }
     var pr = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle(); profile = pr.data;
     var ac = await sb.rpc('my_access'); access = ac.data || { valid:false, reason:'none' };
-    if (claimIfEmpty && access.reason === 'none') { try { await M.fn('claim'); ac = await sb.rpc('my_access'); access = ac.data || access; } catch(e) {} }
+    if (claimIfEmpty && access.reason === 'none' && !M.sim()) { try { await M.fn('claim'); ac = await sb.rpc('my_access'); access = ac.data || access; } catch(e) {} }
     var lk = await sb.from('telegram_links').select('*').eq('user_id', user.id).maybeSingle(); link = lk.data;
     var ch = await sb.from('channels').select('chat_id,title,sort').eq('enabled', true).order('sort'); channels = ch.data || [];
     var ta = await sb.from('telegram_access').select('chat_id,status,updated_at').eq('user_id', user.id); tgAccess = ta.data || [];
+    /* owner preview: replace the data with a preset (never touches the database) */
+    sim = (profile && (profile.role === 'owner' || profile.role === 'admin')) ? M.sim(channels) : null;
+    if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); }
     render();
   }
+  var sim = null;
+  /* in preview, buttons inside the account panels do nothing (they act on real members' accounts) */
+  $('#grid').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button, .tgl, a[target=_blank]'); if (!b || b.id === 'signout') return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this ' + (b.classList.contains('tgl') ? 'switch' : 'button') + ' works.'); }, true);
 
   function planName(k){ return (C.PLANS[k] && C.PLANS[k].title) || (k ? k.charAt(0).toUpperCase()+k.slice(1) : 'Membership'); }
 
@@ -113,7 +119,7 @@
     $('#acc-since').textContent = M.fmtDate(profile && profile.created_at || user.created_at);
     $('#tgl-updates').classList.toggle('on', !!(profile && profile.email_updates));
     var st = $('#st'), body = $('#access-body');
-    var welcome = M.qs('welcome') === '1', paid = M.qs('paid') === '1';
+    var welcome = M.qs('welcome') === '1' || (sim && sim.key === 'joined'), paid = !sim && M.qs('paid') === '1';
 
     if (access.valid) {
       $('#h').textContent = welcome ? "You're in." : 'Your Syndicate.';

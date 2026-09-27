@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin — Mr. Wall Street</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/mws.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/mws.js"></script>
+<style>
+.adm-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:28px}
+.adm-kpis div{background:var(--bg);padding:22px 24px}
+.adm-kpis b{display:block;font-size:34px;line-height:1;letter-spacing:-.04em;font-weight:400;font-variant-numeric:tabular-nums}
+.adm-kpis span{display:block;margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+.adm-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.adm-bar input{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:10px 14px;outline:none;min-width:260px;border-radius:0;-webkit-appearance:none}
+.adm-bar input:focus{border-color:var(--fg-2)}
+.adm-bar .seg{display:flex;border:1px solid var(--line-2)}
+.adm-bar .seg button{background:none;border:0;color:var(--fg-3);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 14px;cursor:pointer;border-right:1px solid var(--line-2)}
+.adm-bar .seg button:last-child{border-right:0}
+.adm-bar .seg button.on{color:var(--fg);background:var(--bg-3)}
+.adm-bar .sp{flex:1}
+.tbl{width:100%;border-collapse:collapse;border:1px solid var(--line);font-size:14px}
+.tbl th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--fg-2)}
+.tbl td.em{color:var(--fg);font-weight:500}
+.tbl tr:last-child td{border-bottom:0}
+.tbl .act{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.tbl .link{font-size:13px}
+.tbl .link.bad{color:var(--bad)}
+.grant{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,2fr) auto;gap:12px;align-items:end}
+.grant .field{margin:0}
+.grant select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:13px 14px;outline:none;border-radius:0;-webkit-appearance:none}
+.log{font-family:var(--mono);font-size:12px;color:var(--fg-3);line-height:1.7;max-height:320px;overflow:auto}
+.log b{color:var(--fg-2);font-weight:500}
+.wrapx{overflow-x:auto}
+@media (max-width:1000px){.adm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grant{grid-template-columns:1fr 1fr}.grant .field:first-child,.grant .field:nth-child(4){grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<a class="brand" href="/" aria-label="Mr. Wall Street"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
+<nav aria-label="Primary"><a href="/#inside">Inside</a><a href="/#membership">Membership</a><a href="/#reviews">Reviews</a><a href="/#faq">FAQ</a></nav>
+<div class="right" id="hdr-actions"></div>
+</div></header>
+<main><div class="wrap"><div class="stage" style="max-width:1320px">
+  <div class="head rv"><p class="eyebrow"><b>/</b>Admin</p><h1 id="h">Syndicate desk.</h1><p id="sub">Loading…</p></div>
+
+  <div id="adm" hidden>
+    <div class="adm-kpis rv d1">
+      <div><b id="k-active">–</b><span>Active access</span></div>
+      <div><b id="k-site">–</b><span>Accounts on the site</span></div>
+      <div><b id="k-whop">–</b><span>Paid on Whop, no account yet</span></div>
+      <div><b id="k-tg">–</b><span>Telegram connected</span></div>
+    </div>
+
+    <div class="panel rv d2" style="margin-bottom:28px">
+      <div class="ttl"><h3>Grant access manually</h3><span class="small muted">Crypto / wire / courtesy. The member creates the account with this email and gets access automatically.</span></div>
+      <form class="grant" id="f-grant" novalidate>
+        <div class="field"><label for="g-email">Email</label><input id="g-email" type="email" placeholder="member@email.com"></div>
+        <div class="field"><label for="g-plan">Plan</label><select id="g-plan"><option value="monthly">Monthly</option><option value="yearly">Yearly</option><option value="lifetime" selected>Lifetime</option></select></div>
+        <div class="field"><label for="g-months">Months</label><input id="g-months" type="number" min="1" max="120" placeholder="auto"></div>
+        <div class="field"><label for="g-note">Note</label><input id="g-note" type="text" placeholder="paid in USDT 27 Sep"></div>
+        <button class="btn acc" type="submit" data-busy="Granting">Grant <span class="ar"></span></button>
+      </form>
+      <div class="msg" id="m-grant"></div>
+    </div>
+
+    <div class="adm-bar rv d2">
+      <input id="q" type="search" placeholder="Search email…">
+      <div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ended">Ended</button></div>
+      <span class="sp"></span>
+      <button class="btn sm ghost" id="sync" type="button" data-busy="Syncing">Sync with Whop</button>
+    </div>
+    <div class="wrapx rv d3"><table class="tbl" id="tbl"><thead><tr><th>Email</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    <p class="small muted" id="count" style="margin-top:10px"></p>
+
+    <div class="panel rv d3" style="margin-top:28px">
+      <div class="ttl"><h3>Recent activity</h3></div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+</div></div></main>
+<footer><div class="wrap"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></span></div></footer>
+<script>
+(async function(){
+  var M = window.MWS, $ = M.$, sb = M.sb();
+  var user = await M.header();
+  if (!user) { M.go('/login?next=/admin'); return; }
+  var prof = (await sb.from('profiles').select('role,email').eq('id', user.id).maybeSingle()).data;
+  if (!prof || ['owner','admin'].indexOf(prof.role) < 0) { $('#sub').textContent = 'This page is for the owner.'; setTimeout(function(){ M.go('/account'); }, 1200); return; }
+  $('#sub').textContent = 'Every member, every access, in one place.';
+  $('#adm').hidden = false;
+
+  var data = { profiles: [], memberships: [], links: [], access: [], log: [] };
+  var filter = 'all', q = '';
+  function valid(m){
+    var s = m.status; var end = m.renewal_period_end ? new Date(m.renewal_period_end) : null;
+    if (s === 'active' || s === 'trialing' || s === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < new Date());
+    if (s === 'completed' && m.plan_key === 'lifetime') return true;
+    if (s === 'past_due') return true;
+    return false;
+  }
+  async function load(){
+    var r = await Promise.all([
+      sb.from('profiles').select('id,email,role,created_at').order('created_at', { ascending: false }),
+      sb.from('memberships').select('id,email,user_id,plan_key,status,renewal_period_end,cancel_at_period_end,updated_at,metadata').order('updated_at', { ascending: false }),
+      sb.from('telegram_links').select('user_id,telegram_username,telegram_id,linked_at'),
+      sb.from('telegram_access').select('user_id,chat_id,status'),
+      sb.from('audit_log').select('at,actor,action,subject,detail').order('at', { ascending: false }).limit(60)
+    ]);
+    data.profiles = r[0].data || []; data.memberships = r[1].data || []; data.links = r[2].data || []; data.access = r[3].data || []; data.log = r[4].data || [];
+    render();
+  }
+  function rank(m){ return valid(m) ? (m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2) : 10; }
+  function build(){
+    var byEmail = {};
+    data.profiles.forEach(function(p){ byEmail[p.email] = byEmail[p.email] || { email: p.email }; byEmail[p.email].profile = p; });
+    data.memberships.forEach(function(m){ var e = byEmail[m.email] = byEmail[m.email] || { email: m.email }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
+    var linkBy = {}; data.links.forEach(function(l){ linkBy[l.user_id] = l; });
+    var accBy = {}; data.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
+    return Object.keys(byEmail).map(function(k){ var e = byEmail[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; return e; });
+  }
+  function render(){
+    var rows = build();
+    $('#k-active').textContent = rows.filter(function(e){ return e.valid; }).length;
+    $('#k-site').textContent = data.profiles.length;
+    $('#k-whop').textContent = rows.filter(function(e){ return e.valid && !e.profile; }).length;
+    $('#k-tg').textContent = data.links.length;
+    var list = rows.filter(function(e){
+      if (q && e.email.indexOf(q) < 0) return false;
+      if (filter === 'active') return e.valid;
+      if (filter === 'site') return !!e.profile;
+      if (filter === 'whop') return e.valid && !e.profile;
+      if (filter === 'notg') return e.valid && e.profile && !e.link;
+      if (filter === 'ended') return e.best && !e.valid;
+      return true;
+    }).sort(function(a,b){ return (b.valid - a.valid) || a.email.localeCompare(b.email); });
+    $('#rows').innerHTML = list.map(function(e){
+      var m = e.best || {};
+      var st = !e.best ? '<span class="tag">no plan</span>' : e.valid ? '<span class="tag ok">' + (m.status === 'past_due' ? 'grace' : m.status === 'canceling' ? 'ending' : 'active') + '</span>' : '<span class="tag bad">' + m.status + '</span>';
+      var acct = e.profile ? '<span class="tag ok">on site</span>' + (e.profile.role !== 'member' ? ' <span class="tag">' + e.profile.role + '</span>' : '') : '<span class="tag">no account</span>';
+      var joined = e.acc.filter(function(a){ return a.status === 'joined'; }).length;
+      var tg = e.link ? '<span class="tag ok">@' + (e.link.telegram_username || e.link.telegram_id) + '</span> <span class="small muted">' + joined + '/' + Math.max(e.acc.length, 1) + ' in</span>' : (e.profile ? '<span class="tag warn">not connected</span>' : '<span class="muted">–</span>');
+      var when = m.plan_key === 'lifetime' ? 'Lifetime' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–');
+      var acts = [];
+      if (e.profile && e.link && e.valid) acts.push('<button class="link" data-a="resend" data-u="' + e.profile.id + '">Resend invites</button>');
+      if (e.profile && e.link) acts.push('<button class="link bad" data-a="kick" data-u="' + e.profile.id + '">Remove from Telegram</button>');
+      if (m.id && m.id.indexOf('manual_') === 0 && e.valid) acts.push('<button class="link bad" data-a="revoke" data-id="' + m.id + '">Revoke</button>');
+      var src = m.id ? (m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') : '';
+      return '<tr><td class="em">' + e.email + '</td><td>' + (m.plan_key || '–') + src + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td><div class="act">' + acts.join('') + '</div></td></tr>';
+    }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
+    $('#count').textContent = list.length + ' of ' + rows.length + ' people';
+    $('#log').innerHTML = data.log.map(function(l){ return '<div>' + M.fmtDate(l.at) + ' ' + new Date(l.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · <b>' + l.action + '</b> ' + (l.subject || '') + ' <span>' + (l.actor || '') + '</span></div>'; }).join('');
+  }
+
+  async function act(a, body, btn){
+    if (a === 'kick' && !confirm('Remove this member from every Telegram channel?')) return;
+    if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
+    if (btn) M.busy(btn, true);
+    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m-grant', 'Synced ' + r.memberships + ' Whop memberships.', 'ok'); await load(); }
+    catch (e) { M.msg('#m-grant', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    finally { if (btn) M.busy(btn, false); }
+  }
+  $('#rows').addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
+  $('#sync').addEventListener('click', function(){ act('sync', {}, $('#sync')); });
+  $('#q').addEventListener('input', function(){ q = $('#q').value.trim().toLowerCase(); render(); });
+  M.$$('#seg button').forEach(function(b){ b.addEventListener('click', function(){ M.$$('#seg button').forEach(function(x){ x.classList.remove('on'); }); b.classList.add('on'); filter = b.dataset.f; render(); }); });
+  $('#f-grant').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var email = $('#g-email').value.trim().toLowerCase(), plan = $('#g-plan').value, months = $('#g-months').value ? Number($('#g-months').value) : null, note = $('#g-note').value.trim();
+    if (!M.validEmail(email)) return M.msg('#m-grant', 'Enter a valid email.', 'bad');
+    var btn = $('#f-grant .btn'); M.busy(btn, true); M.msg('#m-grant', '');
+    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note }); M.msg('#m-grant', 'Access granted to ' + email + (r.user_exists ? '. They already have an account — access is live.' : '. Ask them to create their account at mrofwallstreet.com/signup with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; await load(); }
+    catch (e) { M.msg('#m-grant', M.human(e), 'bad'); }
+    finally { M.busy(btn, false); }
+  });
+  await load();
+})();
+</script>
+</body></html>

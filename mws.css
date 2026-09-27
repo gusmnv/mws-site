@@ -56,7 +56,9 @@ header.top nav a:hover,header.top nav a.on{color:var(--fg)}
 header.top nav a:hover::after,header.top nav a.on::after{right:0}
 header.top .right{display:flex;align-items:center;gap:12px;justify-self:end}
 @media (max-width:960px){header.top nav{display:none}header.top .wrap{grid-template-columns:1fr auto}}
-@media (max-width:480px){header.top .btn.sm span.t{display:none}}
+@media (max-width:480px){header.top .btn.sm{padding:10px 14px;font-size:12.5px}header.top .wrap{gap:12px}}
+.acct{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:1px;align-items:start}
+@media (max-width:900px){.acct{grid-template-columns:1fr}}
 
 /* layout */
 main{flex:1;padding-block:clamp(40px,7vh,96px) clamp(56px,8vh,112px)}
@@ -99,8 +101,8 @@ main{flex:1;padding-block:clamp(40px,7vh,96px) clamp(56px,8vh,112px)}
 .tag.warn::before{content:"● "}
 .tag.bad{border-color:rgba(217,122,122,.5);color:var(--bad)}
 .tag.bad::before{content:"● "}
-.otp{display:flex;gap:8px}
-.otp input{text-align:center;font-family:var(--mono);font-size:22px;letter-spacing:.3em;padding:14px}
+.otp{display:flex;gap:8px;justify-content:center}
+.otp input{width:100%;max-width:320px;text-align:center;font-family:var(--mono);font-size:24px;letter-spacing:.42em;text-indent:.42em;padding:14px 12px}
 .switch{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:16px 0;border-top:1px solid var(--line)}
 .switch:first-of-type{border-top:0}
 .switch b{font-weight:500;display:block}

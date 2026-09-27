@@ -31,7 +31,7 @@
     <button class="btn acc" type="submit" data-busy="Saving">Save password <span class="ar"></span></button>
   </form>
 
-  <div id="grid" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:1px;align-items:start" hidden>
+  <div id="grid" class="acct" hidden>
     <div>
       <!-- access / plan -->
       <section class="panel rv" id="p-access">
@@ -122,7 +122,7 @@
       var renews = access.plan_key === 'lifetime' ? 'Never. Lifetime.' : (access.cancel_at_period_end ? 'Access until ' + M.fmtDate(access.renewal_period_end) : 'Renews ' + M.fmtDate(access.renewal_period_end));
       body.innerHTML = '<dl class="kv"><dt>Plan</dt><dd>' + planName(access.plan_key) + '</dd><dt>Billing</dt><dd>' + renews + '</dd></dl>'
         + (access.status === 'past_due' ? '<div class="msg on bad" style="margin-top:16px">Your last payment failed. Update your card within ' + access.grace_days + ' days of the failed charge to keep your access.</div>' : '')
-        + '<div class="row" style="margin-top:20px">' + (access.manage_url ? '<a class="btn sm ghost" href="' + access.manage_url + '" target="_blank" rel="noopener">Manage subscription</a>' : '<span class="small muted">Manage your subscription from the receipt email or <a href="https://whop.com/orders" target="_blank" rel="noopener">your orders</a>.</span>') + (access.plan_key !== 'lifetime' ? '<a class="link" href="/join?plan=lifetime">Upgrade to Lifetime</a>' : '') + '</div>';
+        + '<div class="row" style="margin-top:20px">' + (access.plan_key === 'lifetime' ? '<span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span>' : (access.manage_url ? '<a class="btn sm ghost" href="' + access.manage_url + '" target="_blank" rel="noopener">Manage subscription</a>' : '<span class="small muted">Manage your subscription from the receipt email or <a href="https://whop.com/orders" target="_blank" rel="noopener">your orders</a>.</span>') + '<a class="link" href="/join?plan=lifetime">Upgrade to Lifetime</a>') + '</div>';
       $('#p-tg').hidden = false; renderTg();
     } else if (paid && !access.valid) {
       $('#h').textContent = 'Confirming your payment…'; $('#sub').textContent = 'This usually takes a few seconds.';

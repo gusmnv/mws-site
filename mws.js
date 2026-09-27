@@ -6,9 +6,9 @@ window.MWS = window.MWS || {};
     SUPABASE_ANON_KEY: "sb_publishable_OWxxeqr1TnJCeQMcJGB9oA_X1qh-i6a",
     SITE: "https://mrofwallstreet.com",
     PLANS: {
-      monthly: { id: "plan_zKhMuAvHoXfE2", title: "Monthly", price: "$99", per: "/ month", tag: "Most popular", sub: "Cancel anytime. The easiest way in." },
-      yearly:  { id: "plan_0LdJbWcZD6tGE", title: "Yearly",  price: "$990", per: "/ year", tag: "Best value", sub: "$82.50 a month, billed annually. Two months free." },
-      lifetime:{ id: "plan_vuo4wah1I85pO", title: "Lifetime", price: "$3,990", per: "one-time", tag: "Golden entry", sub: "One payment. Everything, forever. Immune to price rises." },
+      monthly: { id: "plan_zKhMuAvHoXfE2", title: "Monthly", price: "$99", per: "/ month", tag: "Most popular", sub: "Billed monthly. Cancel anytime." },
+      yearly:  { id: "plan_0LdJbWcZD6tGE", title: "Yearly",  price: "$990", per: "/ year", tag: "Best value", sub: "Billed yearly. Two months free." },
+      lifetime:{ id: "plan_vuo4wah1I85pO", title: "Lifetime", price: "$3,990", per: "one-time", tag: "Golden entry", sub: "One payment. Forever. Never pays again." },
       test:    { id: "plan_YLIcoMLF4LFih", title: "Test", price: "$1", per: "one-time", tag: "Internal", sub: "Internal test plan. Not for members.", hidden: true }
     },
     WHOP_LOADER: "https://js.whop.com/static/checkout/loader.js"
@@ -27,8 +27,8 @@ window.MWS = window.MWS || {};
     var q = new URLSearchParams(location.search), mode = q.get('preview')||'';
     var user = mode ? { id:'u1', email:'member@example.com', created_at:'2026-04-02T00:00:00Z' } : null;
     var access = mode==='active' ? { valid:true, status:'active', plan_key:'yearly', renewal_period_end:'2027-09-27T00:00:00Z', manage_url:'#', grace_days:3 } : mode==='pastdue' ? { valid:true, status:'past_due', plan_key:'monthly', renewal_period_end:'2026-10-27T00:00:00Z', manage_url:'#', grace_days:3 } : { valid:false, reason:'none' };
-    var tables = { profiles: { id:'u1', email:'member@example.com', email_updates:true, created_at:'2026-04-02T00:00:00Z' }, telegram_links: mode==='active' ? { user_id:'u1', telegram_id:1, telegram_username:'gustavo', linked_at:'2026-09-27' } : null, channels: [{chat_id:1,title:'Exclusive ♠️',sort:1},{chat_id:2,title:'Positions List',sort:2},{chat_id:3,title:'Market Desk',sort:3},{chat_id:4,title:'Private Chat 💬',sort:4}], telegram_access: mode==='active' ? [{chat_id:1,status:'joined'},{chat_id:2,status:'joined'},{chat_id:3,status:'invited'},{chat_id:4,status:'joined'}] : [] };
-    function chain(t){ var c = { select:function(){return c;}, eq:function(){return c;}, order:function(){return c;}, update:function(){return c;}, maybeSingle:function(){ return Promise.resolve({ data: Array.isArray(tables[t])?null:tables[t] }); }, then:function(res){ return Promise.resolve({ data: tables[t]||[] }).then(res); } }; return c; }
+    var tables = { profiles: { id:'u1', email:'member@example.com', role: mode==='active' ? 'owner' : 'member', email_updates:true, created_at:'2026-04-02T00:00:00Z' }, memberships: mode==='active' ? [{id:'mem_1',email:'member@example.com',user_id:'u1',plan_key:'yearly',status:'active',renewal_period_end:'2027-09-27',updated_at:'2026-09-27'},{id:'mem_2',email:'whop.only@example.com',user_id:null,plan_key:'monthly',status:'active',renewal_period_end:'2026-10-27',updated_at:'2026-09-27'},{id:'manual_x1',email:'crypto@example.com',user_id:null,plan_key:'lifetime',status:'completed',renewal_period_end:null,updated_at:'2026-09-27'},{id:'mem_3',email:'old@example.com',user_id:null,plan_key:'monthly',status:'canceled',renewal_period_end:'2026-08-01',updated_at:'2026-08-01'}] : [], audit_log: [{at:'2026-09-27T12:42:52Z',actor:'webhook:membership.activated',action:'membership.status',subject:'mem_1'},{at:'2026-09-27T12:19:00Z',actor:'admin:owner',action:'admin.grant',subject:'crypto@example.com'}], telegram_links: mode==='active' ? { user_id:'u1', telegram_id:1, telegram_username:'gustavo', linked_at:'2026-09-27' } : null, channels: [{chat_id:1,title:'Exclusive ♠️',sort:1},{chat_id:2,title:'Positions List',sort:2},{chat_id:3,title:'Market Desk',sort:3},{chat_id:4,title:'Private Chat 💬',sort:4}], telegram_access: mode==='active' ? [{chat_id:1,status:'joined'},{chat_id:2,status:'joined'},{chat_id:3,status:'invited'},{chat_id:4,status:'joined'}] : [] };
+    function chain(t){ var c = { select:function(){return c;}, eq:function(){return c;}, order:function(){return c;}, limit:function(){return c;}, update:function(){return c;}, maybeSingle:function(){ return Promise.resolve({ data: Array.isArray(tables[t])?null:tables[t] }); }, then:function(res){ var v = tables[t]; return Promise.resolve({ data: Array.isArray(v)?v:(v?[v]:[]) }).then(res); } }; return c; }
     return { auth:{ getSession:function(){ return Promise.resolve({ data:{ session: user ? { user:user, access_token:'x' } : null } }); }, onAuthStateChange:function(){}, signOut:function(){ return Promise.resolve({}); }, signUp:function(){ return Promise.resolve({ data:{ user:{identities:[1]}, session:null } }); }, verifyOtp:function(){ return Promise.resolve({ data:{} }); }, signInWithPassword:function(){ return Promise.resolve({ error:{ message:'Invalid login credentials' } }); }, resetPasswordForEmail:function(){ return Promise.resolve({}); }, updateUser:function(){ return Promise.resolve({}); }, resend:function(){ return Promise.resolve({}); } }, from:function(t){ return chain(t); }, rpc:function(){ return Promise.resolve({ data: access }); }, channel:function(){ var ch={ on:function(){return ch;}, subscribe:function(){} }; return ch; } };
   }
 
@@ -60,7 +60,9 @@ window.MWS = window.MWS || {};
     var user = s.data.session && s.data.session.user;
     var slot = $('#hdr-actions'); if(!slot) return user;
     if(user){
-      slot.innerHTML = '<a class="btn sm ghost" href="/account"><span class="t">My account</span></a><button class="btn sm acc" id="hdr-out" type="button">Log out</button>';
+      var onAccount = /^\/account/.test(location.pathname);
+      slot.innerHTML = (onAccount ? '' : '<a class="btn sm ghost" href="/account"><span class="t">My account</span></a>') + '<button class="btn sm ' + (onAccount ? 'ghost' : 'acc') + '" id="hdr-out" type="button">Log out</button>';
+      try { var pr = await window.MWS.sb().from('profiles').select('role').eq('id', user.id).maybeSingle(); if (pr.data && (pr.data.role === 'owner' || pr.data.role === 'admin') && !/^\/admin/.test(location.pathname)) slot.insertAdjacentHTML('afterbegin', '<a class="btn sm ghost" href="/admin"><span class="t">Admin</span></a>'); } catch (e) {}
       $('#hdr-out').addEventListener('click', async function(){ await window.MWS.sb().auth.signOut(); window.MWS.go('/'); });
     } else {
       slot.innerHTML = '<a class="btn sm ghost" href="/login"><span class="t">Log in</span></a><a class="btn sm acc" href="/join">Join now <span class="ar"></span></a>';

@@ -25,7 +25,7 @@
 
   <!-- step 1: plan -->
   <section id="s-plan">
-    <div class="head rv"><p class="eyebrow"><b>/01</b>Choose your entry</p><h1>Every plan unlocks the full Syndicate.</h1><p>The only difference is how long you stay, and Lifetime never pays again.</p></div>
+    <div class="head rv"><p class="eyebrow"><b>/01</b>Choose your plan</p><h1>Choose your plan.</h1><p>Same access on every plan. Only the price changes.</p></div>
     <div class="steps rv d1"><span class="on">Plan</span><span>Email</span><span>Payment</span><span>Account</span></div>
     <div class="plans rv d2" id="plans"></div>
     <div class="assure rv d3"><span>Secure checkout</span><span>Apple Pay · Google Pay · Card</span><span>Telegram access in seconds</span></div>
@@ -74,7 +74,7 @@
 
   /* plans */
   var order = ['monthly','yearly','lifetime'];
-  $('#plans').innerHTML = order.map(function(k){ var p = C.PLANS[k]; return '<div class="plan" data-k="'+k+'" role="button" tabindex="0"><span class="k">'+p.title+'<em>'+p.tag+'</em></span><div class="price">'+p.price+'<small>'+p.per+'</small></div><p class="sub">'+p.sub+'</p><ul><li>All Telegram channels'+(k==='lifetime'?', forever':'')+'</li><li>Every trade and investment, in real time</li><li>Direct access in the private chat</li></ul><span class="btn'+(k==='yearly'?' acc':'')+'">'+(k==='lifetime'?'Take the golden entry':'Join '+k)+' <span class="ar"></span></span></div>'; }).join('');
+  $('#plans').innerHTML = order.map(function(k){ var p = C.PLANS[k]; return '<div class="plan" data-k="'+k+'" role="button" tabindex="0"><span class="k">'+p.title+'<em>'+p.tag+'</em></span><div class="price">'+p.price+'<small>'+p.per+'</small></div><p class="sub">'+p.sub+'</p><span class="btn">Select '+p.title+' <span class="ar"></span></span></div>'; }).join('');
   M.$$('.plan').forEach(function(el){ el.addEventListener('click', function(){ choose(el.dataset.k); }); el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') choose(el.dataset.k); }); });
 
   function show(id){ ['s-plan','s-email','s-pay'].forEach(function(s){ $('#'+s).hidden = (s!==id); }); window.scrollTo({top:0,behavior:'smooth'}); }

@@ -117,7 +117,7 @@ main{flex:1;padding-block:clamp(40px,7vh,96px) clamp(56px,8vh,112px)}
 
 /* plans (join) */
 .plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line)}
-.plan{background:var(--bg);padding:32px 28px;display:flex;flex-direction:column;gap:14px;min-height:380px;border-right:1px solid var(--line);cursor:pointer;transition:background .3s;position:relative}
+.plan{background:var(--bg);padding:32px 28px;display:flex;flex-direction:column;gap:14px;min-height:300px;border-right:1px solid var(--line);cursor:pointer;transition:background .3s;position:relative}
 .plan:last-child{border-right:0}
 .plan:hover{background:var(--bg-2)}
 .plan.sel{background:var(--bg-2);box-shadow:inset 0 0 0 1px var(--fg-2)}
@@ -125,7 +125,7 @@ main{flex:1;padding-block:clamp(40px,7vh,96px) clamp(56px,8vh,112px)}
 .plan .k em{font-style:normal;color:var(--fg)}
 .plan .price{font-size:clamp(44px,4vw,60px);line-height:1;letter-spacing:-.045em;margin-top:12px;font-variant-numeric:tabular-nums}
 .plan .price small{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin-left:10px}
-.plan .sub{font-size:15px;color:var(--fg-2)}
+.plan .sub{font-size:15px;color:var(--fg-2);margin-bottom:auto}
 .plan ul{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--fg-2);margin-bottom:auto}
 .plan li{display:flex;gap:12px}.plan li::before{content:"";width:12px;height:1px;background:var(--fg-3);margin-top:11px;flex:none}
 .plan .btn{align-self:flex-start;margin-top:24px}

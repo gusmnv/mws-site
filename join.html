@@ -67,7 +67,7 @@
 (async function(){
   var M = window.MWS, C = M.config, $ = M.$;
   var user = await M.header();
-  var state = M.store.get('mws_signup') || {};
+  var state = M.signupState();
   var qsPlan = M.qs('plan');
   if (qsPlan && C.PLANS[qsPlan]) state.plan = qsPlan;
   if (user && user.email) state.email = user.email;
@@ -78,7 +78,7 @@
   M.$$('.plan').forEach(function(el){ el.addEventListener('click', function(){ choose(el.dataset.k); }); el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') choose(el.dataset.k); }); });
 
   function show(id){ ['s-plan','s-email','s-pay'].forEach(function(s){ $('#'+s).hidden = (s!==id); }); window.scrollTo({top:0,behavior:'smooth'}); }
-  function save(){ M.store.set('mws_signup', state); }
+  function save(){ M.saveSignup(state); }
 
   function choose(k){ state.plan = k; save(); M.$$('.plan').forEach(function(el){ el.classList.toggle('sel', el.dataset.k===k); }); if (state.email) { pay(); } else { $('#email').value = ''; show('s-email'); setTimeout(function(){ $('#email').focus(); }, 300); } }
 

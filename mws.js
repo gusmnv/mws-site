@@ -39,7 +39,19 @@ window.MWS = window.MWS || {};
   window.MWS.busy = function(btn, on){ btn = typeof btn==='string' ? $(btn) : btn; if(!btn) return; btn.classList.toggle('busy', !!on); if(on){ btn.dataset.t = btn.innerHTML; btn.innerHTML = '<span class="spin"></span>' + (btn.dataset.busy || 'One moment'); } else if(btn.dataset.t){ btn.innerHTML = btn.dataset.t; } };
   window.MWS.go = function(path){ location.href = path; };
   window.MWS.qs = function(k){ return new URLSearchParams(location.search).get(k); };
-  window.MWS.store = { get: function(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch(e){ return null; } }, set: function(k,v){ try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(e){} }, del: function(k){ try{ sessionStorage.removeItem(k); }catch(e){} } };
+  /* store: survives new tabs (the email link opens one) — used for the checkout handoff. sess: this tab only. */
+  function storage(s){ return { get: function(k){ try{ return JSON.parse(s.getItem(k)); }catch(e){ return null; } }, set: function(k,v){ try{ s.setItem(k, JSON.stringify(v)); }catch(e){} }, del: function(k){ try{ s.removeItem(k); }catch(e){} } }; }
+  window.MWS.store = storage(window.localStorage);
+  window.MWS.sess = storage(window.sessionStorage);
+  /* the checkout handoff (plan, email, receipt) — expires after 7 days; a receipt id in the URL (Whop return-url) is captured */
+  window.MWS.signupState = function(){
+    var st = window.MWS.store.get('mws_signup') || window.MWS.sess.get('mws_signup') || {};
+    if (st.at && Date.now() - st.at > 7 * 86400000) st = {};
+    var rq = window.MWS.qs('receipt_id') || window.MWS.qs('receipt') || window.MWS.qs('payment_id');
+    if (rq && /^pay_[A-Za-z0-9]+$/.test(rq)) { st.receipt = rq; st.paid = true; }
+    return st;
+  };
+  window.MWS.saveSignup = function(st){ st.at = st.at || Date.now(); window.MWS.store.set('mws_signup', st); };
   window.MWS.fmtDate = function(iso){ if(!iso) return '—'; var d = new Date(iso); return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); };
   window.MWS.validEmail = function(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e||''); };
 
@@ -56,7 +68,7 @@ window.MWS = window.MWS || {};
 
   /* "view as member" (owners/admins): a preset replaces the account data on /account, the Admin button hides, a bar shows the way back */
   var VA_KEY = 'mws_viewas';
-  window.MWS.viewAs = { get: function(){ return window.MWS.store.get(VA_KEY) || ''; }, set: function(v){ if (v) window.MWS.store.set(VA_KEY, v); else window.MWS.store.del(VA_KEY); } };
+  window.MWS.viewAs = { get: function(){ return window.MWS.sess.get(VA_KEY) || ''; }, set: function(v){ if (v) window.MWS.sess.set(VA_KEY, v); else window.MWS.sess.del(VA_KEY); } };
   window.MWS.PRESETS = { joined: 'New member · just paid, no Telegram yet', active: 'Active member · Telegram connected', lifetime: 'Lifetime member', pastdue: 'Payment failing · in grace period', ending: 'Cancelling at period end', none: 'Logged in · no plan', canceled: 'Cancelled member', real: 'My real account' };
   window.MWS.sim = function(channels){
     var k = window.MWS.viewAs.get(); if (!k || k === 'real' || !window.MWS.PRESETS[k]) return null;

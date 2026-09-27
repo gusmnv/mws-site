@@ -90,15 +90,18 @@
     try { var r = await sb.auth.updateUser({ password: a }); if (r.error) throw r.error; history.replaceState(null, '', '/account'); location.reload(); }
     catch (err) { M.msg('#m-reset', M.human(err), 'bad'); M.busy(btn, false); }
   });
-  if (isReset) { showReset(); if (!user) return; }
+  if (isReset) { showReset(); return; } /* the reset form owns the page until the password is saved */
 
   /* load everything */
   var profile = null, access = null, link = null, channels = [], tgAccess = [];
+  var signup = M.signupState(); if (signup.receipt) M.saveSignup(signup);
+  async function claim(){ try { await M.fn('claim', { receipt: signup.receipt || null }); } catch(e) {} }
   async function load(claimIfEmpty){
     var s = await sb.auth.getSession(); user = s.data.session && s.data.session.user; if (!user) { M.go('/login'); return; }
     var pr = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle(); profile = pr.data;
     var ac = await sb.rpc('my_access'); access = ac.data || { valid:false, reason:'none' };
-    if (claimIfEmpty && access.reason === 'none' && !M.sim()) { try { var st0 = M.store.get('mws_signup') || {}; await M.fn('claim', { receipt: st0.receipt || null }); ac = await sb.rpc('my_access'); access = ac.data || access; } catch(e) {} }
+    if (claimIfEmpty && access.reason === 'none' && !M.sim()) { await claim(); ac = await sb.rpc('my_access'); access = ac.data || access; }
+    if (access.valid && signup.receipt) { M.store.del('mws_signup'); signup = {}; } /* handoff done */
     var lk = await sb.from('telegram_links').select('*').eq('user_id', user.id).maybeSingle(); link = lk.data;
     var ch = await sb.from('channels').select('chat_id,title,sort').eq('enabled', true).order('sort'); channels = ch.data || [];
     var ta = await sb.from('telegram_access').select('chat_id,status,updated_at').eq('user_id', user.id); tgAccess = ta.data || [];
@@ -107,7 +110,7 @@
     if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); }
     render();
   }
-  var sim = null;
+  var sim = null, paidTries = 0;
   /* in preview, buttons inside the account panels do nothing (they act on real members' accounts) */
   $('#grid').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button, .tgl, a[target=_blank]'); if (!b || b.id === 'signout') return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this ' + (b.classList.contains('tgl') ? 'switch' : 'button') + ' works.'); }, true);
 
@@ -124,25 +127,34 @@
     if (access.valid) {
       $('#h').textContent = welcome ? "You're in." : 'Your Syndicate.';
       $('#sub').textContent = welcome ? 'Your account is active. Connect Telegram below and your invites arrive in seconds.' : '';
-      var owner = access.plan_key === 'owner';
-      st.textContent = owner ? 'Owner' : access.status === 'past_due' ? 'Payment issue' : (access.cancel_at_period_end ? 'Cancels at period end' : 'Active'); st.className = 'tag ' + (access.status === 'past_due' ? 'warn' : 'ok');
-      var renews = owner ? 'Never. Your house.' : access.plan_key === 'lifetime' ? 'Never. Lifetime.' : (access.cancel_at_period_end ? 'Access until ' + M.fmtDate(access.renewal_period_end) : 'Renews ' + M.fmtDate(access.renewal_period_end));
+      var owner = access.plan_key === 'owner', lifetime = access.plan_key === 'lifetime';
+      var ending = !owner && !lifetime && (access.cancel_at_period_end || /^(cancel|expir)/.test(access.status || '')); /* cancelled: access runs to the end of the paid period */
+      st.textContent = owner ? 'Owner' : access.status === 'past_due' ? 'Payment issue' : (ending ? 'Ends ' + M.fmtDate(access.renewal_period_end) : 'Active'); st.className = 'tag ' + (access.status === 'past_due' ? 'warn' : 'ok');
+      var renews = owner ? 'Never. Your house.' : lifetime ? 'Never. Lifetime.' : (ending ? 'Access until ' + M.fmtDate(access.renewal_period_end) + '. No further charges.' : 'Renews ' + M.fmtDate(access.renewal_period_end));
       body.innerHTML = '<dl class="kv"><dt>Plan</dt><dd>' + planName(access.plan_key) + '</dd><dt>Billing</dt><dd>' + renews + '</dd></dl>'
         + (access.status === 'past_due' ? '<div class="msg on bad" style="margin-top:16px">Your last payment failed. Update your card within ' + access.grace_days + ' days of the failed charge to keep your access.</div>' : '')
-        + '<div class="row" style="margin-top:20px">' + (owner ? '<span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span>' : access.plan_key === 'lifetime' ? '<span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span>' : (access.manage_url ? '<a class="btn sm ghost" href="' + access.manage_url + '" target="_blank" rel="noopener">Manage subscription</a>' : '<span class="small muted">Manage your subscription from the receipt email or <a href="https://whop.com/orders" target="_blank" rel="noopener">your orders</a>.</span>') + (owner ? '' : '<a class="link" href="/join?plan=lifetime">Upgrade to Lifetime</a>')) + '</div>';
+        + '<div class="row" style="margin-top:20px">' + (owner ? '<span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span>' : lifetime ? '<span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span>' : (access.manage_url ? '<a class="btn sm ghost" href="' + access.manage_url + '" target="_blank" rel="noopener">Manage subscription</a>' : '<span class="small muted">Manage your subscription from the receipt email or <a href="https://whop.com/orders" target="_blank" rel="noopener">your orders</a>.</span>') + (ending ? (access.cancel_at_period_end ? '<span class="small muted">Changed your mind? Resume it under Manage subscription.</span>' : '<a class="link" href="/join?plan=' + (access.plan_key === 'yearly' ? 'yearly' : 'monthly') + '">Rejoin</a>') : '<a class="link" href="/join?plan=lifetime" title="Your current plan keeps billing until you cancel it under Manage subscription.">Upgrade to Lifetime</a>')) + '</div>'
+        + (!owner && !lifetime && !ending ? '<p class="small muted" style="margin-top:10px">Upgrading to Lifetime does not cancel your current plan: cancel it under Manage subscription once Lifetime is active.</p>' : '');
       $('#p-tg').hidden = false; renderTg();
-    } else if (paid && !access.valid) {
+    } else if (paid && !access.valid && paidTries < 20) {
+      paidTries++;
       $('#h').textContent = 'Confirming your payment…'; $('#sub').textContent = 'This usually takes a few seconds.';
       st.textContent = 'Pending'; st.className = 'tag warn';
       body.innerHTML = '<p class="small muted"><span class="spin"></span>Waiting for the payment confirmation. Keep this page open.</p>';
       $('#p-tg').hidden = true;
       setTimeout(function(){ load(true); }, 4000);
+    } else if (paid && !access.valid) {
+      $('#h').textContent = 'Still confirming…'; $('#sub').textContent = 'The payment went through but we have not matched it to this account yet.';
+      st.textContent = 'Pending'; st.className = 'tag warn';
+      body.innerHTML = '<p class="small muted">If you paid with a different email than <b>' + user.email + '</b>, the match can take a few minutes. <button class="link" id="reclaim" type="button">Check again</button> or write to us from the Support box below with your receipt email.</p>';
+      var rc0 = $('#reclaim'); if (rc0) rc0.addEventListener('click', async function(){ rc0.textContent = 'Checking…'; paidTries = 0; await claim(); load(false); });
+      $('#p-tg').hidden = true;
     } else {
       $('#h').textContent = 'Choose your entry.'; $('#sub').textContent = 'Your account is ready. Pick a plan and the Syndicate unlocks the second the payment clears.';
       st.textContent = access.reason === 'none' ? 'No plan' : 'Inactive'; st.className = 'tag bad';
       var plans = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm' + (k==='yearly'?' acc':'') + '" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
       body.innerHTML = '<ul class="list">' + plans + '</ul>' + (access.reason !== 'none' ? '<p class="small muted" style="margin-top:14px">Your previous membership (' + planName(access.plan_key) + ') is ' + access.status + '. Choosing a plan restores your access immediately.</p>' : '<p class="small muted" style="margin-top:14px">Already paid through Whop with this email? <button class="link" id="reclaim" type="button">Check again</button>.</p>');
-      var rc = $('#reclaim'); if (rc) rc.addEventListener('click', async function(){ rc.textContent = 'Checking…'; try { var st1 = M.store.get('mws_signup') || {}; await M.fn('claim', { receipt: st1.receipt || null }); } catch(e){} load(false); });
+      var rc = $('#reclaim'); if (rc) rc.addEventListener('click', async function(){ rc.textContent = 'Checking…'; await claim(); load(false); });
       $('#p-tg').hidden = true;
     }
   }
@@ -156,7 +168,7 @@
       $('#tg-connect').addEventListener('click', connect);
     } else {
       st.textContent = 'Connected'; st.className = 'tag ok';
-      var rows = channels.map(function(c){ var a = tgAccess.filter(function(x){ return String(x.chat_id) === String(c.chat_id); })[0]; var s = a ? a.status : 'pending'; var label = s === 'joined' ? 'Joined' : (s === 'invited' ? 'Invite sent' : (s === 'removed' ? 'Removed' : 'Pending')); return '<li><span>' + (c.title || 'Channel') + '</span><span class="tag ' + (s==='joined'?'ok':(s==='invited'?'warn':'')) + '">' + label + '</span></li>'; }).join('');
+      var rows = channels.map(function(c){ var a = tgAccess.filter(function(x){ return String(x.chat_id) === String(c.chat_id); })[0]; var s = a ? a.status : 'pending'; var label = s === 'joined' ? 'Joined' : (s === 'invited' ? 'Invite sent' : (s === 'removed' || s === 'blocked' || s === 'kick_failed' ? 'Removed' : 'Pending')); return '<li><span>' + (c.title || 'Channel') + '</span><span class="tag ' + (s==='joined'?'ok':(s==='invited'?'warn':'')) + '">' + label + '</span></li>'; }).join('');
       body.innerHTML = '<dl class="kv"><dt>Telegram</dt><dd>' + (link.telegram_username ? '@' + link.telegram_username : (link.telegram_name || 'Connected')) + '</dd></dl>'
         + (channels.length ? '<ul class="list" style="margin-top:14px">' + rows + '</ul>' : '<p class="small muted" style="margin-top:14px">Channels are being prepared.</p>')
         + '<div class="row" style="margin-top:18px"><button class="btn sm ghost" id="tg-resend" type="button" data-busy="Sending">Send my invites again</button><button class="link" id="tg-unlink" type="button">Disconnect</button></div><div class="msg" id="m-tg"></div>';
@@ -167,15 +179,20 @@
 
   async function connect(){
     var b = $('#tg-connect'); M.busy(b, true);
+    /* iOS Safari blocks window.open after an await: open the tab now (inside the tap) and point it at the bot once the link exists */
+    var w = null; try { w = window.open('', '_blank'); } catch (e) { w = null; }
     try {
       var r = await M.fn('tg-link', { action: 'link' });
-      window.open(r.url, '_blank', 'noopener');
-      M.msg('#m-tg', 'Telegram opened. Press Start in the bot. Waiting for the connection…', 'ok');
+      if (w && !w.closed) { try { w.location.href = r.url; } catch (e) { w = null; } }
+      if (!w) { try { window.open(r.url, '_blank', 'noopener'); } catch (e) {} }
+      M.msg('#m-tg', 'Press Start in the bot. Waiting for the connection…', 'ok');
       var t0 = Date.now(); clearInterval(waiting);
       waiting = setInterval(async function(){ var lk = await sb.from('telegram_links').select('*').eq('user_id', user.id).maybeSingle(); if (lk.data) { clearInterval(waiting); load(false); } else if (Date.now() - t0 > 10*60*1000) { clearInterval(waiting); M.msg('#m-tg', 'Still not connected. Press Connect again to get a fresh link.', 'bad'); M.busy(b, false); } }, 3000);
-      b.innerHTML = '<span class="spin"></span>Waiting for Telegram…';
-      var again = document.createElement('a'); again.className = 'link'; again.href = r.url; again.target = '_blank'; again.rel = 'noopener'; again.textContent = 'Open the bot again'; again.style.marginLeft = '16px'; b.after(again);
-    } catch (e) { M.msg('#m-tg', M.human(e), 'bad'); M.busy(b, false); }
+      /* the button becomes the link itself, so one tap always reaches Telegram even when pop-ups are blocked */
+      var open = document.createElement('a'); open.className = 'btn acc'; open.href = r.url; open.target = '_blank'; open.rel = 'noopener'; open.innerHTML = 'Open Telegram <span class="ar"></span>';
+      b.replaceWith(open);
+      open.insertAdjacentHTML('afterend', '<p class="small muted" style="margin-top:12px"><span class="spin"></span>Waiting for Telegram… If nothing opened, tap the button.</p>');
+    } catch (e) { if (w && !w.closed) { try { w.close(); } catch (_) {} } M.msg('#m-tg', M.human(e), 'bad'); M.busy(b, false); }
   }
 
   /* prefs, password, sign out */

@@ -46,7 +46,7 @@
   var M = window.MWS, $ = M.$, sb = M.sb();
   var user = await M.header();
   if (user) { M.go('/account'); return; }
-  var next = M.qs('next') || '/account';
+  var next = M.qs('next') || '/account'; if (!/^\/(?!\/)/.test(next)) next = '/account';
 
   $('#f-login').addEventListener('submit', async function(e){
     e.preventDefault();

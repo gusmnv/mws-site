@@ -210,36 +210,43 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
   var PRICE = { monthly: 99, yearly: 990, lifetime: 3990 };
   var fmtMoney = function(n){ return '$' + (Math.round(n) === n ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); };
 
-  function valid(m){ var st = m.status, end = m.renewal_period_end ? new Date(m.renewal_period_end) : null; if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < new Date()); if (st === 'completed' && m.plan_key === 'lifetime') return true; return st === 'past_due'; }
+  /* mirrors public.membership_is_valid (staff.sql) */
+  function valid(m){ var st = m.status, now = new Date(), end = m.renewal_period_end ? new Date(m.renewal_period_end) : null;
+    if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < now);
+    if (st === 'completed' && m.plan_key === 'lifetime') return true;
+    if ((st === 'canceled' || st === 'cancelled' || st === 'expired') && end && end > now) return true;
+    if (st === 'past_due') { var since = new Date(m.past_due_since || m.updated_at); return since > new Date(now.getTime() - Number(D.settings.grace_days || 3) * 86400000); }
+    return false; }
   function rank(m){ return valid(m) ? (m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2) : 10; }
 
   async function load(){
     var r = await Promise.all([
       sb.from('profiles').select('id,email,role,created_at').order('created_at', { ascending: false }),
-      sb.from('memberships').select('id,email,user_id,plan_key,status,renewal_period_end,cancel_at_period_end,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
+      sb.from('memberships').select('id,email,user_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
       sb.from('telegram_links').select('user_id,telegram_username,telegram_id,linked_at'),
       sb.from('telegram_access').select('user_id,chat_id,status'),
       sb.from('audit_log').select('at,actor,action,subject,detail').order('at', { ascending: false }).limit(80),
       sb.from('channels').select('chat_id,title,username,enabled,sort').order('sort'),
       sb.from('whop_events').select('id,type,received_at,payload').like('type', 'payment.%').order('received_at', { ascending: false }).limit(300),
-      sb.from('settings').select('key,value')
+      M.fn('admin', { action: 'overview' }).catch(function(){ return { settings: [] }; })
     ]);
     D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.events = r[6].data || [];
-    D.settings = {}; (r[7].data || []).forEach(function(x){ D.settings[x.key] = x.value; });
+    D.settings = {}; ((r[7] && r[7].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; });
     $('#upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     render();
   }
 
   function people(){
     var by = {};
-    D.profiles.forEach(function(p){ by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; });
-    D.memberships.forEach(function(m){ var e = by[m.email] = by[m.email] || { email: m.email }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
+    var emailOf = {}; D.profiles.forEach(function(p){ emailOf[p.id] = p.email; by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; });
+    /* a membership bound to an account belongs to that account, even if Whop recorded another email at checkout */
+    D.memberships.forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
     var linkBy = {}; D.links.forEach(function(l){ linkBy[l.user_id] = l; });
     var accBy = {}; D.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
     return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; return e; });
   }
   function payments(){
-    return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var amt = Number(d.total != null ? d.total : (d.amount != null ? d.amount : 0)); if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || '', amount: amt, currency: (d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
+    return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
   }
   function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].title; return pid ? 'Test' : '–'; }
   function tag(cls, text){ return '<span class="tag ' + cls + '">' + text + '</span>'; }
@@ -301,7 +308,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     $('#mrows').innerHTML = man.map(function(m){ return '<tr><td class="em">' + m.email + '</td><td>' + m.plan_key + '</td><td>' + (valid(m) ? tag('ok', 'active') : tag('bad', m.status)) + '</td><td>' + (m.plan_key === 'lifetime' ? 'Never' : M.fmtDate(m.renewal_period_end)) + '</td><td class="small muted">' + ((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? '<button class="link bad" data-a="revoke" data-id="' + m.id + '">Revoke</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No manual access yet.</td></tr>';
 
     // settings
-    $('#s-grace').value = D.settings.grace_days || 3; $('#s-ttl').value = D.settings.invite_ttl_hours || 24;
+    $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; $('#s-ttl').value = D.settings.invite_ttl_hours || 24;
     $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + p.email + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
   }
 
@@ -311,11 +318,13 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     var m = e.best || {};
     var html = '<p class="eyebrow">Member</p><h2>' + e.email + '</h2>';
     html += '<dl class="kv"><dt>Status</dt><dd>' + (e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + (m.plan_key || '–') + (m.id ? ' <span class="small muted">' + m.id + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + e.profile.role : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + (e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
-    if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + (c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : a.status === 'removed' ? 'bad' : 'warn', a.status) + '</li>'; }).join('') + '</ul>';
+    if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + (c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : (a.status === 'removed' || a.status === 'blocked' || a.status === 'kick_failed') ? 'bad' : 'warn', a.status === 'kick_failed' ? 'remove failed' : a.status) + '</li>'; }).join('') + '</ul>';
     if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return x.plan_key + ' · ' + x.status; }).join(' / ') + '</p>';
     html += '<div class="stack">';
-    if (e.profile && e.link && e.valid) html += '<button class="btn ghost" data-a="resend" data-u="' + e.profile.id + '" data-busy="Sending">Resend Telegram invites</button>';
-    if (e.profile && e.link) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
+    var blocked = e.acc.some(function(a){ return a.status === 'blocked'; });
+    if (blocked) html += '<p class="small muted">Removed by you. Automatic invites are paused for this member until you resend.</p>';
+    if (e.profile && e.link && e.valid) html += '<button class="btn ghost" data-a="resend" data-u="' + e.profile.id + '" data-busy="Sending">' + (blocked ? 'Let them back in (resend invites)' : 'Resend Telegram invites') + '</button>';
+    if (e.profile && e.link && !blocked) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
     if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + m.id + '" data-busy="Revoking">Revoke manual access</button>';
     if (!e.valid) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
     html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
@@ -329,7 +338,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
   $('#rows').addEventListener('click', function(ev){ var tr = ev.target.closest('tr[data-e]'); if (tr) openDrawer(tr.dataset.e); });
 
   async function act(a, body, btn){
-    if (a === 'kick' && !confirm('Remove this member from every Telegram channel?')) return;
+    if (a === 'kick' && !confirm('Remove this member from every Telegram channel? Automatic invites stay paused until you resend them.')) return;
     if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
     if (btn) M.busy(btn, true); M.msg('#m', '');
     try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); closeDrawer(); await load(); }
@@ -350,7 +359,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     catch (e) { M.msg('#m', M.human(e), 'bad'); }
     finally { M.busy(btn, false); }
   });
-  $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Number($('#s-grace').value) || 3) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Number($('#s-ttl').value) || 24) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
+  $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Math.max(0, parseInt($('#s-grace').value, 10) || 0)) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Math.max(1, parseInt($('#s-ttl').value, 10) || 24)) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
   $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); try { await M.fn('admin', { action: 'set_role', email: em, role: $('#r-role').value }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } });
 
   // routing

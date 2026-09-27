@@ -48,10 +48,10 @@
   var M = window.MWS, $ = M.$, sb = M.sb();
   var user = await M.header();
   if (user) { M.go('/account'); return; }
-  var state = M.store.get('mws_signup') || {};
+  var state = M.signupState(); if (state.receipt) M.saveSignup(state);
   var paid = M.qs('status') === 'success' || state.paid;
   if (!paid) { $('#eb').innerHTML = '<b>/</b>Create your account'; $('#h').textContent = 'Create your account.'; $('#sub').textContent = 'If you have already paid, use the same email. If not, you can choose a plan after.'; M.$('.steps').hidden = true; }
-  if (state.email) { $('#email').value = state.email; $('#email').readOnly = true; $('#email-hint').textContent = 'Locked to the email you paid with.'; }
+  if (state.email) { $('#email').value = state.email; if (paid) { $('#email').readOnly = true; $('#email-hint').textContent = 'Locked to the email you paid with.'; } }
 
   var pending = null;
   $('#f-signup').addEventListener('submit', async function(e){
@@ -66,7 +66,7 @@
       if (r.error) throw r.error;
       // Supabase returns a user with empty identities when the email already exists
       if (r.data.user && r.data.user.identities && r.data.user.identities.length === 0) throw new Error('already registered');
-      if (r.data.session) { state.email = email; M.store.set('mws_signup', state); M.go('/account?welcome=1'); return; }
+      if (r.data.session) { state.email = email; M.saveSignup(state); M.go('/account?welcome=1'); return; }
       pending = { email: email };
       $('#otp-email').textContent = email;
       $('#f-signup').hidden = true; $('#f-otp').hidden = false; $('#otp').focus();
@@ -82,7 +82,7 @@
     try {
       var r = await sb.auth.verifyOtp({ email: pending.email, token: code, type: 'signup' });
       if (r.error) throw r.error;
-      M.store.set('mws_signup', Object.assign(state, { email: pending.email }));
+      M.saveSignup(Object.assign(state, { email: pending.email }));
       M.go('/account?welcome=1');
     } catch (err) { M.msg('#m-otp', M.human(err), 'bad'); M.busy(btn, false); }
   });

@@ -6,7 +6,7 @@
 <title>The Syndicate — Mr. Wall Street</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0A0A0B">
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/mws.css">
@@ -58,7 +58,6 @@
     <header class="bar">
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><span></span></button>
       <div class="crumbs"><span class="mono">The Syndicate</span><span class="sep">/</span><span id="crumb">Overview</span></div>
-      <div class="mkts" id="mkts" title="Regular trading hours, local time. Holidays not accounted for."></div>
       <span class="tag" id="bar-st">—</span>
     </header>
 
@@ -108,15 +107,15 @@
             <section class="panel rv" id="p-tg"><div class="ttl"><h3>Channels</h3><span class="tag" id="tg-st">—</span></div><div id="tg-body"></div></section>
           </div>
           <div>
-            <section class="panel rv d1"><div class="ttl"><h3>How it works</h3></div>
+            <section class="panel rv d1" id="tg-how"><div class="ttl"><h3>How it works</h3></div>
               <div class="steps3" style="border:0;background:none;gap:0;grid-template-columns:1fr">
-                <div style="padding:0 0 14px"><span class="n">01</span><b>Tap Join</b><p>The link opens the channel in Telegram.</p></div>
-                <div style="padding:14px 0;border-top:1px solid var(--line)"><span class="n">02</span><b>Press Join in Telegram</b><p>It may read <i>Request to join</i>. Telegram sends us the request for your account.</p></div>
-                <div style="padding:14px 0 0;border-top:1px solid var(--line)"><span class="n">03</span><b>Approved in a second</b><p>The request is matched to this membership and approved. Nobody else can use your link.</p></div>
+                <div style="padding:0 0 14px"><span class="n">01</span><b>Tap Join</b><p>The channel opens in Telegram.</p></div>
+                <div style="padding:14px 0;border-top:1px solid var(--line)"><span class="n">02</span><b>Confirm in Telegram</b><p>It may say <i>Request to join</i>. Press it.</p></div>
+                <div style="padding:14px 0 0;border-top:1px solid var(--line)"><span class="n">03</span><b>You are in</b><p>Approved within a second. Nobody else can use your link.</p></div>
               </div>
             </section>
-            <section class="panel rv d2"><div class="ttl"><h3>Good to know</h3></div>
-              <p class="small muted">Your Telegram account is tied to this membership the first time a link is approved. If a membership ends, that account is removed from the channels automatically and comes back when it is active again. Changing phone? Use <b>Disconnect Telegram</b> and join with new links.</p>
+            <section class="panel rv d2" id="tg-know"><div class="ttl"><h3>Good to know</h3></div>
+              <p class="small muted">If your membership ends, you are removed from the channels automatically and come back the moment it is active again. New phone or new Telegram account? <b>Disconnect</b> and join again with fresh links.</p>
             </section>
           </div>
         </div>
@@ -307,7 +306,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       return '<span class="' + (open ? 'open' : '') + '"><i></i><b>' + m[0] + '</b>' + (open ? 'Open' : 'Closed') + ' <em>' + o.hour + ':' + o.minute + '</em></span>';
     }).join('');
   }
-  mkts(); setInterval(mkts, 30000);
+  /* markets strip removed: cleaner bar */
 
   /* router: #page */
   var current = '';
@@ -388,7 +387,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var joined = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length;
     var daysTxt = days === 0 ? 'Joined today.' : days === 1 ? 'One day in the Syndicate.' : days + ' days in the Syndicate.';
     var banner = '', plansHtml = '';
-    $('#tg-sub').textContent = (channels.length === 1 ? 'One private room' : channels.length ? channels.length + ' private rooms' : 'Private rooms') + ', personal links. Approved automatically, for your account only.';
+    (function(){ var n = channels.length, j = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length, who = link ? (link.telegram_username || tgUser) : null;
+      $('#tg-sub').textContent = !access.valid ? 'Your channels open the moment your membership is active.' : (n && j === n) ? ('You are in. ' + (n === 1 ? 'The channel is' : 'Both channels are') + ' on your Telegram' + (who ? ' as @' + who : '') + '.') : (n === 1 ? 'One private channel. ' : n ? n + ' private channels. ' : 'Private channels. ') + 'Tap Join, confirm in Telegram, and you are in.';
+      $('#tg-how').hidden = !!(n && j === n); })();
     var chatCh = channels.filter(function(c){ return /chat|talk|lounge|discuss/i.test(c.title || ''); })[0]; $('#sup-chat').textContent = chatCh ? chatCh.title : "In the members' chat";
     $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>The Desk: portfolio, calendar, earnings</span><span class="soon">Soon</span></li>';
 
@@ -504,8 +505,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     st.textContent = channels.length && joined === channels.length ? 'Inside' : (joined ? joined + ' of ' + channels.length : (link ? 'Connected' : 'Ready')); st.className = 'tag ' + (joined ? 'ok' : 'warn');
     if (!channels.length) { body.innerHTML = '<p class="small muted">Channels are being prepared. Your links will appear here.</p>'; return; }
     var who = link ? (link.telegram_username || tgUser) : null;
-    body.innerHTML = '<p class="small muted" style="margin-bottom:14px">Tap a channel, press <b>Join</b> (or <b>Request to join</b>) in Telegram, and you are approved within a second. The links are personal: they only work for you.</p>' + (link ? '<p class="small" style="margin-bottom:14px">Connected as <b>' + (who ? '@' + esc(who) : esc(link.telegram_name || 'your Telegram account')) + '</b>. <span class="muted">Not you? Disconnect below: that account is removed and you get new links.</span></p>' : '') + '<ul class="list" id="tg-list"><li><span class="small muted"><span class="spin"></span>Preparing your links…</span></li></ul><div class="row" style="margin-top:16px"><button class="link" id="tg-refresh" type="button">Links not working? Get new ones</button>' + (link ? '<button class="link" id="tg-unlink" type="button">Disconnect Telegram</button>' : '') + '</div><div class="msg" id="m-tg"></div>';
-    $('#tg-refresh').addEventListener('click', async function(){ if (this.disabled) return; var b = this; b.disabled = true; b.textContent = 'Refreshing…'; try { await fetchInvites(true); paintInvites(); } finally { b.disabled = false; b.textContent = 'Links not working? Get new ones'; } });
+    var allIn = channels.length && joined === channels.length;
+    body.innerHTML = (allIn ? '' : '<p class="small muted" style="margin-bottom:14px">Personal links: each one works for you only, once.</p>') + '<ul class="list" id="tg-list"><li><span class="small muted"><span class="spin"></span>Preparing your links…</span></li></ul><div class="row" style="margin-top:16px"><span class="small muted">' + (link ? 'Connected as <b>' + (who ? '@' + esc(who) : esc(link.telegram_name || 'your Telegram account')) + '</b>' : 'No Telegram connected yet') + '</span><span class="small">' + (allIn ? '' : '<button class="link" id="tg-refresh" type="button">Links not working? Get new ones</button>') + (link ? (allIn ? '' : ' · ') + '<button class="link" id="tg-unlink" type="button">Disconnect Telegram</button>' : '') + '</span></div><div class="msg" id="m-tg"></div>';
+    var rf = $('#tg-refresh'); if (rf) rf.addEventListener('click', async function(){ if (this.disabled) return; var b = this; b.disabled = true; b.textContent = 'Refreshing…'; try { await fetchInvites(true); paintInvites(); } finally { b.disabled = false; b.textContent = 'Links not working? Get new ones'; } });
     var un = $('#tg-unlink'); if (un) un.addEventListener('click', async function(){ if (!confirm('Disconnect Telegram? You will be removed from the channels and can join again with new links.')) return; var b = this; b.disabled = true; b.textContent = 'Disconnecting…'; try { await M.fn('tg-link', { action: 'unlink' }); invites = null; load(false); } catch(e){ M.msg('#m-tg', M.human(e), 'bad'); b.disabled = false; b.textContent = 'Disconnect Telegram'; } });
     if (invites && invitesFor === user.id && !sim) { paintInvites(); } else if (current === 'telegram' || sim) { fetchInvites(false).then(paintInvites); }
   }

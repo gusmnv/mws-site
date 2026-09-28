@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/mws.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
 <script src="/mws.js"></script>
 <style>
 body{display:block}
@@ -214,7 +214,21 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
           <div class="setrow"><div><b>Invite link validity</b><span>Each Telegram invite works once and expires after this.</span></div><div><input id="s-ttl" type="number" min="1" max="168"> <span>hours</span></div></div>
           <div class="row" style="margin-top:16px"><span></span><button class="btn sm acc" id="s-save" type="button" data-busy="Saving">Save rules</button></div>
         </div>
-        <div class="card rv d1"><h3>Team</h3><div id="team"></div>
+        <div class="card rv d1"><h3>Notice to members</h3>
+          <p class="small muted" style="margin-bottom:12px">Shows at the top of the member area for everyone logged in, until they dismiss it or you switch it off.</p>
+          <form id="f-notice" novalidate>
+            <div class="field"><label for="n-body">Message</label><textarea id="n-body" rows="3" placeholder="The Desk opens Monday. Portfolio first." style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:12px 14px;outline:none;border-radius:0;resize:vertical;width:100%"></textarea></div>
+            <div class="grant" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:12px">
+              <div class="field"><label for="n-kind">Tone</label><select id="n-kind"><option value="info">Neutral</option><option value="good">Good news</option><option value="warn">Warning</option></select></div>
+              <div class="field"><label for="n-label">Button text (if there is a link)</label><input id="n-label" type="text" placeholder="Open"></div>
+            </div>
+            <div class="field"><label for="n-link">Link (optional, https only)</label><input id="n-link" type="url" placeholder="https://mrofwallstreet.com/app#portfolio"></div>
+            <div class="row"><span class="small muted">Members see it the second you post.</span><button class="btn sm acc" type="submit" data-busy="Posting">Post notice</button></div>
+          </form>
+          <div id="notices" style="margin-top:14px"></div>
+        </div>
+        <div class="card rv d1"><h3>Plans that grant access</h3><div id="plans"></div></div>
+        <div class="card rv d2"><h3>Team</h3><div id="team"></div>
           <form class="team" id="f-role" novalidate><input id="r-email" type="email" placeholder="email of an existing account"><select id="r-role"><option value="admin">Admin</option><option value="owner">Owner</option><option value="member">Member</option></select><button class="btn sm ghost" type="submit">Set</button></form>
           <p class="small muted" style="margin-top:16px">Links: <a href="https://whop.com/dashboard/biz_RcxWC0ig56n1mw/" target="_blank" rel="noopener">Whop dashboard</a> · <a href="https://supabase.com/dashboard/project/rgvyyxphqhtedhgvwopy" target="_blank" rel="noopener">Database</a></p>
         </div>
@@ -227,6 +241,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 <aside class="drawer" id="drawer" aria-hidden="true"><button class="link x" id="dx" type="button">Close</button><div id="dbody"></div></aside>
 
 <script>
+if (top !== self) { try { top.location = location; } catch (e) { document.documentElement.innerHTML = ''; } }
 (async function(){
   var M = window.MWS, $ = M.$, sb = M.sb();
   var s = await sb.auth.getSession(); var user = s.data.session && s.data.session.user;
@@ -242,16 +257,17 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
   function presetFor(e){ var m = e.best; if (!m) return 'none'; if (!e.valid) return 'canceled'; if (m.status === 'past_due') return 'pastdue'; if (m.cancel_at_period_end || m.status === 'canceling') return 'ending'; if (m.plan_key === 'lifetime') return 'lifetime'; if (!e.link) return 'joined'; return 'active'; }
 
   var X = M.esc; /* every value that came from a user, Whop or Telegram is escaped before innerHTML */
-  var D = { profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {} };
+  var D = { profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {}, plans: [] };
   var filter = 'all', q = '';
   var PRICE = { monthly: 99, yearly: 990, lifetime: 3990 };
   var fmtMoney = function(n){ return '$' + (Math.round(n) === n ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); };
 
   /* mirrors public.membership_is_valid (staff.sql) */
   function valid(m){ var st = m.status, now = new Date(), end = m.renewal_period_end ? new Date(m.renewal_period_end) : null;
+    if (D.planOn && m.id.indexOf('manual_') !== 0 && !D.planOn[m.plan_id]) return false; /* mirrors security.sql: only plans that grant access count */
     if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < now);
     if (st === 'completed' && m.plan_key === 'lifetime') return true;
-    if ((st === 'canceled' || st === 'cancelled' || st === 'expired') && end && end > now) return true;
+    if ((st === 'canceled' || st === 'cancelled' || st === 'expired') && end && end > now) return D.planOn ? !!m.cancel_at_period_end : true; /* after security.sql: only member-initiated cancellations keep the paid period */
     if (st === 'past_due') { var since = new Date(m.past_due_since || m.updated_at); return since > new Date(now.getTime() - Number(D.settings.grace_days || 3) * 86400000); }
     return false; }
   function rank(m){ if (!valid(m)) return 30; var tier = m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2; var st = (m.status === 'active' || m.status === 'trialing' || m.status === 'completed') ? 0 : m.status === 'past_due' ? 1 : 2; return tier * 3 + st; } /* mirrors my_access() */
@@ -259,16 +275,19 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
   async function load(){
     var r = await Promise.all([
       sb.from('profiles').select('id,email,role,created_at').order('created_at', { ascending: false }),
-      sb.from('memberships').select('id,email,user_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
+      sb.from('memberships').select('id,email,user_id,plan_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
       sb.from('telegram_links').select('user_id,telegram_username,telegram_id,linked_at'),
       sb.from('telegram_access').select('user_id,chat_id,status'),
       sb.from('audit_log').select('at,actor,action,subject,detail').order('at', { ascending: false }).limit(80),
       sb.from('channels').select('chat_id,title,username,enabled,sort').order('sort'),
+      sb.from('plans').select('*'),
+      sb.from('notices').select('*').order('created_at', { ascending: false }).limit(20),
       sb.from('whop_events').select('id,type,received_at,payload').like('type', 'payment.%').order('received_at', { ascending: false }).limit(300),
       M.fn('admin', { action: 'overview' }).catch(function(){ return { settings: [] }; })
     ]);
-    D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.events = r[6].data || [];
-    D.settings = {}; ((r[7] && r[7].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; });
+    D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
+    D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; });
+    D.planOn = null; if (D.plans.some(function(p){ return typeof p.grants_access === 'boolean'; })) { D.planOn = {}; D.plans.forEach(function(p){ D.planOn[p.plan_id] = !!p.grants_access; }); }
     $('#upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     render();
   }
@@ -337,7 +356,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     // telegram
     var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
-    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + D.channels.map(function(c){ return '<li><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + '</span></li>'; }).join('') + '</ul>' : '<p class="muted">No channels registered yet. Edit the bot\'s admin rights in each channel once and they appear here.</p>';
+    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + D.channels.map(function(c){ return '<li><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + ' <button class="link" data-ch="' + X(c.chat_id) + '" data-on="' + (c.enabled ? '0' : '1') + '">' + (c.enabled ? 'Switch off' : 'Switch on') + '</button></span></li>'; }).join('') + '</ul>' : '<p class="muted">No channels registered yet. Make @MrWallStreetBot admin in a channel (from a Telegram account connected to an owner account) and it appears here.</p>';
     $('#notg').innerHTML = rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 12).map(function(e){ return '<li><span>' + X(e.email) + '</span><span class="small muted">' + X(e.best.plan_key || '') + '</span></li>'; }).join('') || '<li class="muted">Everyone with access is connected.</li>';
 
     // access (manual)
@@ -346,6 +365,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     // settings
     $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; $('#s-ttl').value = D.settings.invite_ttl_hours || 24;
+    renderPlans(); renderNotices();
     $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + X(p.email) + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
   }
 
@@ -398,6 +418,45 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
   });
   $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Math.max(0, parseInt($('#s-grace').value, 10) || 0)) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Math.max(1, parseInt($('#s-ttl').value, 10) || 24)) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
   $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); try { await M.fn('admin', { action: 'set_role', email: em, role: $('#r-role').value }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } });
+
+  // channels on/off (channels added by a non-staff Telegram start off) + which plans grant access
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-ch]'); if (!b) return; ev.stopPropagation();
+    var on = b.dataset.on === '1'; if (!on && !confirm('Switch this channel off? Members lose their links to it and new invites stop. Existing members are not removed.')) return;
+    try { await M.fn('admin', { action: 'channel_toggle', chat_id: Number(b.dataset.ch), enabled: on }); M.msg('#m', on ? 'Channel switched on. Members get their links on the next sync or when they open the Telegram page.' : 'Channel switched off.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-plan]'); if (!b) return; ev.stopPropagation();
+    var on = b.dataset.on === '1'; if (!on && !confirm('Stop this plan from granting access? Members on it lose access on the next sync.')) return;
+    try { await M.fn('admin', { action: 'plan_access', plan_id: b.dataset.plan, grants_access: on }); M.msg('#m', 'Plan updated.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  function renderNotices(){
+    var el = $('#notices'); if (!el) return;
+    if (D.notices === null) { el.innerHTML = '<p class="small muted">Run <b>supabase/security.sql</b> once to enable notices.</p>'; $('#f-notice .btn').disabled = true; return; }
+    el.innerHTML = D.notices.length ? '<ul class="attn">' + D.notices.map(function(n){ return '<li><span>' + X(n.body).slice(0, 140) + (n.body.length > 140 ? '…' : '') + ' <span class="small muted">' + X(M.fmtDate(n.created_at)) + '</span></span><span>' + (n.active ? tag('ok', 'live') : tag('', 'off')) + ' <button class="link" data-nt="' + X(n.id) + '" data-on="' + (n.active ? '0' : '1') + '">' + (n.active ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-ndel="' + X(n.id) + '">Delete</button></span></li>'; }).join('') + '</ul>' : '<p class="small muted">No notices yet.</p>';
+  }
+  $('#f-notice').addEventListener('submit', async function(ev){
+    ev.preventDefault(); var body = $('#n-body').value.trim(); if (!body) return M.msg('#m', 'Write the message first.', 'bad');
+    var link = $('#n-link').value.trim(); if (link && !/^https:\/\//i.test(link)) return M.msg('#m', 'Links must start with https://', 'bad');
+    var btn = $('#f-notice .btn'); M.busy(btn, true);
+    try { var r = await sb.from('notices').insert({ body: body.slice(0, 500), kind: $('#n-kind').value, link: link || null, link_label: $('#n-label').value.trim().slice(0, 40) || null, active: true }); if (r.error) throw r.error; M.msg('#m', 'Notice posted. Members see it now.', 'ok'); $('#n-body').value = ''; $('#n-link').value = ''; $('#n-label').value = ''; await load(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); }
+  });
+  document.addEventListener('click', async function(ev){
+    var t = ev.target.closest('button[data-nt]'), d = ev.target.closest('button[data-ndel]'); if (!t && !d) return; ev.stopPropagation();
+    try {
+      if (t) { var r1 = await sb.from('notices').update({ active: t.dataset.on === '1' }).eq('id', t.dataset.nt); if (r1.error) throw r1.error; }
+      if (d) { if (!confirm('Delete this notice?')) return; var r2 = await sb.from('notices').delete().eq('id', d.dataset.ndel); if (r2.error) throw r2.error; }
+      await load();
+    } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  function renderPlans(){
+    var el = $('#plans'); if (!el) return;
+    if (!D.plans.length) { el.innerHTML = '<p class="small muted">No plans mirrored yet (the sync fills this).</p>'; return; }
+    var gated = D.plans.some(function(p){ return typeof p.grants_access === 'boolean'; });
+    var byPlan = {}; D.memberships.forEach(function(m){ if (valid(m)) byPlan[m.plan_id] = (byPlan[m.plan_id] || 0) + 1; });
+    el.innerHTML = (gated ? '' : '<div class="msg on bad" style="margin-bottom:12px">Run <b>supabase/security.sql</b> once: until then every Whop plan grants access (including the $1 test plan).</div>') + '<ul class="attn">' + D.plans.map(function(p){ var on = gated ? !!p.grants_access : true; return '<li><span>' + X(p.title) + ' <span class="small muted">' + X(p.price_label) + ' · ' + X(p.plan_key) + '</span></span><span>' + (byPlan[p.plan_id] || 0) + ' valid ' + (on ? tag('ok', 'grants access') : tag('bad', 'no access')) + (gated ? ' <button class="link" data-plan="' + X(p.plan_id) + '" data-on="' + (on ? '0' : '1') + '">' + (on ? 'Turn off' : 'Turn on') + '</button>' : '') + '</span></li>'; }).join('') + '</ul><p class="small muted" style="margin-top:12px">New plans from Whop start on when they cost more than $5, off otherwise. Manual grants ignore this list.</p>';
+  }
 
   // portfolio (The Desk): staff writes public.positions directly (RLS: owner/admin only), members read it in /app#portfolio
   var POS = [];

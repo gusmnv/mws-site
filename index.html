@@ -353,7 +353,7 @@ setTimeout(function(){el.remove();},3700);
 </div>
 <div id="prog"></div>
 </header>
-<div id="menu" aria-hidden="true"><ul><li><a href="#inside"><i>/01</i>Inside</a></li><li><a href="#membership"><i>/02</i>Membership</a></li><li><a href="#reviews"><i>/03</i>Reviews</a></li><li><a href="#faq"><i>/04</i>FAQ</a></li><li><a href="/join"><i>/</i>Join now</a></li></ul></div>
+<div id="menu" aria-hidden="true"><ul><li><a href="#inside"><i>/01</i>Inside</a></li><li><a href="#membership"><i>/02</i>Membership</a></li><li><a href="#reviews"><i>/03</i>Reviews</a></li><li><a href="#faq"><i>/04</i>FAQ</a></li><li><a href="/login" id="menu-login"><i>/</i>Log in</a></li><li><a href="/join"><i>/</i>Join now</a></li></ul></div>
 
 <main id="top">
 <section class="hero" id="hero">
@@ -534,5 +534,5 @@ setTimeout(onScroll,100);setTimeout(onScroll,3200);
 
 })();
 </script>
-<script>/* logged-in members: header goes straight to the member area */(function(){try{var v=localStorage.getItem('sb-rgvyyxphqhtedhgvwopy-auth-token');if(!v)return;var s=JSON.parse(v);if(!s||!s.refresh_token)return;var a=document.getElementById('hdr-login');if(a){a.textContent='Member area';a.href='/app';}}catch(e){}})();</script>
+<script>/* logged-in members: header goes straight to the member area */(function(){try{var v=localStorage.getItem('sb-rgvyyxphqhtedhgvwopy-auth-token');if(!v)return;var s=JSON.parse(v);if(!s||!s.refresh_token)return;['hdr-login','menu-login'].forEach(function(id){var a=document.getElementById(id);if(!a)return;a.href='/app';if(a.firstChild&&a.firstChild.tagName==='I'){a.lastChild.textContent='Member area';}else{a.textContent='Member area';}});}catch(e){}})();</script>
 </body></html>

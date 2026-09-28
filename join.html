@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/mws.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
 <script src="/mws.js"></script>
 <script>window.onWhopComplete = function(planId, receiptId){ window.MWS.onPaid && window.MWS.onPaid(planId, receiptId); };</script>
 </head>
@@ -69,7 +69,7 @@
   var user = await M.header();
   var state = M.signupState();
   var qsPlan = M.qs('plan');
-  if (qsPlan && C.PLANS[qsPlan]) state.plan = qsPlan;
+  if (qsPlan && C.PLANS[qsPlan] && !C.PLANS[qsPlan].hidden) state.plan = qsPlan;
   if (user && user.email) state.email = user.email;
   /* a logged-in member with a live recurring plan must not buy a second one by accident */
   var access = null;
@@ -103,7 +103,7 @@
       show('s-pay');
       $('#pay-title').textContent = 'You already have an active ' + (C.PLANS[access.plan_key] || {}).title + ' plan';
       $('#sum-plan').textContent = (C.PLANS[access.plan_key] || {}).title || 'Active plan'; $('#sum-price').textContent = ''; $('#sum-sub').textContent = 'Renews ' + M.fmtDate(access.renewal_period_end); $('#sum-email').textContent = state.email;
-      $('#whop-checkout').innerHTML = '<div class="msg on">Nothing to pay. Your ' + M.esc((C.PLANS[access.plan_key] || {}).title || 'current') + ' membership is active and renews on ' + M.esc(M.fmtDate(access.renewal_period_end)) + '.</div><div class="row" style="margin-top:18px"><a class="btn acc" href="/app#membership">Go to my membership <span class="ar"></span></a>' + (access.manage_url ? '<a class="btn ghost" href="' + M.esc(access.manage_url) + '" target="_blank" rel="noopener">Manage subscription</a>' : '') + '</div><p class="small muted" style="margin-top:14px">Want Lifetime instead? <a href="/join?plan=lifetime">Upgrade here</a>, then cancel the current plan under Manage subscription.</p>';
+      $('#whop-checkout').innerHTML = '<div class="msg on">Nothing to pay. Your ' + M.esc((C.PLANS[access.plan_key] || {}).title || 'current') + ' membership is active and renews on ' + M.esc(M.fmtDate(access.renewal_period_end)) + '.</div><div class="row" style="margin-top:18px"><a class="btn acc" href="/app#membership">Go to my membership <span class="ar"></span></a>' + (access.manage_url ? '<a class="btn ghost" href="' + (/^https:\/\//i.test(access.manage_url) ? M.esc(access.manage_url) : '#') + '" target="_blank" rel="noopener">Manage subscription</a>' : '') + '</div><p class="small muted" style="margin-top:14px">Want Lifetime instead? <a href="/join?plan=lifetime">Upgrade here</a>, then cancel the current plan under Manage subscription.</p>';
       return;
     }
     $('#sum-price').innerHTML = p.price + '<small>' + p.per + '</small>';

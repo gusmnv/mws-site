@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portfolio · The Desk — Mr. Wall Street</title>
+
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/mws.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
+<script src="/mws.js"></script>
+<meta name="description" content="The Syndicate portfolio: every position, its size, entry, mark and thesis. Members only.">
+<style>
+.sc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(32px,5vw,72px);align-items:start}
+.sc .lock{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line-2);padding:4px 8px;color:var(--fg-2);margin-left:6px;white-space:nowrap}
+.sc .lock::before{content:"";display:inline-block;width:7px;height:9px;border:1px solid currentColor;border-radius:1px;margin-right:7px;vertical-align:-1px;box-shadow:inset 0 -3px 0 currentColor}
+.sc h1{font-size:clamp(36px,4.4vw,60px);line-height:1.02;letter-spacing:-.04em;margin-top:18px}
+.sc .lead{color:var(--fg-2);margin-top:18px;max-width:46ch;font-size:17px}
+.sc ul.pts{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-direction:column;gap:12px;color:var(--fg-2);font-size:15px;max-width:48ch}
+.sc ul.pts li{display:flex;gap:14px}.sc ul.pts li::before{content:"";width:14px;height:1px;background:var(--fg-3);margin-top:12px;flex:none}
+.sc .cta{margin-top:32px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.sc .cta .row2{display:flex;gap:22px;flex-wrap:wrap;align-items:center;align-self:stretch}
+.sc .cta .small{margin-top:4px}
+.sample{border:1px solid var(--line);background:var(--bg);position:relative;overflow:hidden;box-shadow:0 30px 80px -40px rgba(0,0,0,.8)}
+.sample .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+.sample .bar b{color:var(--fg);font-weight:500}
+.sample .bar .live{color:var(--fg)}.sample .bar .live::before{content:"● ";animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.sample table{width:100%;border-collapse:collapse;font-size:14px}
+.sample th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;text-align:left;padding:12px 20px;border-bottom:1px solid var(--line);white-space:nowrap}
+.sample td{padding:14px 20px;border-bottom:1px solid var(--line);color:var(--fg-2);white-space:nowrap;vertical-align:middle}
+.sample td.em{color:var(--fg);font-weight:500}.sample td.pos{color:var(--fg)}.sample td.neg{color:var(--bad)}
+.sample td .sub{display:block;font-size:12px;color:var(--fg-3);margin-top:2px}
+.sample tr.blur td{filter:blur(6px);-webkit-user-select:none;user-select:none;pointer-events:none;opacity:.8}
+.sample .veil{position:absolute;left:0;right:0;bottom:0;height:62%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:34px;background:linear-gradient(180deg,rgba(10,10,11,0),rgba(10,10,11,.55) 35%,rgba(10,10,11,.92) 75%);pointer-events:none}
+.sample .veil span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg);border:1px solid var(--line-2);padding:10px 14px;background:var(--bg);pointer-events:auto}
+.sample .chat{padding:8px 0}
+.sample .msg-row{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;padding:12px 20px;border-top:1px solid var(--line)}
+.sample .msg-row:first-child{border-top:0}
+.sample .av{width:34px;height:34px;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--fg-2);background:var(--bg-2)}
+.sample .msg-row .who{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);display:flex;justify-content:space-between;gap:10px}
+.sample .msg-row p{margin-top:5px;font-size:14.5px;color:var(--fg);line-height:1.5}
+.sample .msg-row.blur p,.sample .msg-row.blur .who{filter:blur(6px);-webkit-user-select:none;user-select:none}
+.sample .cal{padding:6px 0}
+.sample .day{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:16px;padding:14px 20px;border-top:1px solid var(--line);align-items:baseline}
+.sample .day:first-child{border-top:0}
+.sample .day .d{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
+.sample .day .t{color:var(--fg);font-size:14.5px}.sample .day .t small{display:block;color:var(--fg-3);font-size:12.5px;margin-top:2px}
+.sample .day .imp{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-2);border:1px solid var(--line-2);padding:3px 7px}
+.sample .day.blur .t,.sample .day.blur .imp{filter:blur(6px);-webkit-user-select:none;user-select:none}
+.more{margin-top:clamp(44px,7vh,80px);border-top:1px solid var(--line);padding-top:26px}
+.more p{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:14px}
+.more .g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.more a{background:var(--bg);padding:18px 20px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px;transition:background .3s}
+.more a:hover{background:var(--bg-2)}
+.more a.on{background:var(--bg-2);box-shadow:inset 0 0 0 1px var(--line-2)}
+.more a b{font-weight:500;font-size:15px}.more a span{color:var(--fg-3);font-size:13px}
+@media (max-width:960px){.sc{grid-template-columns:minmax(0,1fr)}.more .g{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.sample th:nth-child(n+4),.sample td:nth-child(n+4){display:none}.sample .day{grid-template-columns:70px minmax(0,1fr)}.sample .day .imp{display:none}.sc .cta .btn{width:100%}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<a class="brand" href="/" aria-label="Mr. Wall Street"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
+<nav aria-label="Primary"><a href="/portfolio" data-nav="portfolio">Portfolio</a><a href="/telegram" data-nav="telegram">Telegram</a><a href="/earnings" data-nav="earnings">Earnings</a><a href="/calendar" data-nav="calendar">Calendar</a><a href="/#membership">Membership</a></nav>
+<div class="right" id="hdr-actions"></div>
+</div></header>
+<main><div class="wrap"><div class="stage wide">
+  <div class="sc">
+    <div class="rv">
+      <p class="eyebrow"><b>/04</b>The Desk · Portfolio <span class="lock">Members only</span></p>
+      <h1>The book, open.</h1>
+      <p class="lead">Every position we hold, how it is sized, where we got in, where it trades now and why we are in it. Marked by Mr. Wall Street, changed the moment the view changes.</p>
+      <ul class="pts"><li>Open positions with entry, mark, target and weight of the book.</li><li>The thesis behind each one, in plain words, not a ticker dump.</li><li>The closed book: what was called, when, and how it ended.</li><li>Updated live in your member area, no refresh.</li></ul>
+      <div class="cta" id="cta">
+        <div class="row2"><a class="btn acc" href="/join">Join The Syndicate <span class="ar"></span></a><a class="link" href="/login?next=%2Fapp%23portfolio">Already a member? Log in</a></div>
+        <p class="small muted">From $99 a month, cancel anytime. Everything in The Syndicate is included; nothing is sold separately.</p>
+      </div>
+    </div>
+    <div class="rv d1"><div class="sample"><div class="bar"><span><b>The Syndicate</b> · open positions</span><span>Illustration</span></div><table><thead><tr><th>Position</th><th>Entry</th><th>Mark</th><th>P&amp;L</th><th>Weight</th></tr></thead><tbody><tr><td class="em">BTC <span class="sub">Bitcoin · long</span></td><td>57.7–64K</td><td>83,000</td><td class="pos">+36.1%</td><td>35%</td></tr><tr class="blur"><td class="em">MSTR <span class="sub">Strategy · long</span></td><td>$90–100</td><td>162</td><td class="pos">+70.5%</td><td>20%</td></tr><tr class="blur"><td class="em">ASST <span class="sub">Asset Entities · long</span></td><td>$30</td><td>29.5</td><td class="neg">−1.7%</td><td>10%</td></tr><tr class="blur"><td class="em">CASH <span class="sub">Dry powder</span></td><td>—</td><td>—</td><td>—</td><td>25%</td></tr></tbody></table><div class="veil"><span>Members only</span></div></div></div>
+  </div>
+  <div class="more rv d2"><p>Also inside</p><div class="g">
+    <a href="/portfolio" data-k="portfolio"><b>Portfolio</b><span>The book, live</span></a>
+    <a href="/telegram" data-k="telegram"><b>Telegram</b><span>The channels</span></a>
+    <a href="/earnings" data-k="earnings"><b>Earnings</b><span>Report season</span></a>
+    <a href="/calendar" data-k="calendar"><b>Calendar</b><span>The week ahead</span></a>
+  </div></div>
+</div></div></main>
+<footer><div class="wrap"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></span></div></footer>
+<script>
+(async function(){
+  var M = window.MWS, $ = M.$, sb = M.sb(), KEY = 'portfolio';
+  M.$$('.more a').forEach(function(a){ a.classList.toggle('on', a.dataset.k === KEY); });
+  M.$$('header.top nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.nav === KEY); });
+  var user = await M.header(); if (!user) return;
+  /* a member goes straight in; anyone else logged in sees the door with their own next step */
+  try { var r = await sb.rpc('my_access'); if (r.data && r.data.valid) { $('#cta').innerHTML = '<div class="row2"><a class="btn acc" href="/app#' + KEY + '">Opening your member area <span class="ar"></span></a></div>'; location.replace('/app#' + KEY); return; } } catch (e) {}
+  $('#cta').innerHTML = '<div class="row2"><a class="btn acc" href="/join">Choose your entry <span class="ar"></span></a><a class="link" href="/app">Your account</a></div><p class="small muted">You are logged in as ' + M.esc(user.email) + ' without an active membership. Paid on Whop with another email? Open your account and use "Find my membership".</p>';
+})();
+</script>
+</body></html>

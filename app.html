@@ -40,7 +40,7 @@
       <a href="#telegram" data-p="telegram"><i>03</i>Telegram<span class="cnt" id="n-tg"></span></a>
       <p class="grp">The Desk <span class="soon" id="desk-grp-tag">In development</span></p>
       <a href="#portfolio" data-p="portfolio"><i>04</i>Portfolio</a>
-      <a href="#economic" data-p="economic"><i>05</i>Economic data</a>
+      <a href="#calendar" data-p="calendar"><i>05</i>Calendar</a>
       <a href="#earnings" data-p="earnings"><i>06</i>Earnings</a>
       <p class="grp">Account</p>
       <a href="#settings" data-p="settings"><i>07</i>Settings</a>
@@ -75,7 +75,7 @@
           <div class="sh"><h2>The Desk</h2><span class="soon">In development</span></div>
           <div class="desk">
             <a href="#portfolio"><span class="n">04 <span class="soon" id="desk-pf-tag">Soon</span></span><h3>Portfolio</h3><p>The positions we hold, how they are sized and the thesis behind each one. Run like a fund, shown like a fund.</p><span class="go">Preview →</span></a>
-            <a href="#economic"><span class="n">05 <span class="soon">Soon</span></span><h3>Economic data</h3><p>The releases that move markets, with the readings as they print and what they change for our positioning.</p><span class="go">Preview →</span></a>
+            <a href="#calendar"><span class="n">05 <span class="soon">Soon</span></span><h3>Calendar</h3><p>The week ahead: the releases and events that move markets, with the readings as they print and what they change for our positioning.</p><span class="go">Preview →</span></a>
             <a href="#earnings"><span class="n">06 <span class="soon">Soon</span></span><h3>Earnings</h3><p>Reporting dates, expectations and results for the names we hold and the names we are watching.</p><span class="go">Preview →</span></a>
           </div>
         </div>
@@ -91,7 +91,7 @@
           <div>
             <section class="panel rv d1"><div class="ttl"><h3>What is included</h3></div>
               <ul class="list" id="incl"></ul>
-              <p class="small muted" style="margin-top:14px">The Desk (portfolio, economic data, earnings) opens for all members at no extra cost.</p>
+              <p class="small muted" style="margin-top:14px">The Desk (portfolio, calendar, earnings) opens for all members at no extra cost.</p>
             </section>
             <section class="panel rv d2"><div class="ttl"><h3>Billing questions</h3></div>
               <p class="small muted">Payments are processed by Whop. Receipts, card changes and cancellations live under <b>Manage subscription</b>. Cancelling keeps your access until the end of the period you paid for.</p>
@@ -144,8 +144,8 @@
         <p class="small muted rv d2" style="margin-top:18px">Until it opens, positions and updates are posted in the Exclusive channel. Members are told in the channels the day the Desk goes live.</p>
         </div>
       </section>
-      <section class="page" data-page="economic">
-        <div class="head rv"><p class="eyebrow"><b>/05</b>The Desk · Economic data</p><h1>The prints that matter.</h1><p>Inflation, rates, jobs, growth. The calendar of the releases that move markets, the readings as they come out and what each one changes for how we are positioned.</p></div>
+      <section class="page" data-page="calendar">
+        <div class="head rv"><p class="eyebrow"><b>/05</b>The Desk · Calendar</p><h1>The week, before it happens.</h1><p>Inflation, rates, jobs, growth, and the events around them. The calendar of what moves markets, the readings as they come out and what each one changes for how we are positioned.</p></div>
         <div class="skel rv d1">
           <div class="r h"><span style="width:44%"></span><span style="width:50%"></span><span style="width:40%"></span><span style="width:60%"></span><span style="width:55%"></span></div>
           <div class="r"><span style="width:66%"></span><span style="width:30%"></span><span style="width:40%"></span><span style="width:40%"></span><span style="width:40%"></span></div>
@@ -235,7 +235,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { overview:'Overview', membership:'Membership', telegram:'Telegram', portfolio:'Portfolio', economic:'Economic data', earnings:'Earnings', settings:'Settings', support:'Support' };
+  var PAGES = { overview:'Overview', membership:'Membership', telegram:'Telegram', portfolio:'Portfolio', calendar:'Calendar', earnings:'Earnings', settings:'Settings', support:'Support' };
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
   var isReset = M.qs('reset') === '1' || /type=recovery/.test(initialHash);
@@ -302,7 +302,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* router: #page */
   var current = '';
   function route(){
-    var k = (location.hash || '#overview').slice(1); if (!PAGES[k] || /=/.test(k)) k = 'overview';
+    var k = (location.hash || '#overview').slice(1); if (k === 'economic') k = 'calendar'; if (!PAGES[k] || /=/.test(k)) k = 'overview';
     current = k;
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
     $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === k); });
@@ -379,7 +379,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var banner = '', plansHtml = '';
     $('#tg-sub').textContent = (channels.length === 1 ? 'One private room' : channels.length ? channels.length + ' private rooms' : 'Private rooms') + ', personal links. Approved automatically, for your account only.';
     var chatCh = channels.filter(function(c){ return /chat|talk|lounge|discuss/i.test(c.title || ''); })[0]; $('#sup-chat').textContent = chatCh ? chatCh.title : "In the members' chat";
-    $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>The Desk: portfolio, economic data, earnings</span><span class="soon">Soon</span></li>';
+    $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>The Desk: portfolio, calendar, earnings</span><span class="soon">Soon</span></li>';
 
     if (access.valid) {
       var owner = access.plan_key === 'owner', lifetime = access.plan_key === 'lifetime', pastDue = access.status === 'past_due';

@@ -199,17 +199,18 @@
 
       <!-- 08 support -->
       <section class="page" data-page="support">
-        <div class="head rv"><p class="eyebrow"><b>/08</b>Support</p><h1>Need a hand?</h1><p>Two official ways to reach us. Nothing else is us.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/08</b>Support</p><h1>Need a hand?</h1><p>Write to us here. We answer in this page, and you get a Telegram note when we do.</p></div>
         <div class="acct">
           <div>
-            <section class="panel rv"><div class="ttl"><h3>Contact</h3></div>
-              <ul class="list">
-                <li><span>Inside Telegram</span><span class="small muted" id="sup-chat">In the members' chat</span></li>
-                <li><span>By email</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
-                <li><span>Public</span><a class="link" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a></li>
-              </ul>
-              <div class="msg on bad" style="margin-top:18px">We never message first. Anyone who contacts you first claiming to be Mr. Wall Street, on Telegram, X or email, is a scam. Report and block.</div>
+            <section class="panel rv" id="sup-new"><div class="ttl"><h3>Write to Mr. Wall Street</h3></div>
+              <form id="f-sup" novalidate>
+                <div class="field"><label for="sup-subject">Subject</label><input id="sup-subject" type="text" maxlength="120" placeholder="Paid with a different email"></div>
+                <div class="field"><label for="sup-body">Message</label><textarea id="sup-body" class="ta" rows="5" maxlength="4000" placeholder="Tell us what happened. Receipts, emails and dates help."></textarea></div>
+                <div class="msg" id="m-sup"></div>
+                <div class="row"><span class="small muted">Answers arrive here, usually within 12 hours.</span><button class="btn acc" type="submit" data-busy="Sending">Send <span class="ar"></span></button></div>
+              </form>
             </section>
+            <section class="panel rv d1" id="sup-threads-wrap" hidden><div class="ttl"><h3>Your conversations</h3><span class="small muted" id="sup-count"></span></div><div id="sup-threads"></div></section>
           </div>
           <div>
             <section class="panel rv d1"><div class="ttl"><h3>Quick answers</h3></div>
@@ -217,9 +218,17 @@
                 <li><b>My payment failed.</b><p>Go to <a href="#membership">Membership</a> → Update your card. Access comes back the moment the charge goes through.</p></li>
                 <li><b>I left a channel by mistake.</b><p>Go to <a href="#telegram">Telegram</a> and get a new link. You are approved again in a second.</p></li>
                 <li><b>I changed my Telegram account.</b><p><a href="#telegram">Telegram</a> → Disconnect, then join with the new account.</p></li>
-                <li><b>I paid with a different email.</b><p>Membership is matched by email. Write to us with your receipt and we link it to this account.</p></li>
+                <li><b>I paid with a different email.</b><p>Membership is matched by email. Write to us above with your receipt and we link it to this account.</p></li>
                 <li><b>How do I cancel?</b><p><a href="#membership">Membership</a> → Manage subscription. Access runs to the end of the paid period.</p></li>
               </ul>
+            </section>
+            <section class="panel rv d2"><div class="ttl"><h3>Other ways</h3></div>
+              <ul class="list">
+                <li><span>Inside Telegram</span><span class="small muted" id="sup-chat">In the members' chat</span></li>
+                <li><span>By email</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
+                <li><span>Public</span><a class="link" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a></li>
+              </ul>
+              <div class="msg on bad" style="margin-top:18px">We never message first. Anyone who contacts you first claiming to be Mr. Wall Street, on Telegram, X or email, is a scam. Report and block.</div>
             </section>
           </div>
         </div>
@@ -238,7 +247,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var PAGES = { overview:'Overview', membership:'Membership', telegram:'Telegram', portfolio:'Portfolio', calendar:'Calendar', earnings:'Earnings', settings:'Settings', support:'Support' };
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
-  var isReset = M.qs('reset') === '1' || /type=recovery/.test(initialHash);
+  var isInvite = M.qs('invited') === '1' || /type=invite/.test(initialHash);
+  var isReset = M.qs('reset') === '1' || /type=recovery/.test(initialHash) || isInvite;
   var recovering = false;
   sb.auth.onAuthStateChange(function(ev){ if (ev === 'PASSWORD_RECOVERY') { isReset = true; recovering = true; if (typeof showReset === 'function') showReset(); } });
   var user = await M.header();
@@ -246,11 +256,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function gate(h, sub, opts){ $('#gate').hidden = false; $('#shell').hidden = true; $('#g-h').textContent = h; $('#g-sub').textContent = sub || ''; $('#g-actions').hidden = !(opts && opts.login); $('#f-reset').hidden = !(opts && opts.form); }
   if (hashErr) {
     history.replaceState(null, '', location.pathname + location.search);
-    gate('This link has expired.', isReset ? 'Password links work once and for one hour. Ask for a new one from the login page.' : 'Confirmation links work for one hour. Log in and we send you a fresh code.', { login: true });
+    gate('This link has expired.', isInvite ? 'Invitation links work once. On the login page press "Forgot password?" with the email you were invited on, and we send you a fresh one.' : isReset ? 'Password links work once and for one hour. Ask for a new one from the login page.' : 'Confirmation links work for one hour. Log in and we send you a fresh code.', { login: true });
     return;
   }
   if (!user && !isReset) { M.go('/login?next=' + encodeURIComponent('/app' + location.search + (/^#[a-z]+$/.test(location.hash) ? location.hash : ''))); return; }
-  function showReset(){ gate('Set a new password.', '', { form: true }); }
+  function showReset(){ gate(isInvite ? 'Welcome. Choose your password.' : 'Set a new password.', isInvite ? 'Your account is ready; this password is how you log in from now on.' : '', { form: true }); }
   /* safe href: only https (and tg://) links from the backend may be clicked */
   function href(u){ u = String(u || ''); return /^(https:\/\/|tg:\/\/)/i.test(u) ? esc(u) : '#'; }
   $('#f-reset').addEventListener('submit', async function(e){
@@ -263,7 +273,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     catch (err) { M.msg('#m-reset', M.human(err), 'bad'); M.busy(btn, false); }
   });
   if (isReset) {
-    if (!user) { gate('This link has expired.', 'Password links work once and for one hour. Ask for a new one from the login page.', { login: true }); return; }
+    if (!user) { gate('This link has expired.', isInvite ? 'Invitation links work once. On the login page press "Forgot password?" with the email you were invited on, and we send you a fresh one.' : 'Password links work once and for one hour. Ask for a new one from the login page.', { login: true }); return; }
     showReset(); return; /* the reset form owns the page until the password is saved */
   }
 
@@ -320,7 +330,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var claimedReceipt = false;
   async function claim(){ try { await M.fn('claim', { receipt: signup.receipt || null }); } catch(e) {} }
   /* one load at a time; anything that arrives meanwhile (realtime bursts) collapses into a single follow-up */
-  var loading = false, queued = null;
+  var loading = false, queued = null, supLoaded = false;
   async function load(claimIfEmpty){
     if (loading) { queued = queued || claimIfEmpty || false; return; }
     loading = true;
@@ -346,6 +356,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     sim = staffRole ? M.sim(channels) : null;
     if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); } else { document.body.classList.remove('sim'); }
     render();
+    if (!supLoaded) { supLoaded = true; loadSupport(); }
   }
   /* in preview, buttons and checkout links inside the pages do nothing (they act on real members' accounts) */
   $('#content').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button, .tgl, a[target=_blank], a[href^="/join"]'); if (!b) return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this ' + (b.classList.contains('tgl') ? 'switch' : 'button') + ' works.'); }, true);
@@ -520,13 +531,60 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   $('#out-all').addEventListener('click', async function(){ if (!confirm('Log out of every device, including this one?')) return; M.viewAs.set(''); try { await sb.auth.signOut({ scope: 'global' }); } catch(e) { await sb.auth.signOut(); } M.go('/login'); });
   $('#signout').addEventListener('click', async function(){ M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); });
 
+  /* ---- support: conversations with Mr. Wall Street (writes go through the support function; reads via RLS) ---- */
+  var SUP = { threads: [], msgs: {}, open: null, loading: false };
+  async function loadSupport(){
+    if (sim) { SUP.threads = []; renderSupport(); return; }
+    try {
+      var t = await sb.from('support_threads').select('id,subject,status,last_at,created_at').order('last_at', { ascending: false }).limit(50);
+      if (t.error) throw t.error;
+      SUP.threads = t.data || [];
+      if (SUP.threads.length) { var m = await sb.from('support_messages').select('id,thread_id,from_staff,body,created_at').in('thread_id', SUP.threads.map(function(x){ return x.id; })).order('created_at'); SUP.msgs = {}; (m.data || []).forEach(function(x){ (SUP.msgs[x.thread_id] = SUP.msgs[x.thread_id] || []).push(x); }); }
+    } catch (e) { SUP.threads = []; }
+    renderSupport();
+  }
+  function fmtWhen(iso){ var d = new Date(iso); return M.fmtDate(iso) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
+  function renderSupport(){
+    var wrap = $('#sup-threads-wrap'), el = $('#sup-threads'); if (!wrap) return;
+    wrap.hidden = !SUP.threads.length; $('#sup-count').textContent = SUP.threads.length ? SUP.threads.length + (SUP.threads.length === 1 ? ' conversation' : ' conversations') : '';
+    if (!SUP.threads.length) { el.innerHTML = ''; return; }
+    if (!SUP.open) SUP.open = SUP.threads[0].id;
+    el.innerHTML = SUP.threads.map(function(t){
+      var open = t.id === SUP.open, msgs = SUP.msgs[t.id] || [];
+      var st = t.status === 'answered' ? '<span class="tag ok">Answered</span>' : t.status === 'closed' ? '<span class="tag">Closed</span>' : '<span class="tag warn">Waiting</span>';
+      var html = '<div class="sup-t' + (open ? ' on' : '') + '" data-t="' + esc(t.id) + '"><button class="sup-h" type="button" data-open="' + esc(t.id) + '"><span><b>' + esc(t.subject) + '</b><span class="small muted">' + esc(fmtWhen(t.last_at)) + '</span></span>' + st + '</button>';
+      if (open) {
+        html += '<div class="sup-m">' + msgs.map(function(m){ return '<div class="sup-msg' + (m.from_staff ? ' staff' : '') + '"><span class="who">' + (m.from_staff ? 'Mr. Wall Street' : 'You') + ' · ' + esc(fmtWhen(m.created_at)) + '</span><p>' + esc(m.body).replace(/\n/g, '<br>') + '</p></div>'; }).join('') + '</div>';
+        html += t.status === 'closed' ? '<p class="small muted" style="margin-top:12px">This conversation is closed. Start a new one above if you need anything else.</p>' : '<form class="sup-reply" data-reply="' + esc(t.id) + '"><textarea class="ta" rows="3" maxlength="4000" placeholder="Reply…"></textarea><div class="row"><span class="msg" data-m="1"></span><button class="btn sm acc" type="submit" data-busy="Sending">Reply</button></div></form>';
+      }
+      return html + '</div>';
+    }).join('');
+  }
+  $('#f-sup').addEventListener('submit', async function(e){
+    e.preventDefault(); if (sim) return;
+    var subject = $('#sup-subject').value.trim(), body = $('#sup-body').value.trim();
+    if (!subject) return M.msg('#m-sup', 'Give it a subject.', 'bad'); if (!body) return M.msg('#m-sup', 'Write the message.', 'bad');
+    var btn = $('#f-sup .btn'); M.busy(btn, true); M.msg('#m-sup', '');
+    try { var r = await M.fn('support', { action: 'new', subject: subject, body: body }); $('#sup-subject').value = ''; $('#sup-body').value = ''; SUP.open = r.id; M.msg('#m-sup', 'Sent. You will find the answer on this page.', 'ok'); await loadSupport(); }
+    catch (err) { M.msg('#m-sup', M.human(err), 'bad'); } finally { M.busy(btn, false); }
+  });
+  $('#sup-threads').addEventListener('click', function(e){ var b = e.target.closest('button[data-open]'); if (!b) return; SUP.open = SUP.open === b.dataset.open ? null : b.dataset.open; renderSupport(); });
+  $('#sup-threads').addEventListener('submit', async function(e){
+    var f = e.target.closest('form[data-reply]'); if (!f) return; e.preventDefault();
+    var ta = f.querySelector('textarea'), body = ta.value.trim(), m = f.querySelector('[data-m]'); if (!body) return M.msg(m, 'Write the reply.', 'bad');
+    var btn = f.querySelector('.btn'); M.busy(btn, true); M.msg(m, '');
+    try { await M.fn('support', { action: 'reply', thread_id: f.dataset.reply, body: body }); ta.value = ''; await loadSupport(); } catch (err) { M.msg(m, M.human(err), 'bad'); M.busy(btn, false); }
+  });
+
   /* live updates: membership, telegram link and channel status (Join → Joined without a reload) */
   try {
     sb.channel('app').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links', filter: 'user_id=eq.' + user.id }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_access', filter: 'user_id=eq.' + user.id }, function(){ invites = null; load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ load(false); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, function(){ load(false); }).subscribe();
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, function(){ load(false); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, function(){ loadSupport(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, function(){ loadSupport(); }).subscribe();
   } catch(e) {}
 
   load(true);

@@ -49,6 +49,20 @@ header.top{display:none}
 .ev.new{background:linear-gradient(90deg,var(--bg-3),transparent 70%);margin:0 -12px;padding-left:12px;padding-right:12px}
 .ev.new b::after{content:"NEW";font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--warn);margin-left:8px;vertical-align:1px}
 .chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.sup2{grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr)}
+#slist li{cursor:pointer;flex-wrap:nowrap}
+#slist li.on{background:var(--bg-2);margin:0 -12px;padding-left:12px;padding-right:12px}
+#slist li>span:first-child{display:flex;flex-direction:column;gap:2px;min-width:0;word-break:normal}
+#slist li b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+#slist li .small{white-space:nowrap}
+.thread{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.tm{border:1px solid var(--line);padding:12px 14px;max-width:88%;align-self:flex-start;background:var(--bg-2)}
+.tm.staff{align-self:flex-end;background:var(--bg);border-color:var(--line-2)}
+.tm .who{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin-bottom:6px}
+.tm p{font-size:14.5px;line-height:1.55;word-break:break-word}
+.ta{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;line-height:1.5;padding:12px 14px;outline:none;border-radius:0;resize:vertical;width:100%;min-height:90px}
+.ta:focus{border-color:var(--fg-2)}
+@media (max-width:1100px){.sup2{grid-template-columns:minmax(0,1fr)}}
 .chk input{accent-color:var(--fg);width:14px;height:14px;margin:0}
 .mainx{padding:26px clamp(20px,3vw,44px) 60px;min-width:0}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
@@ -133,13 +147,14 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     <nav id="nav">
       <a href="#overview" data-v="overview"><i>01</i>Overview</a>
       <a href="#activity" data-v="activity"><i>02</i>Activity <span class="nn" id="nav-n" hidden>0</span></a>
-      <a href="#members" data-v="members"><i>03</i>Members</a>
-      <a href="#payments" data-v="payments"><i>04</i>Payments</a>
-      <a href="#telegram" data-v="telegram"><i>05</i>Telegram</a>
+      <a href="#support" data-v="support"><i>03</i>Support <span class="nn" id="nav-sup" hidden>0</span></a>
+      <a href="#members" data-v="members"><i>04</i>Members</a>
+      <a href="#payments" data-v="payments"><i>05</i>Payments</a>
+      <a href="#telegram" data-v="telegram"><i>06</i>Telegram</a>
       <div class="grp">Manage</div>
-      <a href="#access" data-v="access"><i>06</i>Grant access</a>
-      <a href="#portfolio" data-v="portfolio"><i>07</i>Portfolio</a>
-      <a href="#settings" data-v="settings"><i>08</i>Settings</a>
+      <a href="#access" data-v="access"><i>07</i>Grant access</a>
+      <a href="#portfolio" data-v="portfolio"><i>08</i>Portfolio</a>
+      <a href="#settings" data-v="settings"><i>09</i>Settings</a>
       <a href="/app" class="mob-ma"><i>→</i>Member area</a>
     </nav>
     <div class="me"><span>Signed in as</span><b id="me-email">…</b><a class="btn sm ghost ma" href="/app">Member area <span class="ar"></span></a><button class="link" id="out" type="button">Log out</button></div>
@@ -165,14 +180,26 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     <!-- ACTIVITY -->
     <section class="view" data-v="activity">
-      <div class="bar"><div class="seg" id="aseg"><button class="on" data-c="all">All</button><button data-c="telegram">Telegram</button><button data-c="billing">Billing</button><button data-c="accounts">Accounts</button><button data-c="system">System</button></div><span class="sp"></span><label class="small muted chk"><input type="checkbox" id="a-minor"> Show routine events</label><span class="small muted" id="a-count"></span></div>
+      <div class="bar"><div class="seg" id="aseg"><button class="on" data-c="all">All</button><button data-c="telegram">Telegram</button><button data-c="billing">Billing</button><button data-c="accounts">Accounts</button><button data-c="support">Support</button><button data-c="system">System</button></div><span class="sp"></span><label class="small muted chk"><input type="checkbox" id="a-minor"> Show routine events</label><span class="small muted" id="a-count"></span></div>
       <div class="card rv"><div class="act-list" id="alist"></div></div>
       <p class="small muted" style="margin-top:14px">Everything the system does with members, in plain words, as it happens. Failures also reach you as a Telegram message from the bot.</p>
     </section>
 
+    <!-- SUPPORT -->
+    <section class="view" data-v="support">
+      <div class="two sup2">
+        <div class="card rv"><h3>Conversations <span class="small muted" id="sup-n"></span></h3>
+          <div class="seg" id="sseg" style="margin-bottom:14px"><button class="on" data-s="open">Waiting</button><button data-s="answered">Answered</button><button data-s="closed">Closed</button><button data-s="all">All</button></div>
+          <ul class="attn" id="slist"></ul>
+        </div>
+        <div class="card rv d1" id="sview"><p class="muted">Pick a conversation on the left.</p></div>
+      </div>
+      <p class="small muted" style="margin-top:14px">Members write from their member area → Support. Every message pings you on Telegram; when you answer here, they get a Telegram note (if connected) and see it in their page.</p>
+    </section>
+
     <!-- MEMBERS -->
     <section class="view" data-v="members">
-      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button></div><span class="sp"></span><span class="small muted" id="count"></span></div>
+      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
       <div class="tblw"><table class="tbl" id="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th>Since</th></tr></thead><tbody id="rows"></tbody></table></div>
     </section>
 
@@ -305,10 +332,13 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       sb.from('plans').select('*'),
       sb.from('notices').select('*').order('created_at', { ascending: false }).limit(20),
       sb.from('whop_events').select('id,type,received_at,payload').like('type', 'payment.%').order('received_at', { ascending: false }).limit(300),
-      M.fn('admin', { action: 'overview' }).catch(function(){ return { settings: [] }; })
+      M.fn('admin', { action: 'overview' }).catch(function(){ return { settings: [] }; }),
+      sb.from('support_threads').select('id,user_id,subject,status,last_at,created_at').order('last_at', { ascending: false }).limit(200),
+      sb.from('support_messages').select('id,thread_id,user_id,from_staff,body,created_at').order('created_at').limit(2000)
     ]);
     D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
-    D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; });
+    D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; }); D.invited = (r[9] && r[9].invited) || {};
+    D.sup = r[10].error ? null : (r[10].data || []); D.supMsgs = {}; ((r[11] && r[11].data) || []).forEach(function(m){ (D.supMsgs[m.thread_id] = D.supMsgs[m.thread_id] || []).push(m); });
     D.planOn = null; if (D.plans.some(function(p){ return typeof p.grants_access === 'boolean'; })) { D.planOn = {}; D.plans.forEach(function(p){ D.planOn[p.plan_id] = !!p.grants_access; }); }
     $('#upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     render();
@@ -391,6 +421,13 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       case 'claim.throttled': return R('accounts', '', s + ' is retrying too fast', '', true);
       case 'claim.error': case 'claim.receipt_error': return R('accounts', 'bad', 'Membership check failed for ' + s, err);
       case 'grant_error': return R('telegram', 'bad', 'Could not prepare Telegram access for ' + s, err);
+      case 'support.new': return R('support', 'warn', (d.email || s) + ' wrote to you: "' + (d.subject || '') + '"', 'Waiting for your answer in Support.');
+      case 'support.message': return R('support', 'warn', (d.email || s) + ' replied in "' + (d.subject || '') + '"', 'Waiting for your answer in Support.');
+      case 'support.reply': return R('support', 'ok', by + ' answered ' + s, '"' + (d.subject || '') + '"');
+      case 'support.closed': return R('support', '', by + ' closed "' + (d.subject || '') + '"', s);
+      case 'support.reopened': return R('support', '', by + ' reopened "' + (d.subject || '') + '"', s);
+      case 'support.error': return R('support', 'bad', 'Support message failed for ' + s, err);
+      case 'invite.sent': return R('accounts', 'ok', by + ' invited ' + s + ' to create their account', 'They got an email with a one-tap link; the account counts as "invited" until they open it.');
       case 'error': return R('system', 'bad', 'Telegram update failed' + (d.kind ? ' (' + d.kind + ')' : ''), err);
       default: return R('system', '', a + (s ? ' · ' + s : ''), '', true);
     }
@@ -436,6 +473,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'no Telegram') + '</li>'); });
     rows.filter(function(e){ return e.best && e.best.status === 'past_due'; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'card failing · grace') + '</li>'); });
     rows.filter(function(e){ return e.best && e.best.cancel_at_period_end && e.valid; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'ends ' + M.fmtDate(e.best.renewal_period_end)) + '</li>'); });
+    var waiting = (D.sup || []).filter(function(t){ return t.status === 'open'; }).length; if (waiting) attn.unshift('<li><span>' + waiting + (waiting === 1 ? ' member is waiting for an answer' : ' members are waiting for an answer') + '</span><a class="link" href="#support">Open Support</a></li>');
     $('#attn').innerHTML = attn.join('') || '<li class="muted">Everything is in order.</li>';
     renderActivity();
 
@@ -453,13 +491,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#rows').innerHTML = list.map(function(e){
       var m = e.best || {};
       var st = !e.best ? tag('', 'no plan') : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
-      var acct = e.profile ? tag('ok', 'on site') + (e.profile.role !== 'member' ? ' ' + tag('', e.profile.role) : '') : tag('', 'no account');
+      var inv = D.invited && D.invited[e.email];
+      var acct = e.profile ? ((inv && !inv.accepted) ? tag('warn', 'invited') : tag('ok', 'on site')) + (e.profile.role !== 'member' ? ' ' + tag('', e.profile.role) : '') : tag('', 'no account');
       var joined = e.acc.filter(function(a){ return a.status === 'joined'; }).length;
       var tg = e.link ? tag('ok', '@' + X(e.link.telegram_username || e.link.telegram_id)) + ' <span class="small muted">' + joined + ' ch</span>' : (e.profile ? tag('warn', 'not connected') : '<span class="muted">–</span>');
       var when = m.plan_key === 'lifetime' ? 'Lifetime' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–');
       return '<tr data-e="' + X(e.email) + '"><td class="em">' + X(e.email) + '</td><td>' + X(m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
     }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
     $('#count').textContent = list.length + ' of ' + rows.length;
+    var inviteN = rows.filter(function(e){ return e.valid && !e.profile; }).length; $('#invite-all').hidden = !(filter === 'whop' && inviteN); $('#invite-all').textContent = 'Invite all without an account (' + inviteN + ')';
+    renderSupport();
 
     // payments
     $('#p-n').textContent = p30.filter(function(p){ return p.ok; }).length; $('#p-rev').textContent = fmtMoney(rev30); $('#p-fail').textContent = p30.filter(function(p){ return p.type === 'failed'; }).length;
@@ -496,6 +537,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (e.profile && e.link && !blocked) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
     if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + X(m.id) + '" data-busy="Revoking">Revoke manual access</button>';
     if (!e.valid) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
+    var inv2 = D.invited && D.invited[e.email];
+    if (!e.profile) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
+    else if (inv2 && !inv2.accepted) html += '<p class="small muted">Invited ' + X(M.fmtDate(inv2.invited_at)) + ', has not opened the link yet.</p><button class="btn ghost" data-a="reinvite" data-email="' + X(e.email) + '" data-busy="Sending">Send the link again</button>';
     html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
     html += '</div>';
     $('#dbody').innerHTML = html; $('#drawer').classList.add('on'); $('#scrim').classList.add('on');
@@ -510,15 +554,38 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (a === 'kick' && !confirm('Remove this member from every Telegram channel? Automatic invites stay paused until you resend them.')) return;
     if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
     if (btn) M.busy(btn, true); M.msg('#m', '');
-    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); closeDrawer(); await load(); }
+    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); if (a === 'invite') { var fk = Object.keys(r.failed || {}); M.msg('#m', 'Invitation sent to ' + r.sent.length + (r.skipped.length ? ' · ' + r.skipped.length + ' already had an account' : '') + (fk.length ? ' · failed: ' + fk.join(', ') : '') + '.', fk.length ? 'bad' : 'ok'); } closeDrawer(); await load(); }
     catch (e) { M.msg('#m', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     finally { if (btn) M.busy(btn, false); }
   }
-  document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
+  document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; if (b.dataset.a === 'invite') return act('invite', { emails: [b.dataset.email] }, b); if (b.dataset.a === 'reinvite') return reinvite(b.dataset.email, b); act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
+  async function reinvite(email, btn){ M.busy(btn, true); try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/app?invited=1' }); if (r.error) throw r.error; M.msg('#m', 'A fresh link is on its way to ' + email + '.', 'ok'); closeDrawer(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } }
+  $('#invite-all').addEventListener('click', function(){ var list = people().filter(function(e){ return e.valid && !e.profile; }).map(function(e){ return e.email; }); if (!list.length) return; if (!confirm('Send the invitation email to ' + list.length + ' member(s) who paid on Whop and have no account yet?')) return; act('invite', { emails: list }, $('#invite-all')); });
   $('#sync').addEventListener('click', function(){ act('sync', {}, $('#sync')); });
   $('#q').addEventListener('input', function(){ q = $('#q').value.trim().toLowerCase(); render(); });
   M.$$('#seg button').forEach(function(b){ b.addEventListener('click', function(){ setFilter(b.dataset.f); }); });
   function setFilter(f){ filter = f; M.$$('#seg button').forEach(function(x){ x.classList.toggle('on', x.dataset.f === f); }); render(); }
+  /* ---- support inbox ---- */
+  var sFilter = 'open', sOpen = null;
+  function emailOfUser(uid){ var p = D.profiles.filter(function(x){ return x.id === uid; })[0]; return p ? p.email : uid; }
+  function renderSupport(){
+    var nb = $('#nav-sup'); if (D.sup === null) { $('#slist').innerHTML = '<li class="muted">Run <b>supabase/support.sql</b> once to enable Support.</li>'; nb.hidden = true; return; }
+    var open = D.sup.filter(function(t){ return t.status === 'open'; }).length; nb.hidden = !open; nb.textContent = String(open);
+    var list = D.sup.filter(function(t){ return sFilter === 'all' || t.status === sFilter; });
+    $('#sup-n').textContent = open ? '· ' + open + ' waiting' : '';
+    $('#slist').innerHTML = list.map(function(t){ var w = new Date(t.last_at); return '<li data-t="' + X(t.id) + '"' + (t.id === sOpen ? ' class="on"' : '') + '><span><b>' + X(t.subject) + '</b><span class="small muted">' + X(emailOfUser(t.user_id)) + ' · ' + X(M.fmtDate(t.last_at)) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</span></span>' + tag(t.status === 'open' ? 'warn' : t.status === 'answered' ? 'ok' : '', t.status === 'open' ? 'waiting' : t.status) + '</li>'; }).join('') || '<li class="muted">Nothing here.</li>';
+    var t = D.sup.filter(function(x){ return x.id === sOpen; })[0], v = $('#sview');
+    if (!t) { v.innerHTML = '<p class="muted">Pick a conversation on the left.</p>'; return; }
+    var msgs = D.supMsgs[t.id] || [];
+    v.innerHTML = '<h3>' + X(t.subject) + ' <span class="small muted">' + X(emailOfUser(t.user_id)) + '</span></h3><div class="thread">' + msgs.map(function(m){ var w = new Date(m.created_at); return '<div class="tm' + (m.from_staff ? ' staff' : '') + '"><span class="who">' + (m.from_staff ? 'You' : X(emailOfUser(t.user_id))) + ' · ' + X(M.fmtDate(m.created_at)) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</span><p>' + X(m.body).replace(/\n/g, '<br>') + '</p></div>'; }).join('') + '</div>'
+      + '<form id="f-sreply" novalidate><textarea class="ta" id="s-body" rows="4" maxlength="4000" placeholder="Your answer…"></textarea><div class="row" style="margin-top:10px"><span class="small muted">' + (t.status === 'closed' ? 'Closed. Answering reopens it.' : 'They see it instantly and get a Telegram note if connected.') + '</span><span><button class="link" type="button" id="s-toggle">' + (t.status === 'closed' ? 'Reopen' : 'Close') + '</button> &nbsp; <button class="btn sm acc" type="submit" data-busy="Sending">Answer</button></span></div></form>'
+      + '<p class="small muted" style="margin-top:14px"><a class="link" href="#members" data-open-member="' + X(emailOfUser(t.user_id)) + '">Open this member</a></p>';
+  }
+  M.$$('#sseg button').forEach(function(b){ b.addEventListener('click', function(){ sFilter = b.dataset.s; M.$$('#sseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); renderSupport(); }); });
+  $('#slist').addEventListener('click', function(ev){ var li = ev.target.closest('li[data-t]'); if (!li) return; sOpen = li.dataset.t; renderSupport(); });
+  document.addEventListener('submit', async function(ev){ if (ev.target.id !== 'f-sreply') return; ev.preventDefault(); var body = $('#s-body').value.trim(); if (!body) return M.msg('#m', 'Write the answer first.', 'bad'); var btn = ev.target.querySelector('.btn'); M.busy(btn, true); try { await M.fn('support', { action: 'reply', thread_id: sOpen, body: body }); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); M.busy(btn, false); } });
+  document.addEventListener('click', async function(ev){ var b = ev.target.closest('#s-toggle'); if (!b) return; var t = D.sup.filter(function(x){ return x.id === sOpen; })[0]; if (!t) return; try { await M.fn('support', { action: t.status === 'closed' ? 'reopen' : 'close', thread_id: sOpen }); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } });
+  document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-open-member]'); if (!a) return; ev.preventDefault(); location.hash = '#members'; setTimeout(function(){ openDrawer(a.dataset.openMember); }, 50); });
   $('#f-grant').addEventListener('submit', async function(ev){
     ev.preventDefault();
     var email = $('#g-email').value.trim().toLowerCase(), plan = $('#g-plan').value, months = $('#g-months').value ? Number($('#g-months').value) : null, note = $('#g-note').value.trim();
@@ -618,7 +685,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
 
   // routing
-  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], members: ['Members', 'Everyone who has, had or paid for access.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
+  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Support', 'Members write from their member area. Answer here.'], members: ['Members', 'Everyone who has, had or paid for access.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
   function route(){ var v = currentView(); if (!TITLES[v]) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);
@@ -626,7 +693,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   route(); await load(); loadPositions(); if (currentView() === 'activity') { hlSince = seenAt(); renderActivity(); }
   /* live: tables in the realtime publication push; audit_log and telegram_access only if housekeeping.sql was run, so a quiet poll covers them */
   var loadT = null; function loadSoon(){ clearTimeout(loadT); loadT = setTimeout(function(){ load(); }, 700); }
-  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, loadSoon).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'audit_log' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_access' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ loadPositions(); }).subscribe(); } catch (e) {}
+  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, loadSoon).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'audit_log' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_access' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ loadPositions(); }).subscribe(); } catch (e) {}
   var lastLoad = Date.now(); setInterval(function(){ if (!document.hidden) { lastLoad = Date.now(); load(); } }, 90000);
   document.addEventListener('visibilitychange', function(){ if (!document.hidden && Date.now() - lastLoad > 60000) { lastLoad = Date.now(); load(); } });
 })();

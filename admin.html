@@ -152,7 +152,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     <nav id="nav">
       <a href="#overview" data-v="overview"><i>01</i>Overview</a>
       <a href="#activity" data-v="activity"><i>02</i>Activity <span class="nn" id="nav-n" hidden>0</span></a>
-      <a href="#support" data-v="support"><i>03</i>Support <span class="nn" id="nav-sup" hidden>0</span></a>
+      <a href="#support" data-v="support"><i>03</i>Inbox <span class="nn" id="nav-sup" hidden>0</span></a>
       <a href="#emails" data-v="emails"><i>04</i>Emails</a>
       <a href="#members" data-v="members"><i>05</i>Members</a>
       <a href="#payments" data-v="payments"><i>06</i>Payments</a>
@@ -200,7 +200,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
         </div>
         <div class="card rv d1" id="sview"><p class="muted">Pick a conversation on the left.</p></div>
       </div>
-      <p class="small muted" style="margin-top:14px">Members write from their member area → Support. Every message pings you on Telegram; when you answer here, they get a Telegram note (if connected) and see it in their page.</p>
+      <p class="small muted" style="margin-top:14px">Members write from their member area → Feedback. Every message pings you on Telegram; when you answer here, they get a Telegram note (if connected) and see it in their page.</p>
     </section>
 
     <!-- EMAILS -->
@@ -444,12 +444,12 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       case 'claim.throttled': return R('accounts', '', s + ' is retrying too fast', '', true);
       case 'claim.error': case 'claim.receipt_error': return R('accounts', 'bad', 'Membership check failed for ' + s, err);
       case 'grant_error': return R('telegram', 'bad', 'Could not prepare Telegram access for ' + s, err);
-      case 'support.new': return R('support', 'warn', (d.email || s) + ' wrote to you: "' + (d.subject || '') + '"', 'Waiting for your answer in Support.');
-      case 'support.message': return R('support', 'warn', (d.email || s) + ' replied in "' + (d.subject || '') + '"', 'Waiting for your answer in Support.');
+      case 'support.new': return R('support', 'warn', (d.email || s) + ' wrote to you: "' + (d.subject || '') + '"', 'Waiting for your answer in the Inbox.');
+      case 'support.message': return R('support', 'warn', (d.email || s) + ' replied in "' + (d.subject || '') + '"', 'Waiting for your answer in the Inbox.');
       case 'support.reply': return R('support', 'ok', by + ' answered ' + s, '"' + (d.subject || '') + '"');
       case 'support.closed': return R('support', '', by + ' closed "' + (d.subject || '') + '"', s);
       case 'support.reopened': return R('support', '', by + ' reopened "' + (d.subject || '') + '"', s);
-      case 'support.error': return R('support', 'bad', 'Support message failed for ' + s, err);
+      case 'support.error': return R('support', 'bad', 'Inbox message failed for ' + s, err);
       case 'invite.sent': return R('accounts', 'ok', by + ' invited ' + s + ' to create their account', 'They got an email with a one-tap link; the account counts as "invited" until they open it.');
       case 'error': return R('system', 'bad', 'Telegram update failed' + (d.kind ? ' (' + d.kind + ')' : ''), err);
       default: return R('system', '', a + (s ? ' · ' + s : ''), '', true);
@@ -496,7 +496,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'no Telegram') + '</li>'); });
     rows.filter(function(e){ return e.best && e.best.status === 'past_due'; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'card failing · grace') + '</li>'); });
     rows.filter(function(e){ return e.best && e.best.cancel_at_period_end && e.valid; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'ends ' + M.fmtDate(e.best.renewal_period_end)) + '</li>'); });
-    var waiting = (D.sup || []).filter(function(t){ return t.status === 'open'; }).length; if (waiting) attn.unshift('<li><span>' + waiting + (waiting === 1 ? ' member is waiting for an answer' : ' members are waiting for an answer') + '</span><a class="link" href="#support">Open Support</a></li>');
+    var waiting = (D.sup || []).filter(function(t){ return t.status === 'open'; }).length; if (waiting) attn.unshift('<li><span>' + waiting + (waiting === 1 ? ' member is waiting for an answer' : ' members are waiting for an answer') + '</span><a class="link" href="#support">Open Inbox</a></li>');
     $('#attn').innerHTML = attn.join('') || '<li class="muted">Everything is in order.</li>';
     renderActivity();
 
@@ -629,7 +629,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var sFilter = 'open', sOpen = null;
   function emailOfUser(uid){ var p = D.profiles.filter(function(x){ return x.id === uid; })[0]; return p ? p.email : uid; }
   function renderSupport(){
-    var nb = $('#nav-sup'); if (D.sup === null) { $('#slist').innerHTML = '<li class="muted">Run <b>supabase/support.sql</b> once to enable Support.</li>'; nb.hidden = true; return; }
+    var nb = $('#nav-sup'); if (D.sup === null) { $('#slist').innerHTML = '<li class="muted">Run <b>supabase/support.sql</b> once to enable the Inbox.</li>'; nb.hidden = true; return; }
     var open = D.sup.filter(function(t){ return t.status === 'open'; }).length; nb.hidden = !open; nb.textContent = String(open);
     var list = D.sup.filter(function(t){ return sFilter === 'all' || t.status === sFilter; });
     $('#sup-n').textContent = open ? '· ' + open + ' waiting' : '';
@@ -747,7 +747,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
 
   // routing
-  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Support', 'Members write from their member area. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
+  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
   function route(){ var v = currentView(); if (!TITLES[v]) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);

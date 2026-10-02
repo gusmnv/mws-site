@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>The Syndicate — Mr. Wall Street</title>
+<title>Member area — Mr. Wall Street</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0A0A0B">
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
@@ -34,22 +34,21 @@
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
-      <p class="grp">Your Syndicate</p>
-      <a href="#overview" data-p="overview"><i>01</i>Overview</a>
-      <a href="#membership" data-p="membership"><i>02</i>Membership<span class="cnt" id="n-mem"></span></a>
-      <a href="#telegram" data-p="telegram"><i>03</i>Telegram<span class="cnt" id="n-tg"></span></a>
+      <p class="grp">Inside</p>
+      <a href="#telegram" data-p="telegram"><i>01</i>Telegram<span class="cnt" id="n-tg"></span></a>
+      <a href="#portfolio" data-p="portfolio"><i>02</i>Portfolio<span class="cnt" id="n-pf"></span></a>
       <p class="grp">The Desk <span class="soon" id="desk-grp-tag">In development</span></p>
-      <a href="#portfolio" data-p="portfolio"><i>04</i>Portfolio</a>
-      <a href="#calendar" data-p="calendar"><i>05</i>Calendar</a>
-      <a href="#earnings" data-p="earnings"><i>06</i>Earnings</a>
-      <p class="grp">Account</p>
-      <a href="#settings" data-p="settings"><i>07</i>Settings</a>
-      <a href="#support" data-p="support"><i>08</i>Support</a>
+      <a href="#calendar" data-p="calendar"><i>03</i>Calendar</a>
+      <a href="#earnings" data-p="earnings"><i>04</i>Earnings</a>
+      <p class="grp">Settings</p>
+      <a href="#account" data-p="account"><i>05</i>Account</a>
+      <a href="#membership" data-p="membership"><i>06</i>Membership<span class="cnt" id="n-mem"></span></a>
+      <a href="#devices" data-p="devices"><i>07</i>Devices</a>
+      <a href="#feedback" data-p="feedback"><i>08</i>Feedback<span class="cnt" id="n-fb"></span></a>
     </nav>
     <div class="side-foot">
       <a class="adm" href="/admin" id="side-admin" hidden>Admin <span>→</span></a>
-      <div class="me"><b id="me-name">…</b><span id="me-email"></span></div>
-      <div class="row"><a class="link" href="/">← mrofwallstreet.com</a><button class="link" id="signout" type="button">Log out</button></div>
+      <div class="row"><button class="link" id="signout" type="button">Log out</button></div>
     </div>
   </aside>
   <div class="scrim" id="scrim"></div>
@@ -57,32 +56,18 @@
   <div class="mainc">
     <header class="bar">
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><span></span></button>
-      <div class="crumbs"><span class="mono">The Syndicate</span><span class="sep">/</span><span id="crumb">Overview</span></div>
+      <div class="crumbs"><span class="mono">Mr. Wall Street</span><span class="sep">/</span><span id="crumb">Telegram</span></div>
       <span class="tag" id="bar-st">—</span>
     </header>
 
     <main class="content" id="content">
 
-      <!-- 01 overview -->
-      <section class="page" data-page="overview">
-        <div class="head rv"><p class="eyebrow"><b>/01</b>Overview</p><h1 id="h">Loading…</h1><p id="sub"></p></div>
-        <div id="ov-notices"></div>
-        <div id="ov-banner"></div>
-        <div class="tiles rv d1" id="tiles"></div>
-        <div id="ov-plans"></div>
-        <div class="sec rv d2">
-          <div class="sh"><h2>The Desk</h2><span class="soon">In development</span></div>
-          <div class="desk">
-            <a href="#portfolio"><span class="n">04 <span class="soon" id="desk-pf-tag">Soon</span></span><h3>Portfolio</h3><p>The positions we hold, how they are sized and the thesis behind each one. Run like a fund, shown like a fund.</p><span class="go">Preview →</span></a>
-            <a href="#calendar"><span class="n">05 <span class="soon">Soon</span></span><h3>Calendar</h3><p>The week ahead: the releases and events that move markets, with the readings as they print and what they change for our positioning.</p><span class="go">Preview →</span></a>
-            <a href="#earnings"><span class="n">06 <span class="soon">Soon</span></span><h3>Earnings</h3><p>Reporting dates, expectations and results for the names we hold and the names we are watching.</p><span class="go">Preview →</span></a>
-          </div>
-        </div>
-      </section>
+      <!-- status hooks (no Overview page any more; render() still writes here, nothing is shown) -->
+      <div hidden aria-hidden="true"><h1 id="h"></h1><p id="sub"></p><div id="tiles"></div><div id="ov-plans"></div><span id="desk-pf-tag"></span></div>
 
-      <!-- 02 membership -->
+      <!-- 07 membership -->
       <section class="page" data-page="membership">
-        <div class="head rv"><p class="eyebrow"><b>/02</b>Membership</p><h1>Your membership.</h1><p id="mem-sub"></p></div>
+        <div class="head rv"><p class="eyebrow"><b>/06</b>Membership</p><h1>Your membership.</h1><p id="mem-sub"></p></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="p-access"><div class="ttl"><h3>Plan &amp; billing</h3><span class="tag" id="st">—</span></div><div id="access-body"></div></section>
@@ -99,9 +84,11 @@
         </div>
       </section>
 
-      <!-- 03 telegram -->
+      <!-- 01 telegram -->
       <section class="page" data-page="telegram">
-        <div class="head rv"><p class="eyebrow"><b>/03</b>Telegram</p><h1>Your channels.</h1><p id="tg-sub">Private rooms, personal links. Approved automatically, for your account only.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/01</b>Telegram</p><h1>Your channels.</h1><p id="tg-sub">Private rooms, personal links. Approved automatically, for your account only.</p></div>
+        <div id="ov-notices"></div>
+        <div id="ov-banner"></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="p-tg"><div class="ttl"><h3>Channels</h3><span class="tag" id="tg-st">—</span></div><div id="tg-body"></div></section>
@@ -121,9 +108,9 @@
         </div>
       </section>
 
-      <!-- 04–06 the desk -->
+      <!-- 03–05 the desk -->
       <section class="page" data-page="portfolio">
-        <div class="head rv"><p class="eyebrow"><b>/04</b>The Desk · Portfolio <span class="soon" id="pf-tag">In development</span></p><h1>The book, open.</h1><p>Every position Mr. Wall Street holds: entry, size, last mark and the thesis. Updated as trades happen, so members see the portfolio the way a fund sees it, not the way a tweet shows it.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/02</b>Portfolio <span class="soon" id="pf-tag">In development</span></p><h1>The book, open.</h1><p>Every position Mr. Wall Street holds: entry, size, last mark and the thesis. Updated as trades happen, so members see the portfolio the way a fund sees it, not the way a tweet shows it.</p></div>
         <div id="pf-live" hidden>
           <div class="tiles rv" id="pf-tiles"></div>
           <div class="sec"><div class="sh"><h2>Open positions</h2><span class="small muted" id="pf-upd"></span></div><div class="ptw"><table class="pt" id="pf-open"></table></div></div>
@@ -144,7 +131,7 @@
         </div>
       </section>
       <section class="page" data-page="calendar">
-        <div class="head rv"><p class="eyebrow"><b>/05</b>The Desk · Calendar</p><h1>The week, before it happens.</h1><p>Inflation, rates, jobs, growth, and the events around them. The calendar of what moves markets, the readings as they come out and what each one changes for how we are positioned.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/03</b>The Desk · Calendar</p><h1>The week, before it happens.</h1><p>Inflation, rates, jobs, growth, and the events around them. The calendar of what moves markets, the readings as they come out and what each one changes for how we are positioned.</p></div>
         <div class="skel rv d1">
           <div class="r h"><span style="width:44%"></span><span style="width:50%"></span><span style="width:40%"></span><span style="width:60%"></span><span style="width:55%"></span></div>
           <div class="r"><span style="width:66%"></span><span style="width:30%"></span><span style="width:40%"></span><span style="width:40%"></span><span style="width:40%"></span></div>
@@ -156,7 +143,7 @@
         <p class="small muted rv d2" style="margin-top:18px">Until it opens, the macro calls are posted in the Exclusive channel.</p>
       </section>
       <section class="page" data-page="earnings">
-        <div class="head rv"><p class="eyebrow"><b>/06</b>The Desk · Earnings</p><h1>Report season, covered.</h1><p>Dates, expectations and results for the names in the book and the names on the watchlist, with the read-through for each position.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/04</b>The Desk · Earnings</p><h1>Report season, covered.</h1><p>Dates, expectations and results for the names in the book and the names on the watchlist, with the read-through for each position.</p></div>
         <div class="skel rv d1">
           <div class="r h"><span style="width:30%"></span><span style="width:50%"></span><span style="width:40%"></span><span style="width:60%"></span><span style="width:55%"></span></div>
           <div class="r"><span style="width:40%"></span><span style="width:60%"></span><span style="width:52%"></span><span style="width:45%"></span><span style="width:50%"></span></div>
@@ -168,23 +155,32 @@
         <p class="small muted rv d2" style="margin-top:18px">Until it opens, earnings plays are called in the Exclusive channel.</p>
       </section>
 
-      <!-- 07 settings -->
-      <section class="page" data-page="settings">
-        <div class="head rv"><p class="eyebrow"><b>/07</b>Settings</p><h1>Your account.</h1><p>Email, password and what we send you.</p></div>
+      <!-- 06 account -->
+      <section class="page" data-page="account">
+        <div class="head rv"><p class="eyebrow"><b>/05</b>Account</p><h1>Your account.</h1><p>Name, email, password and what we send you.</p></div>
         <div class="acct">
           <div>
-            <section class="panel rv"><div class="ttl"><h3>Security</h3></div>
+            <section class="panel rv"><div class="ttl"><h3>You</h3><span class="tag" id="acc-tag"></span></div>
               <dl class="kv"><dt>Email</dt><dd id="acc-email"></dd><dt>Name</dt><dd id="acc-name"></dd><dt>Member since</dt><dd id="acc-since"></dd></dl>
-              <div class="row" style="margin-top:18px"><button class="link" id="chg-pw" type="button">Change password</button><button class="link" id="out-all" type="button">Log out of all devices</button></div>
+              <div class="row" style="margin-top:18px"><button class="link" id="chg-name" type="button">Change name</button><button class="link" id="chg-pw" type="button">Change password</button></div>
+              <form id="f-name" hidden style="margin-top:18px" novalidate>
+                <div class="field"><label for="cname">Your name</label><input id="cname" type="text" maxlength="24" autocomplete="name" spellcheck="false"><span class="small muted" style="display:block;margin-top:6px">3 to 24 characters.</span></div>
+                <div class="msg" id="m-name"></div>
+                <div class="row"><button class="btn sm acc" type="submit" data-busy="Saving">Save name</button><button class="link" type="button" id="name-cancel">Cancel</button></div>
+              </form>
               <form id="f-pw" hidden style="margin-top:18px" novalidate>
                 <div class="field"><label for="cpw">New password</label><input id="cpw" type="password" autocomplete="new-password" minlength="8"></div>
                 <div class="msg" id="m-pw"></div>
-                <button class="btn sm acc" type="submit" data-busy="Saving">Save</button>
+                <button class="btn sm acc" type="submit" data-busy="Saving">Save password</button>
               </form>
               <div class="msg" id="m-sec"></div>
             </section>
-            <section class="panel rv d2"><div class="ttl"><h3>Your data</h3></div>
-              <p class="small muted">To export or delete your data, or to close your account, write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> from this email. See the <a href="/privacy">privacy policy</a>.</p>
+            <section class="panel rv d2"><div class="ttl"><h3>Help</h3></div>
+              <ul class="list">
+                <li><span>Write to us</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
+                <li><span>Your data</span><span class="small muted">Export or delete: email us from this address. <a href="/privacy">Privacy policy</a></span></li>
+              </ul>
+              <div class="msg on bad" style="margin-top:18px">We never message first. Anyone who contacts you first claiming to be Mr. Wall Street, on Telegram, X or email, is a scam.</div>
             </section>
           </div>
           <div>
@@ -196,17 +192,39 @@
         </div>
       </section>
 
-      <!-- 08 support -->
-      <section class="page" data-page="support">
-        <div class="head rv"><p class="eyebrow"><b>/08</b>Support</p><h1>Need a hand?</h1><p>Write to us here. We answer in this page, and you get a Telegram note when we do.</p></div>
+      <!-- 08 devices -->
+      <section class="page" data-page="devices">
+        <div class="head rv"><p class="eyebrow"><b>/07</b>Devices</p><h1>Where you are logged in.</h1><p>Every device with an open session on this account. End any of them.</p></div>
         <div class="acct">
           <div>
-            <section class="panel rv" id="sup-new"><div class="ttl"><h3>Write to Mr. Wall Street</h3></div>
+            <section class="panel rv"><div class="ttl"><h3>Sessions</h3><span class="small muted" id="dev-n"></span></div>
+              <ul class="list devs" id="dev-list"><li><span class="muted">Loading…</span></li></ul>
+              <div class="msg" id="m-dev"></div>
+              <div class="row" style="margin-top:18px"><button class="btn sm ghost" id="out-others" type="button" data-busy="Ending">Log out of all other devices</button><button class="link" id="out-all" type="button">Log out everywhere, including here</button></div>
+            </section>
+          </div>
+          <div>
+            <section class="panel rv d1"><div class="ttl"><h3>Good to know</h3></div>
+              <ul class="faq">
+                <li><b>Do not recognise a device?</b><p>End that session, then change your password under <a href="#account">Account</a>.</p></li>
+                <li><b>Ending a session</b><p>stops that device from staying logged in. It may keep working for up to an hour, then it is out.</p></li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 feedback: the inbox. Members write here; it lands in Admin → Inbox and the answer shows up on this page -->
+      <section class="page" data-page="feedback">
+        <div class="head rv"><p class="eyebrow"><b>/08</b>Feedback</p><h1>Tell us.</h1><p>Feedback, ideas, questions, problems. Write here; the answer arrives on this page, and you get a Telegram note when it does.</p></div>
+        <div class="acct">
+          <div>
+            <section class="panel rv" id="sup-new"><div class="ttl"><h3>Write to Mr. Wall Street</h3><span class="tag">Inbox</span></div>
               <form id="f-sup" novalidate>
-                <div class="field"><label for="sup-subject">Subject</label><input id="sup-subject" type="text" maxlength="120" placeholder="Paid with a different email"></div>
-                <div class="field"><label for="sup-body">Message</label><textarea id="sup-body" class="ta" rows="5" maxlength="4000" placeholder="Tell us what happened. Receipts, emails and dates help."></textarea></div>
+                <div class="field"><label for="sup-subject">Subject</label><input id="sup-subject" type="text" maxlength="120" placeholder="An idea for the Desk, a question, a problem…"></div>
+                <div class="field"><label for="sup-body">Message</label><textarea id="sup-body" class="ta" rows="5" maxlength="4000" placeholder="Say it plainly. For payment issues, add the receipt email and date."></textarea></div>
                 <div class="msg" id="m-sup"></div>
-                <div class="row"><span class="small muted">Answers arrive here, usually within 12 hours.</span><button class="btn acc" type="submit" data-busy="Sending">Send <span class="ar"></span></button></div>
+                <div class="row"><span class="small muted">Answers arrive here, usually within a day.</span><button class="btn acc" type="submit" data-busy="Sending">Send <span class="ar"></span></button></div>
               </form>
             </section>
             <section class="panel rv d1" id="sup-threads-wrap" hidden><div class="ttl"><h3>Your conversations</h3><span class="small muted" id="sup-count"></span></div><div id="sup-threads"></div></section>
@@ -223,7 +241,6 @@
             </section>
             <section class="panel rv d2"><div class="ttl"><h3>Other ways</h3></div>
               <ul class="list">
-                <li><span>Inside Telegram</span><span class="small muted" id="sup-chat">In the members' chat</span></li>
                 <li><span>By email</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
                 <li><span>Public</span><a class="link" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a></li>
               </ul>
@@ -243,7 +260,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { overview:'Overview', membership:'Membership', telegram:'Telegram', portfolio:'Portfolio', calendar:'Calendar', earnings:'Earnings', settings:'Settings', support:'Support' };
+  var PAGES = { telegram:'Telegram', portfolio:'Portfolio', calendar:'Calendar', earnings:'Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
   var isInvite = M.qs('invited') === '1' || /type=invite/.test(initialHash);
@@ -311,11 +328,12 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* router: #page */
   var current = '';
   function route(){
-    var k = (location.hash || '#overview').slice(1); if (k === 'economic') k = 'calendar'; if (!PAGES[k] || /=/.test(k)) k = 'overview';
+    var k = (location.hash || '#telegram').slice(1); if (k === 'economic') k = 'calendar'; if (k === 'settings') k = 'account'; if (k === 'support' || k === 'chat') k = 'feedback'; if (k === 'overview') k = 'telegram'; if (!PAGES[k] || /=/.test(k)) k = 'telegram';
+    if (k === 'devices' && typeof loadDevices === 'function') loadDevices();
     current = k;
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
     $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === k); });
-    $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — The Syndicate — Mr. Wall Street';
+    $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — Mr. Wall Street';
     drawer(false); window.scrollTo(0, 0);
     if (k === 'telegram' && access && access.valid && !invites) { fetchInvites(false).then(paintInvites); }
   }
@@ -355,6 +373,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     sim = staffRole ? M.sim(channels) : null;
     if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); } else { document.body.classList.remove('sim'); }
     render();
+    if (current === 'devices') loadDevices();
     if (!supLoaded) { supLoaded = true; loadSupport(); }
   }
   /* in preview, buttons and checkout links inside the pages do nothing (they act on real members' accounts) */
@@ -370,9 +389,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function render(){
     /* identity */
     var name = firstName();
-    $('#me-name').textContent = name || (profile && profile.full_name) || user.email.split('@')[0];
-    $('#me-email').textContent = user.email;
-    $('#acc-email').textContent = user.email; $('#acc-name').textContent = (profile && profile.full_name) || '—';
+    $('#acc-email').textContent = user.email; $('#acc-name').textContent = (profile && profile.full_name) || '—'; $('#acc-tag').textContent = 'Add your name'; $('#acc-tag').hidden = !!(profile && profile.full_name);
     $('#acc-since').textContent = M.fmtDate(profile && profile.created_at || user.created_at);
     $('#tgl-updates').classList.toggle('on', !!(profile && profile.email_updates)); $('#tgl-updates').setAttribute('aria-checked', String(!!(profile && profile.email_updates)));
     var staff = !sim && profile && (profile.role === 'owner' || profile.role === 'admin');
@@ -385,12 +402,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var manage = access.manage_url ? '<a class="btn sm ghost" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Manage subscription</a>' : '<span class="small muted">Manage your subscription from the receipt email or <a href="https://whop.com/orders" target="_blank" rel="noopener">your orders</a>.</span>';
     var since = new Date(profile && profile.created_at || user.created_at), days = Math.max(0, Math.floor((Date.now() - since.getTime()) / 86400000));
     var joined = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length;
-    var daysTxt = days === 0 ? 'Joined today.' : days === 1 ? 'One day in the Syndicate.' : days + ' days in the Syndicate.';
+    var daysTxt = days === 0 ? 'Joined today.' : days === 1 ? 'One day as a member.' : days + ' days as a member.';
     var banner = '', plansHtml = '';
     (function(){ var n = channels.length, j = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length, who = link ? (link.telegram_username || tgUser) : null;
       $('#tg-sub').textContent = !access.valid ? 'Your channels open the moment your membership is active.' : (n && j === n) ? ('You are in. ' + (n === 1 ? 'The channel is' : 'Both channels are') + ' on your Telegram' + (who ? ' as @' + who : '') + '.') : (n === 1 ? 'One private channel. ' : n ? n + ' private channels. ' : 'Private channels. ') + 'Tap Join, confirm in Telegram, and you are in.';
       $('#tg-how').hidden = !!(n && j === n); })();
-    var chatCh = channels.filter(function(c){ return /chat|talk|lounge|discuss/i.test(c.title || ''); })[0]; $('#sup-chat').textContent = chatCh ? chatCh.title : "In the members' chat";
     $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>The Desk: portfolio, calendar, earnings</span><span class="soon">Soon</span></li>';
 
     if (access.valid) {
@@ -421,16 +437,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       $('#h').textContent = 'Confirming your payment…'; $('#sub').textContent = 'This usually takes a few seconds. Keep this page open.';
       st.textContent = 'Pending'; st.className = 'tag warn'; bar.textContent = 'Pending'; bar.className = 'tag warn'; $('#mem-sub').textContent = 'Waiting for the payment confirmation.';
       body.innerHTML = '<p class="small muted"><span class="spin"></span>Waiting for the payment confirmation.</p>';
-      $('#tiles').innerHTML = tile('Membership <span class="tag warn">Pending</span>', '<span class="spin"></span>Confirming', 'Matching your payment to this account.') + tile('Telegram', '—', 'Your links appear the moment the payment is confirmed.') + tile('Member since', esc(M.fmtDate(since)), 'Welcome to the Syndicate.');
+      $('#tiles').innerHTML = tile('Membership <span class="tag warn">Pending</span>', '<span class="spin"></span>Confirming', 'Matching your payment to this account.') + tile('Telegram', '—', 'Your links appear the moment the payment is confirmed.') + tile('Member since', esc(M.fmtDate(since)), 'Welcome.');
       clearTimeout(pollT); pollT = setTimeout(function(){ load(paidTries % 3 === 1); }, 4000); /* re-check access every 4s; ask Whop again every 12s */
       renderTg(false);
     } else if (paid && !access.valid) {
       $('#h').textContent = 'Still confirming…'; $('#sub').textContent = 'The payment went through but we have not matched it to this account yet.';
       st.textContent = 'Pending'; st.className = 'tag warn'; bar.textContent = 'Pending'; bar.className = 'tag warn'; $('#mem-sub').textContent = '';
-      body.innerHTML = '<p class="small muted">If you paid with a different email than <b>' + esc(user.email) + '</b>, the match can take a few minutes. <button class="link" data-reclaim="1" type="button">Check again</button> or write to us from <a href="#support">Support</a> with your receipt email.</p>';
+      body.innerHTML = '<p class="small muted">If you paid with a different email than <b>' + esc(user.email) + '</b>, the match can take a few minutes. <button class="link" data-reclaim="1" type="button">Check again</button> or write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with your receipt email.</p>';
       $('#tiles').innerHTML = tile('Membership <span class="tag warn">Pending</span>', 'Not matched yet', '<button class="link" data-reclaim="1" type="button">Check again</button>') + tile('Telegram', '—', 'Your links appear the moment the payment is confirmed.') + tile('Member since', esc(M.fmtDate(since)), '');
       var plans2 = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
-      plansHtml = '<section class="panel rv d1" style="margin-top:1px"><div class="ttl"><h3>Did the payment not go through?</h3><span class="tag">Plans</span></div><p class="small muted" style="margin-bottom:12px">If your card was declined or you closed the checkout early, pick a plan again. If you were charged, do not pay twice: write to <a href="#support">Support</a> with the receipt.</p><ul class="list">' + plans2 + '</ul></section>';
+      plansHtml = '<section class="panel rv d1" style="margin-top:1px"><div class="ttl"><h3>Did the payment not go through?</h3><span class="tag">Plans</span></div><p class="small muted" style="margin-bottom:12px">If your card was declined or you closed the checkout early, pick a plan again. If you were charged, do not pay twice: write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with the receipt.</p><ul class="list">' + plans2 + '</ul></section>';
       renderTg(false);
     } else if (access.status === 'past_due') {
       /* grace period over: Whop is still retrying the same subscription, so the fix is the card, not a second plan */
@@ -442,13 +458,13 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       $('#n-mem').textContent = '!'; $('#n-mem').className = 'cnt warn'; $('#n-tg').textContent = '';
       renderTg(false);
     } else {
-      $('#h').textContent = name ? 'Choose your entry, ' + name + '.' : 'Choose your entry.'; $('#sub').textContent = 'Your account is ready. Pick a plan and the Syndicate unlocks the second the payment clears.';
+      $('#h').textContent = name ? 'Choose your entry, ' + name + '.' : 'Choose your entry.'; $('#sub').textContent = 'Your account is ready. Pick a plan and everything unlocks the second the payment clears.';
       st.textContent = access.reason === 'none' ? 'No plan' : 'Inactive'; st.className = 'tag bad'; bar.textContent = 'No plan'; bar.className = 'tag'; $('#mem-sub').textContent = access.reason === 'none' ? 'No active plan on this account.' : 'Your previous membership (' + planName(access.plan_key) + ') has ended.';
       var plans = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm' + (k==='yearly'?' acc':'') + '" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
       var prev = access.reason !== 'none' ? '<p class="small muted" style="margin-top:14px">Your previous membership (' + esc(planName(access.plan_key)) + ') has ended. Choosing a plan restores your access immediately.</p>' : '<p class="small muted" style="margin-top:14px">Already paid through Whop with this email? <button class="link" data-reclaim="1" type="button">Check again</button>.</p>';
       body.innerHTML = '<ul class="list">' + plans + '</ul>' + prev;
       plansHtml = '<section class="panel rv d1" style="margin-top:1px"><div class="ttl"><h3>Plans</h3><span class="tag">' + (access.reason === 'none' ? 'Choose one' : 'Rejoin') + '</span></div><ul class="list">' + plans + '</ul>' + prev + '</section>';
-      $('#tiles').innerHTML = tile('Membership <span class="tag bad">' + (access.reason === 'none' ? 'No plan' : 'Ended') + '</span>', access.reason === 'none' ? 'None yet' : esc(planName(access.plan_key)), access.reason === 'none' ? 'Choose a plan below.' : 'Ended. Choose a plan to come back.', '#membership') + tile('Telegram <span class="tag">Locked</span>', (channels.length || 2) + ' channels', 'Unlock with any plan. Personal links, one tap.') + tile('Member since', esc(M.fmtDate(since)), 'Account created. The Syndicate is one step away.');
+      $('#tiles').innerHTML = tile('Membership <span class="tag bad">' + (access.reason === 'none' ? 'No plan' : 'Ended') + '</span>', access.reason === 'none' ? 'None yet' : esc(planName(access.plan_key)), access.reason === 'none' ? 'Choose a plan below.' : 'Ended. Choose a plan to come back.', '#membership') + tile('Telegram <span class="tag">Locked</span>', (channels.length || 2) + ' channels', 'Unlock with any plan. Personal links, one tap.') + tile('Member since', esc(M.fmtDate(since)), 'Account created. Access is one step away.');
       $('#n-mem').textContent = '!'; $('#n-mem').className = 'cnt warn'; $('#n-tg').textContent = '';
       renderTg(false);
     }
@@ -528,7 +544,40 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* prefs, password, sign out */
   $('#tgl-updates').addEventListener('click', async function(){ var t = this, on = !t.classList.contains('on'); t.classList.toggle('on', on); t.setAttribute('aria-checked', String(on)); var r = await sb.from('profiles').update({ email_updates: on }).eq('id', user.id); if (r && r.error) { t.classList.toggle('on', !on); t.setAttribute('aria-checked', String(!on)); M.toast('Could not save. Try again.'); } else if (profile) profile.email_updates = on; });
   $('#tgl-updates').addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); this.click(); } });
-  $('#chg-pw').addEventListener('click', function(){ $('#f-pw').hidden = !$('#f-pw').hidden; });
+  $('#chg-pw').addEventListener('click', function(){ $('#f-pw').hidden = !$('#f-pw').hidden; $('#f-name').hidden = true; });
+  $('#chg-name').addEventListener('click', function(){ var f = $('#f-name'); f.hidden = !f.hidden; $('#f-pw').hidden = true; if (!f.hidden) { $('#cname').value = (profile && profile.full_name) || ''; $('#cname').focus(); } });
+  $('#name-cancel').addEventListener('click', function(){ $('#f-name').hidden = true; });
+  /* name: 3 to 24 characters */
+  async function saveName(v){
+    v = v.replace(/\s+/g, ' ').trim();
+    if (v.length < 3) throw new Error('At least 3 characters.'); if (v.length > 24) throw new Error('At most 24 characters.');
+    var u = await sb.from('profiles').update({ full_name: v }).eq('id', user.id); if (u.error) throw u.error;
+    if (profile) profile.full_name = v; $('#acc-name').textContent = v; $('#acc-tag').hidden = true;
+  }
+  $('#f-name').addEventListener('submit', async function(e){ e.preventDefault(); if (sim) return M.toast('Preview only.'); var btn = $('#f-name .btn'); M.busy(btn, true); M.msg('#m-name', ''); try { await saveName($('#cname').value); $('#f-name').hidden = true; M.toast('Name saved.'); } catch (err) { M.msg('#m-name', M.human(err), 'bad'); } finally { M.busy(btn, false); } });
+  /* devices: the account's open sessions (account.sql) */
+  var DEV = { list: null, loading: false };
+  function ua(s){ s = String(s || ''); var os = /iPhone|iPad/.test(s) ? 'iPhone' : /Android/.test(s) ? 'Android' : /Macintosh/.test(s) ? 'Mac' : /Windows/.test(s) ? 'Windows' : /Linux/.test(s) ? 'Linux' : 'Device'; var br = /Edg\//.test(s) ? 'Edge' : /OPR\//.test(s) ? 'Opera' : /Firefox\//.test(s) ? 'Firefox' : /CriOS|Chrome\//.test(s) ? 'Chrome' : /Safari\//.test(s) ? 'Safari' : ''; return os + (br ? ' · ' + br : ''); }
+  async function loadDevices(){
+    if (!DEV || DEV.loading || !access) return; DEV.loading = true;
+    try { var r = await sb.rpc('my_sessions'); if (r.error) throw r.error; DEV.list = r.data || []; }
+    catch (e) { DEV.list = null; $('#dev-list').innerHTML = '<li><span class="muted">Could not load your sessions.</span></li>'; DEV.loading = false; return; }
+    DEV.loading = false; renderDevices();
+  }
+  function renderDevices(){
+    var list = DEV.list || [], el = $('#dev-list');
+    $('#dev-n').textContent = list.length ? list.length + (list.length === 1 ? ' device' : ' devices') : '';
+    el.innerHTML = list.length ? list.map(function(d){ var cur = !!d.current; return '<li><span><b style="font-weight:500">' + esc(ua(d.user_agent)) + '</b>' + (cur ? ' <span class="tag ok">This device</span>' : '') + '<span class="small muted" style="display:block">' + (d.ip ? esc(String(d.ip).replace(/\/\d+$/, '')) + ' · ' : '') + 'active ' + esc(fmtWhen(d.last_at)) + ' · since ' + esc(M.fmtDate(d.created_at)) + '</span></span>' + (cur ? '<button class="link" id="signout2" type="button">Log out</button>' : '<button class="link" data-end="' + esc(d.id) + '" type="button">End session</button>') + '</li>'; }).join('') : '<li><span class="muted">No open sessions.</span></li>';
+    $('#out-others').hidden = list.length < 2;
+  }
+  function fmtWhen(iso){ var d = new Date(iso); return M.fmtDate(iso) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
+  $('#dev-list').addEventListener('click', async function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'signout2') { M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); return; }
+    if (!b.dataset.end || sim) return; b.textContent = 'Ending…'; b.disabled = true;
+    try { var r = await sb.rpc('revoke_session', { sid: b.dataset.end }); if (r.error) throw r.error; M.toast('Session ended.'); await loadDevices(); } catch (err) { M.msg('#m-dev', M.human(err), 'bad'); b.disabled = false; b.textContent = 'End session'; }
+  });
+  $('#out-others').addEventListener('click', async function(){ if (sim) return M.toast('Preview only.'); var btn = this; M.busy(btn, true); try { var r = await sb.auth.signOut({ scope: 'others' }); if (r.error) throw r.error; M.toast('Every other device is logged out.'); await loadDevices(); } catch (err) { M.msg('#m-dev', M.human(err), 'bad'); } finally { M.busy(btn, false); } });
   $('#f-pw').addEventListener('submit', async function(e){ e.preventDefault(); var v = $('#cpw').value; if (v.length < 8) return M.msg('#m-pw', 'At least 8 characters.', 'bad'); var btn = $('#f-pw .btn'); M.busy(btn, true); try { var r = await sb.auth.updateUser({ password: v }); if (r.error) throw r.error; M.msg('#m-pw', 'Password updated.', 'ok'); $('#cpw').value=''; } catch(err) { M.msg('#m-pw', M.human(err), 'bad'); } M.busy(btn, false); });
   $('#out-all').addEventListener('click', async function(){ if (!confirm('Log out of every device, including this one?')) return; M.viewAs.set(''); try { await sb.auth.signOut({ scope: 'global' }); } catch(e) { await sb.auth.signOut(); } M.go('/login'); });
   $('#signout').addEventListener('click', async function(){ M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); });

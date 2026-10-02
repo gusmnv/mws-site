@@ -70,6 +70,9 @@ header.top{display:none}
 .topbar .sub{color:var(--fg-3);font-size:14px;margin-top:4px}
 .topbar .acts{display:flex;gap:10px;align-items:center}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:22px}
+.kpis.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:1100px){.kpis.five{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){.kpis.five{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .kpis>div{background:var(--bg);padding:20px 22px;min-height:118px;display:flex;flex-direction:column;min-width:0}
 .kpis b{display:block;font-size:32px;line-height:1;letter-spacing:-.04em;font-weight:400;font-variant-numeric:tabular-nums;margin-top:14px}
 .kpis span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
@@ -209,13 +212,14 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     <!-- MEMBERS -->
     <section class="view" data-v="members">
-      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button><button data-f="legacy">Legacy</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
+      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">No account yet</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button><button data-f="legacy">Legacy</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
       <div class="tblw"><table class="tbl" id="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th>Since</th></tr></thead><tbody id="rows"></tbody></table></div>
     </section>
 
     <!-- PAYMENTS -->
     <section class="view" data-v="payments">
-      <div class="kpis rv"><div><span>Payments · 30 days</span><b id="p-n">–</b></div><div><span>Revenue · 30 days</span><b id="p-rev">–</b></div><div><span>Failed · 30 days</span><b id="p-fail">–</b></div><div><span>All-time via site</span><b id="p-all">–</b><em>Since 27 Sep 2026 — earlier payments live in Whop</em></div></div>
+      <div class="kpis five rv"><div><span>Payments · 30 days</span><b id="p-n">–</b><em>Membership plans</em></div><div><span>Revenue · 30 days</span><b id="p-rev">–</b><em>Membership plans</em></div><div><span>Failed · 30 days</span><b id="p-fail">–</b></div><div><span>All-time</span><b id="p-all">–</b><em>Membership, since 2 Oct 2026</em></div><div><span>Other · 30 days</span><b id="p-other">–</b><em id="p-other-sub"></em></div></div>
+      <div class="bar"><div class="seg" id="pseg"><button class="on" data-f="plans">Membership</button><button data-f="other">Other links</button><button data-f="all">All</button></div><span class="sp"></span><span class="small muted">Only the site's plans count as membership revenue. Invoices and extra links for private clients show under Other.</span></div>
       <div class="tblw"><table class="tbl"><thead><tr><th>When</th><th>Member</th><th>Plan</th><th class="num">Amount</th><th>Status</th><th>Reference</th></tr></thead><tbody id="prow"></tbody></table></div>
     </section>
 
@@ -236,6 +240,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
           <div class="field"><label for="g-months">Months</label><input id="g-months" type="number" min="1" max="120" placeholder="auto"></div>
           <div class="field"><label for="g-paid">Paid on</label><input id="g-paid" type="date"></div>
           <div class="field"><label for="g-note">Note</label><input id="g-note" type="text" placeholder="paid in USDT · 27 Sep"></div>
+          <label class="chk" for="g-invite"><input id="g-invite" type="checkbox" checked> Email the invitation now (if they have no account yet)</label>
           <button class="btn acc" type="submit" data-busy="Granting">Grant <span class="ar"></span></button>
         </form>
       </div>
@@ -318,7 +323,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   var X = M.esc; /* every value that came from a user, Whop or Telegram is escaped before innerHTML */
   var D = { profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {}, plans: [] };
-  var filter = 'all', q = '';
+  var filter = 'all', q = '', pFilter = 'plans';
   var PRICE = { monthly: 99, yearly: 990, lifetime: 3990 };
   var fmtMoney = function(n){ return '$' + (Math.round(n) === n ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); };
 
@@ -372,7 +377,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var legacyIds = {}, legacyMail = {}, liveMail = {}; D.memberships.forEach(function(m){ if (m.legacy) { legacyIds[m.id] = 1; legacyMail[m.email] = 1; } else liveMail[m.email] = 1; });
     return D.events.filter(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var mid = d.membership_id || (d.membership && (d.membership.id || d.membership)); if (mid && legacyIds[mid]) return false; var em = (d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '').toLowerCase(); return !(em && legacyMail[em] && !liveMail[em]); }).map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
   }
-  function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].title; return pid ? 'Test' : '–'; }
+  function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].hidden ? 'Other link' : C[k].title; return pid ? 'Other link' : '–'; }
+  /* a payment counts for the membership only when it came through one of the site's plans; invoices and extra links are shown apart */
+  function isPlanPay(p){ var C = M.config.PLANS; for (var k in C) if (C[k].id === p.plan) return !C[k].hidden; return false; }
   function tag(cls, text){ return '<span class="tag ' + cls + '">' + X(text) + '</span>'; }
 
   /* ---- activity: every audit row, payment and signup as one plain sentence; unread = newer than the last time you opened Activity ---- */
@@ -476,16 +483,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var rows = people(), now = Date.now(), d30 = now - 30 * 86400000;
     var active = rows.filter(function(e){ return e.valid; });
     var mrr = active.reduce(function(s, e){ var k = e.best.plan_key; return s + (k === 'monthly' ? 99 : k === 'yearly' ? 990 / 12 : 0); }, 0);
-    var pays = payments(); var p30 = pays.filter(function(p){ return p.at.getTime() > d30; });
+    var allPays = payments(), pays = allPays.filter(isPlanPay), other = allPays.filter(function(p){ return !isPlanPay(p); }); var p30 = pays.filter(function(p){ return p.at.getTime() > d30; });
     var rev30 = p30.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0);
     var newMonth = rows.filter(function(e){ return e.since && new Date(e.since).getTime() > d30; }).length;
     $('#k-active').textContent = active.length; $('#k-active-sub').textContent = newMonth + ' new in 30 days · ' + active.filter(function(e){ return e.best.plan_key === 'lifetime'; }).length + ' lifetime';
     $('#k-mrr').textContent = fmtMoney(Math.round(mrr));
-    $('#k-rev').textContent = fmtMoney(rev30); $('#k-rev-sub').textContent = p30.filter(function(p){ return p.ok; }).length + ' payments via the site';
+    $('#k-rev').textContent = fmtMoney(rev30); $('#k-rev-sub').textContent = p30.filter(function(p){ return p.ok; }).length + ' membership payments';
     $('#k-tg').textContent = D.links.length; $('#k-tg-sub').textContent = active.filter(function(e){ return e.profile && !e.link; }).length + ' active without Telegram';
     // attention
     var attn = [];
-    rows.filter(function(e){ return e.valid && !e.profile; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'paid on Whop · no account') + '</li>'); });
+    rows.filter(function(e){ return e.valid && !e.profile; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'paid · no account yet') + '</li>'); });
     rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'no Telegram') + '</li>'); });
     rows.filter(function(e){ return e.best && e.best.status === 'past_due'; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'card failing · grace') + '</li>'); });
     rows.filter(function(e){ return e.best && e.best.cancel_at_period_end && e.valid; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'ends ' + M.fmtDate(e.best.renewal_period_end)) + '</li>'); });
@@ -516,13 +523,15 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       return '<tr data-e="' + X(e.email) + '"><td class="em">' + X(e.email) + '</td><td>' + X(m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
     }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
     $('#count').textContent = filter === 'legacy' ? list.length + ' from Whop before the clean start' : list.length + ' of ' + rows.length;
-    var inviteN = rows.filter(function(e){ return e.valid && !e.profile; }).length; $('#invite-all').hidden = !(filter === 'whop' && inviteN); $('#invite-all').textContent = 'Invite all without an account (' + inviteN + ')';
+    var inviteN = rows.filter(function(e){ return e.valid && !e.profile; }).length; $('#invite-all').hidden = !(filter === 'whop' && inviteN); $('#invite-all').textContent = 'Email the invitation to all without an account (' + inviteN + ')';
     renderSupport(); renderEmails();
 
     // payments
     $('#p-n').textContent = p30.filter(function(p){ return p.ok; }).length; $('#p-rev').textContent = fmtMoney(rev30); $('#p-fail').textContent = p30.filter(function(p){ return p.type === 'failed'; }).length;
     $('#p-all').textContent = fmtMoney(pays.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0));
-    $('#prow').innerHTML = pays.slice(0, 200).map(function(p){ return '<tr><td>' + M.fmtDate(p.at) + ' ' + p.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + X(p.email || '–') + '</td><td>' + X(planName(p.plan)) + '</td><td class="num">' + fmtMoney(p.amount) + ' ' + X(p.currency) + '</td><td>' + (p.ok ? tag('ok', 'paid') : tag(p.type === 'failed' ? 'bad' : '', p.type)) + '</td><td class="small muted">' + X(p.ref) + '</td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No payments through the site yet.</td></tr>';
+    var o30 = other.filter(function(p){ return p.ok && p.at.getTime() > d30; }); $('#p-other').textContent = fmtMoney(o30.reduce(function(s, p){ return s + p.amount; }, 0)); $('#p-other-sub').textContent = o30.length + ' invoices and extra links · not membership';
+    var shown = pFilter === 'other' ? other : pFilter === 'all' ? allPays : pays;
+    $('#prow').innerHTML = shown.slice(0, 200).map(function(p){ return '<tr><td>' + M.fmtDate(p.at) + ' ' + p.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + X(p.email || '–') + '</td><td>' + X(planName(p.plan)) + '</td><td class="num">' + fmtMoney(p.amount) + ' ' + X(p.currency) + '</td><td>' + (p.ok ? tag('ok', 'paid') : tag(p.type === 'failed' ? 'bad' : '', p.type)) + '</td><td class="small muted">' + X(p.ref) + '</td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No payments through the site yet.</td></tr>';
 
     // telegram
     var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
@@ -583,8 +592,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
   document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; if (b.dataset.a === 'invite') return act('invite', { emails: [b.dataset.email] }, b); if (b.dataset.a === 'reinvite') return reinvite(b.dataset.email, b); act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
   async function reinvite(email, btn){ M.busy(btn, true); try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/app?invited=1' }); if (r.error) throw r.error; M.msg('#m', 'A fresh link is on its way to ' + email + '.', 'ok'); closeDrawer(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } }
-  $('#invite-all').addEventListener('click', function(){ var list = people().filter(function(e){ return e.valid && !e.profile; }).map(function(e){ return e.email; }); if (!list.length) return; if (!confirm('Send the invitation email to ' + list.length + ' member(s) who paid on Whop and have no account yet?')) return; act('invite', { emails: list }, $('#invite-all')); });
+  $('#invite-all').addEventListener('click', function(){ var list = people().filter(function(e){ return e.valid && !e.profile; }).map(function(e){ return e.email; }); if (!list.length) return; if (!confirm('Send the invitation email to ' + list.length + ' member(s) with access and no account yet?')) return; act('invite', { emails: list }, $('#invite-all')); });
   $('#sync').addEventListener('click', function(){ act('sync', {}, $('#sync')); });
+  M.$$('#pseg button').forEach(function(b){ b.addEventListener('click', function(){ pFilter = b.dataset.f; M.$$('#pseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); render(); }); });
   $('#q').addEventListener('input', function(){ q = $('#q').value.trim().toLowerCase(); render(); });
   M.$$('#seg button').forEach(function(b){ b.addEventListener('click', function(){ setFilter(b.dataset.f); }); });
   function setFilter(f){ filter = f; M.$$('#seg button').forEach(function(x){ x.classList.toggle('on', x.dataset.f === f); }); render(); }
@@ -641,7 +651,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var email = $('#g-email').value.trim().toLowerCase(), plan = $('#g-plan').value, months = $('#g-months').value ? Number($('#g-months').value) : null, note = $('#g-note').value.trim(), paid = $('#g-paid').value || null;
     if (!M.validEmail(email)) return M.msg('#m', 'Enter a valid email.', 'bad');
     var btn = $('#f-grant .btn'); M.busy(btn, true); M.msg('#m', '');
-    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note, paid_on: paid }); M.msg('#m', 'Access granted to ' + email + (r.user_exists ? ' — live now.' : ' — activates when they create their account with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; $('#g-months').value = ''; $('#g-paid').value = ''; await load(); }
+    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note, paid_on: paid });
+      var invited = false; if (!r.user_exists && $('#g-invite').checked) { try { var iv = await M.fn('admin', { action: 'invite', emails: [email] }); invited = (iv.sent || []).indexOf(email) >= 0; } catch (e2) { invited = false; } }
+      M.msg('#m', 'Access granted to ' + email + (r.user_exists ? ' — live now.' : invited ? ' — invitation emailed; access is live the moment they choose a password.' : ' — activates when they create their account with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; $('#g-months').value = ''; $('#g-paid').value = ''; await load(); }
     catch (e) { M.msg('#m', M.human(e), 'bad'); }
     finally { M.busy(btn, false); }
   });

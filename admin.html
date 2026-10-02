@@ -6,7 +6,7 @@
 <title>Admin — Mr. Wall Street</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0A0A0B">
-<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/mws.css">
@@ -112,6 +112,8 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 .drawer .kv{margin:18px 0}
 .drawer .stack{display:flex;flex-direction:column;gap:10px;margin-top:18px}
 .drawer .stack .btn{justify-content:center}
+.drawer .mailframe{width:100%;height:min(70vh,760px);border:1px solid var(--line-2);background:#0A0A0B;margin-top:16px}
+.row-link{cursor:pointer}.tbl tr.row-link:hover td{background:var(--bg-2)}
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
 .scrim.on{opacity:1;pointer-events:auto}
 .view{display:none}.view.on{display:block}
@@ -143,18 +145,19 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 <body class="adm">
 <div class="dash">
   <aside class="side">
-    <a class="brand" href="/"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
+    <a class="brand" href="/"><img src="/lion.svg" width="30" height="30" alt=""><span>MR. WALL STREET</span></a>
     <nav id="nav">
       <a href="#overview" data-v="overview"><i>01</i>Overview</a>
       <a href="#activity" data-v="activity"><i>02</i>Activity <span class="nn" id="nav-n" hidden>0</span></a>
       <a href="#support" data-v="support"><i>03</i>Support <span class="nn" id="nav-sup" hidden>0</span></a>
-      <a href="#members" data-v="members"><i>04</i>Members</a>
-      <a href="#payments" data-v="payments"><i>05</i>Payments</a>
-      <a href="#telegram" data-v="telegram"><i>06</i>Telegram</a>
+      <a href="#emails" data-v="emails"><i>04</i>Emails</a>
+      <a href="#members" data-v="members"><i>05</i>Members</a>
+      <a href="#payments" data-v="payments"><i>06</i>Payments</a>
+      <a href="#telegram" data-v="telegram"><i>07</i>Telegram</a>
       <div class="grp">Manage</div>
-      <a href="#access" data-v="access"><i>07</i>Grant access</a>
-      <a href="#portfolio" data-v="portfolio"><i>08</i>Portfolio</a>
-      <a href="#settings" data-v="settings"><i>09</i>Settings</a>
+      <a href="#access" data-v="access"><i>08</i>Grant access</a>
+      <a href="#portfolio" data-v="portfolio"><i>09</i>Portfolio</a>
+      <a href="#settings" data-v="settings"><i>10</i>Settings</a>
       <a href="/app" class="mob-ma"><i>→</i>Member area</a>
     </nav>
     <div class="me"><span>Signed in as</span><b id="me-email">…</b><a class="btn sm ghost ma" href="/app">Member area <span class="ar"></span></a><button class="link" id="out" type="button">Log out</button></div>
@@ -197,9 +200,16 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <p class="small muted" style="margin-top:14px">Members write from their member area → Support. Every message pings you on Telegram; when you answer here, they get a Telegram note (if connected) and see it in their page.</p>
     </section>
 
+    <!-- EMAILS -->
+    <section class="view" data-v="emails">
+      <div class="bar"><input id="eq" type="search" placeholder="Search email or subject…"><div class="seg" id="eseg"><button class="on" data-f="all">All</button><button data-f="billing">Billing</button><button data-f="account">Account</button><button data-f="support">Support</button><button data-f="preview">Previews</button><button data-f="failed">Failed</button></div><span class="sp"></span><span class="small muted" id="ecount"></span></div>
+      <div class="tblw"><table class="tbl" id="etbl"><thead><tr><th>When</th><th>To</th><th>Email</th><th>Type</th><th>Status</th></tr></thead><tbody id="erows"></tbody></table></div>
+      <p class="small muted" style="margin-top:14px">Every email the site sends, exactly as sent, from contact@mrofwallstreet.com. Click one to open it. Account emails (codes, password links) are sent by the login system and show in Resend for now.</p>
+    </section>
+
     <!-- MEMBERS -->
     <section class="view" data-v="members">
-      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
+      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">Whop only</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button><button data-f="legacy">Legacy</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
       <div class="tblw"><table class="tbl" id="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th>Since</th></tr></thead><tbody id="rows"></tbody></table></div>
     </section>
 
@@ -219,11 +229,12 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     <!-- ACCESS -->
     <section class="view" data-v="access">
-      <div class="card rv"><h3>Grant access manually</h3><p class="small muted" style="margin-bottom:16px">For crypto, wire or courtesy access. If the member already has an account with this email, access is live immediately; otherwise it activates the moment they create their account with it.</p>
+      <div class="card rv"><h3>Grant access manually</h3><p class="small muted" style="margin-bottom:16px">For members you bring in by hand, crypto, wire or courtesy access. "Paid on" starts the period on the real payment date (leave empty for today). If the member already has an account with this email, access is live immediately; otherwise it activates the moment they create their account with it.</p>
         <form class="grant" id="f-grant" novalidate>
           <div class="field"><label for="g-email">Email</label><input id="g-email" type="email" placeholder="member@email.com"></div>
           <div class="field"><label for="g-plan">Plan</label><select id="g-plan"><option value="monthly">Monthly</option><option value="yearly">Yearly</option><option value="lifetime" selected>Lifetime</option></select></div>
           <div class="field"><label for="g-months">Months</label><input id="g-months" type="number" min="1" max="120" placeholder="auto"></div>
+          <div class="field"><label for="g-paid">Paid on</label><input id="g-paid" type="date"></div>
           <div class="field"><label for="g-note">Note</label><input id="g-note" type="text" placeholder="paid in USDT · 27 Sep"></div>
           <button class="btn acc" type="submit" data-busy="Granting">Grant <span class="ar"></span></button>
         </form>
@@ -313,6 +324,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   /* mirrors public.membership_is_valid (staff.sql) */
   function valid(m){ var st = m.status, now = new Date(), end = m.renewal_period_end ? new Date(m.renewal_period_end) : null;
+    if (m.legacy) return false; /* clean_start.sql: Whop memberships from before the cutoff are history */
     if (D.planOn && m.id.indexOf('manual_') !== 0 && !D.planOn[m.plan_id]) return false; /* mirrors security.sql: only plans that grant access count */
     if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < now);
     if (st === 'completed' && m.plan_key === 'lifetime') return true;
@@ -324,7 +336,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   async function load(){
     var r = await Promise.all([
       sb.from('profiles').select('id,email,role,created_at').order('created_at', { ascending: false }),
-      sb.from('memberships').select('id,email,user_id,plan_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
+      sb.from('memberships').select('id,email,user_id,plan_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,created_at,updated_at,metadata,legacy').order('updated_at', { ascending: false }),
       sb.from('telegram_links').select('user_id,telegram_username,telegram_id,linked_at'),
       sb.from('telegram_access').select('user_id,chat_id,status'),
       sb.from('audit_log').select('id,at,actor,action,subject,detail').order('at', { ascending: false }).limit(300),
@@ -334,27 +346,31 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       sb.from('whop_events').select('id,type,received_at,payload').like('type', 'payment.%').order('received_at', { ascending: false }).limit(300),
       M.fn('admin', { action: 'overview' }).catch(function(){ return { settings: [] }; }),
       sb.from('support_threads').select('id,user_id,subject,status,last_at,created_at').order('last_at', { ascending: false }).limit(200),
-      sb.from('support_messages').select('id,thread_id,user_id,from_staff,body,created_at').order('created_at').limit(2000)
+      sb.from('support_messages').select('id,thread_id,user_id,from_staff,body,created_at').order('created_at').limit(2000),
+      sb.from('sent_emails').select('id,user_id,to_email,type,subject,status,provider_id,error,sent_by,created_at').order('created_at', { ascending: false }).limit(500)
     ]);
     D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
     D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; }); D.invited = (r[9] && r[9].invited) || {};
+    D.emails = r[12] && !r[12].error ? (r[12].data || []) : null;
     D.sup = r[10].error ? null : (r[10].data || []); D.supMsgs = {}; ((r[11] && r[11].data) || []).forEach(function(m){ (D.supMsgs[m.thread_id] = D.supMsgs[m.thread_id] || []).push(m); });
     D.planOn = null; if (D.plans.some(function(p){ return typeof p.grants_access === 'boolean'; })) { D.planOn = {}; D.plans.forEach(function(p){ D.planOn[p.plan_id] = !!p.grants_access; }); }
     $('#upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     render();
   }
 
-  function people(){
+  function people(legacy){
     var by = {};
-    var emailOf = {}; D.profiles.forEach(function(p){ emailOf[p.id] = p.email; by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; });
+    var emailOf = {}; D.profiles.forEach(function(p){ emailOf[p.id] = p.email; if (!legacy) { by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; } });
     /* a membership bound to an account belongs to that account, even if Whop recorded another email at checkout */
-    D.memberships.forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
+    D.memberships.filter(function(m){ return legacy ? !!m.legacy : !m.legacy; }).forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
     var linkBy = {}; D.links.forEach(function(l){ linkBy[l.user_id] = l; });
     var accBy = {}; D.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
-    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; return e; });
+    var profBy = {}; D.profiles.forEach(function(p){ profBy[p.email] = p; });
+    return Object.keys(by).map(function(k){ var e = by[k]; if (legacy) { e.legacy = true; e.profile = profBy[k] || null; } e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; return e; });
   }
   function payments(){
-    return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
+    var legacyIds = {}, legacyMail = {}, liveMail = {}; D.memberships.forEach(function(m){ if (m.legacy) { legacyIds[m.id] = 1; legacyMail[m.email] = 1; } else liveMail[m.email] = 1; });
+    return D.events.filter(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var mid = d.membership_id || (d.membership && (d.membership.id || d.membership)); if (mid && legacyIds[mid]) return false; var em = (d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '').toLowerCase(); return !(em && legacyMail[em] && !liveMail[em]); }).map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
   }
   function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].title; return pid ? 'Test' : '–'; }
   function tag(cls, text){ return '<span class="tag ' + cls + '">' + X(text) + '</span>'; }
@@ -478,8 +494,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     renderActivity();
 
     // members table
-    var list = rows.filter(function(e){
+    var list = (filter === 'legacy' ? people(true) : rows).filter(function(e){
       if (q && e.email.indexOf(q) < 0) return false;
+      if (filter === 'legacy') return true;
       if (filter === 'active') return e.valid;
       if (filter === 'site') return !!e.profile;
       if (filter === 'whop') return e.valid && !e.profile;
@@ -490,7 +507,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     }).sort(function(a, b){ return (b.valid - a.valid) || a.email.localeCompare(b.email); });
     $('#rows').innerHTML = list.map(function(e){
       var m = e.best || {};
-      var st = !e.best ? tag('', 'no plan') : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
+      var st = !e.best ? tag('', 'no plan') : e.legacy ? tag('', 'legacy · ' + m.status) : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
       var inv = D.invited && D.invited[e.email];
       var acct = e.profile ? ((inv && !inv.accepted) ? tag('warn', 'invited') : tag('ok', 'on site')) + (e.profile.role !== 'member' ? ' ' + tag('', e.profile.role) : '') : tag('', 'no account');
       var joined = e.acc.filter(function(a){ return a.status === 'joined'; }).length;
@@ -498,9 +515,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       var when = m.plan_key === 'lifetime' ? 'Lifetime' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–');
       return '<tr data-e="' + X(e.email) + '"><td class="em">' + X(e.email) + '</td><td>' + X(m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
     }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
-    $('#count').textContent = list.length + ' of ' + rows.length;
+    $('#count').textContent = filter === 'legacy' ? list.length + ' from Whop before the clean start' : list.length + ' of ' + rows.length;
     var inviteN = rows.filter(function(e){ return e.valid && !e.profile; }).length; $('#invite-all').hidden = !(filter === 'whop' && inviteN); $('#invite-all').textContent = 'Invite all without an account (' + inviteN + ')';
-    renderSupport();
+    renderSupport(); renderEmails();
 
     // payments
     $('#p-n').textContent = p30.filter(function(p){ return p.ok; }).length; $('#p-rev').textContent = fmtMoney(rev30); $('#p-fail').textContent = p30.filter(function(p){ return p.type === 'failed'; }).length;
@@ -524,21 +541,26 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   // drawer
   function openDrawer(email){
-    var e = people().filter(function(x){ return x.email === email; })[0]; if (!e) return;
+    var e = people().filter(function(x){ return x.email === email; })[0] || people(true).filter(function(x){ return x.email === email; })[0]; if (!e) return;
     var m = e.best || {};
     var html = '<p class="eyebrow">Member</p><h2>' + X(e.email) + '</h2>';
-    html += '<dl class="kv"><dt>Status</dt><dd>' + X(e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + X(m.plan_key || '–') + (m.id ? ' <span class="small muted">' + X(m.id) + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + X(e.profile.role) : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + X(e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
+    if (e.legacy) html += '<p class="small muted">From Whop, before the clean start. Not a member of the site until you import it.</p>';
+    html += '<dl class="kv"><dt>Status</dt><dd>' + X(e.legacy ? 'Legacy · ' + m.status : e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + X(m.plan_key || '–') + (m.id ? ' <span class="small muted">' + X(m.id) + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + X(e.profile.role) : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + X(e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
     if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + X(c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : (a.status === 'removed' || a.status === 'blocked' || a.status === 'kick_failed') ? 'bad' : 'warn', a.status === 'kick_failed' ? 'remove failed' : a.status) + '</li>'; }).join('') + '</ul>';
     if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return X(x.plan_key) + ' · ' + X(x.status); }).join(' / ') + '</p>';
+    var mine = (D.emails || []).filter(function(x){ return x.to_email === e.email; });
+    if (mine.length) html += '<p class="eyebrow" style="margin-top:18px">Emails · ' + mine.length + '</p><ul class="attn">' + mine.slice(0, 8).map(function(x){ return '<li data-mail="' + X(x.id) + '" class="row-link"><span>' + X(x.subject) + '<span class="small muted">' + X(M.fmtDate(x.created_at)) + '</span></span>' + tag(x.status === 'sent' ? 'ok' : 'bad', x.status) + '</li>'; }).join('') + '</ul>';
     html += '<div class="stack">';
+    if (e.legacy) { html += '<button class="btn acc" data-a="import_legacy" data-id="' + X(m.id) + '" data-busy="Importing">Import as a member (keeps the Whop dates)</button>'; }
     var blocked = e.acc.some(function(a){ return a.status === 'blocked'; });
     if (blocked) html += '<p class="small muted">Removed by you. Automatic invites are paused for this member until you resend.</p>';
     if (e.profile && e.link && e.valid) html += '<button class="btn ghost" data-a="resend" data-u="' + e.profile.id + '" data-busy="Sending">' + (blocked ? 'Let them back in (resend invites)' : 'Resend Telegram invites') + '</button>';
     if (e.profile && e.link && !blocked) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
     if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + X(m.id) + '" data-busy="Revoking">Revoke manual access</button>';
-    if (!e.valid) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
+    if (!e.valid && !e.legacy) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
+    if (!e.legacy && m.id && m.id.indexOf('manual_') !== 0 && m.id.indexOf('mem_') === 0) html += '<button class="link" data-a="set_legacy" data-id="' + X(m.id) + '" data-busy="Moving">Move to legacy (hide from the site)</button>';
     var inv2 = D.invited && D.invited[e.email];
-    if (!e.profile) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
+    if (!e.profile && !e.legacy) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
     else if (inv2 && !inv2.accepted) html += '<p class="small muted">Invited ' + X(M.fmtDate(inv2.invited_at)) + ', has not opened the link yet.</p><button class="btn ghost" data-a="reinvite" data-email="' + X(e.email) + '" data-busy="Sending">Send the link again</button>';
     html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
     html += '</div>';
@@ -553,6 +575,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   async function act(a, body, btn){
     if (a === 'kick' && !confirm('Remove this member from every Telegram channel? Automatic invites stay paused until you resend them.')) return;
     if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
+    if (a === 'set_legacy' && !confirm('Move this membership to legacy? It stops counting and loses access on the site.')) return;
     if (btn) M.busy(btn, true); M.msg('#m', '');
     try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); if (a === 'invite') { var fk = Object.keys(r.failed || {}); M.msg('#m', 'Invitation sent to ' + r.sent.length + (r.skipped.length ? ' · ' + r.skipped.length + ' already had an account' : '') + (fk.length ? ' · failed: ' + fk.join(', ') : '') + '.', fk.length ? 'bad' : 'ok'); } closeDrawer(); await load(); }
     catch (e) { M.msg('#m', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -565,6 +588,33 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   $('#q').addEventListener('input', function(){ q = $('#q').value.trim().toLowerCase(); render(); });
   M.$$('#seg button').forEach(function(b){ b.addEventListener('click', function(){ setFilter(b.dataset.f); }); });
   function setFilter(f){ filter = f; M.$$('#seg button').forEach(function(x){ x.classList.toggle('on', x.dataset.f === f); }); render(); }
+  /* ---- emails (sent_emails: everything the site sends, as sent) ---- */
+  var eFilter = 'all', eq = '';
+  var EKIND = { welcome: 'billing', payment_received: 'billing', payment_failed: 'billing', renewal: 'billing', access_ended: 'billing', invite: 'account', confirm: 'account', magic: 'account', reset: 'account', change_email: 'account', reauth: 'account', support_reply: 'support', announcement: 'account' };
+  function renderEmails(){
+    if (D.emails === null) { $('#erows').innerHTML = '<tr><td colspan="5" class="muted">Run <b>supabase/sent_emails.sql</b> once to enable the email log.</td></tr>'; $('#ecount').textContent = ''; return; }
+    var list = D.emails.filter(function(x){
+      if (eq && (x.to_email + ' ' + x.subject).toLowerCase().indexOf(eq) < 0) return false;
+      if (eFilter === 'failed') return x.status !== 'sent';
+      if (eFilter === 'preview') return /^preview/.test(x.sent_by || '');
+      if (eFilter === 'all') return true;
+      return EKIND[x.type] === eFilter && !/^preview/.test(x.sent_by || '');
+    });
+    $('#erows').innerHTML = list.map(function(x){ var w = new Date(x.created_at); return '<tr data-mail="' + X(x.id) + '" class="row-link"><td>' + M.fmtDate(x.created_at) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + X(x.to_email) + '</td><td>' + X(x.subject) + '</td><td><span class="small muted">' + X(x.type) + (/^preview/.test(x.sent_by || '') ? ' · preview' : '') + '</span></td><td>' + (x.status === 'sent' ? tag('ok', 'sent') : tag('bad', 'failed')) + '</td></tr>'; }).join('') || '<tr><td colspan="5" class="muted">No emails yet.</td></tr>';
+    $('#ecount').textContent = list.length + ' of ' + D.emails.length;
+  }
+  async function openEmail(id){
+    var x = (D.emails || []).filter(function(e){ return e.id === id; })[0]; if (!x) return;
+    var w = new Date(x.created_at), html = '<p class="eyebrow">Email</p><h2>' + X(x.subject) + '</h2>';
+    html += '<dl class="kv"><dt>To</dt><dd><a class="link" href="#members" data-open-member="' + X(x.to_email) + '">' + X(x.to_email) + '</a></dd><dt>Sent</dt><dd>' + X(M.fmtDate(x.created_at)) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</dd><dt>Type</dt><dd>' + X(x.type) + '</dd><dt>Status</dt><dd>' + (x.status === 'sent' ? 'Sent' : 'Failed · ' + X(x.error || '')) + '</dd><dt>By</dt><dd>' + X(x.sent_by || 'system') + '</dd>' + (x.provider_id ? '<dt>Resend id</dt><dd class="small muted">' + X(x.provider_id) + '</dd>' : '') + '</dl>';
+    html += '<iframe class="mailframe" sandbox="" referrerpolicy="no-referrer" title="Email as sent"></iframe>';
+    $('#dbody').innerHTML = html; $('#drawer').classList.add('on'); $('#scrim').classList.add('on');
+    var fr = $('#dbody .mailframe'); try { var r = await sb.from('sent_emails').select('html').eq('id', id).maybeSingle(); fr.srcdoc = (r.data && r.data.html) || '<p style="font-family:sans-serif;color:#888;padding:20px">Could not load this email.</p>'; } catch (e) { fr.srcdoc = '<p style="font-family:sans-serif;color:#888;padding:20px">Could not load this email.</p>'; }
+  }
+  $('#eq').addEventListener('input', function(){ eq = $('#eq').value.trim().toLowerCase(); renderEmails(); });
+  M.$$('#eseg button').forEach(function(b){ b.addEventListener('click', function(){ eFilter = b.dataset.f; M.$$('#eseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); renderEmails(); }); });
+  document.addEventListener('click', function(ev){ var t = ev.target.closest('[data-mail]'); if (!t || ev.target.closest('a')) return; openEmail(t.dataset.mail); });
+
   /* ---- support inbox ---- */
   var sFilter = 'open', sOpen = null;
   function emailOfUser(uid){ var p = D.profiles.filter(function(x){ return x.id === uid; })[0]; return p ? p.email : uid; }
@@ -588,10 +638,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-open-member]'); if (!a) return; ev.preventDefault(); location.hash = '#members'; setTimeout(function(){ openDrawer(a.dataset.openMember); }, 50); });
   $('#f-grant').addEventListener('submit', async function(ev){
     ev.preventDefault();
-    var email = $('#g-email').value.trim().toLowerCase(), plan = $('#g-plan').value, months = $('#g-months').value ? Number($('#g-months').value) : null, note = $('#g-note').value.trim();
+    var email = $('#g-email').value.trim().toLowerCase(), plan = $('#g-plan').value, months = $('#g-months').value ? Number($('#g-months').value) : null, note = $('#g-note').value.trim(), paid = $('#g-paid').value || null;
     if (!M.validEmail(email)) return M.msg('#m', 'Enter a valid email.', 'bad');
     var btn = $('#f-grant .btn'); M.busy(btn, true); M.msg('#m', '');
-    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note }); M.msg('#m', 'Access granted to ' + email + (r.user_exists ? ' — live now.' : ' — activates when they create their account with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; $('#g-months').value = ''; await load(); }
+    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note, paid_on: paid }); M.msg('#m', 'Access granted to ' + email + (r.user_exists ? ' — live now.' : ' — activates when they create their account with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; $('#g-months').value = ''; $('#g-paid').value = ''; await load(); }
     catch (e) { M.msg('#m', M.human(e), 'bad'); }
     finally { M.busy(btn, false); }
   });
@@ -685,7 +735,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
 
   // routing
-  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Support', 'Members write from their member area. Answer here.'], members: ['Members', 'Everyone who has, had or paid for access.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
+  var TITLES = { overview: ['Overview', 'The Syndicate at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Support', 'Members write from their member area. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
   function route(){ var v = currentView(); if (!TITLES[v]) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);
@@ -693,7 +743,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   route(); await load(); loadPositions(); if (currentView() === 'activity') { hlSince = seenAt(); renderActivity(); }
   /* live: tables in the realtime publication push; audit_log and telegram_access only if housekeeping.sql was run, so a quiet poll covers them */
   var loadT = null; function loadSoon(){ clearTimeout(loadT); loadT = setTimeout(function(){ load(); }, 700); }
-  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, loadSoon).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'audit_log' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_access' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ loadPositions(); }).subscribe(); } catch (e) {}
+  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, loadSoon).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'audit_log' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_access' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ loadPositions(); }).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sent_emails' }, loadSoon).subscribe(); } catch (e) {}
   var lastLoad = Date.now(); setInterval(function(){ if (!document.hidden) { lastLoad = Date.now(); load(); } }, 90000);
   document.addEventListener('visibilitychange', function(){ if (!document.hidden && Date.now() - lastLoad > 60000) { lastLoad = Date.now(); load(); } });
 })();

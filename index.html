@@ -251,8 +251,10 @@ section{padding-block:clamp(72px,9vw,128px)}
 .plan{background:var(--bg);padding:36px 32px;display:flex;flex-direction:column;gap:16px;min-height:400px;position:relative;opacity:0;transform:translateY(16px);transition:background .4s,opacity 1.1s var(--ease),transform 1.1s var(--ease)}
 .plan.on{opacity:1;transform:none}
 .plan:hover{background:var(--bg-2)}
-.plan .k{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--fg-3);letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
-.plan .k em{font-style:normal;color:var(--fg)}
+.plan .k{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:24px;font-weight:500;letter-spacing:-.015em;color:var(--fg);text-transform:capitalize}
+.plan .k em{font-style:normal;font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-2);border:1px solid var(--line-2);padding:4px 8px;white-space:nowrap}
+.plan{justify-content:flex-start}.plan .btn{margin-top:auto}
+h1,h2,h3{text-transform:capitalize}
 .plan .price{font-size:clamp(48px,4.4vw,64px);line-height:1;letter-spacing:-.045em;font-weight:400;margin-top:14px;font-variant-numeric:tabular-nums}
 .plan .price small{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin-left:10px;font-weight:400}
 .plan .sub{font-size:15px;color:var(--fg-2)}
@@ -363,7 +365,7 @@ setTimeout(function(){el.remove();},3700);
 <header class="top" id="hdr">
 <div class="wrap">
 <a class="brand" href="#top" aria-label="Mr. Wall Street"><img src="/lion.svg" width="30" height="30" alt=""><span>MR. WALL STREET</span></a>
-<nav aria-label="Primary"><a href="/portfolio">Portfolio</a><a href="/telegram">Telegram</a><a href="/earnings">Earnings</a><a href="/calendar">Calendar</a><a href="#membership">Membership</a></nav>
+<nav aria-label="Primary"><a href="/telegram">Telegram</a><a href="/portfolio">Portfolio</a><a href="/earnings">Earnings</a><a href="/calendar">Calendar</a></nav>
 <div class="right">
 <a class="btn sm ghost" href="/login" id="hdr-login">Log in</a>
 <a class="btn sm acc" href="/join">Join now <span class="ar"></span></a>
@@ -372,7 +374,7 @@ setTimeout(function(){el.remove();},3700);
 </div>
 <div id="prog"></div>
 </header>
-<div id="menu" aria-hidden="true"><ul><li><a href="/portfolio"><i>/01</i>Portfolio</a></li><li><a href="/telegram"><i>/02</i>Telegram</a></li><li><a href="/earnings"><i>/03</i>Earnings</a></li><li><a href="/calendar"><i>/04</i>Calendar</a></li><li><a href="#membership"><i>/05</i>Membership</a></li><li><a href="/login" id="menu-login"><i>/</i>Log in</a></li><li><a href="/join"><i>/</i>Join now</a></li></ul></div>
+<div id="menu" aria-hidden="true"><ul><li><a href="/telegram"><i>/01</i>Telegram</a></li><li><a href="/portfolio"><i>/02</i>Portfolio</a></li><li><a href="/earnings"><i>/03</i>Earnings</a></li><li><a href="/calendar"><i>/04</i>Calendar</a></li><li><a href="/login" id="menu-login"><i>/</i>Log in</a></li><li><a href="/join"><i>/</i>Join now</a></li></ul></div>
 
 <main id="top">
 <section class="hero" id="hero">
@@ -414,11 +416,11 @@ setTimeout(function(){el.remove();},3700);
 <section id="membership" class="pinsec">
 <div class="pin"><div class="pc">
 <div class="wrap">
-<div class="head rv"><p class="eyebrow"><b>/02</b>Membership</p><h2><span class="lm"><span>Choose your entry.</span></span></h2><p class="sub">Every plan unlocks everything. Core is monthly or yearly; Lifetime never pays again.</p><div class="cnt"><span class="cn">01 / 03</span><i class="cb"></i></div></div>
+<div class="head rv"><p class="eyebrow"><b>/02</b>Membership</p><h2><span class="lm"><span>Choose your entry.</span></span></h2><p class="sub">Same access on every plan: all Telegram channels, every trade and investment in real time, the private chat. Only the price changes.</p><div class="cnt"><span class="cn">01 / 03</span><i class="cb"></i></div></div>
 <div class="plans">
-<div class="plan"><span class="k">Monthly Core<em>Most popular</em></span><div class="price">$99<small>/ month</small></div><p class="sub">Cancel anytime. The easiest way in.</p><ul><li>All Telegram channels</li><li>Every trade and investment, in real time</li><li>Direct access in the private chat</li></ul><a class="btn" href="/join?plan=monthly">Join monthly <span class="ar"></span></a></div>
-<div class="plan best"><span class="k">Yearly Core<em>Best value</em></span><div class="price">$990<small>/ year</small></div><p class="sub">$82.50 a month, billed annually. Two months free.</p><ul><li>All Telegram channels</li><li>Every trade and investment, in real time</li><li>Direct access in the private chat</li></ul><a class="btn acc" href="/join?plan=yearly">Join yearly <span class="ar"></span></a></div>
-<div class="plan"><span class="k">Lifetime<em>Golden entry</em></span><div class="price">$3,990<small>one-time</small></div><p class="sub">One payment. Everything, forever. Immune to price rises.</p><ul><li>All Telegram channels, forever</li><li>Every trade and investment, in real time</li><li>Direct access in the private chat</li></ul><a class="btn" href="/join?plan=lifetime">Take the golden entry <span class="ar"></span></a></div>
+<div class="plan"><span class="k">Monthly Core<em>Most popular</em></span><div class="price">$99<small>/ month</small></div><p class="sub">Cancel anytime. The easiest way in.</p><a class="btn" href="/join?plan=monthly">Join Monthly <span class="ar"></span></a></div>
+<div class="plan best"><span class="k">Yearly Core<em>Best value</em></span><div class="price">$990<small>/ year</small></div><p class="sub">$82.50 a month, billed annually. Save $198 a year.</p><a class="btn acc" href="/join?plan=yearly">Join Yearly <span class="ar"></span></a></div>
+<div class="plan"><span class="k">Lifetime<em>Golden entry</em></span><div class="price">$3,990<small>one-time</small></div><p class="sub">One payment. Everything, forever. Immune to price rises.</p><a class="btn" href="/join?plan=lifetime">Take The Golden Entry <span class="ar"></span></a></div>
 </div>
 <div class="assure"><span>Secure checkout</span><span>Telegram access in seconds</span><span>Rated 4.9 of 5 · 50 verified reviews</span></div>
 </div>
@@ -458,10 +460,10 @@ setTimeout(function(){el.remove();},3700);
 <div class="wrap">
 <div class="row"><a class="lock" href="#top" aria-label="Mr. Wall Street"><img src="/lion.svg" width="26" height="26" alt=""><span>MR. WALL STREET</span></a><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span></div>
 <nav class="fnav" aria-label="Site">
-<div><h4>The Desk</h4><a href="/portfolio">Portfolio</a><a href="/telegram">Telegram</a><a href="/earnings">Earnings</a><a href="/calendar">Calendar</a></div>
+<div><h4>Inside</h4><a href="/telegram">Telegram</a><a href="/portfolio">Portfolio</a><a href="/earnings">Earnings</a><a href="/calendar">Calendar</a></div>
 <div><h4>Membership</h4><a href="/join">Become a member</a><a href="#membership">Plans and pricing</a><a href="#faq">Questions</a></div>
 <div><h4>Account</h4><a href="/login">Log in</a><a href="/signup">Create account</a><a href="/app">Member area</a><a href="mailto:contact@mrofwallstreet.com">Contact</a></div>
-<div><h4>Company</h4><a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a><a href="/terms">Terms of service</a><a href="/privacy">Privacy policy</a></div>
+<div><h4>More</h4><a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a><a href="/terms">Terms of service</a><a href="/privacy">Privacy policy</a></div>
 </nav>
 <p class="disc">Mr. Wall Street provides educational content and market opinion only. Nothing here constitutes financial advice. Trading and investing involve substantial risk, including loss of capital. Past performance does not guarantee future results. Always do your own research. Copyright reserved.</p>
 </div>
@@ -559,5 +561,5 @@ setTimeout(onScroll,100);setTimeout(onScroll,3200);
 
 })();
 </script>
-<script>/* logged-in members: header goes straight to the member area */(function(){try{var v=localStorage.getItem('sb-rgvyyxphqhtedhgvwopy-auth-token');if(!v)return;var s=JSON.parse(v);if(!s||!s.refresh_token)return;['hdr-login','menu-login'].forEach(function(id){var a=document.getElementById(id);if(!a)return;a.href='/app';if(a.firstChild&&a.firstChild.tagName==='I'){a.lastChild.textContent='Member area';}else{a.textContent='Member area';}});}catch(e){}})();</script>
+<script>/* logged-in members: header goes straight to the member area */(function(){try{var v=localStorage.getItem('sb-rgvyyxphqhtedhgvwopy-auth-token');if(!v)return;var s=JSON.parse(v);if(!s||!s.refresh_token)return;['hdr-login','menu-login'].forEach(function(id){var a=document.getElementById(id);if(!a)return;a.href='/app';if(a.firstChild&&a.firstChild.tagName==='I'){a.lastChild.textContent='Member area';}else{a.textContent='Member area';}});var acc=null;try{acc=JSON.parse(localStorage.getItem('mws_access'));}catch(e){}if(acc&&acc.valid){document.querySelectorAll('a[href^="/join"]').forEach(function(a){a.href='/app#membership';var ar=a.querySelector('.ar');a.textContent=a.closest('.plan')?'Your plan':'Member area';if(ar){a.appendChild(document.createTextNode(' '));a.appendChild(ar);}});}}catch(e){}})();</script>
 </body></html>

@@ -34,7 +34,6 @@
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
-      <p class="grp">Inside</p>
       <a href="#telegram" data-p="telegram"><i>01</i>Telegram<span class="cnt" id="n-tg"></span></a>
       <a href="#portfolio" data-p="portfolio"><i>02</i>Portfolio<span class="cnt" id="n-pf"></span></a>
       <p class="grp">The Desk <span class="soon" id="desk-grp-tag">In development</span></p>
@@ -67,10 +66,14 @@
 
       <!-- 07 membership -->
       <section class="page" data-page="membership">
-        <div class="head rv"><p class="eyebrow"><b>/06</b>Membership</p><h1>Your membership.</h1><p id="mem-sub"></p></div>
+        <div class="head rv"><p class="eyebrow"><b>/06</b>Membership</p><h1>Your membership.</h1><p id="mem-sub" hidden></p></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="p-access"><div class="ttl"><h3>Plan &amp; billing</h3><span class="tag" id="st">—</span></div><div id="access-body"></div></section>
+            <section class="panel rv d1" id="p-bill"><div class="ttl"><h3>Billing history</h3><span class="small muted" id="bill-n"></span></div>
+              <div id="bill-list"><p class="small muted">Loading…</p></div>
+              <p class="small muted" style="margin-top:14px">Every charge on this account through the site's checkout. Whop also emails a receipt at each charge. For an invoice in a company name, write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a>.</p>
+            </section>
           </div>
           <div>
             <section class="panel rv d1"><div class="ttl"><h3>What is included</h3></div>
@@ -86,12 +89,12 @@
 
       <!-- 01 telegram -->
       <section class="page" data-page="telegram">
-        <div class="head rv"><p class="eyebrow"><b>/01</b>Telegram</p><h1>Your channels.</h1><p id="tg-sub">Private rooms, personal links. Approved automatically, for your account only.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/01</b>Telegram</p><h1>Your channels.</h1><p id="tg-sub" hidden></p></div>
         <div id="ov-notices"></div>
         <div id="ov-banner"></div>
         <div class="acct">
           <div>
-            <section class="panel rv" id="p-tg"><div class="ttl"><h3>Channels</h3><span class="tag" id="tg-st">—</span></div><div id="tg-body"></div></section>
+            <section class="panel rv" id="p-tg"><div class="ttl"><h3>Channels</h3><span class="tag" id="tg-st" hidden>—</span></div><div id="tg-body"></div></section>
           </div>
           <div>
             <section class="panel rv d1" id="tg-how"><div class="ttl"><h3>How it works</h3></div>
@@ -102,7 +105,12 @@
               </div>
             </section>
             <section class="panel rv d2" id="tg-know"><div class="ttl"><h3>Good to know</h3></div>
-              <p class="small muted">If your membership ends, you are removed from the channels automatically and come back the moment it is active again. New phone or new Telegram account? <b>Disconnect</b> and join again with fresh links.</p>
+              <ul class="faq">
+                <li><b>Your seat is tied to your membership.</b><p>While it is active, you are in every channel: every trade, every investment, every market call, in real time.</p></li>
+                <li><b>If a payment fails or the plan ends, the channels close for you.</b><p>Automatically, the same day. You stop seeing the calls while the rest of the group keeps getting them. Keep the card valid and nothing changes.</p></li>
+                <li><b>Back on time.</b><p>The moment a payment clears again, your links come back and you are approved in a second. Nothing to request, nobody to ask.</p></li>
+                <li><b>New phone or new Telegram account?</b><p><b>Disconnect</b> below and join again with fresh links. Links are personal and work once.</p></li>
+              </ul>
             </section>
           </div>
         </div>
@@ -110,7 +118,7 @@
 
       <!-- 03–05 the desk -->
       <section class="page" data-page="portfolio">
-        <div class="head rv"><p class="eyebrow"><b>/02</b>Portfolio <span class="soon" id="pf-tag">In development</span></p><h1>The book, open.</h1><p>Every position Mr. Wall Street holds: entry, size, last mark and the thesis. Updated as trades happen, so members see the portfolio the way a fund sees it, not the way a tweet shows it.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/02</b>Portfolio <span class="soon" id="pf-tag">In development</span></p><h1>The book, open.</h1></div>
         <div id="pf-live" hidden>
           <div class="tiles rv" id="pf-tiles"></div>
           <div class="sec"><div class="sh"><h2>Open positions</h2><span class="small muted" id="pf-upd"></span></div><div class="ptw"><table class="pt" id="pf-open"></table></div></div>
@@ -131,7 +139,7 @@
         </div>
       </section>
       <section class="page" data-page="calendar">
-        <div class="head rv"><p class="eyebrow"><b>/03</b>The Desk · Calendar</p><h1>The week, before it happens.</h1><p>Inflation, rates, jobs, growth, and the events around them. The calendar of what moves markets, the readings as they come out and what each one changes for how we are positioned.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/03</b>The Desk · Calendar</p><h1>The week, before it happens.</h1></div>
         <div class="skel rv d1">
           <div class="r h"><span style="width:44%"></span><span style="width:50%"></span><span style="width:40%"></span><span style="width:60%"></span><span style="width:55%"></span></div>
           <div class="r"><span style="width:66%"></span><span style="width:30%"></span><span style="width:40%"></span><span style="width:40%"></span><span style="width:40%"></span></div>
@@ -143,7 +151,7 @@
         <p class="small muted rv d2" style="margin-top:18px">Until it opens, the macro calls are posted in the Exclusive channel.</p>
       </section>
       <section class="page" data-page="earnings">
-        <div class="head rv"><p class="eyebrow"><b>/04</b>The Desk · Earnings</p><h1>Report season, covered.</h1><p>Dates, expectations and results for the names in the book and the names on the watchlist, with the read-through for each position.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/04</b>The Desk · Earnings</p><h1>Report season, covered.</h1></div>
         <div class="skel rv d1">
           <div class="r h"><span style="width:30%"></span><span style="width:50%"></span><span style="width:40%"></span><span style="width:60%"></span><span style="width:55%"></span></div>
           <div class="r"><span style="width:40%"></span><span style="width:60%"></span><span style="width:52%"></span><span style="width:45%"></span><span style="width:50%"></span></div>
@@ -157,44 +165,37 @@
 
       <!-- 06 account -->
       <section class="page" data-page="account">
-        <div class="head rv"><p class="eyebrow"><b>/05</b>Account</p><h1>Your account.</h1><p>Name, email, password and what we send you.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/05</b>Account</p><h1>Your account.</h1></div>
         <div class="acct">
           <div>
-            <section class="panel rv"><div class="ttl"><h3>You</h3><span class="tag" id="acc-tag"></span></div>
-              <dl class="kv"><dt>Email</dt><dd id="acc-email"></dd><dt>Name</dt><dd id="acc-name"></dd><dt>Member since</dt><dd id="acc-since"></dd></dl>
-              <div class="row" style="margin-top:18px"><button class="link" id="chg-name" type="button">Change name</button><button class="link" id="chg-pw" type="button">Change password</button></div>
-              <form id="f-name" hidden style="margin-top:18px" novalidate>
-                <div class="field"><label for="cname">Your name</label><input id="cname" type="text" maxlength="24" autocomplete="name" spellcheck="false"><span class="small muted" style="display:block;margin-top:6px">3 to 24 characters.</span></div>
+            <section class="panel rv"><div class="ttl"><h3>You</h3><span class="tag" id="acc-tag" hidden>Add your name</span></div>
+              <dl class="kv edit">
+                <dt>Name</dt><dd><span id="acc-name">—</span><button class="link" id="chg-name" type="button">Change</button></dd>
+                <dt>Email</dt><dd><span id="acc-email"></span></dd>
+                <dt>Password</dt><dd><span class="mono">••••••••••</span><button class="link" id="chg-pw" type="button">Change</button></dd>
+                <dt>Member since</dt><dd><span id="acc-since"></span></dd>
+              </dl>
+              <form id="f-name" hidden style="margin-top:22px" novalidate>
+                <div class="field"><label for="cname">New name</label><input id="cname" type="text" maxlength="24" autocomplete="name" spellcheck="false"><span class="small muted" style="display:block;margin-top:6px">3 to 24 characters.</span></div>
                 <div class="msg" id="m-name"></div>
                 <div class="row"><button class="btn sm acc" type="submit" data-busy="Saving">Save name</button><button class="link" type="button" id="name-cancel">Cancel</button></div>
               </form>
-              <form id="f-pw" hidden style="margin-top:18px" novalidate>
+              <form id="f-pw" hidden style="margin-top:22px" novalidate>
                 <div class="field"><label for="cpw">New password</label><input id="cpw" type="password" autocomplete="new-password" minlength="8"></div>
                 <div class="msg" id="m-pw"></div>
-                <button class="btn sm acc" type="submit" data-busy="Saving">Save password</button>
+                <div class="row"><button class="btn sm acc" type="submit" data-busy="Saving">Save password</button><button class="link" type="button" id="pw-cancel">Cancel</button></div>
               </form>
               <div class="msg" id="m-sec"></div>
-            </section>
-            <section class="panel rv d2"><div class="ttl"><h3>Help</h3></div>
-              <ul class="list">
-                <li><span>Write to us</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
-                <li><span>Your data</span><span class="small muted">Export or delete: email us from this address. <a href="/privacy">Privacy policy</a></span></li>
-              </ul>
-              <div class="msg on bad" style="margin-top:18px">We never message first. Anyone who contacts you first claiming to be Mr. Wall Street, on Telegram, X or email, is a scam.</div>
+              <span id="tgl-updates" hidden aria-hidden="true"></span>
             </section>
           </div>
-          <div>
-            <section class="panel rv d1"><div class="ttl"><h3>Emails</h3></div>
-              <div class="switch"><div><b>Account &amp; access</b><span class="d">Codes, receipts, renewals, access changes. Required.</span></div><span class="tgl on" style="opacity:.5;pointer-events:none"></span></div>
-              <div class="switch"><div><b id="lbl-updates">Updates from Mr. Wall Street</b><span class="d">Market notes, announcements, when the Desk opens.</span></div><span class="tgl" id="tgl-updates" role="switch" tabindex="0" aria-labelledby="lbl-updates" aria-checked="false"></span></div>
-            </section>
-          </div>
+          <div></div>
         </div>
       </section>
 
       <!-- 08 devices -->
       <section class="page" data-page="devices">
-        <div class="head rv"><p class="eyebrow"><b>/07</b>Devices</p><h1>Where you are logged in.</h1><p>Every device with an open session on this account. End any of them.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/07</b>Devices</p><h1>Where you are logged in.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv"><div class="ttl"><h3>Sessions</h3><span class="small muted" id="dev-n"></span></div>
@@ -203,20 +204,13 @@
               <div class="row" style="margin-top:18px"><button class="btn sm ghost" id="out-others" type="button" data-busy="Ending">Log out of all other devices</button><button class="link" id="out-all" type="button">Log out everywhere, including here</button></div>
             </section>
           </div>
-          <div>
-            <section class="panel rv d1"><div class="ttl"><h3>Good to know</h3></div>
-              <ul class="faq">
-                <li><b>Do not recognise a device?</b><p>End that session, then change your password under <a href="#account">Account</a>.</p></li>
-                <li><b>Ending a session</b><p>stops that device from staying logged in. It may keep working for up to an hour, then it is out.</p></li>
-              </ul>
-            </section>
-          </div>
+          <div></div>
         </div>
       </section>
 
       <!-- 08 feedback: the inbox. Members write here; it lands in Admin → Inbox and the answer shows up on this page -->
       <section class="page" data-page="feedback">
-        <div class="head rv"><p class="eyebrow"><b>/08</b>Feedback</p><h1>Tell us.</h1><p>Feedback, ideas, questions, problems. Write here; the answer arrives on this page, and you get a Telegram note when it does.</p></div>
+        <div class="head rv"><p class="eyebrow"><b>/08</b>Feedback</p><h1>Tell us.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="sup-new"><div class="ttl"><h3>Write to Mr. Wall Street</h3><span class="tag">Inbox</span></div>
@@ -230,18 +224,10 @@
             <section class="panel rv d1" id="sup-threads-wrap" hidden><div class="ttl"><h3>Your conversations</h3><span class="small muted" id="sup-count"></span></div><div id="sup-threads"></div></section>
           </div>
           <div>
-            <section class="panel rv d1"><div class="ttl"><h3>Quick answers</h3></div>
-              <ul class="faq">
-                <li><b>My payment failed.</b><p>Go to <a href="#membership">Membership</a> → Update your card. Access comes back the moment the charge goes through.</p></li>
-                <li><b>I left a channel by mistake.</b><p>Go to <a href="#telegram">Telegram</a> and get a new link. You are approved again in a second.</p></li>
-                <li><b>I changed my Telegram account.</b><p><a href="#telegram">Telegram</a> → Disconnect, then join with the new account.</p></li>
-                <li><b>I paid with a different email.</b><p>Membership is matched by email. Write to us above with your receipt and we link it to this account.</p></li>
-                <li><b>How do I cancel?</b><p><a href="#membership">Membership</a> → Manage subscription. Access runs to the end of the paid period.</p></li>
-              </ul>
-            </section>
-            <section class="panel rv d2"><div class="ttl"><h3>Other ways</h3></div>
+            <section class="panel rv d1"><div class="ttl"><h3>Other ways</h3></div>
               <ul class="list">
                 <li><span>By email</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
+                <li><span>On Telegram</span><a class="link" href="https://t.me/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></li>
                 <li><span>Public</span><a class="link" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a></li>
               </ul>
               <div class="msg on bad" style="margin-top:18px">We never message first. Anyone who contacts you first claiming to be Mr. Wall Street, on Telegram, X or email, is a scam. Report and block.</div>
@@ -367,6 +353,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var ch = await sb.from('channels').select('chat_id,title,sort').eq('enabled', true).order('sort'); if (ch.error) throw ch.error;
     var ta = await sb.from('telegram_access').select('chat_id,status,invite_link,updated_at').eq('user_id', user.id); if (ta.error) throw ta.error;
     access = acc; link = lk.data; channels = ch.data || []; tgAccess = ta.data || [];
+    if (!M.sim()) M.store.set('mws_access', { valid: !!acc.valid, at: Date.now() });
     try { var ps = await sb.from('positions').select('*').order('sort').order('opened_at', { ascending: false }); positions = ps.error ? null : (ps.data || []); } catch (e) { positions = null; } /* RLS: empty for non-members */
     try { var ns = await sb.from('notices').select('id,body,kind,link,link_label,created_at').eq('active', true).order('created_at', { ascending: false }).limit(3); notices = ns.error ? [] : (ns.data || []); } catch (e) { notices = []; }
     /* owner preview: a preset replaces the data (never touches the database) */
@@ -374,6 +361,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); } else { document.body.classList.remove('sim'); }
     render();
     if (current === 'devices') loadDevices();
+    loadBilling();
     if (!supLoaded) { supLoaded = true; loadSupport(); }
   }
   /* in preview, buttons and checkout links inside the pages do nothing (they act on real members' accounts) */
@@ -399,7 +387,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var welcome = welcomeOnce || (sim && sim.key === 'joined'), paid = !sim && (paidQs || !!(signup && signup.paid && Date.now() - (signup.paidAt || signup.at || 0) < 2 * 3600000));
     if (access.valid && (paidQs || welcomeOnce)) { paidQs = false; try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} } /* one-time flags: a reload shows the normal page */
     var grace = Number(access.grace_days) || 3;
-    var manage = access.manage_url ? '<a class="btn sm ghost" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Manage subscription</a>' : '<span class="small muted">Manage your subscription from the receipt email or <a href="https://whop.com/orders" target="_blank" rel="noopener">your orders</a>.</span>';
+    var manage = '<a class="btn sm ghost" href="' + (access.manage_url ? href(access.manage_url) : 'https://whop.com/orders/') + '" target="_blank" rel="noopener">Manage subscription</a>'; /* card, invoices, cancel or resume: Whop's secure page for this membership */
     var since = new Date(profile && profile.created_at || user.created_at), days = Math.max(0, Math.floor((Date.now() - since.getTime()) / 86400000));
     var joined = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length;
     var daysTxt = days === 0 ? 'Joined today.' : days === 1 ? 'One day as a member.' : days + ' days as a member.';
@@ -427,7 +415,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
         + tile('Member since', esc(M.fmtDate(since)), owner ? 'Owner access. Everything members get, plus the <b>admin</b>.' : daysTxt, owner ? '/admin' : null);
       body.innerHTML = '<dl class="kv"><dt>Plan</dt><dd>' + esc(planName(access.plan_key)) + '</dd><dt>Billing</dt><dd>' + esc(renews) + '</dd></dl>'
         + (pastDue ? '<div class="msg on bad" style="margin-top:16px">Your last payment failed. Update your card under Manage subscription within ' + grace + ' days of the failed charge to keep your access.</div>' : '')
-        + '<div class="row" style="margin-top:20px">' + (owner ? '<span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span>' : lifetime ? '<span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span>' : manage + (ending ? (access.cancel_at_period_end ? '<span class="small muted">Changed your mind? Resume it under Manage subscription.</span>' : '<a class="link" href="/join?plan=' + (access.plan_key === 'yearly' ? 'yearly' : 'monthly') + '">Rejoin</a>') : (pastDue ? '' : '<a class="link" href="/join?plan=lifetime" title="Your current plan keeps billing until you cancel it under Manage subscription.">Upgrade to Lifetime</a>'))) + '</div>'
+        + '<div class="row" style="margin-top:20px">' + (owner ? '<span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span>' : lifetime ? '<span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span>' : manage + (ending ? (access.cancel_at_period_end ? '<span class="small muted">Changed your mind? Resume it under Manage subscription.</span>' : '<a class="link" href="/join?plan=' + (access.plan_key === 'yearly' ? 'yearly' : 'monthly') + '&from=app">Rejoin</a>') : (pastDue ? '' : '<a class="link" href="/join?plan=lifetime&from=app" title="Your current plan keeps billing until you cancel it under Manage subscription.">Upgrade to Lifetime</a>'))) + '</div>'
         + (!owner && !lifetime && !ending && !pastDue ? '<p class="small muted" style="margin-top:10px">Upgrading to Lifetime does not cancel your current plan: cancel it under Manage subscription once Lifetime is active.</p>' : '');
       $('#n-mem').textContent = ''; $('#n-mem').className = 'cnt';
       $('#n-tg').textContent = channels.length ? joined + '/' + channels.length : ''; $('#n-tg').className = 'cnt' + (joined < channels.length ? ' warn' : '');
@@ -547,6 +535,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   $('#chg-pw').addEventListener('click', function(){ $('#f-pw').hidden = !$('#f-pw').hidden; $('#f-name').hidden = true; });
   $('#chg-name').addEventListener('click', function(){ var f = $('#f-name'); f.hidden = !f.hidden; $('#f-pw').hidden = true; if (!f.hidden) { $('#cname').value = (profile && profile.full_name) || ''; $('#cname').focus(); } });
   $('#name-cancel').addEventListener('click', function(){ $('#f-name').hidden = true; });
+  $('#pw-cancel').addEventListener('click', function(){ $('#f-pw').hidden = true; });
   /* name: 3 to 24 characters */
   async function saveName(v){
     v = v.replace(/\s+/g, ' ').trim();
@@ -555,9 +544,30 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (profile) profile.full_name = v; $('#acc-name').textContent = v; $('#acc-tag').hidden = true;
   }
   $('#f-name').addEventListener('submit', async function(e){ e.preventDefault(); if (sim) return M.toast('Preview only.'); var btn = $('#f-name .btn'); M.busy(btn, true); M.msg('#m-name', ''); try { await saveName($('#cname').value); $('#f-name').hidden = true; M.toast('Name saved.'); } catch (err) { M.msg('#m-name', M.human(err), 'bad'); } finally { M.busy(btn, false); } });
+  /* billing history: every charge on this account (billing.sql → my_payments) */
+  var BILL = { list: null, loading: false };
+  function money(n, cur){ cur = (cur || 'USD').toUpperCase(); var v = Number(n) || 0; return (cur === 'USD' ? '$' : cur + ' ') + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function payAmount(p){ var tot = p.total != null ? p.total : (p.amount != null ? p.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; var cur = (tot && tot.currency) || p.currency || 'USD'; return { amount: amt, currency: cur }; }
+  function planTitle(pid){ for (var k in C.PLANS) if (C.PLANS[k].id === pid) return C.PLANS[k].hidden ? 'Private invoice' : C.PLANS[k].title; return pid ? 'Private invoice' : 'Membership'; }
+  async function loadBilling(){
+    if (BILL.loading || sim) { if (sim) renderBilling([]); return; } BILL.loading = true;
+    try { var r = await sb.rpc('my_payments'); if (r.error) throw r.error; BILL.list = r.data || []; renderBilling(BILL.list); }
+    catch (e) { $('#bill-list').innerHTML = '<p class="small muted">Could not load your billing history.</p>'; }
+    BILL.loading = false;
+  }
+  function renderBilling(list){
+    var el = $('#bill-list'); if (!el) return;
+    var rows = (list || []).map(function(p){
+      if (p.kind === 'manual') return { at: p.at, what: planName(p.plan_key) + ' · recorded by Mr. Wall Street', amount: '', st: p.status === 'completed' || p.status === 'active' ? ['ok', 'Paid'] : ['', p.status || ''], link: '' };
+      var a = payAmount(p), ok = p.type === 'payment.succeeded', failed = /fail/.test(p.type), refund = /refund/.test(p.type) || (p.refunded && Number(p.refunded.amount != null ? p.refunded.amount : p.refunded) > 0);
+      return { at: p.at, what: planTitle(p.plan) + (p.brand ? ' · ' + p.brand.charAt(0).toUpperCase() + p.brand.slice(1) + (p.last4 ? ' ···' + p.last4 : '') : ''), amount: money(a.amount, a.currency), st: refund ? ['warn', 'Refunded'] : failed ? ['bad', 'Failed'] : ok ? ['ok', 'Paid'] : ['', p.type.replace('payment.', '')], link: /^https:\/\//i.test(p.receipt || '') ? p.receipt : '' };
+    });
+    $('#bill-n').textContent = rows.length ? rows.length + (rows.length === 1 ? ' charge' : ' charges') : '';
+    el.innerHTML = rows.length ? '<table class="bill"><thead><tr><th>When</th><th>What</th><th>Amount</th><th>Status</th></tr></thead><tbody>' + rows.map(function(r){ return '<tr><td class="mono">' + esc(M.fmtDate(r.at)) + '</td><td>' + esc(r.what) + (r.link ? ' · <a class="link" href="' + esc(r.link) + '" target="_blank" rel="noopener">Receipt</a>' : '') + '</td><td class="mono">' + esc(r.amount) + '</td><td><span class="tag ' + r.st[0] + '">' + esc(r.st[1]) + '</span></td></tr>'; }).join('') + '</tbody></table>' : '<p class="small muted">No charges on this account yet.</p>';
+  }
   /* devices: the account's open sessions (account.sql) */
   var DEV = { list: null, loading: false };
-  function ua(s){ s = String(s || ''); var os = /iPhone|iPad/.test(s) ? 'iPhone' : /Android/.test(s) ? 'Android' : /Macintosh/.test(s) ? 'Mac' : /Windows/.test(s) ? 'Windows' : /Linux/.test(s) ? 'Linux' : 'Device'; var br = /Edg\//.test(s) ? 'Edge' : /OPR\//.test(s) ? 'Opera' : /Firefox\//.test(s) ? 'Firefox' : /CriOS|Chrome\//.test(s) ? 'Chrome' : /Safari\//.test(s) ? 'Safari' : ''; return os + (br ? ' · ' + br : ''); }
+  function ua(s){ s = String(s || ''); var os = /iPhone|iPad/.test(s) ? 'iPhone' : /Android/.test(s) ? 'Android' : /Macintosh/.test(s) ? 'Mac' : /Windows/.test(s) ? 'Windows' : /Linux/.test(s) ? 'Linux' : 'Device'; var br = /Edg\//.test(s) ? 'Edge' : /OPR\//.test(s) ? 'Opera' : /Firefox\//.test(s) ? 'Firefox' : /CriOS|Chrome\//.test(s) ? 'Chrome' : /Safari\//.test(s) ? 'Safari' : ''; return br ? br + ' on ' + os : os; }
   async function loadDevices(){
     if (!DEV || DEV.loading || !access) return; DEV.loading = true;
     try { var r = await sb.rpc('my_sessions'); if (r.error) throw r.error; DEV.list = r.data || []; }

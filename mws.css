@@ -125,8 +125,9 @@ main{flex:1;padding-block:clamp(40px,7vh,96px) clamp(56px,8vh,112px)}
 .plan:last-child{border-right:0}
 .plan:hover{background:var(--bg-2)}
 .plan.sel{background:var(--bg-2);box-shadow:inset 0 0 0 1px var(--fg-2)}
-.plan .k{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--fg-3);letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
-.plan .k em{font-style:normal;color:var(--fg)}
+.plan .k{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:22px;font-weight:500;letter-spacing:-.015em;color:var(--fg);text-transform:capitalize}
+.plan .k em{font-style:normal;font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-2);border:1px solid var(--line-2);padding:4px 8px;white-space:nowrap}
+h1,h2,h3{text-transform:capitalize}
 .plan .price{font-size:clamp(44px,4vw,60px);line-height:1;letter-spacing:-.045em;margin-top:12px;font-variant-numeric:tabular-nums}
 .plan .price small{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin-left:10px}
 .plan .sub{font-size:15px;color:var(--fg-2);margin-bottom:auto}
@@ -324,3 +325,20 @@ a.tile:hover{background:var(--bg-2)}
 .sup-reply .row{justify-content:flex-end;gap:12px}
 .sup-reply .msg{margin:0;flex:1}
 
+/* billing history */
+.bill{width:100%;border-collapse:collapse;font-size:14px}
+.bill th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;text-align:left;padding:0 10px 10px 0;border-bottom:1px solid var(--line)}
+.bill td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--fg-2)}
+.bill tr:last-child td{border-bottom:0}
+.bill td.mono{font-family:var(--mono);font-size:12.5px;color:var(--fg);white-space:nowrap}
+.bill td:nth-child(2){color:var(--fg)}
+@media (max-width:600px){.bill thead{display:none}.bill tr{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--line)}.bill td{display:block;padding:0;border:0}.bill td:nth-child(1){grid-column:1;order:1}.bill td:nth-child(2){grid-column:1/-1;order:0}.bill td:nth-child(3){grid-column:2;order:1;text-align:right}.bill td:nth-child(4){grid-column:1/-1;order:2}}
+/* account: settings rows with inline "Change" */
+.kv.edit{gap:0;grid-template-columns:auto minmax(0,1fr)}
+.kv.edit dt,.kv.edit dd{padding:13px 0;border-top:1px solid var(--line)}
+.kv.edit dt{padding-top:16px;padding-right:28px}
+.kv.edit dt:first-of-type,.kv.edit dd:first-of-type{border-top:0;padding-top:0}
+.kv.edit dd{display:flex;justify-content:space-between;align-items:baseline;gap:14px;min-width:0}
+.kv.edit dd>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kv.edit dd .mono{font-family:var(--mono);letter-spacing:.12em;color:var(--fg-2)}
+.kv.edit dd .link{font-size:13px;flex:none}

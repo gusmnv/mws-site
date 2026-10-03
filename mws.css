@@ -342,3 +342,7 @@ a.tile:hover{background:var(--bg-2)}
 .kv.edit dd>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kv.edit dd .mono{font-family:var(--mono);letter-spacing:.12em;color:var(--fg-2)}
 .kv.edit dd .link{font-size:13px;flex:none}
+/* manage plan */
+.list.mg li{align-items:flex-start;flex-wrap:wrap}
+.list.mg .mg-acts{gap:8px 14px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.list.mg .mg-acts .link{font-size:13px}

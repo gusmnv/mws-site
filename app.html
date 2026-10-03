@@ -55,7 +55,7 @@
   <div class="mainc">
     <header class="bar">
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><span></span></button>
-      <div class="crumbs"><span class="mono">Mr. Wall Street</span><span class="sep">/</span><span id="crumb">Telegram</span></div>
+      <div class="crumbs"><span id="crumb">Telegram</span></div>
       <span class="tag" id="bar-st">—</span>
     </header>
 
@@ -70,18 +70,20 @@
         <div class="acct">
           <div>
             <section class="panel rv" id="p-access"><div class="ttl"><h3>Plan &amp; billing</h3><span class="tag" id="st">—</span></div><div id="access-body"></div></section>
+            <section class="panel rv d1" id="p-manage" hidden><div class="ttl"><h3>Manage your plan</h3><span class="small muted" id="mg-n"></span></div>
+              <div id="mg-list"></div>
+              <div class="msg" id="m-mg"></div>
+              <p class="small muted" style="margin-top:14px">Cancelling stops the next charge; your access runs to the end of what you paid. Changed your mind? Resume with one tap. Card details are the one thing entered on Whop's secure page.</p>
+            </section>
             <section class="panel rv d1" id="p-bill"><div class="ttl"><h3>Billing history</h3><span class="small muted" id="bill-n"></span></div>
               <div id="bill-list"><p class="small muted">Loading…</p></div>
               <p class="small muted" style="margin-top:14px">Every charge on this account through the site's checkout. Whop also emails a receipt at each charge. For an invoice in a company name, write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a>.</p>
             </section>
           </div>
           <div>
-            <section class="panel rv d1"><div class="ttl"><h3>What is included</h3></div>
-              <ul class="list" id="incl"></ul>
-              <p class="small muted" style="margin-top:14px">The Desk (portfolio, calendar, earnings) opens for all members at no extra cost.</p>
-            </section>
+            <ul id="incl" hidden aria-hidden="true"></ul>
             <section class="panel rv d2"><div class="ttl"><h3>Billing questions</h3></div>
-              <p class="small muted">Payments are processed by Whop. Receipts, card changes and cancellations live under <b>Manage subscription</b>. Cancelling keeps your access until the end of the period you paid for.</p>
+              <p class="small muted">Cancel, resume or switch plans right here. Receipts and card changes open on Whop's secure page, the payment processor. Cancelling keeps your access until the end of the period you paid for; Lifetime never renews.</p>
             </section>
           </div>
         </div>
@@ -361,7 +363,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); } else { document.body.classList.remove('sim'); }
     render();
     if (current === 'devices') loadDevices();
-    loadBilling();
+    loadBilling(); loadManage();
     if (!supLoaded) { supLoaded = true; loadSupport(); }
   }
   /* in preview, buttons and checkout links inside the pages do nothing (they act on real members' accounts) */
@@ -415,8 +417,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
         + tile('Member since', esc(M.fmtDate(since)), owner ? 'Owner access. Everything members get, plus the <b>admin</b>.' : daysTxt, owner ? '/admin' : null);
       body.innerHTML = '<dl class="kv"><dt>Plan</dt><dd>' + esc(planName(access.plan_key)) + '</dd><dt>Billing</dt><dd>' + esc(renews) + '</dd></dl>'
         + (pastDue ? '<div class="msg on bad" style="margin-top:16px">Your last payment failed. Update your card under Manage subscription within ' + grace + ' days of the failed charge to keep your access.</div>' : '')
-        + '<div class="row" style="margin-top:20px">' + (owner ? '<span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span>' : lifetime ? '<span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span>' : manage + (ending ? (access.cancel_at_period_end ? '<span class="small muted">Changed your mind? Resume it under Manage subscription.</span>' : '<a class="link" href="/join?plan=' + (access.plan_key === 'yearly' ? 'yearly' : 'monthly') + '&from=app">Rejoin</a>') : (pastDue ? '' : '<a class="link" href="/join?plan=lifetime&from=app" title="Your current plan keeps billing until you cancel it under Manage subscription.">Upgrade to Lifetime</a>'))) + '</div>'
-        + (!owner && !lifetime && !ending && !pastDue ? '<p class="small muted" style="margin-top:10px">Upgrading to Lifetime does not cancel your current plan: cancel it under Manage subscription once Lifetime is active.</p>' : '');
+        + (owner ? '<div class="row" style="margin-top:20px"><span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span></div>' : lifetime ? '<div class="row" style="margin-top:20px"><span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span></div>' : '')
+        + '';
       $('#n-mem').textContent = ''; $('#n-mem').className = 'cnt';
       $('#n-tg').textContent = channels.length ? joined + '/' + channels.length : ''; $('#n-tg').className = 'cnt' + (joined < channels.length ? ' warn' : '');
       renderTg(true);
@@ -544,6 +546,43 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (profile) profile.full_name = v; $('#acc-name').textContent = v; $('#acc-tag').hidden = true;
   }
   $('#f-name').addEventListener('submit', async function(e){ e.preventDefault(); if (sim) return M.toast('Preview only.'); var btn = $('#f-name .btn'); M.busy(btn, true); M.msg('#m-name', ''); try { await saveName($('#cname').value); $('#f-name').hidden = true; M.toast('Name saved.'); } catch (err) { M.msg('#m-name', M.human(err), 'bad'); } finally { M.busy(btn, false); } });
+  /* manage the plan here (memberships_self.sql → my_memberships; the billing function talks to Whop) */
+  var MG = { list: null, loading: false };
+  async function loadManage(){
+    if (MG.loading) return; MG.loading = true;
+    if (sim) { MG.list = access && access.valid && access.plan_key !== 'owner' ? [{ id: 'mem_preview', plan_key: access.plan_key, status: access.status, renewal_period_end: access.renewal_period_end, cancel_at_period_end: !!access.cancel_at_period_end, manage_url: '#', manual: false, valid: true }] : []; renderManage(); MG.loading = false; return; }
+    try { var r = await sb.rpc('my_memberships'); if (r.error) throw r.error; MG.list = r.data || []; } catch (e) { MG.list = []; }
+    renderManage(); MG.loading = false;
+  }
+  function renderManage(){
+    var el = $('#mg-list'), wrap = $('#p-manage'); if (!el) return;
+    var list = (MG.list || []).filter(function(m){ return m.valid && !m.manual; });
+    wrap.hidden = !list.length; if (!list.length) return;
+    $('#mg-n').textContent = list.length > 1 ? list.length + ' plans on this account' : '';
+    el.innerHTML = '<ul class="list mg">' + list.map(function(m){
+      var life = m.plan_key === 'lifetime', ending = !life && (m.cancel_at_period_end || /^(cancel|expir)/.test(m.status || '')), past = m.status === 'past_due';
+      var when = m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : null;
+      var line = life ? 'Paid once. Nothing renews, nothing to cancel.' : ending ? (when ? 'Cancelled. Access until ' + when + ', no further charges.' : 'Cancelled.') : past ? 'Last charge failed. Update the card to keep access.' : (when ? 'Renews ' + when + '.' : 'Active.');
+      var acts = '';
+      if (!life) {
+        if (m.cancel_at_period_end) acts += '<button class="btn sm acc" data-mg="resume" data-id="' + esc(m.id) + '" data-busy="Resuming">Resume plan</button>';
+        else if (!/^(cancel|expir)/.test(m.status || '')) acts += '<button class="link" data-mg="cancel" data-id="' + esc(m.id) + '">Cancel at period end</button>';
+        acts += '<a class="btn sm ghost" href="' + (/^https:\/\//i.test(m.manage_url || '') ? esc(m.manage_url) : 'https://whop.com/orders/') + '" target="_blank" rel="noopener">' + (past ? 'Update card' : 'Card &amp; invoices') + '</a>';
+        if (m.plan_key === 'monthly') acts += '<a class="link" href="/join?plan=yearly&from=app">Switch to yearly</a>';
+        if (m.plan_key !== 'lifetime') acts += '<a class="link" href="/join?plan=lifetime&from=app">Go Lifetime</a>';
+      }
+      return '<li><span><b style="font-weight:500">' + esc(planName(m.plan_key)) + '</b>' + (ending ? ' <span class="tag warn">Ends ' + esc(when || '') + '</span>' : past ? ' <span class="tag bad">Payment issue</span>' : ' <span class="tag ok">Active</span>') + '<span class="small muted" style="display:block;margin-top:3px">' + esc(line) + '</span></span><span class="row mg-acts">' + acts + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  $('#mg-list').addEventListener('click', async function(e){
+    var b = e.target.closest('button[data-mg]'); if (!b) return;
+    if (sim) return M.toast('Preview only. For a real member this works.');
+    var act = b.dataset.mg, id = b.dataset.id, m = (MG.list || []).filter(function(x){ return x.id === id; })[0]; if (!m) return;
+    if (act === 'cancel' && !confirm('Cancel your ' + planName(m.plan_key) + ' plan at the end of the current period? You keep access until ' + (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : 'the period ends') + ', and nothing else is charged. You can resume any time before that.')) return;
+    M.busy(b, true); M.msg('#m-mg', '');
+    try { var r = await M.fn('billing', { action: act, id: id }); m.cancel_at_period_end = act === 'cancel'; if (r.renewal_period_end) m.renewal_period_end = r.renewal_period_end; renderManage(); M.toast(act === 'cancel' ? 'Cancelled. Access runs to the end of the period.' : 'Welcome back. Your plan renews as before.'); setTimeout(function(){ load(false); loadManage(); }, 1500); }
+    catch (err) { M.msg('#m-mg', M.human(err), 'bad'); M.busy(b, false); }
+  });
   /* billing history: every charge on this account (billing.sql → my_payments) */
   var BILL = { list: null, loading: false };
   function money(n, cur){ cur = (cur || 'USD').toUpperCase(); var v = Number(n) || 0; return (cur === 'USD' ? '$' : cur + ' ') + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }

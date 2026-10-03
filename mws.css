@@ -20,7 +20,7 @@ h3{font-size:19px;line-height:1.3;letter-spacing:-.015em;font-weight:500}
 
 /* background grid (marketing pages only; the member area and admin are plain) */
 body.app::before,body.adm::before{display:none}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:var(--gs,72px) var(--gs,72px);background-position:0 var(--gy,56px);-webkit-mask-image:radial-gradient(ellipse 85% 75% at 50% 35%,#000 25%,rgba(0,0,0,.3) 70%,transparent 100%);mask-image:radial-gradient(ellipse 85% 75% at 50% 35%,#000 25%,rgba(0,0,0,.3) 70%,transparent 100%)}
+body::before{content:"";position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:0;pointer-events:none;transform:translateZ(0);background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:var(--gs,72px) var(--gs,72px);background-position:0 var(--gy,56px);-webkit-mask-image:radial-gradient(ellipse 85% 75% at 50% 35%,#000 25%,rgba(0,0,0,.3) 70%,transparent 100%);mask-image:radial-gradient(ellipse 85% 75% at 50% 35%,#000 25%,rgba(0,0,0,.3) 70%,transparent 100%)}
 main,header,footer{position:relative;z-index:1}
 
 /* buttons */

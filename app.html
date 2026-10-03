@@ -27,6 +27,13 @@
   <div class="row" id="g-actions" hidden style="margin-top:18px"><a class="btn acc" href="/login">Go to log in <span class="ar"></span></a></div>
 </div>
 
+<!-- pay gate: a logged-in account without an active plan does not enter the member area -->
+<div class="gate pg" id="paygate" hidden>
+  <div class="head rv"><h1 id="pg-h">Choose your entry.</h1></div>
+  <div class="panel rv d1" id="pg-body"></div>
+  <div class="row rv d2" style="margin-top:18px;justify-content:space-between"><span class="small muted" id="pg-who"></span><button class="link" id="pg-out" type="button">Log out</button></div>
+</div>
+
 <div class="shell" id="shell" hidden>
   <aside class="side" id="side" aria-label="Member menu">
     <div class="side-top">
@@ -376,7 +383,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function statusOf(chat_id){ var a = tgAccess.filter(function(x){ return String(x.chat_id) === String(chat_id); })[0]; return a ? a.status : 'pending'; }
   function tile(k, v, d, href, cls){ return '<' + (href ? 'a href="' + href + '"' : 'div') + ' class="tile ' + (cls || '') + '"><span class="k">' + k + '</span><span class="v">' + v + '</span><span class="d">' + d + '</span></' + (href ? 'a' : 'div') + '>'; }
 
+  var gateState = '';
   function render(){
+    gateState = '';
     /* identity */
     var name = firstName();
     $('#acc-email').textContent = user.email; $('#acc-name').textContent = (profile && profile.full_name) || '—'; $('#acc-tag').textContent = 'Add your name'; $('#acc-tag').hidden = !!(profile && profile.full_name);
@@ -423,7 +432,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       $('#n-tg').textContent = channels.length ? joined + '/' + channels.length : ''; $('#n-tg').className = 'cnt' + (joined < channels.length ? ' warn' : '');
       renderTg(true);
     } else if (paid && !access.valid && paidTries < 20) {
-      paidTries++;
+      gateState = 'pending'; paidTries++;
       $('#h').textContent = 'Confirming your payment…'; $('#sub').textContent = 'This usually takes a few seconds. Keep this page open.';
       st.textContent = 'Pending'; st.className = 'tag warn'; bar.textContent = 'Pending'; bar.className = 'tag warn'; $('#mem-sub').textContent = 'Waiting for the payment confirmation.';
       body.innerHTML = '<p class="small muted"><span class="spin"></span>Waiting for the payment confirmation.</p>';
@@ -431,6 +440,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       clearTimeout(pollT); pollT = setTimeout(function(){ load(paidTries % 3 === 1); }, 4000); /* re-check access every 4s; ask Whop again every 12s */
       renderTg(false);
     } else if (paid && !access.valid) {
+      gateState = 'unmatched';
       $('#h').textContent = 'Still confirming…'; $('#sub').textContent = 'The payment went through but we have not matched it to this account yet.';
       st.textContent = 'Pending'; st.className = 'tag warn'; bar.textContent = 'Pending'; bar.className = 'tag warn'; $('#mem-sub').textContent = '';
       body.innerHTML = '<p class="small muted">If you paid with a different email than <b>' + esc(user.email) + '</b>, the match can take a few minutes. <button class="link" data-reclaim="1" type="button">Check again</button> or write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with your receipt email.</p>';
@@ -439,6 +449,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       plansHtml = '<section class="panel rv d1" style="margin-top:1px"><div class="ttl"><h3>Did the payment not go through?</h3><span class="tag">Plans</span></div><p class="small muted" style="margin-bottom:12px">If your card was declined or you closed the checkout early, pick a plan again. If you were charged, do not pay twice: write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with the receipt.</p><ul class="list">' + plans2 + '</ul></section>';
       renderTg(false);
     } else if (access.status === 'past_due') {
+      gateState = 'paused';
       /* grace period over: Whop is still retrying the same subscription, so the fix is the card, not a second plan */
       $('#h').textContent = 'Payment failed.'; $('#sub').textContent = 'Your access is paused until your card is updated. No new plan is needed.';
       st.textContent = 'Paused'; st.className = 'tag bad'; bar.textContent = 'Paused'; bar.className = 'tag bad'; $('#mem-sub').textContent = 'Last charge failed. Access is paused.';
@@ -448,9 +459,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       $('#n-mem').textContent = '!'; $('#n-mem').className = 'cnt warn'; $('#n-tg').textContent = '';
       renderTg(false);
     } else {
+      gateState = 'none';
       $('#h').textContent = name ? 'Choose your entry, ' + name + '.' : 'Choose your entry.'; $('#sub').textContent = 'Your account is ready. Pick a plan and everything unlocks the second the payment clears.';
       st.textContent = access.reason === 'none' ? 'No plan' : 'Inactive'; st.className = 'tag bad'; bar.textContent = 'No plan'; bar.className = 'tag'; $('#mem-sub').textContent = access.reason === 'none' ? 'No active plan on this account.' : 'Your previous membership (' + planName(access.plan_key) + ') has ended.';
-      var plans = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm' + (k==='yearly'?' acc':'') + '" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
+      var plans = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm' + '" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
       var prev = access.reason !== 'none' ? '<p class="small muted" style="margin-top:14px">Your previous membership (' + esc(planName(access.plan_key)) + ') has ended. Choosing a plan restores your access immediately.</p>' : '<p class="small muted" style="margin-top:14px">Already paid through Whop with this email? <button class="link" data-reclaim="1" type="button">Check again</button>. Paid with a different email? Tell us in <a class="link" href="#feedback">Feedback</a> and we attach it to this account.</p>';
       body.innerHTML = '<ul class="list">' + plans + '</ul>' + prev;
       plansHtml = '<section class="panel rv d1" style="margin-top:1px"><div class="ttl"><h3>Plans</h3><span class="tag">' + (access.reason === 'none' ? 'Choose one' : 'Rejoin') + '</span></div><ul class="list">' + plans + '</ul>' + prev + '</section>';
@@ -460,7 +472,24 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     }
     $('#ov-banner').innerHTML = banner; $('#ov-plans').innerHTML = plansHtml;
     renderNotices(); renderPortfolio(); lastLoad = Date.now();
+    paygate(name, grace);
     $$('[data-reclaim]').forEach(function(b){ b.addEventListener('click', async function(){ b.textContent = 'Checking…'; paidTries = 0; await claim(); load(false); }); });
+  }
+
+  /* no active plan → no member area: only the way in (plans), the payment states, and the way out */
+  function paygate(name, grace){
+    var pg = $('#paygate'); if (!pg) return;
+    var gated = !sim && !access.valid && !!gateState;
+    pg.hidden = !gated; $('#shell').hidden = gated; document.body.classList.toggle('gated', gated);
+    if (!gated) return;
+    var plans = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
+    var other = '<p class="small muted" style="margin-top:14px">Already paid through Whop with this email? <button class="link" data-reclaim="1" type="button">Check again</button>. Paid with a different email? Write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with the receipt and we attach it to this account.</p>';
+    var h = 'Choose your entry.', body = '';
+    if (gateState === 'pending') { h = 'Confirming your payment…'; body = '<p class="small muted"><span class="spin"></span>This usually takes a few seconds. Keep this page open.</p>'; }
+    else if (gateState === 'unmatched') { h = 'Still confirming…'; body = '<p>The payment went through but we have not matched it to this account yet.</p>' + other + '<p class="small muted" style="margin-top:14px">If your card was declined or you closed the checkout early, pick a plan again. If you were charged, do not pay twice.</p><ul class="list">' + plans + '</ul>'; }
+    else if (gateState === 'paused') { h = 'Payment failed.'; body = '<p>The last charge on your ' + esc(planName(access.plan_key)) + ' plan failed, so your access is paused. Update the card and it comes back automatically. No new plan is needed.</p><div class="row" style="margin-top:18px">' + (access.manage_url ? '<a class="btn acc" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>' : '<a class="btn acc" href="https://whop.com/orders/" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>') + '<button class="link" data-reclaim="1" type="button">I updated it, check again</button></div>'; }
+    else { h = name ? 'Choose your entry, ' + name + '.' : 'Choose your entry.'; body = '<p>' + (access.reason === 'none' ? 'This account has no active plan yet. Pick one and everything unlocks the second the payment clears: the channels, the portfolio, all of it.' : 'Your previous membership (' + esc(planName(access.plan_key)) + ') has ended. Choosing a plan restores your access immediately.') + '</p><ul class="list" style="margin-top:16px">' + plans + '</ul>' + other; }
+    $('#pg-h').textContent = h; $('#pg-body').innerHTML = body; $('#pg-who').textContent = user.email;
   }
 
   /* notices from Mr. Wall Street (admin → Settings); dismissed ones stay hidden on this device */
@@ -643,6 +672,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   $('#f-pw').addEventListener('submit', async function(e){ e.preventDefault(); var v = $('#cpw').value; if (v.length < 8) return M.msg('#m-pw', 'At least 8 characters.', 'bad'); var btn = $('#f-pw .btn'); M.busy(btn, true); try { var r = await sb.auth.updateUser({ password: v }); if (r.error) throw r.error; M.msg('#m-pw', 'Password updated.', 'ok'); $('#cpw').value=''; } catch(err) { M.msg('#m-pw', M.human(err), 'bad'); } M.busy(btn, false); });
   $('#out-all').addEventListener('click', async function(){ if (!confirm('Log out of every device, including this one?')) return; M.viewAs.set(''); try { await sb.auth.signOut({ scope: 'global' }); } catch(e) { await sb.auth.signOut(); } M.go('/login'); });
   $('#signout').addEventListener('click', async function(){ M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); });
+  $('#pg-out').addEventListener('click', async function(){ M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); });
 
   /* ---- support: conversations with Mr. Wall Street (writes go through the support function; reads via RLS) ---- */
   var SUP = { threads: [], msgs: {}, open: null, loading: false };

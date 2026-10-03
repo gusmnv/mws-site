@@ -214,7 +214,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     <!-- MEMBERS -->
     <section class="view" data-v="members">
-      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">No account yet</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button><button data-f="legacy">Legacy</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
+      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">No account yet</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
       <div class="tblw"><table class="tbl" id="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th>Since</th></tr></thead><tbody id="rows"></tbody></table></div>
     </section>
 
@@ -356,7 +356,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       sb.from('support_messages').select('id,thread_id,user_id,from_staff,body,created_at').order('created_at').limit(2000),
       sb.from('sent_emails').select('id,user_id,to_email,type,subject,status,provider_id,error,sent_by,created_at').order('created_at', { ascending: false }).limit(500)
     ]);
-    D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
+    D.profiles = r[0].data || []; D.memberships = (r[1].data || []).map(function(m){ m.legacy = false; return m; }); /* 3 Oct: every paid membership counts, whatever its date (the flag stays in the table for the record) */ D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
     D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; }); D.invited = (r[9] && r[9].invited) || {};
     D.emails = r[12] && !r[12].error ? (r[12].data || []) : null;
     D.sup = r[10].error ? null : (r[10].data || []); D.supMsgs = {}; ((r[11] && r[11].data) || []).forEach(function(m){ (D.supMsgs[m.thread_id] = D.supMsgs[m.thread_id] || []).push(m); });
@@ -569,7 +569,6 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (e.profile && e.link && !blocked) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
     if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + X(m.id) + '" data-busy="Revoking">Revoke manual access</button>';
     if (!e.valid && !e.legacy) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
-    if (!e.legacy && m.id && m.id.indexOf('manual_') !== 0 && m.id.indexOf('mem_') === 0) html += '<button class="link" data-a="set_legacy" data-id="' + X(m.id) + '" data-busy="Moving">Move to legacy (hide from the site)</button>';
     var inv2 = D.invited && D.invited[e.email];
     if (!e.profile && !e.legacy) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
     else if (inv2 && !inv2.accepted) html += '<p class="small muted">Invited ' + X(M.fmtDate(inv2.invited_at)) + ', has not opened the link yet.</p><button class="btn ghost" data-a="reinvite" data-email="' + X(e.email) + '" data-busy="Sending">Send the link again</button>';

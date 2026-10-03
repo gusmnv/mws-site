@@ -85,20 +85,23 @@ html.menu .burger i{top:20px;transform:rotate(45deg)}html.menu .burger i+i{trans
 #menu{position:fixed;inset:0;z-index:55;background:var(--bg);display:flex;flex-direction:column;justify-content:space-between;gap:32px;padding:calc(56px + 11vh) clamp(24px,8vw,64px) max(28px,env(safe-area-inset-bottom,0px) + 22px);clip-path:inset(0 0 100% 0);transition:clip-path .7s var(--ease-io);pointer-events:none}
 html.menu #menu{clip-path:inset(0 0 0 0);pointer-events:auto}
 #menu ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-#menu ul a{text-decoration:none;font-size:clamp(34px,9vw,56px);letter-spacing:-.04em;font-weight:400;line-height:1.15;display:flex;gap:18px;align-items:baseline;transform:translateY(40px);opacity:0;transition:transform .7s var(--ease),opacity .7s}
-#menu ul a i{font-family:var(--mono);font-style:normal;font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--fg-3);width:34px;flex:none}
+#menu ul a{text-decoration:none;font-size:clamp(34px,9vw,56px);letter-spacing:-.04em;font-weight:400;line-height:1.15;display:block;padding:10px 0;border-bottom:1px solid var(--line);transform:translateY(40px);opacity:0;transition:transform .7s var(--ease),opacity .7s}
+#menu ul li:last-child a{border-bottom:0}
 html.menu #menu ul a{transform:none;opacity:1}
-#menu .auth{display:flex;gap:10px;opacity:0;transform:translateY(24px);transition:transform .7s var(--ease) .28s,opacity .7s .28s}html.menu #menu .auth{opacity:1;transform:none}#menu .auth .btn{flex:1 1 0;justify-content:center;height:54px;font-size:15px;transform:none;opacity:1;transition:none}
+/* bottom of the menu: Join now on top, Log in beneath, both full width (as on the first site) */
+#menu .auth{display:flex;flex-direction:column;gap:10px;opacity:0;transform:translateY(24px);transition:transform .7s var(--ease) .28s,opacity .7s .28s}html.menu #menu .auth{opacity:1;transform:none}#menu .auth .btn{width:100%;justify-content:center;height:56px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transform:none;opacity:1;transition:none}#menu .auth .btn.ghost{color:var(--fg);border-color:var(--line-2)}
 #menu li:nth-child(2) a{transition-delay:.06s}#menu li:nth-child(3) a{transition-delay:.12s}#menu li:nth-child(4) a{transition-delay:.18s}#menu li:nth-child(5) a{transition-delay:.24s}#menu li:nth-child(6) a{transition-delay:.3s}#menu li:nth-child(7) a{transition-delay:.36s}
 @media (max-width:960px){nav{display:none}.burger{display:block}header.top .wrap{grid-template-columns:1fr auto}header.top .right{gap:10px}}
 @media (max-width:480px){header.top .btn.sm{display:none}}
 
 /* background field: grid + grain */
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+/* both layers are sized to the large viewport (not inset:0) so they never resize while the phone's toolbar collapses — resizing a masked/filtered fixed layer on every scroll frame is what makes iOS stutter */
+body::before{content:"";position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:0;pointer-events:none;transform:translateZ(0);
   background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:var(--gs,72px) var(--gs,72px);background-position:0 var(--gy,56px);
   -webkit-mask-image:radial-gradient(ellipse 85% 75% at 50% 35%,#000 25%,rgba(0,0,0,.3) 70%,transparent 100%);mask-image:radial-gradient(ellipse 85% 75% at 50% 35%,#000 25%,rgba(0,0,0,.3) 70%,transparent 100%)}
-body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.045;mix-blend-mode:screen;
+body::after{content:"";position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:0;pointer-events:none;opacity:.04;transform:translateZ(0);
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>")}
+@media (max-width:900px){body::after{display:none}}
 main,footer{position:relative;z-index:1}
 main{padding-top:56px}
 
@@ -127,7 +130,10 @@ h1 .dim{color:var(--fg-2)}
 .scroll-hint i::after{content:"";position:absolute;left:0;top:0;height:100%;width:40%;background:var(--fg);animation:sh 2s var(--ease-io) infinite}
 @keyframes sh{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
 @media (max-width:900px){.hero-l .cta{width:100%}}
-@media (max-width:600px){.hero .eyebrow b{display:none}.hero-l .cta .btn{width:100%;max-width:420px}.hero .wrap{padding-bottom:96px}}
+.hero-note{margin-top:18px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);display:flex;flex-wrap:wrap;gap:6px 0}
+.hero-note span+span::before{content:"·";margin:0 10px;color:var(--line-2)}
+/* phone: the hero ends with its content (no empty screen under the button); the numbers follow at once */
+@media (max-width:600px){.hero{min-height:0}.hero .eyebrow b{display:none}.hero .eyebrow{margin-bottom:26px}.hero-l .cta{margin-top:30px}.hero-l .cta .btn{width:100%;max-width:420px}.hero .wrap{padding-top:clamp(28px,5vh,44px);padding-bottom:44px}.hero-foot{display:none}.hero-note{font-size:10.5px;flex-wrap:nowrap;white-space:nowrap}.hero-note span:nth-child(3){display:none}}
 
 /* pinned scenes — the page only moves on once the scene has been seen */
 .pinsec{padding:0;position:relative}
@@ -154,7 +160,9 @@ h1 .dim{color:var(--fg-2)}
 .stat .l{font-size:16px;font-weight:500;letter-spacing:-.01em;color:var(--fg);line-height:1.3}
 .stat .l span{display:block;font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin-top:7px}
 @media (max-width:900px){.stats .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:26px 22px 24px}.stat:nth-child(2){border-right:1px solid var(--line)}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
-.stat .l em{font-style:normal}.stat .l em.mb{display:none}@media (max-width:600px){.stats .wrap{grid-template-columns:.9fr .9fr .9fr 1.3fr}.stat{padding:18px 6px 16px 10px;gap:8px;border-top:0!important;border-right:0!important}.stat:last-child{border-right:1px solid var(--line)!important}.stat .v{font-size:clamp(18px,5.2vw,22px);letter-spacing:-.03em}.stat .v small{font-size:.5em;margin-left:3px}.stat .l{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-3);line-height:1.35}.stat .l span{display:none}.stat .l em.dk{display:none}.stat .l em.mb{display:inline}}
+.stat em{font-style:normal}.stat em.mb{display:none}
+/* phone: one row, four equal cells, every label on two lines */
+@media (max-width:600px){.stats .wrap{grid-template-columns:repeat(4,minmax(0,1fr))}.stat{padding:16px 4px 14px 10px;gap:7px;border-top:0!important;border-right:0!important;min-width:0}.stat:last-child{border-right:1px solid var(--line)!important}.stat .v{font-size:clamp(17px,4.9vw,21px);letter-spacing:-.03em}.stat .v small{font-size:.5em;margin-left:3px}.stat .v em.dk{display:none}.stat .v em.mb{display:inline}.stat .l{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--fg-3);line-height:1.4;min-height:2.8em}.stat .l span{display:none}.stat .l em.dk{display:none}.stat .l em.mb{display:inline}}
 
 section{padding-block:clamp(72px,9vw,128px)}
 .sec-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px;margin-bottom:40px;position:relative;padding-top:0}
@@ -176,15 +184,16 @@ section{padding-block:clamp(72px,9vw,128px)}
 .svc{--mx:50%;--my:50%;background:var(--bg);padding:28px 28px 30px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;min-height:290px;opacity:0;transform:translateY(14px);transition:background .4s,opacity 1.1s var(--ease),transform 1.1s var(--ease)}
 .svc.on{opacity:1;transform:none}
 .svc::after{content:"";position:absolute;inset:0;background:radial-gradient(170px circle at var(--mx) var(--my),rgba(255,255,255,.075),transparent 62%);opacity:0;transition:opacity .5s;pointer-events:none}
-.svc:hover::after{opacity:1}
+@media (hover:hover){.svc:hover::after{opacity:1}}
 .svc .idx{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--fg-3);letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:baseline}
 .svc .idx b{font-weight:500;color:var(--fg-2)}
 .svc h3{margin-top:auto;padding-top:30px}
 .svc p{color:var(--fg-2);font-size:15.5px}
 .svc ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:14px;color:var(--fg-2)}
 .svc li{display:flex;gap:12px}
-.svc li::before{content:"";width:12px;height:1px;background:var(--fg-3);margin-top:10px;flex:none;transition:width .4s var(--ease),background .4s}
-.svc:hover li::before{width:20px;background:var(--fg-2)}
+.svc li::before{content:"";width:12px;height:1px;background:var(--fg-3);margin-top:10px;flex:none;transform-origin:0 50%;transition:transform .4s var(--ease),background .4s}
+/* hover may never change layout: a wider dash used to re-wrap the line and shift the whole page while scrolling on phones */
+@media (hover:hover){.svc:hover li::before{transform:scaleX(1.5);background:var(--fg-2)}}
 @media (max-height:820px){.svc{min-height:240px;padding:22px 24px 24px}.svc h3{padding-top:18px}}
 @media (max-width:1000px){.services{grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line)}.svc{border:0}}
 @media (max-width:640px){.services{grid-template-columns:1fr}.svc{min-height:0}.svc h3{padding-top:20px}}
@@ -359,7 +368,7 @@ setTimeout(function(){el.remove();},3700);
 </div>
 <div id="prog"></div>
 </header>
-<div id="menu" aria-hidden="true"><ul><li><a href="/telegram"><i>/01</i>Telegram</a></li><li><a href="/portfolio"><i>/02</i>Portfolio</a></li><li><a href="/earnings"><i>/03</i>Earnings</a></li><li><a href="/calendar"><i>/04</i>Calendar</a></li></ul><div class="auth"><a class="btn ghost" href="/login" id="menu-login">Log in</a><a class="btn acc" href="/join" id="menu-join">Join now <span class="ar"></span></a></div></div>
+<div id="menu" aria-hidden="true"><ul><li><a href="/telegram">Telegram</a></li><li><a href="/portfolio">Portfolio</a></li><li><a href="/earnings">Earnings</a></li><li><a href="/calendar">Calendar</a></li></ul><div class="auth"><a class="btn acc" href="/join" id="menu-join">Join now <span class="ar"></span></a><a class="btn ghost" href="/login" id="menu-login">Log in</a></div></div>
 
 <main id="top">
 <section class="hero" id="hero">
@@ -369,6 +378,7 @@ setTimeout(function(){el.remove();},3700);
 <h1 id="h1"><span class="ln"><span>The market has</span></span><span class="ln"><span>an inner circle.</span></span><span class="ln"><span class="dim">Enter it.</span></span></h1>
 <p class="lede rv d2"><b>Every trade taken. Every investment made. Every market call, in real time.</b> Macro and geopolitical research, portfolio management coupled with risk management, and a private network of serious traders and investors.</p>
 <div class="cta rv d3"><a class="btn acc" href="/join">Become a member <span class="ar"></span></a></div>
+<p class="hero-note rv d4"><span>From $99 a month</span><span>Cancel anytime</span><span>Access in seconds</span></p>
 </div>
 </div>
 <div class="hero-foot" aria-hidden="true"><span class="scroll-hint"><i></i>Scroll</span></div>
@@ -376,10 +386,10 @@ setTimeout(function(){el.remove();},3700);
 
 <section class="stats" id="numbers" aria-label="By the numbers">
 <div class="wrap">
-<div class="stat rv"><div class="v" data-n="27.8" data-f="k">0</div><div class="l"><b>Followers on X</b><span>@mrofwallstreet</span></div></div>
-<div class="stat rv d1"><div class="v" data-n="4.9" data-f="r">0<small>/ 5</small></div><div class="l"><b>Member rating</b><span>50 verified reviews · all five stars</span></div></div>
-<div class="stat rv d2"><div class="v" data-n="100" data-f="p">0</div><div class="l"><b>Members inside</b><span>Mr. Wall Street</span></div></div>
-<div class="stat rv d3"><div class="v">Apr 2024</div><div class="l"><b><em class="dk">Active every day since</em><em class="mb">Active since</em></b><span>Not one day missed</span></div></div>
+<div class="stat rv"><div class="v" data-n="27.8" data-f="k">0</div><div class="l"><b><em class="dk">Followers on X</em><em class="mb">Followers<br>on X</em></b><span>@mrofwallstreet</span></div></div>
+<div class="stat rv d1"><div class="v" data-n="4.9" data-f="r">0<small>/ 5</small></div><div class="l"><b><em class="dk">Member rating</em><em class="mb">Member<br>rating</em></b><span>50 verified reviews · all five stars</span></div></div>
+<div class="stat rv d2"><div class="v" data-n="100" data-f="p">0</div><div class="l"><b><em class="dk">Members inside</em><em class="mb">Members<br>inside</em></b><span>Mr. Wall Street</span></div></div>
+<div class="stat rv d3"><div class="v"><em class="dk">Apr 2024</em><em class="mb">Apr ’24</em></div><div class="l"><b><em class="dk">Active every day since</em><em class="mb">Active<br>since</em></b><span>Not one day missed</span></div></div>
 </div>
 </section>
 
@@ -387,7 +397,8 @@ setTimeout(function(){el.remove();},3700);
 <div class="pin"><div class="pc">
 <div class="wrap">
 <div class="head rv"><p class="eyebrow"><b>/01</b>Features</p><h2><span class="lm"><span>Less noise. More edge.</span></span></h2><div class="cnt"><span class="cn">01 / 06</span><i class="cb"></i></div></div>
-<div class="services"><article class="svc"><span class="idx"><b>/01</b>Trading</span><h3>Real-time trading</h3><p>Live trading signals posted the moment I take them, with the entry, the take profit and the stop loss on every single call.</p><ul><li>Live signals the moment I take them</li><li>Entry, take profit and stop loss on every call</li><li>Leveraged setups with defined risk</li></ul></article><article class="svc"><span class="idx"><b>/02</b>Investing</span><h3>Long-term investments</h3><p>A full list of top long-term investments, continuously updated as markets move and built for capital preservation and compounding.</p><ul><li>Full list of top long-term investments</li><li>Continuously updated as markets move</li><li>Built for capital preservation and compounding</li></ul></article><article class="svc"><span class="idx"><b>/03</b>Updates</span><h3>Active market updates</h3><p>What actually matters today, called out early. Reaction to breaking macro and market events before it moves the tape, not after.</p><ul><li>What matters today, called out early</li><li>Reaction to breaking macro and market events</li><li>Before it moves the tape, not after</li></ul></article><article class="svc"><span class="idx"><b>/04</b>Research</span><h3>Global market analyses</h3><p>Macroeconomic and geopolitical research, essential data insights and the reasoning behind every position I take.</p><ul><li>Macroeconomic and geopolitical research</li><li>Essential data insights</li><li>The reasoning behind every position</li></ul></article><article class="svc"><span class="idx"><b>/05</b>Community</span><h3>Private community</h3><p>A private network of premium members. Share your trades, compare positioning and get direct access to me in the chat.</p><ul><li>A private network of premium members</li><li>Share your trades and compare positioning</li><li>Direct access to me in the chat</li></ul></article><article class="svc"><span class="idx"><b>/06</b>Exchanges</span><h3>Exchange benefits</h3><p>Better VIP tiers on partner exchanges, exclusive promotions and fee discounts, negotiated for members only.</p><ul><li>Better VIP tiers on partner exchanges</li><li>Exclusive promotions and fee discounts</li><li>Negotiated for members only</li></ul></article></div>
+<div class="services"><article class="svc"><span class="idx"><b>/01</b>Trading</span><h3>Real-time trading</h3><p>When I take a trade, you see it the second I take it. Not a screenshot after the fact: the entry, the take profit and the stop loss, posted live.</p><ul><li>Entry, take profit and stop loss on every call</li><li>Leveraged setups, with the risk defined before entry</li><li>Updates as the trade plays out, until it closes</li></ul></article><article class="svc"><span class="idx"><b>/02</b>Investing</span><h3>Long-term investments</h3><p>The positions I actually hold for the long run, in one list, with the levels and the reasoning. Reviewed as markets move, never left to rot.</p><ul><li>My full long-term list, with entry levels</li><li>Reviewed as the macro picture changes</li><li>Capital preservation first, compounding second</li></ul></article><article class="svc"><span class="idx"><b>/03</b>Updates</span><h3>Active market updates</h3><p>Markets move on news, and most people read about it after the move. I call out what matters the moment it matters, so you can act before the tape does.</p><ul><li>Breaking macro and market events, read in real time</li><li>What each one means for the positions we hold</li><li>Quiet when nothing matters. No filler.</li></ul></article><article class="svc"><span class="idx"><b>/04</b>Research</span><h3>Global market analyses</h3><p>The thinking behind every position: macro, geopolitics, liquidity and the data that actually moves prices. Written so you follow the reasoning, not just the trade.</p><ul><li>Macroeconomic and geopolitical research</li><li>The data points I watch, and why</li><li>The thesis behind every position I take</li></ul></article><article class="svc"><span class="idx"><b>/05</b>Community</span><h3>Private community</h3><p>A private room of serious traders and investors, with me in it every day. Ask your questions, share your trades, compare positioning.</p><ul><li>Direct access to me in the chat</li><li>Members who trade, not spectators</li><li>Answers from me, not from a support team</li></ul></article><article class="svc"><span class="idx"><b>/06</b>Exchanges</span><h3>Exchange benefits</h3><p>Members get better terms at the exchanges I use: higher VIP tiers, lower fees and promotions negotiated for the group, not for the public.</p><ul><li>Higher VIP tiers on partner exchanges</li><li>Fee discounts and exclusive promotions</li><li>Negotiated for members only</li></ul></article></div>
+</div>
 </div>
 </div></div>
 </section>
@@ -398,7 +409,7 @@ setTimeout(function(){el.remove();},3700);
 <div class="head rv"><p class="eyebrow"><b>/02</b>Membership</p><h2><span class="lm"><span>Choose your entry.</span></span></h2><div class="cnt"><span class="cn">01 / 03</span><i class="cb"></i></div></div>
 <div class="plans">
 <div class="plan"><span class="k">Monthly Core<em>Most popular</em></span><div class="price">$99<small>/ month</small></div><p class="sub">Cancel anytime. The easiest way in.</p><a class="btn" href="/join?plan=monthly">Join Monthly <span class="ar"></span></a></div>
-<div class="plan best"><span class="k">Yearly Core<em>Best value</em></span><div class="price">$990<small>/ year</small></div><p class="sub">$82.50 a month, billed annually. Save $198 a year.</p><a class="btn acc" href="/join?plan=yearly">Join Yearly <span class="ar"></span></a></div>
+<div class="plan best"><span class="k">Yearly Core<em>Best value</em></span><div class="price">$990<small>/ year</small></div><p class="sub">$82.50 a month, billed annually. Save $198 a year.</p><a class="btn" href="/join?plan=yearly">Join Yearly <span class="ar"></span></a></div>
 <div class="plan"><span class="k">Lifetime<em>Golden entry</em></span><div class="price">$3,990<small>one-time</small></div><p class="sub">One payment. Everything, forever. Immune to price rises.</p><a class="btn" href="/join?plan=lifetime">Take The Golden Entry <span class="ar"></span></a></div>
 </div>
 <div class="assure"><span>Secure checkout</span><span>Telegram access in seconds</span><span>Rated 4.9 of 5 · 50 verified reviews</span></div>
@@ -428,7 +439,7 @@ setTimeout(function(){el.remove();},3700);
 <div class="q"><button class="qh" aria-expanded="false"><span class="n">/08</span><span>Is Mr. Wall Street active in the channels?</span><span class="pl"></span></button><div class="qa"><div class="qi"><p>Every single day since April 2024, without one day missed. I post, I answer members in the Chat and in Support, and I run the room myself. No team, no ghostwriters.</p></div></div></div>
 <div class="q"><button class="qh" aria-expanded="false"><span class="n">/09</span><span>What is the difference between the plans?</span><span class="pl"></span></button><div class="qa"><div class="qi"><p>Nothing inside. All three unlock everything. The only difference is how long you stay: Monthly is the easiest way in, Yearly saves you two months, and Lifetime is one payment, forever, immune to every future price rise.</p></div></div></div>
 <div class="q"><button class="qh" aria-expanded="false"><span class="n">/10</span><span>Can I cancel?</span><span class="pl"></span></button><div class="qa"><div class="qi"><p>Yes, at any time, from your member area, in two clicks: Membership, then Manage subscription. Access stays until the end of the paid period. Because access is digital and instant, payments are final. Lifetime is one payment, forever.</p></div></div></div>
-<div class="q"><button class="qh" aria-expanded="false"><span class="n">/11</span><span>How do I reach support?</span><span class="pl"></span></button><div class="qa"><div class="qi"><p>From your member area: open Support, write, and the answer comes back on the same page, with a Telegram note the moment it lands. Or ask in the Chat. We never send the first message. Anyone messaging you first claiming to be Mr. Wall Street is a scam: block and report.</p></div></div></div>
+<div class="q"><button class="qh" aria-expanded="false"><span class="n">/11</span><span>How do I reach support?</span><span class="pl"></span></button><div class="qa"><div class="qi"><p>From your member area: open Support, write, and the answer comes back on the same page, with a Telegram note the moment it lands. Or ask in the Chat. Our only channels are the member area, contact@mrofwallstreet.com, @mrofwallstreet on Telegram and @mrofwallstreet on X. Anything else claiming to be Mr. Wall Street is a scam: block and report.</p></div></div></div>
 </div>
 </div>
 </section>
@@ -483,7 +494,7 @@ function onScroll(){
 var y=window.scrollY||0, max=(doc.scrollHeight-window.innerHeight)||1, vh=window.innerHeight;
 if(prog) prog.style.transform='scaleX('+Math.min(1,y/max)+')';
 if(rpEl&&window.innerWidth>=900){rpEl.style.setProperty('--ly',(y*.08).toFixed(1)+'px');}if(lionEl){lionEl.style.opacity=(doc.classList.contains('intro-lock')||!$('#hero').classList.contains('in'))?'':String(clamp(1-y/(vh*.9),0,1));}
-if(hdr){if(y>lastY+4&&y>140)hdr.classList.add('hide');else if(y<lastY-4||y<140)hdr.classList.remove('hide');lastY=y;}
+if(hdr&&y>=0&&y<=max&&!doc.classList.contains('menu')){if(y>lastY+10&&y>140)hdr.classList.add('hide');else if(y<lastY-10||y<140)hdr.classList.remove('hide');lastY=y;}
 pins.forEach(function(P){P.scroll();});
 ticking=false;
 }
@@ -520,7 +531,7 @@ function hscene(sec,K){var rows=$('.rows',sec),items=$$('.rows .svc, .rows .card
 var P=makePin(sec,{len:function(){var pad=parseFloat(getComputedStyle(head).paddingLeft)||48,left=head.offsetLeft+pad;rows.style.marginLeft=left+'px';maxX=Math.max(0,Math.max.apply(null,$$('.track',rows).map(function(t){return t.scrollWidth+(parseFloat(getComputedStyle(t).marginLeft)||0)}))+left*2-window.innerWidth);return Math.round(maxX*K)+160;},
 on:function(p){htx=-p*maxX;counter(sec,Math.min(N,Math.floor(p*N)+1),N);},
 mobile:function(){rows.style.transform='';rows.style.marginLeft='';}});
-(function loop(){if(window.innerWidth>=900){hx+=(htx-hx)*0.14;if(Math.abs(htx-hx)<0.05)hx=htx;rows.style.transform='translate3d('+hx.toFixed(2)+'px,0,0)';}requestAnimationFrame(loop);})();}
+(function loop(){if(window.innerWidth>=900){hx+=(htx-hx)*0.14;if(Math.abs(htx-hx)<0.05)hx=htx;rows.style.transform='translate3d('+hx.toFixed(2)+'px,0,0)';requestAnimationFrame(loop);}else{setTimeout(loop,400);}})();}
 hscene($('#reviews'),1.35);
 
 /* step scenes: track record rows, membership plans */

@@ -201,9 +201,9 @@
         <div class="acct">
           <div>
             <section class="panel rv"><div class="ttl"><h3>Sessions</h3><span class="small muted" id="dev-n"></span></div>
-              <ul class="list devs" id="dev-list"><li><span class="muted">Loading…</span></li></ul>
+              <div id="dev-list"><p class="small muted">Loading…</p></div>
               <div class="msg" id="m-dev"></div>
-              <div class="row" style="margin-top:18px"><button class="btn sm ghost" id="out-others" type="button" data-busy="Ending">Log out of all other devices</button><button class="link" id="out-all" type="button">Log out everywhere, including here</button></div>
+              <div class="row" style="margin-top:18px"><button class="btn sm ghost" id="out-others" type="button" data-busy="Ending">Log out of all other devices</button><button class="link" id="out-all" type="button" hidden>Log out everywhere</button></div>
             </section>
           </div>
           <div></div>
@@ -228,9 +228,9 @@
           <div>
             <section class="panel rv d1"><div class="ttl"><h3>Other ways</h3></div>
               <ul class="list">
-                <li><span>By email</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
-                <li><span>On Telegram</span><a class="link" href="https://t.me/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></li>
-                <li><span>Public</span><a class="link" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a></li>
+                <li><span>Email</span><a class="link" href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a></li>
+                <li><span>Telegram</span><a class="link" href="https://t.me/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></li>
+                <li><span>X</span><a class="link" href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet</a></li>
               </ul>
               <div class="msg on bad" style="margin-top:18px">We never message first. Anyone who contacts you first claiming to be Mr. Wall Street, on Telegram, X or email, is a scam. Report and block.</div>
             </section>
@@ -616,7 +616,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function renderDevices(){
     var list = DEV.list || [], el = $('#dev-list');
     $('#dev-n').textContent = list.length ? list.length + (list.length === 1 ? ' device' : ' devices') : '';
-    el.innerHTML = list.length ? list.map(function(d){ var cur = !!d.current; return '<li><span><b style="font-weight:500">' + esc(ua(d.user_agent)) + '</b>' + (cur ? ' <span class="tag ok">This device</span>' : '') + '<span class="small muted" style="display:block">' + (d.ip ? esc(String(d.ip).replace(/\/\d+$/, '')) + ' · ' : '') + 'active ' + esc(fmtWhen(d.last_at)) + ' · since ' + esc(M.fmtDate(d.created_at)) + '</span></span>' + (cur ? '<button class="link" id="signout2" type="button">Log out</button>' : '<button class="link" data-end="' + esc(d.id) + '" type="button">End session</button>') + '</li>'; }).join('') : '<li><span class="muted">No open sessions.</span></li>';
+    el.innerHTML = list.length ? '<table class="bill devs"><thead><tr><th>Device</th><th>IP</th><th>Last active</th><th>Since</th><th></th></tr></thead><tbody>' + list.map(function(d){ var cur = !!d.current; return '<tr' + (cur ? ' class="cur"' : '') + '><td>' + esc(ua(d.user_agent)) + (cur ? '<span class="small muted" style="display:block">This device</span>' : '') + '</td><td class="mono">' + esc(String(d.ip || '—').replace(/\/\d+$/, '')) + '</td><td class="mono">' + esc(fmtWhen(d.last_at)) + '</td><td class="mono">' + esc(M.fmtDate(d.created_at)) + '</td><td class="act">' + (cur ? '<button class="link" id="signout2" type="button">Log out</button>' : '<button class="link" data-end="' + esc(d.id) + '" type="button">End session</button>') + '</td></tr>'; }).join('') + '</tbody></table>' : '<p class="small muted">No open sessions.</p>';
     $('#out-others').hidden = list.length < 2;
   }
   function fmtWhen(iso){ var d = new Date(iso); return M.fmtDate(iso) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }

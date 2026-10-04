@@ -22,7 +22,8 @@
 <link rel="stylesheet" href="/mws.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
 <script src="/mws.js"></script>
-<script>window.onWhopComplete = function(planId, receiptId){ window.MWS.onPaid && window.MWS.onPaid(planId, receiptId); };</script>
+<script>/* Whop calls this when the payment completes; if it ever fires before the page script defined MWS.onPaid, the result is kept and picked up below */
+window.onWhopComplete = function(planId, receiptId){ if (window.MWS && window.MWS.onPaid) window.MWS.onPaid(planId, receiptId); else window.__whopPaid = [planId, receiptId]; };</script>
 </head>
 <body>
 <header class="top"><div class="wrap">
@@ -61,7 +62,7 @@
         <p class="eyebrow">Order</p>
         <div><div class="big" id="sum-price"></div><p class="muted small" id="sum-sub" style="margin-top:10px"></p></div>
         <dl class="kv"><dt>Plan</dt><dd id="sum-plan"></dd><dt>Email</dt><dd id="sum-email"></dd><dt>Access</dt><dd>All Mr. Wall Street Telegram channels</dd></dl>
-        <p class="small muted">After payment you will create your password and connect Telegram. Takes one minute.</p>
+        <p class="small muted" id="after-pay">After payment you will create your password and connect Telegram. Takes one minute.</p>
         <button class="link" type="button" id="back-email">← Change email or plan</button>
       </aside>
     </div>
@@ -85,12 +86,20 @@
   var state = M.signupState();
   var qsPlan = M.qs('plan');
   if (qsPlan && C.PLANS[qsPlan] && !C.PLANS[qsPlan].hidden) state.plan = qsPlan;
-  if (user && user.email) state.email = user.email;
-  /* a logged-in member with a live recurring plan must not buy a second one by accident */
+  if (user && user.email) { state.email = user.email; $('#after-pay').textContent = 'After payment your membership updates within seconds. Nothing else to do.'; }
+  /* a logged-in member with a live recurring plan must not buy a second one by accident. If the plan check itself fails
+     (network, server) no checkout is mounted: without knowing the current plan the page could sell a member the plan they already have */
   var access = null;
-  if (user) { try { var ac = await sb.rpc('my_access'); access = ac.data; } catch (e) {} }
+  if (user) {
+    var ac = null; try { ac = await sb.rpc('my_access'); } catch (e) { ac = { error: e }; }
+    if (!ac || ac.error || !ac.data) { $('#plans').innerHTML = '<div class="msg on bad">Could not check your current plan. Reload the page and try again.</div>'; return; }
+    access = ac.data;
+  }
   if (access && access.valid && M.qs('from') !== 'app') { M.go('/app#membership'); return; } /* already a member: nothing to buy here */
+  /* a live recurring plan (monthly / yearly, not cancelling) can only be upgraded to a higher tier here: monthly → yearly or Lifetime, yearly → Lifetime */
+  var TIER = { monthly: 1, yearly: 2, lifetime: 3 };
   function hasRecurring(){ return access && access.valid && (access.plan_key === 'monthly' || access.plan_key === 'yearly') && !/^(cancel|expir)/.test(access.status || '') && !access.cancel_at_period_end; }
+  function blocked(k){ if (access && access.valid && access.plan_key === 'lifetime') return 'lifetime'; return hasRecurring() && (TIER[k] || 0) <= (TIER[access.plan_key] || 0) ? 'same' : ''; }
 
   /* plans */
   var order = ['monthly','yearly','lifetime'];
@@ -100,7 +109,8 @@
   function show(id){ ['s-plan','s-email','s-pay'].forEach(function(s){ $('#'+s).hidden = (s!==id); }); window.scrollTo({top:0,behavior:'smooth'}); }
   function save(){ M.saveSignup(state); }
 
-  function choose(k){ state.plan = k; save(); M.$$('.plan').forEach(function(el){ el.classList.toggle('sel', el.dataset.k===k); }); if (state.email) { pay(); } else { $('#email').value = ''; show('s-email'); setTimeout(function(){ $('#email').focus(); }, 300); } }
+  /* logged in: the account email is the one; anyone else confirms the address first (pre-filled if this browser typed one before) */
+  function choose(k){ state.plan = k; save(); M.$$('.plan').forEach(function(el){ el.classList.toggle('sel', el.dataset.k===k); }); if (user && state.email) { pay(); } else { $('#email').value = state.email || ''; show('s-email'); setTimeout(function(){ $('#email').focus(); }, 300); } }
 
   $('#back-plan').addEventListener('click', function(){ show('s-plan'); });
   $('#back-email').addEventListener('click', function(){ if (user) { show('s-plan'); } else { show('s-email'); } });
@@ -115,13 +125,19 @@
   var loaded = false;
   function pay(){
     var p = C.PLANS[state.plan]; if (!p) { show('s-plan'); return; }
-    if (hasRecurring() && state.plan !== 'lifetime') {
+    var why = blocked(state.plan);
+    if (why) {
+      var cur = (C.PLANS[access.plan_key] || {}).title || 'current', life = why === 'lifetime';
       show('s-pay');
-      $('#pay-title').textContent = 'You already have an active ' + (C.PLANS[access.plan_key] || {}).title + ' plan';
-      $('#sum-plan').textContent = (C.PLANS[access.plan_key] || {}).title || 'Active plan'; $('#sum-price').textContent = ''; $('#sum-sub').textContent = 'Renews ' + M.fmtDate(access.renewal_period_end); $('#sum-email').textContent = state.email;
-      $('#whop-checkout').innerHTML = '<div class="msg on">Nothing to pay. Your ' + M.esc((C.PLANS[access.plan_key] || {}).title || 'current') + ' membership is active and renews on ' + M.esc(M.fmtDate(access.renewal_period_end)) + '.</div><div class="row" style="margin-top:18px"><a class="btn acc" href="/app#membership">Go to my membership <span class="ar"></span></a>' + (access.manage_url ? '<a class="btn ghost" href="' + (/^https:\/\//i.test(access.manage_url) ? M.esc(access.manage_url) : '#') + '" target="_blank" rel="noopener">Manage subscription</a>' : '') + '</div><p class="small muted" style="margin-top:14px">Want Lifetime instead? <a href="/join?plan=lifetime">Upgrade here</a>, then cancel the current plan under Manage subscription.</p>';
+      $('#pay-title').textContent = life ? 'You already have Lifetime' : 'You already have an active ' + cur + ' plan';
+      $('#sum-plan').textContent = cur; $('#sum-price').textContent = ''; $('#sum-sub').textContent = life ? 'Paid once. Never renews.' : 'Renews ' + M.fmtDate(access.renewal_period_end); $('#sum-email').textContent = state.email;
+      var up = access.plan_key === 'monthly' ? '<p class="small muted" style="margin-top:14px">Want more? <a href="/join?plan=yearly&amp;from=app">Switch to yearly</a> or <a href="/join?plan=lifetime&amp;from=app">go Lifetime</a>, then cancel the current plan from your membership page.</p>' : access.plan_key === 'yearly' ? '<p class="small muted" style="margin-top:14px">Want Lifetime instead? <a href="/join?plan=lifetime&amp;from=app">Upgrade here</a>, then cancel the current plan from your membership page.</p>' : '';
+      $('#whop-checkout').innerHTML = '<div class="msg on">Nothing to pay. ' + (life ? 'Lifetime is the top: everything, forever, already yours.' : 'Your ' + M.esc(cur) + ' membership is active and renews on ' + M.esc(M.fmtDate(access.renewal_period_end)) + '.') + '</div><div class="row" style="margin-top:18px"><a class="btn acc" href="/app#membership">Go to my membership <span class="ar"></span></a>' + (!life && access.manage_url ? '<a class="btn ghost" href="' + (/^https:\/\//i.test(access.manage_url) ? M.esc(access.manage_url) : '#') + '" target="_blank" rel="noopener">Manage subscription</a>' : '') + '</div>' + up;
       return;
     }
+    /* the same plan, already paid and set to end: resuming is free, paying again is not (a reminder, not a block: the person may want a fresh start) */
+    var ending = access && access.valid && access.plan_key === state.plan && (access.cancel_at_period_end || /^(cancel|expir)/.test(access.status || ''));
+    if (ending) M.msg('#m-pay', 'Your ' + ((C.PLANS[access.plan_key] || {}).title || 'current') + ' plan is set to end' + (access.renewal_period_end ? ' on ' + M.fmtDate(access.renewal_period_end) : '') + '. You can resume it from your membership page instead of paying again.');
     $('#sum-price').innerHTML = p.price + '<small>' + p.per + '</small>';
     $('#sum-sub').textContent = p.sub;
     $('#sum-plan').textContent = p.title;
@@ -143,9 +159,10 @@
   }
 
   M.onPaid = function(planId, receiptId){
-    state.paid = true; state.receipt = receiptId || null; state.paidAt = Date.now(); save();
+    state.paid = true; state.receipt = (typeof receiptId === 'string' && receiptId) ? receiptId : null; state.paidAt = Date.now(); save();
     M.go(user ? '/app?paid=1' : '/signup?status=success');
   };
+  if (window.__whopPaid) { var wp = window.__whopPaid; window.__whopPaid = null; M.onPaid(wp[0], wp[1]); return; }
 
   /* entry */
   if (M.qs('status') === 'error') M.msg('#m-pay', 'The payment did not go through. You can try again.', 'bad');

@@ -318,7 +318,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   if (!me || ['owner','admin'].indexOf(me.role) < 0) { $('#subtitle').textContent = 'This page is for the owner.'; setTimeout(function(){ M.go('/app'); }, 1200); return; }
   $('#me-email').textContent = me.email;
   M.viewAs.set('');
-  $('#out').addEventListener('click', async function(){ await sb.auth.signOut(); M.go('/'); });
+  $('#out').addEventListener('click', function(){ M.signOut('/'); });
   /* "Preview what they see" (member drawer): a preset replaces the data on /app; a bar brings you back. The Member area button opens your own real account. */
   function previewAs(key){ M.viewAs.set(key || 'active'); M.go('/app'); }
   function presetFor(e){ var m = e.best; if (!m) return 'none'; if (!e.valid) return 'canceled'; if (m.status === 'past_due') return 'pastdue'; if (m.cancel_at_period_end || m.status === 'canceling') return 'ending'; if (m.plan_key === 'lifetime') return 'lifetime'; if (!e.link) return 'joined'; return 'active'; }
@@ -326,12 +326,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var X = M.esc; /* every value that came from a user, Whop or Telegram is escaped before innerHTML */
   var D = { profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {}, plans: [] };
   var filter = 'all', q = '', pFilter = 'plans';
-  var PRICE = { monthly: 99, yearly: 990, lifetime: 3990 };
   var fmtMoney = function(n){ return '$' + (Math.round(n) === n ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); };
 
-  /* mirrors public.membership_is_valid (staff.sql) */
+  /* mirrors public.membership_is_valid (legacy_counts_again.sql): every paid membership counts, whatever its date */
   function valid(m){ var st = m.status, now = new Date(), end = m.renewal_period_end ? new Date(m.renewal_period_end) : null;
-    if (m.legacy) return false; /* clean_start.sql: Whop memberships from before the cutoff are history */
     if (D.planOn && m.id.indexOf('manual_') !== 0 && !D.planOn[m.plan_id]) return false; /* mirrors security.sql: only plans that grant access count */
     if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < now);
     if (st === 'completed' && m.plan_key === 'lifetime') return true;
@@ -340,10 +338,17 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     return false; }
   function rank(m){ if (!valid(m)) return 30; var tier = m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2; var st = (m.status === 'active' || m.status === 'trialing' || m.status === 'completed') ? 0 : m.status === 'past_due' ? 1 : 2; return tier * 3 + st; } /* mirrors my_access() */
 
+  var loading = false, loadAgain = false;
   async function load(){
+    if (loading) { loadAgain = true; return; } /* realtime bursts, the 90 s timer and a click can all ask at once: one load at a time */
+    loading = true;
+    try { await doLoad(); } catch (e) { M.msg('#m', 'Could not refresh: ' + M.human(e), 'bad'); } /* a failed refresh is said out loud, and the page keeps running (timer, realtime) */
+    finally { loading = false; if (loadAgain) { loadAgain = false; setTimeout(load, 500); } }
+  }
+  async function doLoad(){
     var r = await Promise.all([
       sb.from('profiles').select('id,email,role,created_at').order('created_at', { ascending: false }),
-      sb.from('memberships').select('id,email,user_id,plan_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,created_at,updated_at,metadata,legacy').order('updated_at', { ascending: false }),
+      sb.from('memberships').select('id,email,user_id,plan_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
       sb.from('telegram_links').select('user_id,telegram_username,telegram_id,linked_at'),
       sb.from('telegram_access').select('user_id,chat_id,status'),
       sb.from('audit_log').select('id,at,actor,action,subject,detail').order('at', { ascending: false }).limit(300),
@@ -356,7 +361,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       sb.from('support_messages').select('id,thread_id,user_id,from_staff,body,created_at').order('created_at').limit(2000),
       sb.from('sent_emails').select('id,user_id,to_email,type,subject,status,provider_id,error,sent_by,created_at').order('created_at', { ascending: false }).limit(500)
     ]);
-    D.profiles = r[0].data || []; D.memberships = (r[1].data || []).map(function(m){ m.legacy = false; return m; }); /* 3 Oct: every paid membership counts, whatever its date (the flag stays in the table for the record) */ D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
+    var bad = r.filter(function(x, i){ return i !== 9 && x && x.error; })[0]; if (bad) M.msg('#m', 'Some data could not be read: ' + M.human(bad.error), 'bad'); /* an RLS or grant problem must not look like an empty dashboard */
+    D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
     D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; }); D.invited = (r[9] && r[9].invited) || {};
     D.emails = r[12] && !r[12].error ? (r[12].data || []) : null;
     D.sup = r[10].error ? null : (r[10].data || []); D.supMsgs = {}; ((r[11] && r[11].data) || []).forEach(function(m){ (D.supMsgs[m.thread_id] = D.supMsgs[m.thread_id] || []).push(m); });
@@ -365,19 +371,18 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     render();
   }
 
-  function people(legacy){
+  /* one row per person: the account (if any) plus every membership under it; a membership bound to an account belongs to
+     that account even if Whop recorded another email at checkout */
+  function people(){
     var by = {};
-    var emailOf = {}; D.profiles.forEach(function(p){ emailOf[p.id] = p.email; if (!legacy) { by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; } });
-    /* a membership bound to an account belongs to that account, even if Whop recorded another email at checkout */
-    D.memberships.filter(function(m){ return legacy ? !!m.legacy : !m.legacy; }).forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
+    var emailOf = {}; D.profiles.forEach(function(p){ emailOf[p.id] = p.email; by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; });
+    D.memberships.forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
     var linkBy = {}; D.links.forEach(function(l){ linkBy[l.user_id] = l; });
     var accBy = {}; D.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
-    var profBy = {}; D.profiles.forEach(function(p){ profBy[p.email] = p; });
-    return Object.keys(by).map(function(k){ var e = by[k]; if (legacy) { e.legacy = true; e.profile = profBy[k] || null; } e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; return e; });
+    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; return e; });
   }
   function payments(){
-    var legacyIds = {}, legacyMail = {}, liveMail = {}; D.memberships.forEach(function(m){ if (m.legacy) { legacyIds[m.id] = 1; legacyMail[m.email] = 1; } else liveMail[m.email] = 1; });
-    return D.events.filter(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var mid = d.membership_id || (d.membership && (d.membership.id || d.membership)); if (mid && legacyIds[mid]) return false; var em = (d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '').toLowerCase(); return !(em && legacyMail[em] && !liveMail[em]); }).map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
+    return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
   }
   function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].hidden ? 'Other link' : C[k].title; return pid ? 'Other link' : '–'; }
   /* a payment counts for the membership only when it came through one of the site's plans; invoices and extra links are shown apart */
@@ -442,7 +447,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       case 'event.unhandled': return R('system', '', 'Whop event not used: ' + (l.subject || ''), '', true);
       case 'claim': return R('accounts', d.found ? 'ok' : '', s + ' looked for their Whop membership', d.found ? d.found + ' found and attached to the account.' : 'Nothing under this email. If they paid with another one, grant access manually.');
       case 'claim.receipt': return R('accounts', d.matched ? 'ok' : 'warn', s + ' attached receipt ' + (d.receipt || ''), d.matched ? 'Whop email matches the account.' : 'Paid on Whop as ' + (d.whop_email || '?') + '; the account is ' + (d.account_email || '?') + '.');
-      case 'claim.receipt_rejected': return R('accounts', 'warn', 'Receipt rejected for ' + s, (d.paid === false ? 'Not paid yet' : d.fresh === false ? 'Older than 7 days' : 'Already attached to another account') + (d.status ? ' · ' + d.status : '') + '.');
+      case 'claim.receipt_rejected': return R('accounts', 'warn', 'Receipt rejected for ' + s, (d.paid === false ? 'Not paid yet' : d.fresh === false ? 'Older than 6 hours' : (d.reason || 'Already attached to another account')) + (d.status ? ' · ' + d.status : '') + '.');
       case 'claim.throttled': return R('accounts', '', s + ' is retrying too fast', '', true);
       case 'claim.error': case 'claim.receipt_error': return R('accounts', 'bad', 'Membership check failed for ' + s, err);
       case 'grant_error': return R('telegram', 'bad', 'Could not prepare Telegram access for ' + s, err);
@@ -503,9 +508,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     renderActivity();
 
     // members table
-    var list = (filter === 'legacy' ? people(true) : rows).filter(function(e){
+    var list = rows.filter(function(e){
       if (q && e.email.indexOf(q) < 0) return false;
-      if (filter === 'legacy') return true;
       if (filter === 'active') return e.valid;
       if (filter === 'site') return !!e.profile;
       if (filter === 'whop') return e.valid && !e.profile;
@@ -516,7 +520,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     }).sort(function(a, b){ return (b.valid - a.valid) || a.email.localeCompare(b.email); });
     $('#rows').innerHTML = list.map(function(e){
       var m = e.best || {};
-      var st = !e.best ? tag('', 'no plan') : e.legacy ? tag('', 'legacy · ' + m.status) : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
+      var st = !e.best ? tag('', 'no plan') : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
       var inv = D.invited && D.invited[e.email];
       var acct = e.profile ? ((inv && !inv.accepted) ? tag('warn', 'invited') : tag('ok', 'on site')) + (e.profile.role !== 'member' ? ' ' + tag('', e.profile.role) : '') : tag('', 'no account');
       var joined = e.acc.filter(function(a){ return a.status === 'joined'; }).length;
@@ -524,7 +528,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       var when = m.plan_key === 'lifetime' ? 'Lifetime' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–');
       return '<tr data-e="' + X(e.email) + '"><td class="em">' + X(e.email) + '</td><td>' + X(m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
     }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
-    $('#count').textContent = filter === 'legacy' ? list.length + ' from Whop before the clean start' : list.length + ' of ' + rows.length;
+    $('#count').textContent = list.length + ' of ' + rows.length;
     var inviteN = rows.filter(function(e){ return e.valid && !e.profile; }).length; $('#invite-all').hidden = !(filter === 'whop' && inviteN); $('#invite-all').textContent = 'Email the invitation to all without an account (' + inviteN + ')';
     renderSupport(); renderEmails();
 
@@ -545,54 +549,54 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#mrows').innerHTML = man.map(function(m){ return '<tr><td class="em">' + X(m.email) + '</td><td>' + X(m.plan_key) + '</td><td>' + (valid(m) ? tag('ok', 'active') : tag('bad', m.status)) + '</td><td>' + (m.plan_key === 'lifetime' ? 'Never' : M.fmtDate(m.renewal_period_end)) + '</td><td class="small muted">' + X((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? '<button class="link bad" data-a="revoke" data-id="' + X(m.id) + '">Revoke</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No manual access yet.</td></tr>';
 
     // settings
-    $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; $('#s-ttl').value = D.settings.invite_ttl_hours || 24;
+    if (document.activeElement !== $('#s-grace')) $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; if (document.activeElement !== $('#s-ttl')) $('#s-ttl').value = D.settings.invite_ttl_hours || 24; /* a refresh must not overwrite a number being typed */
     renderPlans(); renderNotices();
     $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + X(p.email) + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
   }
 
   // drawer
   function openDrawer(email){
-    var e = people().filter(function(x){ return x.email === email; })[0] || people(true).filter(function(x){ return x.email === email; })[0]; if (!e) return;
+    var e = people().filter(function(x){ return x.email === email; })[0]; if (!e) return;
     var m = e.best || {};
     var html = '<p class="eyebrow">Member</p><h2>' + X(e.email) + '</h2>';
-    if (e.legacy) html += '<p class="small muted">From Whop, before the clean start. Not a member of the site until you import it.</p>';
-    html += '<dl class="kv"><dt>Status</dt><dd>' + X(e.legacy ? 'Legacy · ' + m.status : e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + X(m.plan_key || '–') + (m.id ? ' <span class="small muted">' + X(m.id) + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + X(e.profile.role) : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + X(e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
+    html += '<dl class="kv"><dt>Status</dt><dd>' + X(e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + X(m.plan_key || '–') + (m.id ? ' <span class="small muted">' + X(m.id) + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + X(e.profile.role) : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + X(e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
     if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + X(c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : (a.status === 'removed' || a.status === 'blocked' || a.status === 'kick_failed') ? 'bad' : 'warn', a.status === 'kick_failed' ? 'remove failed' : a.status) + '</li>'; }).join('') + '</ul>';
     if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return X(x.plan_key) + ' · ' + X(x.status); }).join(' / ') + '</p>';
     var mine = (D.emails || []).filter(function(x){ return x.to_email === e.email; });
     if (mine.length) html += '<p class="eyebrow" style="margin-top:18px">Emails · ' + mine.length + '</p><ul class="attn">' + mine.slice(0, 8).map(function(x){ return '<li data-mail="' + X(x.id) + '" class="row-link"><span>' + X(x.subject) + '<span class="small muted">' + X(M.fmtDate(x.created_at)) + '</span></span>' + tag(x.status === 'sent' ? 'ok' : 'bad', x.status) + '</li>'; }).join('') + '</ul>';
     html += '<div class="stack">';
-    if (e.legacy) { html += '<button class="btn acc" data-a="import_legacy" data-id="' + X(m.id) + '" data-busy="Importing">Import as a member (keeps the Whop dates)</button>'; }
     var blocked = e.acc.some(function(a){ return a.status === 'blocked'; });
     if (blocked) html += '<p class="small muted">Removed by you. Automatic invites are paused for this member until you resend.</p>';
     if (e.profile && e.link && e.valid) html += '<button class="btn ghost" data-a="resend" data-u="' + e.profile.id + '" data-busy="Sending">' + (blocked ? 'Let them back in (resend invites)' : 'Resend Telegram invites') + '</button>';
     if (e.profile && e.link && !blocked) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
     if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + X(m.id) + '" data-busy="Revoking">Revoke manual access</button>';
-    if (!e.valid && !e.legacy) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
+    if (!e.valid) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
     var inv2 = D.invited && D.invited[e.email];
-    if (!e.profile && !e.legacy) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
+    if (!e.profile) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
     else if (inv2 && !inv2.accepted) html += '<p class="small muted">Invited ' + X(M.fmtDate(inv2.invited_at)) + ', has not opened the link yet.</p><button class="btn ghost" data-a="reinvite" data-email="' + X(e.email) + '" data-busy="Sending">Send the link again</button>';
     html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
     html += '</div>';
     if (e.profile) html += '<form class="linkw" id="f-link" data-u="' + e.profile.id + '" novalidate><p class="eyebrow" style="margin-top:22px">Paid on Whop with another email?</p><div class="row"><input type="email" id="link-email" placeholder="email used on Whop" autocomplete="off"><button class="btn sm ghost" type="submit" data-busy="Linking">Link to this account</button></div><p class="small muted">Binds every Whop membership under that email to this account; access follows immediately.</p></form>';
-    $('#dbody').innerHTML = html; $('#drawer').classList.add('on'); $('#scrim').classList.add('on');
+    $('#dbody').innerHTML = html; showDrawer();
     var g = $('#d-grant'); if (g) g.addEventListener('click', function(){ closeDrawer(); $('#g-email').value = e.email; });
     $('#d-preview').addEventListener('click', function(){ previewAs(this.dataset.p); });
   }
-  function closeDrawer(){ $('#drawer').classList.remove('on'); $('#scrim').classList.remove('on'); }
+  /* the drawer is a dialog: announced to assistive tech only while open, focus moves in, Escape closes it */
+  function showDrawer(){ var d = $('#drawer'); d.classList.add('on'); $('#scrim').classList.add('on'); d.setAttribute('aria-hidden', 'false'); $('#dx').focus(); }
+  function closeDrawer(){ var d = $('#drawer'); if (!d.classList.contains('on')) return; d.classList.remove('on'); $('#scrim').classList.remove('on'); d.setAttribute('aria-hidden', 'true'); }
   $('#dx').addEventListener('click', closeDrawer); $('#scrim').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeDrawer(); });
   $('#rows').addEventListener('click', function(ev){ var tr = ev.target.closest('tr[data-e]'); if (tr) openDrawer(tr.dataset.e); });
 
   async function act(a, body, btn){
     if (a === 'kick' && !confirm('Remove this member from every Telegram channel? Automatic invites stay paused until you resend them.')) return;
     if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
-    if (a === 'set_legacy' && !confirm('Move this membership to legacy? It stops counting and loses access on the site.')) return;
     if (btn) M.busy(btn, true); M.msg('#m', '');
-    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); if (a === 'link_email') M.msg('#m', r.linked ? 'Linked ' + r.linked + ' membership(s)' + (r.live ? '' : ' (all legacy: no access until imported)') + '.' : 'No Whop membership under that email.', r.linked ? 'ok' : 'bad'); if (a === 'invite') { var fk = Object.keys(r.failed || {}); M.msg('#m', 'Invitation sent to ' + r.sent.length + (r.skipped.length ? ' · ' + r.skipped.length + ' already had an account' : '') + (fk.length ? ' · failed: ' + fk.join(', ') : '') + '.', fk.length ? 'bad' : 'ok'); } closeDrawer(); await load(); }
+    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); if (a === 'link_email') M.msg('#m', r.linked ? 'Linked ' + r.linked + ' membership(s).' : 'No Whop membership under that email.', r.linked ? 'ok' : 'bad'); if (a === 'invite') { var fk = Object.keys(r.failed || {}); M.msg('#m', 'Invitation sent to ' + r.sent.length + (r.skipped.length ? ' · ' + r.skipped.length + ' already had an account' : '') + (fk.length ? ' · failed: ' + fk.join(', ') : '') + '.', fk.length ? 'bad' : 'ok'); } closeDrawer(); await load(); }
     catch (e) { M.msg('#m', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     finally { if (btn) M.busy(btn, false); }
   }
-  document.addEventListener('submit', function(ev){ var f = ev.target.closest('#f-link'); if (!f) return; ev.preventDefault(); var em = $('#link-email').value.trim(); if (!M.validEmail(em)) return M.msg('#m', 'Enter the email used on Whop.', 'bad'); act('link_email', { user_id: f.dataset.u, email: em }, f.querySelector('.btn')); });
+  document.addEventListener('submit', function(ev){ var f = ev.target.closest('#f-link'); if (!f) return; ev.preventDefault(); var em = $('#link-email').value.trim(); if (!M.validEmail(em)) return M.msg('#m', 'Enter the email used on Whop.', 'bad'); if (!confirm('Bind every Whop membership under ' + em + ' to this account? Access follows immediately.')) return; act('link_email', { user_id: f.dataset.u, email: em }, f.querySelector('.btn')); });
   document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; if (b.dataset.a === 'invite') return act('invite', { emails: [b.dataset.email] }, b); if (b.dataset.a === 'reinvite') return reinvite(b.dataset.email, b); act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
   async function reinvite(email, btn){ M.busy(btn, true); try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/app?invited=1' }); if (r.error) throw r.error; M.msg('#m', 'A fresh link is on its way to ' + email + '.', 'ok'); closeDrawer(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } }
   $('#invite-all').addEventListener('click', function(){ var list = people().filter(function(e){ return e.valid && !e.profile; }).map(function(e){ return e.email; }); if (!list.length) return; if (!confirm('Send the invitation email to ' + list.length + ' member(s) with access and no account yet?')) return; act('invite', { emails: list }, $('#invite-all')); });
@@ -605,7 +609,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var eFilter = 'all', eq = '';
   var EKIND = { welcome: 'billing', payment_received: 'billing', payment_failed: 'billing', renewal: 'billing', access_ended: 'billing', invite: 'account', confirm: 'account', magic: 'account', reset: 'account', change_email: 'account', reauth: 'account', support_reply: 'support', announcement: 'account' };
   function renderEmails(){
-    if (D.emails === null) { $('#erows').innerHTML = '<tr><td colspan="5" class="muted">Run <b>supabase/sent_emails.sql</b> once to enable the email log.</td></tr>'; $('#ecount').textContent = ''; return; }
+    if (D.emails === null) { $('#erows').innerHTML = '<tr><td colspan="5" class="muted">The email log could not be read. Run <b>supabase/night_2026-10-04.sql</b> once in the SQL editor (it grants the admin page read access to sent_emails).</td></tr>'; $('#ecount').textContent = ''; return; }
     var list = D.emails.filter(function(x){
       if (eq && (x.to_email + ' ' + x.subject).toLowerCase().indexOf(eq) < 0) return false;
       if (eFilter === 'failed') return x.status !== 'sent';
@@ -621,7 +625,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var w = new Date(x.created_at), html = '<p class="eyebrow">Email</p><h2>' + X(x.subject) + '</h2>';
     html += '<dl class="kv"><dt>To</dt><dd><a class="link" href="#members" data-open-member="' + X(x.to_email) + '">' + X(x.to_email) + '</a></dd><dt>Sent</dt><dd>' + X(M.fmtDate(x.created_at)) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</dd><dt>Type</dt><dd>' + X(x.type) + '</dd><dt>Status</dt><dd>' + (x.status === 'sent' ? 'Sent' : 'Failed · ' + X(x.error || '')) + '</dd><dt>By</dt><dd>' + X(x.sent_by || 'system') + '</dd>' + (x.provider_id ? '<dt>Resend id</dt><dd class="small muted">' + X(x.provider_id) + '</dd>' : '') + '</dl>';
     html += '<iframe class="mailframe" sandbox="" referrerpolicy="no-referrer" title="Email as sent"></iframe>';
-    $('#dbody').innerHTML = html; $('#drawer').classList.add('on'); $('#scrim').classList.add('on');
+    $('#dbody').innerHTML = html; showDrawer();
     var fr = $('#dbody .mailframe'); try { var r = await sb.from('sent_emails').select('html').eq('id', id).maybeSingle(); fr.srcdoc = (r.data && r.data.html) || '<p style="font-family:sans-serif;color:#888;padding:20px">Could not load this email.</p>'; } catch (e) { fr.srcdoc = '<p style="font-family:sans-serif;color:#888;padding:20px">Could not load this email.</p>'; }
   }
   $('#eq').addEventListener('input', function(){ eq = $('#eq').value.trim().toLowerCase(); renderEmails(); });
@@ -661,7 +665,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     finally { M.busy(btn, false); }
   });
   $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Math.max(0, parseInt($('#s-grace').value, 10) || 0)) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Math.max(1, parseInt($('#s-ttl').value, 10) || 24)) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
-  $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); try { await M.fn('admin', { action: 'set_role', email: em, role: $('#r-role').value }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } });
+  $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); var role = $('#r-role').value; if (!confirm('Make ' + em + ' ' + role + '?' + (role === 'owner' || role === 'admin' ? ' Staff see every member and every setting.' : ''))) return; var rb = $('#f-role .btn'); M.busy(rb, true); try { await M.fn('admin', { action: 'set_role', email: em, role: role }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(rb, false); } });
 
   // channels on/off (channels added by a non-staff Telegram start off) + which plans grant access
   document.addEventListener('click', async function(ev){
@@ -677,7 +681,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function renderNotices(){
     var el = $('#notices'); if (!el) return;
     if (D.notices === null) { el.innerHTML = '<p class="small muted">Run <b>supabase/security.sql</b> once to enable notices.</p>'; $('#f-notice .btn').disabled = true; return; }
-    el.innerHTML = D.notices.length ? '<ul class="attn">' + D.notices.map(function(n){ return '<li><span>' + X(n.body).slice(0, 140) + (n.body.length > 140 ? '…' : '') + ' <span class="small muted">' + X(M.fmtDate(n.created_at)) + '</span></span><span>' + (n.active ? tag('ok', 'live') : tag('', 'off')) + ' <button class="link" data-nt="' + X(n.id) + '" data-on="' + (n.active ? '0' : '1') + '">' + (n.active ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-ndel="' + X(n.id) + '">Delete</button></span></li>'; }).join('') + '</ul>' : '<p class="small muted">No notices yet.</p>';
+    el.innerHTML = D.notices.length ? '<ul class="attn">' + D.notices.map(function(n){ return '<li><span>' + X(String(n.body || '').slice(0, 140)) + (String(n.body || '').length > 140 ? '…' : '') + ' <span class="small muted">' + X(M.fmtDate(n.created_at)) + '</span></span><span>' + (n.active ? tag('ok', 'live') : tag('', 'off')) + ' <button class="link" data-nt="' + X(n.id) + '" data-on="' + (n.active ? '0' : '1') + '">' + (n.active ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-ndel="' + X(n.id) + '">Delete</button></span></li>'; }).join('') + '</ul>' : '<p class="small muted">No notices yet.</p>';
   }
   $('#f-notice').addEventListener('submit', async function(ev){
     ev.preventDefault(); var body = $('#n-body').value.trim(); if (!body) return M.msg('#m', 'Write the message first.', 'bad');
@@ -732,7 +736,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var mark = num($('#p-mark').value);
     var row = { symbol: symbol, name: $('#p-name').value.trim() || null, side: $('#p-side').value, asset_class: $('#p-class').value, size_pct: num($('#p-size').value), entry: $('#p-entry').value.trim() || null, entry_price: num($('#p-entryp').value), mark: mark, mark_at: mark == null ? null : (old && old.mark != null && Number(old.mark) === mark ? old.mark_at : new Date().toISOString()), target: $('#p-target').value.trim() || null, opened_at: $('#p-opened').value || (old ? old.opened_at : new Date().toISOString().slice(0, 10)), sort: parseInt($('#p-sort').value, 10) || 100, thesis: $('#p-thesis').value.trim() || null };
     var btn = $('#f-pos .btn'); M.busy(btn, true);
-    try { var r = id ? await sb.from('positions').update(row).eq('id', id) : await sb.from('positions').insert(row); if (r.error) throw r.error; M.msg('#m', id ? symbol + ' updated.' : symbol + ' published.', 'ok'); pfFill(null); await loadPositions(); }
+    try { var r = id ? await sb.from('positions').update(row).eq('id', id) : await sb.from('positions').insert(row); if (r.error) throw r.error; M.msg('#m', id ? symbol + ' updated.' : symbol + ' published.', 'ok'); M.busy(btn, false); pfFill(null); await loadPositions(); } /* busy off before the form resets, or the old "Save" label comes back over the reset one */
     catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); }
   });
   document.addEventListener('click', async function(ev){
@@ -751,7 +755,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   // routing
   var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
-  function route(){ var v = currentView(); if (!TITLES[v]) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
+  function route(){ var v = currentView(); if (!Object.prototype.hasOwnProperty.call(TITLES, v)) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);
   document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-f]'); if (a) setFilter(a.dataset.f); });

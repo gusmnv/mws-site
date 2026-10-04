@@ -22,66 +22,73 @@ window.MWS = window.MWS || {};
   /* supabase client */
   var sb = null;
   window.MWS.sb = function(){ if(!sb){ sb = C.SUPABASE_URL.indexOf('__')===0 ? previewClient() : window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }); try { sb.auth.onAuthStateChange(function(ev){ if (ev === 'SIGNED_OUT') window.MWS.store.del('mws_access'); }); } catch (e) {} } return sb; };
-  /* offline preview stub (only when the config placeholders are not filled) */
-  function previewClient(){
-    var q = new URLSearchParams(location.search), mode = q.get('preview')||'';
-    var user = mode ? { id:'u1', email:'member@example.com', created_at:'2026-04-02T00:00:00Z' } : null; var full = mode==='owner' ? 'Gustavo Owner' : 'Alex Member';
-    var access = mode==='owner' ? { valid:true, status:'owner', plan_key:'owner', reason:'staff', grace_days:3 } : mode==='active' ? { valid:true, status:'active', plan_key:'yearly', renewal_period_end:'2027-09-27T00:00:00Z', manage_url:'#', grace_days:3 } : mode==='pastdue' ? { valid:true, status:'past_due', plan_key:'monthly', renewal_period_end:'2026-10-27T00:00:00Z', manage_url:'#', grace_days:3 } : { valid:false, reason:'none' };
-    var tables = { profiles: mode==='active' ? [{ id:'u1', email:'member@example.com', full_name:full, role:'owner', email_updates:true, created_at:'2026-04-02T00:00:00Z' },{ id:'u2', email:'old@example.com', role:'member', email_updates:true, created_at:'2026-05-10T00:00:00Z' }] : { id:'u1', email:'member@example.com', full_name:full, role: mode==='owner' ? 'owner' : 'member', email_updates:true, created_at:'2026-04-02T00:00:00Z' }, memberships: mode==='active' ? [{id:'mem_1',email:'member@example.com',user_id:'u1',plan_key:'yearly',status:'active',renewal_period_end:'2027-09-27',updated_at:'2026-09-27'},{id:'mem_2',email:'whop.only@example.com',user_id:null,plan_key:'monthly',status:'active',renewal_period_end:'2026-10-27',updated_at:'2026-09-27'},{id:'manual_x1',email:'crypto@example.com',user_id:null,plan_key:'lifetime',status:'completed',renewal_period_end:null,updated_at:'2026-09-27'},{id:'mem_3',email:'old@example.com',user_id:null,plan_key:'monthly',status:'canceled',renewal_period_end:'2026-08-01',updated_at:'2026-08-01'},{id:'mem_9',email:'legacy.buyer@example.com',user_id:null,plan_key:'yearly',status:'active',renewal_period_end:'2027-03-01',created_at:'2026-03-01',updated_at:'2026-09-27',legacy:true}] : [], sent_emails: mode==='active' ? [{id:'e1',user_id:'u1',to_email:'member@example.com',type:'welcome',subject:'Welcome, your membership is active',status:'sent',provider_id:'re_1',sent_by:'system',created_at:new Date(Date.now()-40*60000).toISOString(),html:'<!doctype html><body style="background:#0A0A0B;color:#F5F5F3;font-family:sans-serif;padding:40px"><h1 style="font-weight:400">Welcome, Gustavo.</h1><p style="color:#BDBDC2">Your Yearly membership is active.</p></body>'},{id:'e2',user_id:null,to_email:'whop.only@example.com',type:'payment_failed',subject:'Your payment did not go through',status:'sent',provider_id:'re_2',sent_by:'system',created_at:new Date(Date.now()-3*3600000).toISOString(),html:'<!doctype html><body style="background:#0A0A0B;color:#F5F5F3;font-family:sans-serif;padding:40px"><h1 style="font-weight:400">Your payment did not go through.</h1></body>'},{id:'e3',user_id:'u1',to_email:'member@example.com',type:'support_reply',subject:'Mr. Wall Street answered you',status:'failed',error:'Resend: rate limit',sent_by:'system',created_at:new Date(Date.now()-26*3600000).toISOString(),html:''},{id:'e4',user_id:null,to_email:'alternartivebull@gmail.com',type:'invite',subject:'Your Mr. Wall Street account is ready',status:'sent',provider_id:'re_4',sent_by:'preview:admin:member@example.com',created_at:new Date(Date.now()-50*3600000).toISOString(),html:''}] : [], audit_log: [{id:9,at:new Date(Date.now()-5*60000).toISOString(),actor:'telegram',action:'join.declined',subject:'u2',detail:{chat_id:1,why:'no active membership',username:'oldmember'}},{id:8,at:new Date(Date.now()-12*60000).toISOString(),actor:'telegram',action:'join.approved',subject:'u1',detail:{chat_id:1,username:'gustavo'}},{id:7,at:new Date(Date.now()-12*60000-9000).toISOString(),actor:'telegram',action:'link.created',subject:'u1',detail:{username:'gustavo',via:'join_request'}},{id:6,at:new Date(Date.now()-3*3600000).toISOString(),actor:'webhook:payment.failed',action:'membership.status',subject:'mem_2',detail:{from:'active',to:'past_due',email:'whop.only@example.com'}},{id:5,at:new Date(Date.now()-26*3600000).toISOString(),actor:'system',action:'reconcile',subject:null,detail:{ms:2100,users:3,checked:257,changed:0,granted:0,revoked:0}},{id:4,at:new Date(Date.now()-27*3600000).toISOString(),actor:'telegram',action:'channel.pending',subject:'-100555',detail:{title:'Some random group',type:'supergroup',by:12345}},{id:3,at:new Date(Date.now()-50*3600000).toISOString(),actor:'admin:member@example.com',action:'admin.grant',subject:'crypto@example.com',detail:{plan_key:'lifetime'}},{id:2,at:new Date(Date.now()-51*3600000).toISOString(),actor:'system',action:'plan.new',subject:'plan_x',detail:{title:'Weekend pass',price:3,grants_access:false}},{id:1,at:new Date(Date.now()-52*3600000).toISOString(),actor:'system',action:'telegram.revoked',subject:'u2',detail:{reason:'membership ended',blocked:false}}], support_threads: [{id:'t1',user_id:'u1',subject:'Paid with a different email',status:'open',last_at:new Date(Date.now()-3600000).toISOString(),created_at:new Date(Date.now()-3600000).toISOString()},{id:'t2',user_id:'u2',subject:'Left the channel by mistake',status:'answered',last_at:new Date(Date.now()-26*3600000).toISOString(),created_at:new Date(Date.now()-27*3600000).toISOString()}], support_messages: [{id:'m1',thread_id:'t1',user_id:'u1',from_staff:false,body:'Hi, I paid on Whop with my work email and this account uses my personal one. Receipt pay_abc123.',created_at:new Date(Date.now()-3600000).toISOString()},{id:'m2',thread_id:'t2',user_id:'u2',from_staff:false,body:'I left Exclusive by mistake, can you let me back in?',created_at:new Date(Date.now()-27*3600000).toISOString()},{id:'m3',thread_id:'t2',user_id:'u1',from_staff:true,body:'Go to Telegram in your member area and tap "get a new link". You are approved in a second.',created_at:new Date(Date.now()-26*3600000).toISOString()}], telegram_links: mode==='active' ? { user_id:'u1', telegram_id:1, telegram_username:'gustavo', linked_at:'2026-09-27' } : null, channels: [{chat_id:1,title:'Exclusive ♠️',sort:1,enabled:true},{chat_id:2,title:'Positions List',sort:2,enabled:true},{chat_id:3,title:'Market Desk',sort:3,enabled:true},{chat_id:4,title:'Private Chat 💬',sort:4,enabled:true}], telegram_access: mode==='active' ? [{user_id:'u1',chat_id:1,status:'joined'},{user_id:'u1',chat_id:2,status:'joined'},{user_id:'u1',chat_id:3,status:'invited'},{user_id:'u1',chat_id:4,status:'joined'}] : [], settings: [{key:'grace_days',value:'3'},{key:'invite_ttl_hours',value:'24'}], positions: (mode==='active'||mode==='owner') ? [{id:'p1',symbol:'BTC',name:'Bitcoin',side:'long',asset_class:'crypto',entry:'57.7-64K',entry_price:61000,mark:83000,mark_at:'2026-09-24',target:'130K',size_pct:35,status:'open',opened_at:'2026-08-11',thesis:'Cycle bottom is in at 57.7K. First target open.',updated_at:'2026-09-24T00:00:00Z',sort:1},{id:'p2',symbol:'MSTR',name:'Strategy',side:'long',asset_class:'equity',entry:'$90-100',entry_price:95,mark:162,target:'$950',size_pct:20,status:'open',opened_at:'2026-07-23',thesis:'Not selling one share.',sort:2},{id:'p3',symbol:'BTC',name:'Bitcoin · 2022 cycle',side:'long',asset_class:'crypto',entry:'16-18K',exit:'100-126K',result:'x7',status:'closed',opened_at:'2022-11-20',closed_at:'2025-11-16',thesis:'Bought when the market called for 10-12K.',sort:100}] : [], whop_events: mode==='active' ? [{id:'msg_1',type:'payment.succeeded',received_at:'2026-09-27T12:42:52Z',payload:{data:{id:'pay_1',total:990,currency:'usd',paid_at:'2026-09-27T12:42:50Z',user:{email:'member@example.com'},plan:{id:'plan_0LdJbWcZD6tGE'}}}},{id:'msg_2',type:'payment.succeeded',received_at:'2026-09-20T10:00:00Z',payload:{data:{id:'pay_2',total:99,currency:'usd',paid_at:'2026-09-20T10:00:00Z',user:{email:'whop.only@example.com'},plan:{id:'plan_zKhMuAvHoXfE2'}}}},{id:'msg_3',type:'payment.failed',received_at:'2026-09-25T09:00:00Z',payload:{data:{id:'pay_3',total:99,currency:'usd',user:{email:'old@example.com'},plan:{id:'plan_zKhMuAvHoXfE2'}}}}] : [] };
-    var ago = function(min){ return new Date(Date.now() - min*60000).toISOString(); };
-    var nextId = 100;
-    function chain(t){
-      var f = [], lim = 0, op = 'select', payload = null;
-      function rows(){ var v = tables[t]; v = Array.isArray(v) ? v : (v ? [v] : []); return v.filter(function(r){ return f.every(function(x){ return x(r); }); }); }
-      function run(){
-        if (op === 'insert') { var r = Object.assign({ id: nextId++, created_at: new Date().toISOString(), pinned:false, edited_at:null, deleted_at:null }, payload); (tables[t] = tables[t] || []).push(r); return { data: [r] }; }
-        if (op === 'delete') { var keep = (tables[t] || []).filter(function(r){ return !f.every(function(x){ return x(r); }); }); tables[t] = keep; return { data: [] }; }
-        var out = rows(); if (lim) out = out.slice(0, lim); return { data: out };
-      }
-      var c = { select:function(){ return c; }, eq:function(k,v){ f.push(function(r){ return String(r[k]) === String(v); }); return c; }, neq:function(k,v){ f.push(function(r){ return String(r[k]) !== String(v); }); return c; }, in:function(k,vs){ f.push(function(r){ return vs.map(String).indexOf(String(r[k])) >= 0; }); return c; }, lt:function(k,v){ f.push(function(r){ return r[k] < v; }); return c; }, gt:function(k,v){ f.push(function(r){ return r[k] > v; }); return c; }, gte:function(){ return c; }, not:function(){ return c; }, like:function(){ return c; }, is:function(k,v){ f.push(function(r){ return r[k] == v; }); return c; }, match:function(o){ Object.keys(o).forEach(function(k){ c.eq(k, o[k]); }); return c; }, order:function(k,o){ var desc = o && o.ascending === false; f.sorter = function(a,b){ return (a[k] > b[k] ? 1 : a[k] < b[k] ? -1 : 0) * (desc ? -1 : 1); }; return c; }, limit:function(n){ lim = n; return c; }, update:function(){ return c; }, upsert:function(){ return c; }, insert:function(p){ op = 'insert'; payload = p; return c; }, delete:function(){ op = 'delete'; return c; },
-        maybeSingle:function(){ return c.then(function(x){ return { data: x.data[0] || null }; }); }, single:function(){ return c.then(function(x){ return { data: x.data[0] || null }; }); },
-        then:function(res, rej){ var out = run(); if (f.sorter && out.data) out.data = out.data.slice().sort(f.sorter); if (lim && out.data && f.sorter) out.data = out.data.slice(0, lim); return Promise.resolve(out).then(res, rej); } };
-      return c;
-    }
-    return { auth:{ getSession:function(){ return Promise.resolve({ data:{ session: user ? { user:user, access_token:'x' } : null } }); }, onAuthStateChange:function(){}, signOut:function(){ return Promise.resolve({}); }, signUp:function(){ return Promise.resolve({ data:{ user:{identities:[1]}, session:null } }); }, verifyOtp:function(){ return Promise.resolve({ data:{} }); }, signInWithPassword:function(){ return Promise.resolve({ error:{ message:'Invalid login credentials' } }); }, resetPasswordForEmail:function(){ return Promise.resolve({}); }, updateUser:function(){ return Promise.resolve({}); }, resend:function(){ return Promise.resolve({}); } }, from:function(t){ return chain(t); }, rpc:function(name, args){ if (name === 'revoke_session') return Promise.resolve({ data: null }); if (name === 'my_memberships') return Promise.resolve({ data: mode==='active' ? [{id:'mem_1',plan_key:'yearly',plan_id:'plan_0LdJbWcZD6tGE',status:'active',renewal_period_end:'2027-09-27T00:00:00Z',cancel_at_period_end:false,manage_url:'https://whop.com/orders/',manual:false,valid:true}] : mode==='pastdue' ? [{id:'mem_2',plan_key:'monthly',status:'past_due',renewal_period_end:'2026-10-27T00:00:00Z',cancel_at_period_end:false,manage_url:'https://whop.com/orders/',manual:false,valid:true}] : [] }); if (name === 'my_payments') return Promise.resolve({ data: mode==='active' ? [{kind:'whop',id:'e1',type:'payment.succeeded',at:'2026-09-27T15:09:53Z',total:990,currency:'usd',plan:'plan_0LdJbWcZD6tGE',status:'paid',brand:'mastercard',last4:'4242',ref:'pay_1'},{kind:'whop',id:'e2',type:'payment.failed',at:'2026-08-27T10:00:00Z',total:99,currency:'usd',plan:'plan_zKhMuAvHoXfE2',status:'failed',brand:'visa',last4:'1111',ref:'pay_0'},{kind:'whop',id:'e3',type:'payment.succeeded',at:'2026-07-27T10:00:00Z',total:99,currency:'usd',plan:'plan_zKhMuAvHoXfE2',status:'paid',brand:'visa',last4:'1111',ref:'pay_x'}] : [] }); if (name === 'my_sessions') return Promise.resolve({ data: user ? [{ id:'s1', created_at: ago(60*24*3), last_at: new Date().toISOString(), user_agent:'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36', ip:'86.99.1.2/32', current:true }, { id:'s2', created_at: ago(60*24*9), last_at: ago(95), user_agent:'Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1', ip:'89.12.3.4/32', current:false }] : [] }); return Promise.resolve({ data: access }); }, removeChannel:function(){}, channel:function(){ var ch={ on:function(){return ch;}, subscribe:function(cb){ if (cb) setTimeout(function(){ cb('SUBSCRIBED'); }, 0); return ch; }, track:function(){ return Promise.resolve(); }, send:function(){ return Promise.resolve(); }, presenceState:function(){ return { u1:[{}], u2:[{}], u9:[{}] }; }, unsubscribe:function(){} }; return ch; } };
-  }
+  function previewClient(){ return null; }
 
   /* helpers */
   var $ = window.MWS.$ = function(s, r){ return (r||document).querySelector(s); };
   window.MWS.$$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
   window.MWS.msg = function(el, text, kind){ el = typeof el==='string' ? $(el) : el; if(!el) return; el.textContent = text||''; el.className = 'msg' + (text ? ' on' : '') + (kind ? ' '+kind : ''); };
-  window.MWS.busy = function(btn, on){ btn = typeof btn==='string' ? $(btn) : btn; if(!btn) return; btn.classList.toggle('busy', !!on); if(on){ btn.dataset.t = btn.innerHTML; btn.innerHTML = '<span class="spin"></span>' + (btn.dataset.busy || 'One moment'); } else if(btn.dataset.t){ btn.innerHTML = btn.dataset.t; } };
+  /* busy button: spinner + disabled (a second click or Enter while a request runs does nothing); idempotent either way */
+  window.MWS.busy = function(btn, on){
+    btn = typeof btn==='string' ? $(btn) : btn; if(!btn) return;
+    if(on){ if(btn.classList.contains('busy')) return; btn.classList.add('busy'); btn.dataset.t = btn.innerHTML; btn.innerHTML = '<span class="spin"></span>' + (btn.dataset.busy || 'One moment'); btn.disabled = true; }
+    else { btn.classList.remove('busy'); if(btn.dataset.t){ btn.innerHTML = btn.dataset.t; delete btn.dataset.t; } btn.disabled = false; }
+  };
   window.MWS.go = function(path){ location.href = path; };
   window.MWS.qs = function(k){ return new URLSearchParams(location.search).get(k); };
   /* store: survives new tabs (the email link opens one) — used for the checkout handoff. sess: this tab only. */
   function storage(s){ return { get: function(k){ try{ return JSON.parse(s.getItem(k)); }catch(e){ return null; } }, set: function(k,v){ try{ s.setItem(k, JSON.stringify(v)); }catch(e){} }, del: function(k){ try{ s.removeItem(k); }catch(e){} } }; }
   window.MWS.store = storage(window.localStorage);
   window.MWS.sess = storage(window.sessionStorage);
-  /* the checkout handoff (plan, email, receipt) — expires after 7 days; a receipt id in the URL (Whop return-url) is captured */
+  /* the checkout handoff (plan, email, receipt) — expires after 7 days; a receipt id in the URL (Whop return-url) is captured.
+     The "paid" flag and the receipt are trusted for 6 hours, the same window the claim function accepts: after that the
+     payment either matched long ago or needs support, and re-sending the receipt would only produce rejected claims. */
+  window.MWS.PAID_WINDOW = 6 * 3600000;
   window.MWS.signupState = function(){
     var st = window.MWS.store.get('mws_signup') || window.MWS.sess.get('mws_signup') || {};
     if (st.at && Date.now() - st.at > 7 * 86400000) st = {};
+    if ((st.receipt || st.paid) && Date.now() - (st.paidAt || st.at || 0) > window.MWS.PAID_WINDOW) { delete st.receipt; delete st.paidAt; st.paid = false; }
     var rq = window.MWS.qs('receipt_id') || window.MWS.qs('receipt') || window.MWS.qs('payment_id');
     if (rq && /^pay_[A-Za-z0-9]+$/.test(rq)) { st.receipt = rq; st.paid = true; st.paidAt = st.paidAt || Date.now(); }
     return st;
   };
+  window.MWS.paidRecently = function(st){ return !!(st && st.paid && Date.now() - (st.paidAt || st.at || 0) < window.MWS.PAID_WINDOW); };
   window.MWS.saveSignup = function(st){ st.at = st.at || Date.now(); window.MWS.store.set('mws_signup', st); };
   window.MWS.fmtDate = function(iso){ if(!iso) return '—'; var d = new Date(iso); return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); };
   window.MWS.validEmail = function(e){ return /^[^\s@"<>()]+@[^\s@]+\.[^\s@]{2,}$/.test(e||''); };
   /* escape anything that came from a user, Whop or Telegram before it goes into innerHTML */
   window.MWS.esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); };
   /* only same-origin paths are allowed as a post-login destination */
-  window.MWS.safeNext = function(n){ try { var u = new URL(n || '/app', location.origin); if (u.origin !== location.origin || u.pathname === '/login') return '/app'; if (u.pathname === '/account') u.pathname = '/app'; return u.pathname + u.search + (/^#[a-z]+$/.test(u.hash) ? u.hash : ''); } catch (e) { return '/app'; } };
+  window.MWS.safeNext = function(n){
+    try {
+      var u = new URL(n || '/app', location.origin);
+      if (u.origin !== location.origin || u.pathname === '/login') return '/app';
+      var p = u.pathname.replace(/\/{2,}/g, '/'); /* "/app//evil.com" would be read by the browser as a protocol-relative link to evil.com */
+      if (p === '/account') p = '/app';
+      return p + u.search + (/^#[a-z]+$/.test(u.hash) ? u.hash : '');
+    } catch (e) { return '/app'; }
+  };
 
   /* call an edge function with the user's session */
   window.MWS.fn = async function(name, body){
     var s = await window.MWS.sb().auth.getSession();
     var token = s.data.session ? s.data.session.access_token : C.SUPABASE_ANON_KEY;
-    if (C.SUPABASE_URL.indexOf('__')===0) { if (name === 'billing') return { ok:true, cancel_at_period_end: body.action === 'cancel' }; if (name === 'tg-link' && body && body.action === 'links') return { ok:true, linked:false, links:[{chat_id:1,title:'Exclusive ♠️',status:'joined',invite_link:'#'},{chat_id:2,title:'Positions List',status:'invited',invite_link:'https://t.me/+preview'},{chat_id:3,title:'Market Desk',status:'left',invite_link:null},{chat_id:4,title:'Private Chat 💬',status:'invited',invite_link:'https://t.me/+preview2'}] }; return { ok:true, url:'https://t.me/MrWallStreetBot?start=preview', found:0 }; }
+    
     var r = await fetch(C.FUNCTIONS + '/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': C.SUPABASE_ANON_KEY }, body: JSON.stringify(body||{}) });
     var j = null; try { j = await r.json(); } catch(e) { j = { error: 'bad response' }; }
     if(!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
+  };
+
+  /* log out of this device (scope 'local'; the Devices page has the "all other devices" button): preview mode off, access cache
+     gone, the checkout handoff forgotten — a sign-out is a change of person, and a receipt left behind on a shared browser must
+     never be claimed by whoever logs in next. If Supabase cannot be reached the stored session is dropped by hand, so the person
+     is never stuck "logged in". */
+  window.MWS.signOut = async function(to, scope){
+    window.MWS.viewAs.set(''); window.MWS.store.del('mws_access'); window.MWS.store.del('mws_signup'); window.MWS.sess.del('mws_signup');
+    try { var r = await window.MWS.sb().auth.signOut({ scope: scope || 'local' }); if (r && r.error) throw r.error; }
+    catch (e) { try { var ref = /^https?:\/\/([^.\/]+)\./.exec(C.SUPABASE_URL); if (ref) window.localStorage.removeItem('sb-' + ref[1] + '-auth-token'); } catch (e2) {} }
+    window.MWS.go(to || '/');
   };
 
   /* "view as member" (owners/admins): a preset replaces the account data on /account, the Admin button hides, a bar shows the way back */
@@ -122,7 +129,7 @@ window.MWS = window.MWS || {};
     if(user){
       if (slot) slot.innerHTML = (inApp ? '' : '<a class="btn sm ghost" href="/app"><span class="t">Member area</span></a>') + '<button class="btn sm ' + (inApp ? 'ghost' : 'acc') + '" id="hdr-out" type="button">Log out</button>';
       try { var pr = await window.MWS.sb().from('profiles').select('role').eq('id', user.id).maybeSingle(); var staff = pr.data && (pr.data.role === 'owner' || pr.data.role === 'admin'); window.MWS.isStaff = !!staff; if (staff && window.MWS.viewAs.get()) viewBar(); else if (staff && slot && !/^\/admin/.test(location.pathname)) slot.insertAdjacentHTML('afterbegin', '<a class="btn sm ghost" href="/admin"><span class="t">Admin</span></a>'); } catch (e) {}
-      var out = $('#hdr-out'); if (out) out.addEventListener('click', async function(){ window.MWS.viewAs.set(''); await window.MWS.sb().auth.signOut(); window.MWS.go('/'); });
+      var out = $('#hdr-out'); if (out) out.addEventListener('click', function(){ window.MWS.signOut('/'); });
     } else if (slot) {
       slot.innerHTML = '<a class="btn sm ghost" href="/login"><span class="t">Log in</span></a><a class="btn sm acc" href="/join">Join now <span class="ar"></span></a>';
     }
@@ -140,6 +147,7 @@ window.MWS = window.MWS || {};
     if(/Token has expired|invalid.*otp|otp/i.test(m)) return 'That code is wrong or has expired. Request a new one.';
     if(/blocked by the user|bot was blocked/i.test(m)) return 'You blocked @MrWallStreetBot in Telegram. Unblock it and try again.';
     if(/Auth session missing/i.test(m)) return 'This link has expired. Request a new one from the login page.';
+    if(/Failed to fetch|NetworkError|Load failed|network request failed/i.test(m)) return 'No connection. Check your internet and try again.';
     return m;
   };
 })();

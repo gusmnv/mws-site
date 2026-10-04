@@ -34,12 +34,12 @@
   </form>
 
   <form class="panel rv" id="f-otp" hidden novalidate>
-    <div class="ttl"><h3>Confirm your email</h3><span class="tag">Step 2 of 2</span></div>
-    <p class="muted small" style="margin-bottom:16px">We sent a confirmation to <b id="otp-email"></b>. Click the link in that email, or enter the 6-digit code below if it shows one.</p>
+    <div class="ttl"><h3>Confirm your email</h3><span class="tag">Last step</span></div>
+    <p class="muted small" style="margin-bottom:16px">We sent a 6-digit code to <b id="otp-email"></b>. Enter it below to finish.</p>
     <div class="field"><label for="otp">Code</label><div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></div></div>
     <div class="msg" id="m-otp"></div>
     <button class="btn acc wide" type="submit" data-busy="Confirming">Confirm and enter <span class="ar"></span></button>
-    <p class="small muted" style="margin-top:14px">No email? Check spam, or <button class="link" type="button" id="resend">send a new code</button>.</p>
+    <p class="small muted" style="margin-top:14px">No email? Check spam, or <button class="link" type="button" id="resend" data-busy="sending a new code">send a new code</button>.</p>
   </form>
 </div></div></main>
 <footer class="site"><div class="wrap">
@@ -55,13 +55,13 @@
 (async function(){
   var M = window.MWS, $ = M.$, sb = M.sb();
   var user = await M.header();
-  if (user) { M.go('/app'); return; }
   var state = M.signupState();
-  var paid = M.qs('status') === 'success' || !!state.paid;
+  var paid = M.qs('status') === 'success' || M.paidRecently(state); /* a "paid" left behind by someone else on this browser expires after 6 hours */
   if (paid && !state.paid) { state.paid = true; state.paidAt = Date.now(); } /* Whop return-url without onComplete: remember the payment for the account page */
   if (state.receipt || state.paid) M.saveSignup(state);
+  if (user) { M.go('/app' + (paid ? '?paid=1' : '')); return; } /* already logged in: the payment just made is carried to the member area, not dropped */
   if (!paid) { $('#eb').innerHTML = '<b>/</b>Create your account'; $('#h').textContent = 'Create your account.'; $('#sub').textContent = 'If you have already paid, use the same email. If not, you can choose a plan after.'; M.$('.steps').hidden = true; }
-  if (state.email) { $('#email').value = state.email; if (paid) { $('#email').readOnly = true; $('#email-hint').textContent = 'Locked to the email you paid with.'; } }
+  if (state.email) { $('#email').value = state.email; if (paid) $('#email-hint').textContent = 'Use the email you paid with.'; } /* pre-filled, never locked: a shared browser may hold another person's address */
 
   var pending = null;
   $('#f-signup').addEventListener('submit', async function(e){
@@ -72,7 +72,7 @@
     if (pw !== pw2) return M.msg('#m', 'The passwords do not match.', 'bad');
     M.msg('#m', ''); var btn = $('#f-signup .btn'); M.busy(btn, true);
     try {
-      var r = await sb.auth.signUp({ email: email, password: pw, options: { data: { full_name: name }, emailRedirectTo: M.config.SITE + '/app' } });
+      var r = await sb.auth.signUp({ email: email, password: pw, options: { data: { full_name: name.slice(0, 80) }, emailRedirectTo: M.config.SITE + '/app' + (state.receipt ? '?receipt_id=' + encodeURIComponent(state.receipt) : '') } });
       if (r.error) throw r.error;
       // Supabase returns a user with empty identities when the email already exists
       if (r.data.user && r.data.user.identities && r.data.user.identities.length === 0) throw new Error('already registered');
@@ -98,8 +98,10 @@
   });
 
   $('#resend').addEventListener('click', async function(){
+    if (this.disabled) return; M.busy(this, true); /* a double tap would send two codes and trip the rate limit */
     try { var r = await sb.auth.resend({ type: 'signup', email: pending.email }); if (r.error) throw r.error; M.msg('#m-otp', 'New code sent.', 'ok'); }
     catch (err) { M.msg('#m-otp', M.human(err), 'bad'); }
+    finally { M.busy(this, false); }
   });
 })();
 </script>

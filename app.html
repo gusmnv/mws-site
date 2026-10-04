@@ -24,7 +24,9 @@
     <div class="msg" id="m-reset"></div>
     <button class="btn acc" type="submit" data-busy="Saving">Save password <span class="ar"></span></button>
   </form>
+  <div class="row" id="g-back" hidden style="margin-top:18px"><a class="link" href="/app">Not now, back to the member area</a></div>
   <div class="row" id="g-actions" hidden style="margin-top:18px"><a class="btn acc" href="/login">Go to log in <span class="ar"></span></a></div>
+  <div class="row" id="g-reload" hidden style="margin-top:18px"><button class="btn acc" type="button" onclick="location.reload()">Reload <span class="ar"></span></button></div>
 </div>
 
 <!-- pay gate: a logged-in account without an active plan does not enter the member area -->
@@ -37,7 +39,7 @@
 <div class="shell" id="shell" hidden>
   <aside class="side" id="side" aria-label="Member menu">
     <div class="side-top">
-      <a class="brand" href="/app" aria-label="Mr. Wall Street"><img src="/lion-120.png" alt=""><span>MR. WALL STREET</span></a>
+      <a class="brand" href="/app" aria-label="Mr. Wall Street"><img src="/lion-120.png" srcset="/lion-120.png 1x, /lion-240.png 2x" alt=""><span>MR. WALL STREET</span></a>
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
@@ -67,9 +69,6 @@
     </header>
 
     <main class="content" id="content">
-
-      <!-- status hooks (no Overview page any more; render() still writes here, nothing is shown) -->
-      <div hidden aria-hidden="true"><h1 id="h"></h1><p id="sub"></p><div id="tiles"></div><div id="ov-plans"></div><span id="desk-pf-tag"></span></div>
 
       <!-- 07 membership -->
       <section class="page" data-page="membership">
@@ -195,7 +194,6 @@
                 <div class="row"><button class="btn sm acc" type="submit" data-busy="Saving">Save password</button><button class="link" type="button" id="pw-cancel">Cancel</button></div>
               </form>
               <div class="msg" id="m-sec"></div>
-              <span id="tgl-updates" hidden aria-hidden="true"></span>
             </section>
           </div>
           <div></div>
@@ -210,7 +208,7 @@
             <section class="panel rv"><div class="ttl"><h3>Sessions</h3><span class="small muted" id="dev-n"></span></div>
               <div id="dev-list"><p class="small muted">Loading…</p></div>
               <div class="msg" id="m-dev"></div>
-              <div class="row" style="margin-top:18px"><button class="btn sm ghost" id="out-others" type="button" data-busy="Ending">Log out of all other devices</button><button class="link" id="out-all" type="button" hidden>Log out everywhere</button></div>
+              <div class="row" style="margin-top:18px"><button class="btn sm ghost" id="out-others" type="button" data-busy="Ending">Log out of all other devices</button></div>
             </section>
           </div>
           <div></div>
@@ -264,14 +262,15 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   sb.auth.onAuthStateChange(function(ev){ if (ev === 'PASSWORD_RECOVERY') { isReset = true; recovering = true; if (typeof showReset === 'function') showReset(); } });
   var user = await M.header();
   if (recovering) isReset = true;
-  function gate(h, sub, opts){ $('#gate').hidden = false; $('#shell').hidden = true; $('#g-h').textContent = h; $('#g-sub').textContent = sub || ''; $('#g-actions').hidden = !(opts && opts.login); $('#f-reset').hidden = !(opts && opts.form); }
+  function gate(h, sub, opts){ $('#gate').hidden = false; $('#shell').hidden = true; $('#paygate').hidden = true; $('#g-h').textContent = h; $('#g-sub').textContent = sub || ''; $('#g-actions').hidden = !(opts && opts.login); $('#g-reload').hidden = !(opts && opts.reload); $('#g-back').hidden = !(opts && opts.back); $('#f-reset').hidden = !(opts && opts.form); }
   if (hashErr) {
     history.replaceState(null, '', location.pathname + location.search);
     gate('This link has expired.', isInvite ? 'Invitation links work once. On the login page press "Forgot password?" with the email you were invited on, and we send you a fresh one.' : isReset ? 'Password links work once and for one hour. Ask for a new one from the login page.' : 'Confirmation links work for one hour. Log in and we send you a fresh code.', { login: true });
     return;
   }
   if (!user && !isReset) { M.go('/login?next=' + encodeURIComponent('/app' + location.search + (/^#[a-z]+$/.test(location.hash) ? location.hash : ''))); return; }
-  function showReset(){ gate(isInvite ? 'Welcome. Choose your password.' : 'Set a new password.', isInvite ? 'Your account is ready; this password is how you log in from now on.' : '', { form: true }); }
+  /* a member who opened a reset link but changed their mind can go back; an invited account has no password yet, so it stays */
+  function showReset(){ gate(isInvite ? 'Welcome. Choose your password.' : 'Set a new password.', isInvite ? 'Your account is ready; this password is how you log in from now on.' : '', { form: true, back: !isInvite }); }
   /* safe href: only https (and tg://) links from the backend may be clicked */
   function href(u){ u = String(u || ''); return /^(https:\/\/|tg:\/\/)/i.test(u) ? esc(u) : '#'; }
   $('#f-reset').addEventListener('submit', async function(e){
@@ -289,7 +288,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
 
   /* ---- shell ---- */
-  $('#shell').hidden = false;
+  /* first paint: members (the common case, or an unknown account) see the shell at once; an account the last load found
+     without a plan waits the half second for the data, so the pay gate does not flash the member menu first */
+  var cached = M.store.get('mws_access');
+  $('#shell').hidden = !!(cached && cached.valid === false && Date.now() - (cached.at || 0) < 7 * 86400000);
   var side = $('#side'), scrim = $('#scrim');
   var mobile = window.matchMedia('(max-width:960px)');
   function drawer(on){
@@ -306,24 +308,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   scrim.addEventListener('click', function(){ drawer(false); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') drawer(false); });
 
-  /* markets strip: regular hours in each exchange's local time (holidays not accounted for) */
-  var MK = [ ['NYSE','America/New_York',[[570,960]]], ['LSE','Europe/London',[[480,990]]], ['TSE','Asia/Tokyo',[[540,690],[750,930]]] ];
-  function mkts(){
-    var el = $('#mkts'); if (!el) return;
-    el.innerHTML = MK.map(function(m){
-      var parts = new Intl.DateTimeFormat('en-GB', { timeZone: m[1], hour:'2-digit', minute:'2-digit', weekday:'short', hour12:false }).formatToParts(new Date()), o = {};
-      parts.forEach(function(p){ o[p.type] = p.value; });
-      var mins = (parseInt(o.hour, 10) % 24) * 60 + parseInt(o.minute, 10), wk = /Sat|Sun/.test(o.weekday);
-      var open = !wk && m[2].some(function(w){ return mins >= w[0] && mins < w[1]; });
-      return '<span class="' + (open ? 'open' : '') + '"><i></i><b>' + m[0] + '</b>' + (open ? 'Open' : 'Closed') + ' <em>' + o.hour + ':' + o.minute + '</em></span>';
-    }).join('');
-  }
-  /* markets strip removed: cleaner bar */
-
   /* router: #page */
   var current = '';
   function route(){
-    var k = (location.hash || '#telegram').slice(1); if (k === 'economic') k = 'calendar'; if (k === 'settings') k = 'account'; if (k === 'support' || k === 'chat') k = 'feedback'; if (k === 'overview') k = 'telegram'; if (!PAGES[k] || /=/.test(k)) k = 'telegram';
+    var k = (location.hash || '#telegram').slice(1); if (k === 'economic') k = 'calendar'; if (k === 'settings') k = 'account'; if (k === 'support' || k === 'chat') k = 'feedback'; if (k === 'overview') k = 'telegram'; if (!Object.prototype.hasOwnProperty.call(PAGES, k) || /=/.test(k)) k = 'telegram';
     if (k === 'devices' && typeof loadDevices === 'function') loadDevices();
     current = k;
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
@@ -337,36 +325,41 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   /* ---- data ---- */
   var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, tgUser = null, notices = [], lastLoad = 0;
-  var signup = M.signupState(); if (signup.receipt || signup.paid) M.saveSignup(signup);
+  var signup = M.signupState();
+  /* the handoff belongs to the e-mail typed at checkout: another account on the same browser must not inherit its receipt or its "paid" state */
+  if (signup.email && user.email && String(signup.email).toLowerCase() !== String(user.email).toLowerCase()) { signup = {}; M.store.del('mws_signup'); M.sess.del('mws_signup'); }
+  if (signup.receipt || signup.paid) M.saveSignup(signup);
   var welcomeOnce = M.qs('welcome') === '1', paidQs = M.qs('paid') === '1';
-  var claimedReceipt = false;
-  async function claim(){ try { await M.fn('claim', { receipt: signup.receipt || null }); } catch(e) {} }
+  var claimedReceipt = false, lastClaim = 0;
+  /* ask the server to look for this account's payment on Whop; the function itself refuses more than one call per 8 s */
+  async function claim(){ lastClaim = Date.now(); try { await M.fn('claim', { receipt: signup.receipt || null }); } catch(e) {} }
   /* one load at a time; anything that arrives meanwhile (realtime bursts) collapses into a single follow-up */
   var loading = false, queued = null, supLoaded = false;
   async function load(claimIfEmpty){
     if (loading) { queued = queued || claimIfEmpty || false; return; }
     loading = true;
     try { await doLoad(claimIfEmpty); }
-    catch (e) { if (!access) { $('#h').textContent = 'Could not load your account.'; $('#sub').textContent = 'Check your connection and reload the page.'; } else { M.toast('Could not refresh. Will retry.'); } }
+    catch (e) { if (!access) { gate('Could not load your account.', 'Check your connection and try again.', { reload: true }); } else { M.toast('Could not refresh. Will retry.'); } }
     finally { loading = false; if (queued !== null) { var q = queued; queued = null; setTimeout(function(){ load(q); }, 400); } }
   }
   async function doLoad(claimIfEmpty){
     var s = await sb.auth.getSession(); user = s.data.session && s.data.session.user; if (!user) { M.go('/login?next=' + encodeURIComponent(location.pathname + location.search + location.hash)); return; }
     var pr = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle(); if (pr.error) throw pr.error; profile = pr.data;
     staffRole = !!(profile && (profile.role === 'owner' || profile.role === 'admin')) || !!M.isStaff;
+    var simOn = !!(staffRole && M.sim()); /* only staff can preview; a stale preview flag on a member's browser is ignored */
     var ac = await sb.rpc('my_access'); if (ac.error) throw ac.error; var acc = ac.data || { valid:false, reason:'none' };
     /* a fresh receipt is always claimed once (upgrade or rejoin while another plan is still valid), otherwise only when access is missing */
-    if (!M.sim() && ((signup.receipt && !claimedReceipt) || (claimIfEmpty && !acc.valid))) { claimedReceipt = !!signup.receipt; await claim(); ac = await sb.rpc('my_access'); if (!ac.error && ac.data) acc = ac.data; }
+    if (!simOn && ((signup.receipt && !claimedReceipt) || (claimIfEmpty && !acc.valid))) { claimedReceipt = !!signup.receipt; await claim(); ac = await sb.rpc('my_access'); if (!ac.error && ac.data) acc = ac.data; }
     if (acc.valid && (signup.receipt || signup.paid)) { M.store.del('mws_signup'); M.sess.del('mws_signup'); signup = {}; } /* handoff done */
     var lk = await sb.from('telegram_links').select('*').eq('user_id', user.id).maybeSingle(); if (lk.error) throw lk.error;
     var ch = await sb.from('channels').select('chat_id,title,sort').eq('enabled', true).order('sort'); if (ch.error) throw ch.error;
     var ta = await sb.from('telegram_access').select('chat_id,status,invite_link,updated_at').eq('user_id', user.id); if (ta.error) throw ta.error;
     access = acc; link = lk.data; channels = ch.data || []; tgAccess = ta.data || [];
-    if (!M.sim()) M.store.set('mws_access', { valid: !!acc.valid, at: Date.now() });
+    if (!simOn) M.store.set('mws_access', { valid: !!acc.valid, at: Date.now() });
     try { var ps = await sb.from('positions').select('*').order('sort').order('opened_at', { ascending: false }); positions = ps.error ? null : (ps.data || []); } catch (e) { positions = null; } /* RLS: empty for non-members */
     try { var ns = await sb.from('notices').select('id,body,kind,link,link_label,created_at').eq('active', true).order('created_at', { ascending: false }).limit(3); notices = ns.error ? [] : (ns.data || []); } catch (e) { notices = []; }
     /* owner preview: a preset replaces the data (never touches the database) */
-    sim = staffRole ? M.sim(channels) : null;
+    sim = simOn ? M.sim(channels) : null;
     if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); } else { document.body.classList.remove('sim'); }
     render();
     if (current === 'devices') loadDevices();
@@ -374,37 +367,34 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!supLoaded) { supLoaded = true; loadSupport(); }
   }
   /* in preview, buttons and checkout links inside the pages do nothing (they act on real members' accounts) */
-  $('#content').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button, .tgl, a[target=_blank], a[href^="/join"]'); if (!b) return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this ' + (b.classList.contains('tgl') ? 'switch' : 'button') + ' works.'); }, true);
+  $('#content').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button, a[target=_blank], a[href^="/join"]'); if (!b) return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this button works.'); }, true);
 
   function planName(k){ if (k === 'owner') return 'Owner'; return (C.PLANS[k] && C.PLANS[k].title) || (k ? k.charAt(0).toUpperCase()+k.slice(1) : 'Membership'); }
   function graceEnd(){ var from = access.past_due_since ? new Date(access.past_due_since) : new Date(); return new Date(from.getTime() + (Number(access.grace_days) || 3) * 86400000); }
   function firstName(){ var n = (profile && profile.full_name || '').trim().split(/\s+/)[0]; return n && n.length < 24 ? n : ''; }
-  function greeting(){ var h = new Date().getHours(); return h < 5 ? 'Late night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
   function statusOf(chat_id){ var a = tgAccess.filter(function(x){ return String(x.chat_id) === String(chat_id); })[0]; return a ? a.status : 'pending'; }
-  function tile(k, v, d, href, cls){ return '<' + (href ? 'a href="' + href + '"' : 'div') + ' class="tile ' + (cls || '') + '"><span class="k">' + k + '</span><span class="v">' + v + '</span><span class="d">' + d + '</span></' + (href ? 'a' : 'div') + '>'; }
+  function tile(k, v, d){ return '<div class="tile"><span class="k">' + k + '</span><span class="v">' + v + '</span><span class="d">' + d + '</span></div>'; }
 
   var gateState = '';
   function render(){
     gateState = '';
+    $('#gate').hidden = true; /* a failed first load showed the "could not load" gate; data arriving later (realtime) must not paint the shell under it */
     /* identity */
     var name = firstName();
     $('#acc-email').textContent = user.email; $('#acc-name').textContent = (profile && profile.full_name) || '—'; $('#acc-tag').textContent = 'Add your name'; $('#acc-tag').hidden = !!(profile && profile.full_name);
     $('#acc-since').textContent = M.fmtDate(profile && profile.created_at || user.created_at);
-    $('#tgl-updates').classList.toggle('on', !!(profile && profile.email_updates)); $('#tgl-updates').setAttribute('aria-checked', String(!!(profile && profile.email_updates)));
     var staff = !sim && profile && (profile.role === 'owner' || profile.role === 'admin');
     $('#side-admin').hidden = !staff;
 
     var st = $('#st'), body = $('#access-body'), bar = $('#bar-st');
-    var welcome = welcomeOnce || (sim && sim.key === 'joined'), paid = !sim && (paidQs || !!(signup && signup.paid && Date.now() - (signup.paidAt || signup.at || 0) < 2 * 3600000));
-    if (access.valid && (paidQs || welcomeOnce)) { paidQs = false; try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} } /* one-time flags: a reload shows the normal page */
+    var paid = !sim && (paidQs || (!!(signup && signup.paid) && Date.now() - (signup.paidAt || signup.at || 0) < 2 * 3600000));
+    if (access.valid && (paidQs || welcomeOnce)) { paidQs = false; welcomeOnce = false; try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} } /* one-time flags: a reload shows the normal page */
     var grace = Number(access.grace_days) || 3;
     var manage = '<a class="btn sm ghost" href="' + (access.manage_url ? href(access.manage_url) : 'https://whop.com/orders/') + '" target="_blank" rel="noopener">Manage subscription</a>'; /* card, invoices, cancel or resume: Whop's secure page for this membership */
-    var since = new Date(profile && profile.created_at || user.created_at), days = Math.max(0, Math.floor((Date.now() - since.getTime()) / 86400000));
     var joined = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length;
-    var daysTxt = days === 0 ? 'Joined today.' : days === 1 ? 'One day as a member.' : days + ' days as a member.';
-    var banner = '', plansHtml = '';
+    var banner = '';
     (function(){ var n = channels.length, j = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length, who = link ? (link.telegram_username || tgUser) : null;
-      $('#tg-sub').textContent = !access.valid ? 'Your channels open the moment your membership is active.' : (n && j === n) ? ('You are in. ' + (n === 1 ? 'The channel is' : 'Both channels are') + ' on your Telegram' + (who ? ' as @' + who : '') + '.') : (n === 1 ? 'One private channel. ' : n ? n + ' private channels. ' : 'Private channels. ') + 'Tap Join, confirm in Telegram, and you are in.';
+      $('#tg-sub').textContent = !access.valid ? 'Your channels open the moment your membership is active.' : (n && j === n) ? ('You are in. ' + (n === 1 ? 'The channel is' : n === 2 ? 'Both channels are' : 'All ' + n + ' channels are') + ' on your Telegram' + (who ? ' as @' + who : '') + '.') : (n === 1 ? 'One private channel. ' : n ? n + ' private channels. ' : 'Private channels. ') + 'Tap Join, confirm in Telegram, and you are in.';
       $('#tg-how').hidden = !!(n && j === n); })();
     $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>The Desk: portfolio, calendar, earnings</span><span class="soon">Soon</span></li>';
 
@@ -414,16 +404,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       var stTxt = owner ? 'Owner' : pastDue ? 'Payment issue' : (ending ? 'Ends ' + M.fmtDate(access.renewal_period_end) : 'Active'), stCls = 'tag ' + (pastDue ? 'warn' : 'ok');
       st.textContent = stTxt; st.className = stCls; bar.textContent = owner ? 'Owner' : pastDue ? 'Payment issue' : 'Member'; bar.className = stCls;
       var renews = owner ? 'Never. Your house.' : lifetime ? 'Never. Lifetime.' : pastDue ? 'Access ends ' + M.fmtDate(graceEnd()) + ' unless the card is updated.' : (ending ? 'Access until ' + M.fmtDate(access.renewal_period_end) + '. No further charges.' : 'Renews ' + M.fmtDate(access.renewal_period_end));
-      $('#h').textContent = welcome ? "You're in." : (name ? greeting() + ', ' + name + '.' : 'Welcome back.');
-      $('#sub').textContent = welcome ? 'Your account is active. Your Telegram channels are one tap away.' : (pastDue ? 'Your last payment failed. Update your card to keep your seat.' : (joined < channels.length ? 'Your channels are ready. Join them from Telegram.' : 'Everything is in order. The channels are where the work happens.'));
       $('#mem-sub').textContent = renews;
       var left = channels.length - joined;
       if (!pastDue && channels.length && left > 0) banner = '<div class="banner good rv"><div><b>' + (joined ? (left === 1 ? 'One channel left to join.' : left + ' channels left to join.') : 'Join your channels.') + '</b><p>Personal links, one tap each. You are approved automatically.</p></div><a class="btn sm acc" href="#telegram">Open Telegram links <span class="ar"></span></a></div>';
       if (pastDue) banner = '<div class="banner warn rv"><div><b>Payment failed.</b><p>Update your card within ' + grace + ' days of the failed charge to keep your access.</p></div>' + (access.manage_url ? '<a class="btn sm acc" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>' : '') + '</div>';
-      $('#tiles').innerHTML =
-        tile('Membership <span class="' + stCls + '">' + esc(stTxt) + '</span>', esc(planName(access.plan_key)), esc(renews), '#membership')
-        + tile('Telegram <span class="tag ' + (joined ? 'ok' : 'warn') + '">' + (channels.length && joined === channels.length ? 'Inside' : (joined ? joined + ' of ' + channels.length : 'Ready')) + '</span>', channels.length ? joined + ' <span class="muted" style="font-size:.6em">/ ' + channels.length + ' channels</span>' : '—', joined === channels.length && channels.length ? 'You are in every room.' : 'Tap <b>Join</b> on each channel. Approved in a second.', '#telegram')
-        + tile('Member since', esc(M.fmtDate(since)), owner ? 'Owner access. Everything members get, plus the <b>admin</b>.' : daysTxt, owner ? '/admin' : null);
       body.innerHTML = '<dl class="kv"><dt>Plan</dt><dd>' + esc(planName(access.plan_key)) + '</dd><dt>Billing</dt><dd>' + esc(renews) + '</dd></dl>'
         + (pastDue ? '<div class="msg on bad" style="margin-top:16px">Your last payment failed. Update your card under Manage subscription within ' + grace + ' days of the failed charge to keep your access.</div>' : '')
         + (owner ? '<div class="row" style="margin-top:20px"><span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span></div>' : lifetime ? '<div class="row" style="margin-top:20px"><span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span></div>' : '')
@@ -433,48 +417,44 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       renderTg(true);
     } else if (paid && !access.valid && paidTries < 20) {
       gateState = 'pending'; paidTries++;
-      $('#h').textContent = 'Confirming your payment…'; $('#sub').textContent = 'This usually takes a few seconds. Keep this page open.';
       st.textContent = 'Pending'; st.className = 'tag warn'; bar.textContent = 'Pending'; bar.className = 'tag warn'; $('#mem-sub').textContent = 'Waiting for the payment confirmation.';
       body.innerHTML = '<p class="small muted"><span class="spin"></span>Waiting for the payment confirmation.</p>';
-      $('#tiles').innerHTML = tile('Membership <span class="tag warn">Pending</span>', '<span class="spin"></span>Confirming', 'Matching your payment to this account.') + tile('Telegram', '—', 'Your links appear the moment the payment is confirmed.') + tile('Member since', esc(M.fmtDate(since)), 'Welcome.');
       clearTimeout(pollT); pollT = setTimeout(function(){ load(paidTries % 3 === 1); }, 4000); /* re-check access every 4s; ask Whop again every 12s */
       renderTg(false);
     } else if (paid && !access.valid) {
       gateState = 'unmatched';
-      $('#h').textContent = 'Still confirming…'; $('#sub').textContent = 'The payment went through but we have not matched it to this account yet.';
       st.textContent = 'Pending'; st.className = 'tag warn'; bar.textContent = 'Pending'; bar.className = 'tag warn'; $('#mem-sub').textContent = '';
       body.innerHTML = '<p class="small muted">If you paid with a different email than <b>' + esc(user.email) + '</b>, the match can take a few minutes. <button class="link" data-reclaim="1" type="button">Check again</button> or write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with your receipt email.</p>';
-      $('#tiles').innerHTML = tile('Membership <span class="tag warn">Pending</span>', 'Not matched yet', '<button class="link" data-reclaim="1" type="button">Check again</button>') + tile('Telegram', '—', 'Your links appear the moment the payment is confirmed.') + tile('Member since', esc(M.fmtDate(since)), '');
-      var plans2 = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
-      plansHtml = '<section class="panel rv d1" style="margin-top:1px"><div class="ttl"><h3>Did the payment not go through?</h3><span class="tag">Plans</span></div><p class="small muted" style="margin-bottom:12px">If your card was declined or you closed the checkout early, pick a plan again. If you were charged, do not pay twice: write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with the receipt.</p><ul class="list">' + plans2 + '</ul></section>';
       renderTg(false);
     } else if (access.status === 'past_due') {
       gateState = 'paused';
       /* grace period over: Whop is still retrying the same subscription, so the fix is the card, not a second plan */
-      $('#h').textContent = 'Payment failed.'; $('#sub').textContent = 'Your access is paused until your card is updated. No new plan is needed.';
       st.textContent = 'Paused'; st.className = 'tag bad'; bar.textContent = 'Paused'; bar.className = 'tag bad'; $('#mem-sub').textContent = 'Last charge failed. Access is paused.';
       banner = '<div class="banner bad rv"><div><b>Access paused.</b><p>The last charge on your ' + esc(planName(access.plan_key)) + ' plan failed. Update the card and access comes back automatically.</p></div>' + (access.manage_url ? '<a class="btn sm acc" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>' : '') + '</div>';
       body.innerHTML = '<dl class="kv"><dt>Plan</dt><dd>' + esc(planName(access.plan_key)) + '</dd><dt>Status</dt><dd>Last charge failed</dd></dl><div class="row" style="margin-top:20px">' + (access.manage_url ? '<a class="btn acc" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>' : manage) + '<button class="link" data-reclaim="1" type="button">I updated it, check again</button></div><p class="small muted" style="margin-top:14px">Access comes back automatically the moment the charge goes through.</p>';
-      $('#tiles').innerHTML = tile('Membership <span class="tag bad">Paused</span>', esc(planName(access.plan_key)), 'Last charge failed.', '#membership') + tile('Telegram <span class="tag bad">Removed</span>', '—', 'You are back in the channels as soon as the payment clears.', '#telegram') + tile('Member since', esc(M.fmtDate(since)), daysTxt);
       $('#n-mem').textContent = '!'; $('#n-mem').className = 'cnt warn'; $('#n-tg').textContent = '';
       renderTg(false);
     } else {
       gateState = 'none';
-      $('#h').textContent = name ? 'Choose your entry, ' + name + '.' : 'Choose your entry.'; $('#sub').textContent = 'Your account is ready. Pick a plan and everything unlocks the second the payment clears.';
       st.textContent = access.reason === 'none' ? 'No plan' : 'Inactive'; st.className = 'tag bad'; bar.textContent = 'No plan'; bar.className = 'tag'; $('#mem-sub').textContent = access.reason === 'none' ? 'No active plan on this account.' : 'Your previous membership (' + planName(access.plan_key) + ') has ended.';
       var plans = ['monthly','yearly','lifetime'].map(function(k){ var p = C.PLANS[k]; return '<li><span><b style="font-weight:500">' + p.title + '</b> · ' + p.price + ' ' + p.per + '</span><a class="btn sm' + '" href="/join?plan=' + k + '">Choose <span class="ar"></span></a></li>'; }).join('');
       var prev = access.reason !== 'none' ? '<p class="small muted" style="margin-top:14px">Your previous membership (' + esc(planName(access.plan_key)) + ') has ended. Choosing a plan restores your access immediately.</p>' : '<p class="small muted" style="margin-top:14px">Already paid through Whop with this email? <button class="link" data-reclaim="1" type="button">Check again</button>. Paid with a different email? Tell us in <a class="link" href="#feedback">Feedback</a> and we attach it to this account.</p>';
       body.innerHTML = '<ul class="list">' + plans + '</ul>' + prev;
-      plansHtml = '<section class="panel rv d1" style="margin-top:1px"><div class="ttl"><h3>Plans</h3><span class="tag">' + (access.reason === 'none' ? 'Choose one' : 'Rejoin') + '</span></div><ul class="list">' + plans + '</ul>' + prev + '</section>';
-      $('#tiles').innerHTML = tile('Membership <span class="tag bad">' + (access.reason === 'none' ? 'No plan' : 'Ended') + '</span>', access.reason === 'none' ? 'None yet' : esc(planName(access.plan_key)), access.reason === 'none' ? 'Choose a plan below.' : 'Ended. Choose a plan to come back.', '#membership') + tile('Telegram <span class="tag">Locked</span>', (channels.length || 2) + ' channels', 'Unlock with any plan. Personal links, one tap.') + tile('Member since', esc(M.fmtDate(since)), 'Account created. Access is one step away.');
       $('#n-mem').textContent = '!'; $('#n-mem').className = 'cnt warn'; $('#n-tg').textContent = '';
       renderTg(false);
     }
-    $('#ov-banner').innerHTML = banner; $('#ov-plans').innerHTML = plansHtml;
+    $('#ov-banner').innerHTML = banner;
     renderNotices(); renderPortfolio(); lastLoad = Date.now();
     paygate(name, grace);
-    $$('[data-reclaim]').forEach(function(b){ b.addEventListener('click', async function(){ b.textContent = 'Checking…'; paidTries = 0; await claim(); load(false); }); });
   }
+  /* "Check again" (pay gate and Membership panel): one check at a time, at most one every 8 s, same as the server allows */
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('[data-reclaim]'); if (!b || sim) return;
+    if (Date.now() - lastClaim < 8000 || b.disabled) { M.toast('Checked a moment ago. Give it a few seconds.'); return; }
+    var label = b.textContent; b.disabled = true; b.textContent = 'Checking…'; paidTries = 0;
+    await claim(); await load(false);
+    if (document.contains(b)) { b.disabled = false; b.textContent = label; } /* a failed refresh keeps the button, so its own words come back */
+  });
 
   /* no active plan → no member area: only the way in (plans), the payment states, and the way out */
   function paygate(name, grace){
@@ -486,9 +466,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var other = '<p class="small muted" style="margin-top:14px">Already paid through Whop with this email? <button class="link" data-reclaim="1" type="button">Check again</button>. Paid with a different email? Write to <a href="mailto:contact@mrofwallstreet.com">contact@mrofwallstreet.com</a> with the receipt and we attach it to this account.</p>';
     var h = 'Choose your entry.', body = '';
     if (gateState === 'pending') { h = 'Confirming your payment…'; body = '<p class="small muted"><span class="spin"></span>This usually takes a few seconds. Keep this page open.</p>'; }
-    else if (gateState === 'unmatched') { h = 'Still confirming…'; body = '<p>The payment went through but we have not matched it to this account yet.</p>' + other + '<p class="small muted" style="margin-top:14px">If your card was declined or you closed the checkout early, pick a plan again. If you were charged, do not pay twice.</p><ul class="list">' + plans + '</ul>'; }
+    /* a confirmed charge that has not matched this account yet: never show "Choose" buttons here (a second checkout would be a second charge) */
+    else if (gateState === 'unmatched') { h = 'Still confirming…'; body = '<p>The payment went through but we have not matched it to this account yet.</p>' + other + '<p class="small muted" style="margin-top:14px">You were charged, so do not pay again. No Whop receipt in your inbox? Then the payment did not go through and you can <a class="link" href="/join">choose a plan</a>.</p>'; }
     else if (gateState === 'paused') { h = 'Payment failed.'; body = '<p>The last charge on your ' + esc(planName(access.plan_key)) + ' plan failed, so your access is paused. Update the card and it comes back automatically. No new plan is needed.</p><div class="row" style="margin-top:18px">' + (access.manage_url ? '<a class="btn acc" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>' : '<a class="btn acc" href="https://whop.com/orders/" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>') + '<button class="link" data-reclaim="1" type="button">I updated it, check again</button></div>'; }
-    else { h = name ? 'Choose your entry, ' + name + '.' : 'Choose your entry.'; body = '<p>' + (access.reason === 'none' ? 'This account has no active plan yet. Pick one and everything unlocks the second the payment clears: the channels, the portfolio, all of it.' : 'Your previous membership (' + esc(planName(access.plan_key)) + ') has ended. Choosing a plan restores your access immediately.') + '</p><ul class="list" style="margin-top:16px">' + plans + '</ul>' + other; }
+    else { h = name ? 'Choose your entry, ' + name + '.' : 'Choose your entry.'; body = '<p>' + (access.reason === 'none' ? 'This account has no active plan yet. Pick one and everything unlocks the second the payment clears: the channels, every call, all of it.' : 'Your previous membership (' + esc(planName(access.plan_key)) + ') has ended. Choosing a plan restores your access immediately.') + '</p><ul class="list" style="margin-top:16px">' + plans + '</ul>' + other; }
     $('#pg-h').textContent = h; $('#pg-body').innerHTML = body; $('#pg-who').textContent = user.email;
   }
 
@@ -500,8 +481,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     el.innerHTML = list.map(function(n){ return '<div class="banner ' + (n.kind === 'warn' ? 'warn' : n.kind === 'good' ? 'good' : '') + ' rv" data-nid="' + esc(n.id) + '"><div><b>From Mr. Wall Street</b><p>' + esc(n.body) + '</p></div><div class="row" style="gap:12px">' + (n.link ? '<a class="btn sm acc" href="' + href(n.link) + '" ' + (/^https:/i.test(n.link) && n.link.indexOf(location.origin) !== 0 ? 'target="_blank" rel="noopener"' : '') + '>' + esc(n.link_label || 'Open') + ' <span class="ar"></span></a>' : '') + '<button class="link" data-dismiss="' + esc(n.id) + '" type="button">Dismiss</button></div></div>'; }).join('');
     $$('[data-dismiss]', el).forEach(function(b){ b.addEventListener('click', function(){ var g = M.store.get('mws_dismissed') || []; g.push(b.dataset.dismiss); M.store.set('mws_dismissed', g.slice(-50)); renderNotices(); }); });
   }
-  /* coming back to the tab after a while: refresh (realtime may have dropped meanwhile) */
+  /* coming back to the tab after a while, or every 5 minutes while it stays open: refresh (realtime may have dropped meanwhile).
+     A membership that ended closes this page on the next refresh at the latest. */
   document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible' && access && Date.now() - lastLoad > 60000) load(false); });
+  setInterval(function(){ if (!document.hidden && access && Date.now() - lastLoad > 5 * 60000) load(false); }, 60000);
 
   /* The Desk · Portfolio: what staff publish in /admin#portfolio (RLS hides it from non-members) */
   function fmtN(n){ if (n == null) return '—'; n = Number(n); return n >= 1000 ? n.toLocaleString('en-US', { maximumFractionDigits: 0 }) : n.toLocaleString('en-US', { maximumFractionDigits: n < 1 ? 4 : 2 }); }
@@ -511,7 +494,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var unlocked = !!(access && access.valid);
     var open = list.filter(function(p){ return p.status === 'open'; }), closed = list.filter(function(p){ return p.status === 'closed'; });
     $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && list.length); $('#pf-empty').hidden = !(unlocked && !list.length);
-    $('#pf-tag').textContent = unlocked && list.length ? 'Live' : (unlocked ? 'In development' : 'Members'); $('#desk-pf-tag').textContent = unlocked && list.length ? 'Live · ' + open.length + ' open' : 'Soon'; $('#desk-grp-tag').textContent = unlocked && list.length ? 'Portfolio live' : 'In development';
+    $('#pf-tag').textContent = unlocked && list.length ? 'Live' : (unlocked ? 'In development' : 'Members'); $('#desk-grp-tag').textContent = unlocked && list.length ? 'Portfolio live' : 'In development';
     if (!(unlocked && list.length)) return;
     var longs = open.filter(function(p){ return p.side !== 'short'; }).length, alloc = open.reduce(function(a, p){ return a + (Number(p.size_pct) || 0); }, 0);
     var wins = closed.filter(function(p){ return /^\s*(\+|x)/i.test(p.result || ''); }).length;
@@ -528,10 +511,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var SIM_POS = [ { symbol:'BTC', name:'Bitcoin', side:'long', entry:'57.7-64K', entry_price:61000, mark:83000, target:'130K', size_pct:35, status:'open', opened_at:'2026-08-11', thesis:'Cycle bottom is in. First target open.', updated_at:'2026-09-24T00:00:00Z' }, { symbol:'MSTR', name:'Strategy', side:'long', entry:'$90-100', entry_price:95, mark:162, target:'$950', size_pct:20, status:'open', opened_at:'2026-07-23', thesis:'Leveraged Bitcoin with a balance sheet. Not selling one share.' }, { symbol:'ASST', name:'Asset Entities', side:'long', entry:'$30', entry_price:30, mark:29.5, target:'$300', size_pct:10, status:'open', opened_at:'2026-09-25', thesis:'Bought heavily at $30. Long-term.' }, { symbol:'BTC', name:'Bitcoin · 2022 cycle', side:'long', entry:'16-18K', exit:'100-126K', result:'x7', status:'closed', opened_at:'2022-11-20', closed_at:'2025-11-16', thesis:'Bought when the market called for 10-12K.' } ];
 
   /* Telegram: personal join links, one per channel. Tap → Telegram opens the channel → Join → approved in a second. */
+  var invitesInFlight = null;
   async function fetchInvites(refresh){
     if (sim) { invites = channels.map(function(c){ return { chat_id: c.chat_id, title: c.title, status: statusOf(c.chat_id) === 'joined' ? 'joined' : 'invited', invite_link: '#' }; }); return; }
-    try { var r = await M.fn('tg-link', { action: 'links', refresh: !!refresh }); invites = r.links || []; invitesFor = user.id; if (r.username) tgUser = r.username; }
-    catch (e) { invites = null; M.msg('#m-tg', M.human(e), 'bad'); }
+    if (invitesInFlight) return invitesInFlight; /* the route, the panel and a realtime refresh can all ask at once: one call serves them all */
+    invitesInFlight = (async function(){
+      try { var r = await M.fn('tg-link', { action: 'links', refresh: !!refresh }); invites = r.links || []; invitesFor = user.id; if (r.username) tgUser = r.username; }
+      catch (e) { invites = null; M.msg('#m-tg', M.human(e), 'bad'); }
+      finally { invitesInFlight = null; }
+    })();
+    return invitesInFlight;
   }
   function renderTg(unlocked){
     var st = $('#tg-st'), body = $('#tg-body');
@@ -561,8 +550,6 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
 
   /* prefs, password, sign out */
-  $('#tgl-updates').addEventListener('click', async function(){ var t = this, on = !t.classList.contains('on'); t.classList.toggle('on', on); t.setAttribute('aria-checked', String(on)); var r = await sb.from('profiles').update({ email_updates: on }).eq('id', user.id); if (r && r.error) { t.classList.toggle('on', !on); t.setAttribute('aria-checked', String(!on)); M.toast('Could not save. Try again.'); } else if (profile) profile.email_updates = on; });
-  $('#tgl-updates').addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); this.click(); } });
   $('#chg-pw').addEventListener('click', function(){ $('#f-pw').hidden = !$('#f-pw').hidden; $('#f-name').hidden = true; });
   $('#chg-name').addEventListener('click', function(){ var f = $('#f-name'); f.hidden = !f.hidden; $('#f-pw').hidden = true; if (!f.hidden) { $('#cname').value = (profile && profile.full_name) || ''; $('#cname').focus(); } });
   $('#name-cancel').addEventListener('click', function(){ $('#f-name').hidden = true; });
@@ -664,15 +651,14 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function fmtWhen(iso){ var d = new Date(iso); return M.fmtDate(iso) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   $('#dev-list').addEventListener('click', async function(e){
     var b = e.target.closest('button'); if (!b) return;
-    if (b.id === 'signout2') { M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); return; }
+    if (b.id === 'signout2') { M.signOut('/'); return; }
     if (!b.dataset.end || sim) return; b.textContent = 'Ending…'; b.disabled = true;
     try { var r = await sb.rpc('revoke_session', { sid: b.dataset.end }); if (r.error) throw r.error; M.toast('Session ended.'); await loadDevices(); } catch (err) { M.msg('#m-dev', M.human(err), 'bad'); b.disabled = false; b.textContent = 'End session'; }
   });
   $('#out-others').addEventListener('click', async function(){ if (sim) return M.toast('Preview only.'); var btn = this; M.busy(btn, true); try { var r = await sb.auth.signOut({ scope: 'others' }); if (r.error) throw r.error; M.toast('Every other device is logged out.'); await loadDevices(); } catch (err) { M.msg('#m-dev', M.human(err), 'bad'); } finally { M.busy(btn, false); } });
-  $('#f-pw').addEventListener('submit', async function(e){ e.preventDefault(); var v = $('#cpw').value; if (v.length < 8) return M.msg('#m-pw', 'At least 8 characters.', 'bad'); var btn = $('#f-pw .btn'); M.busy(btn, true); try { var r = await sb.auth.updateUser({ password: v }); if (r.error) throw r.error; M.msg('#m-pw', 'Password updated.', 'ok'); $('#cpw').value=''; } catch(err) { M.msg('#m-pw', M.human(err), 'bad'); } M.busy(btn, false); });
-  $('#out-all').addEventListener('click', async function(){ if (!confirm('Log out of every device, including this one?')) return; M.viewAs.set(''); try { await sb.auth.signOut({ scope: 'global' }); } catch(e) { await sb.auth.signOut(); } M.go('/login'); });
-  $('#signout').addEventListener('click', async function(){ M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); });
-  $('#pg-out').addEventListener('click', async function(){ M.viewAs.set(''); await sb.auth.signOut(); M.go('/'); });
+  $('#f-pw').addEventListener('submit', async function(e){ e.preventDefault(); if (sim) return M.toast('Preview only.'); var v = $('#cpw').value; if (v.length < 8) return M.msg('#m-pw', 'At least 8 characters.', 'bad'); var btn = $('#f-pw .btn'); M.busy(btn, true); try { var r = await sb.auth.updateUser({ password: v }); if (r.error) throw r.error; M.msg('#m-pw', 'Password updated.', 'ok'); $('#cpw').value=''; } catch(err) { M.msg('#m-pw', M.human(err), 'bad'); } M.busy(btn, false); });
+  $('#signout').addEventListener('click', function(){ M.signOut('/'); });
+  $('#pg-out').addEventListener('click', function(){ M.signOut('/'); });
 
   /* ---- support: conversations with Mr. Wall Street (writes go through the support function; reads via RLS) ---- */
   var SUP = { threads: [], msgs: {}, open: null, loading: false };
@@ -686,7 +672,6 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     } catch (e) { SUP.threads = []; }
     renderSupport();
   }
-  function fmtWhen(iso){ var d = new Date(iso); return M.fmtDate(iso) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   function renderSupport(){
     var wrap = $('#sup-threads-wrap'), el = $('#sup-threads'); if (!wrap) return;
     wrap.hidden = !SUP.threads.length; $('#sup-count').textContent = SUP.threads.length ? SUP.threads.length + (SUP.threads.length === 1 ? ' conversation' : ' conversations') : '';

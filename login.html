@@ -54,7 +54,7 @@
     <div class="field"><label for="otp">Code</label><div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></div></div>
     <div class="msg" id="m-otp"></div>
     <button class="btn acc wide" type="submit" data-busy="Confirming">Confirm and log in <span class="ar"></span></button>
-    <p class="small muted" style="margin-top:14px">No email? Check spam, or <button class="link" type="button" id="resend">send a new code</button>.</p>
+    <p class="small muted" style="margin-top:14px">No email? Check spam, or <button class="link" type="button" id="resend" data-busy="sending a new code">send a new code</button>.</p>
   </form>
 
   <p class="small muted rv d2" style="margin-top:22px">Already a member through Whop? Log in with the same email, or <a href="/signup">create your account</a> with it and your membership is recognised automatically.</p>
@@ -91,7 +91,7 @@
   /* account created but never confirmed (the code never arrived, or expired): send a fresh code and confirm here */
   var pending = null;
   async function sendCode(){ $('#otp-email').textContent = pending; try { var r = await sb.auth.resend({ type: 'signup', email: pending }); if (r.error) throw r.error; M.msg('#m-otp', 'Code sent. It can take a few seconds.', 'ok'); } catch (e) { M.msg('#m-otp', M.human(e), 'bad'); } }
-  $('#resend').addEventListener('click', sendCode);
+  $('#resend').addEventListener('click', async function(){ if (this.disabled) return; M.busy(this, true); try { await sendCode(); } finally { M.busy(this, false); } }); /* one code per tap */
   $('#f-otp').addEventListener('submit', async function(e){
     e.preventDefault();
     var code = $('#otp').value.replace(/\D/g, '');

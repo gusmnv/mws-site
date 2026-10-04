@@ -282,6 +282,11 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
           <div class="setrow"><div><b>Invite link validity</b><span>Each Telegram invite works once and expires after this.</span></div><div><input id="s-ttl" type="number" min="1" max="168"> <span>hours</span></div></div>
           <div class="row" style="margin-top:16px"><span></span><button class="btn sm acc" id="s-save" type="button" data-busy="Saving">Save rules</button></div>
         </div>
+        <div class="card rv d1"><h3>Test e-mails</h3>
+          <p class="small muted" style="margin-bottom:12px">E-mails used for test purchases, one per line. They are not members: nothing under them is imported from Whop or shown anywhere on the site. Whop itself is not touched. Purchases on the internal test plan are ignored automatically.</p>
+          <div class="field"><label for="s-tests">E-mails</label><textarea id="s-tests" rows="6" spellcheck="false" placeholder="test1@gmail.com&#10;test2@gmail.com" style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:12px 14px;outline:none;border-radius:0;width:100%;resize:vertical"></textarea></div>
+          <div class="row" style="margin-top:12px"><span class="small muted" id="s-tests-n"></span><button class="btn sm acc" id="s-tests-save" type="button" data-busy="Saving">Save</button></div>
+        </div>
         <div class="card rv d1"><h3>Notice to members</h3>
           <p class="small muted" style="margin-bottom:12px">Shows at the top of the member area for everyone logged in, until they dismiss it or you switch it off.</p>
           <form id="f-notice" novalidate>
@@ -324,7 +329,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function presetFor(e){ var m = e.best; if (!m) return 'none'; if (!e.valid) return 'canceled'; if (m.status === 'past_due') return 'pastdue'; if (m.cancel_at_period_end || m.status === 'canceling') return 'ending'; if (m.plan_key === 'lifetime') return 'lifetime'; if (!e.link) return 'joined'; return 'active'; }
 
   var X = M.esc; /* every value that came from a user, Whop or Telegram is escaped before innerHTML */
-  var D = { profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {}, plans: [] };
+  var D = { tests: {}, profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {}, plans: [] };
   var filter = 'all', q = '', pFilter = 'plans';
   var fmtMoney = function(n){ return '$' + (Math.round(n) === n ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); };
 
@@ -364,6 +369,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var bad = r.filter(function(x, i){ return i !== 9 && x && x.error; })[0]; if (bad) M.msg('#m', 'Some data could not be read: ' + M.human(bad.error), 'bad'); /* an RLS or grant problem must not look like an empty dashboard */
     D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
     D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; }); D.invited = (r[9] && r[9].invited) || {};
+    D.tests = {}; try { (JSON.parse(D.settings.test_emails || '[]') || []).forEach(function(x){ D.tests[String(x).toLowerCase()] = true; }); } catch (e) {} /* the owner's test accounts: hidden from lists and numbers, never deleted */
     D.emails = r[12] && !r[12].error ? (r[12].data || []) : null;
     D.sup = r[10].error ? null : (r[10].data || []); D.supMsgs = {}; ((r[11] && r[11].data) || []).forEach(function(m){ (D.supMsgs[m.thread_id] = D.supMsgs[m.thread_id] || []).push(m); });
     D.planOn = null; if (D.plans.some(function(p){ return typeof p.grants_access === 'boolean'; })) { D.planOn = {}; D.plans.forEach(function(p){ D.planOn[p.plan_id] = !!p.grants_access; }); }
@@ -379,8 +385,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     D.memberships.forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
     var linkBy = {}; D.links.forEach(function(l){ linkBy[l.user_id] = l; });
     var accBy = {}; D.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
-    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; return e; });
+    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; e.test = isTest(e); return e; });
   }
+  /* a test account: listed by the owner in Settings → Test accounts, or someone whose only purchases are on the hidden test plan */
+  function testPlan(m){ var C = M.config.PLANS; for (var k in C) if (C[k].hidden && (C[k].id === m.plan_id || k === m.plan_key)) return true; return false; }
+  function isTest(e){ if (D.tests[e.email]) return true; return !!(e.mems && e.mems.length && e.mems.every(testPlan) && !(e.profile && e.profile.role !== 'member')); }
   function payments(){
     return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
   }
@@ -468,10 +477,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     D.profiles.forEach(function(p){ out.push({ at: new Date(p.created_at), cat: 'accounts', tone: 'ok', text: p.email + ' created an account', sub: '', minor: false }); });
     return out.sort(function(a, b){ return b.at - a.at; });
   }
+  function isTestText(t){ t = String(t || '').toLowerCase(); for (var k in D.tests) if (t.indexOf(k) >= 0) return true; return false; }
   function evHtml(e, hl){ return '<div class="ev ' + (e.tone || '') + (hl && !e.minor && e.at.getTime() > hl ? ' new' : '') + '"><span class="dot"></span><div><b>' + X(e.text) + '</b>' + (e.sub ? '<span class="sub">' + X(e.sub) + '</span>' : '') + '</div><time>' + e.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</time></div>'; }
   function dayLabel(t){ var now = new Date(), same = function(a, b){ return a.toDateString() === b.toDateString(); }; if (same(t, now)) return 'Today'; if (same(t, new Date(now.getTime() - 86400000))) return 'Yesterday'; return t.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
   function renderActivity(){
-    var all = events(), seen = seenAt();
+    var all = events().filter(function(e){ return !isTestText(e.text) && !isTestText(e.sub); }), seen = seenAt();
     var unread = all.filter(function(e){ return !e.minor && e.at.getTime() > seen; }).length;
     [$('#bell-n'), $('#nav-n')].forEach(function(b){ b.hidden = !unread; b.textContent = unread > 99 ? '99+' : String(unread); });
     document.title = (unread ? '(' + unread + ') ' : '') + baseTitle;
@@ -487,16 +497,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   $('#a-minor').addEventListener('change', function(){ aMinor = this.checked; renderActivity(); });
 
   function render(){
-    var rows = people(), now = Date.now(), d30 = now - 30 * 86400000;
+    var everyone = people(), tests = everyone.filter(function(e){ return e.test; }), rows = everyone.filter(function(e){ return !e.test; }), now = Date.now(), d30 = now - 30 * 86400000;
     var active = rows.filter(function(e){ return e.valid; });
     var mrr = active.reduce(function(s, e){ var k = e.best.plan_key; return s + (k === 'monthly' ? 99 : k === 'yearly' ? 990 / 12 : 0); }, 0);
-    var allPays = payments(), pays = allPays.filter(isPlanPay), other = allPays.filter(function(p){ return !isPlanPay(p); }); var p30 = pays.filter(function(p){ return p.at.getTime() > d30; });
+    var allPays = payments().filter(function(p){ return !D.tests[String(p.email || '').toLowerCase()]; }), pays = allPays.filter(isPlanPay), other = allPays.filter(function(p){ return !isPlanPay(p); }); var p30 = pays.filter(function(p){ return p.at.getTime() > d30; });
     var rev30 = p30.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0);
     var newMonth = rows.filter(function(e){ return e.since && new Date(e.since).getTime() > d30; }).length;
     $('#k-active').textContent = active.length; $('#k-active-sub').textContent = newMonth + ' new in 30 days · ' + active.filter(function(e){ return e.best.plan_key === 'lifetime'; }).length + ' lifetime';
     $('#k-mrr').textContent = fmtMoney(Math.round(mrr));
     $('#k-rev').textContent = fmtMoney(rev30); $('#k-rev-sub').textContent = p30.filter(function(p){ return p.ok; }).length + ' membership payments';
-    $('#k-tg').textContent = D.links.length; $('#k-tg-sub').textContent = active.filter(function(e){ return e.profile && !e.link; }).length + ' active without Telegram';
+    $('#k-tg').textContent = rows.filter(function(e){ return e.link; }).length; $('#k-tg-sub').textContent = active.filter(function(e){ return e.profile && !e.link; }).length + ' active without Telegram';
     // attention
     var attn = [];
     rows.filter(function(e){ return e.valid && !e.profile; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'paid · no account yet') + '</li>'); });
@@ -550,6 +560,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
     // settings
     if (document.activeElement !== $('#s-grace')) $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; if (document.activeElement !== $('#s-ttl')) $('#s-ttl').value = D.settings.invite_ttl_hours || 24; /* a refresh must not overwrite a number being typed */
+    if (document.activeElement !== $('#s-tests')) $('#s-tests').value = Object.keys(D.tests).sort().join('\n'); $('#s-tests-n').textContent = Object.keys(D.tests).length ? Object.keys(D.tests).length + ' e-mails' : '';
     renderPlans(); renderNotices();
     $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + X(p.email) + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
   }
@@ -558,7 +569,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function openDrawer(email){
     var e = people().filter(function(x){ return x.email === email; })[0]; if (!e) return;
     var m = e.best || {};
-    var html = '<p class="eyebrow">Member</p><h2>' + X(e.email) + '</h2>';
+    var html = '<p class="eyebrow">' + (e.test ? 'Test account' : 'Member') + '</p><h2>' + X(e.email) + '</h2>';
     html += '<dl class="kv"><dt>Status</dt><dd>' + X(e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + X(m.plan_key || '–') + (m.id ? ' <span class="small muted">' + X(m.id) + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + X(e.profile.role) : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + X(e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
     if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + X(c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : (a.status === 'removed' || a.status === 'blocked' || a.status === 'kick_failed') ? 'bad' : 'warn', a.status === 'kick_failed' ? 'remove failed' : a.status) + '</li>'; }).join('') + '</ul>';
     if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return X(x.plan_key) + ' · ' + X(x.status); }).join(' / ') + '</p>';
@@ -575,6 +586,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!e.profile) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
     else if (inv2 && !inv2.accepted) html += '<p class="small muted">Invited ' + X(M.fmtDate(inv2.invited_at)) + ', has not opened the link yet.</p><button class="btn ghost" data-a="reinvite" data-email="' + X(e.email) + '" data-busy="Sending">Send the link again</button>';
     html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
+    if (!e.test) html += '<button class="btn ghost" data-a="test" data-email="' + X(e.email) + '" data-busy="Removing">Not a member: test e-mail, remove from the site</button>';
     html += '</div>';
     if (e.profile) html += '<form class="linkw" id="f-link" data-u="' + e.profile.id + '" novalidate><p class="eyebrow" style="margin-top:22px">Paid on Whop with another email?</p><div class="row"><input type="email" id="link-email" placeholder="email used on Whop" autocomplete="off"><button class="btn sm ghost" type="submit" data-busy="Linking">Link to this account</button></div><p class="small muted">Binds every Whop membership under that email to this account; access follows immediately.</p></form>';
     $('#dbody').innerHTML = html; showDrawer();
@@ -592,14 +604,14 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (a === 'kick' && !confirm('Remove this member from every Telegram channel? Automatic invites stay paused until you resend them.')) return;
     if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
     if (btn) M.busy(btn, true); M.msg('#m', '');
-    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); if (a === 'link_email') M.msg('#m', r.linked ? 'Linked ' + r.linked + ' membership(s).' : 'No Whop membership under that email.', r.linked ? 'ok' : 'bad'); if (a === 'invite') { var fk = Object.keys(r.failed || {}); M.msg('#m', 'Invitation sent to ' + r.sent.length + (r.skipped.length ? ' · ' + r.skipped.length + ' already had an account' : '') + (fk.length ? ' · failed: ' + fk.join(', ') : '') + '.', fk.length ? 'bad' : 'ok'); } closeDrawer(); await load(); }
+    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'test_accounts') M.msg('#m', 'Saved: ' + (r.emails || []).length + ' test e-mails ignored by the site.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); if (a === 'link_email') M.msg('#m', r.linked ? 'Linked ' + r.linked + ' membership(s).' : 'No Whop membership under that email.', r.linked ? 'ok' : 'bad'); if (a === 'invite') { var fk = Object.keys(r.failed || {}); M.msg('#m', 'Invitation sent to ' + r.sent.length + (r.skipped.length ? ' · ' + r.skipped.length + ' already had an account' : '') + (fk.length ? ' · failed: ' + fk.join(', ') : '') + '.', fk.length ? 'bad' : 'ok'); } closeDrawer(); await load(); }
     catch (e) { M.msg('#m', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     finally { if (btn) M.busy(btn, false); }
   }
   document.addEventListener('submit', function(ev){ var f = ev.target.closest('#f-link'); if (!f) return; ev.preventDefault(); var em = $('#link-email').value.trim(); if (!M.validEmail(em)) return M.msg('#m', 'Enter the email used on Whop.', 'bad'); if (!confirm('Bind every Whop membership under ' + em + ' to this account? Access follows immediately.')) return; act('link_email', { user_id: f.dataset.u, email: em }, f.querySelector('.btn')); });
-  document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; if (b.dataset.a === 'invite') return act('invite', { emails: [b.dataset.email] }, b); if (b.dataset.a === 'reinvite') return reinvite(b.dataset.email, b); act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
+  document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; if (b.dataset.a === 'invite') return act('invite', { emails: [b.dataset.email] }, b); if (b.dataset.a === 'reinvite') return reinvite(b.dataset.email, b); if (b.dataset.a === 'test') return act('test_accounts', { add: [b.dataset.email] }, b); if (b.dataset.a === 'untest') return act('test_accounts', { remove: [b.dataset.email] }, b); act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
   async function reinvite(email, btn){ M.busy(btn, true); try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/app?invited=1' }); if (r.error) throw r.error; M.msg('#m', 'A fresh link is on its way to ' + email + '.', 'ok'); closeDrawer(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } }
-  $('#invite-all').addEventListener('click', function(){ var list = people().filter(function(e){ return e.valid && !e.profile; }).map(function(e){ return e.email; }); if (!list.length) return; if (!confirm('Send the invitation email to ' + list.length + ' member(s) with access and no account yet?')) return; act('invite', { emails: list }, $('#invite-all')); });
+  $('#invite-all').addEventListener('click', function(){ var list = people().filter(function(e){ return e.valid && !e.profile && !e.test; }).map(function(e){ return e.email; }); if (!list.length) return; if (!confirm('Send the invitation email to ' + list.length + ' member(s) with access and no account yet?')) return; act('invite', { emails: list }, $('#invite-all')); });
   $('#sync').addEventListener('click', function(){ act('sync', {}, $('#sync')); });
   M.$$('#pseg button').forEach(function(b){ b.addEventListener('click', function(){ pFilter = b.dataset.f; M.$$('#pseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); render(); }); });
   $('#q').addEventListener('input', function(){ q = $('#q').value.trim().toLowerCase(); render(); });
@@ -611,6 +623,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function renderEmails(){
     if (D.emails === null) { $('#erows').innerHTML = '<tr><td colspan="5" class="muted">The email log could not be read. Run <b>supabase/night_2026-10-04.sql</b> once in the SQL editor (it grants the admin page read access to sent_emails).</td></tr>'; $('#ecount').textContent = ''; return; }
     var list = D.emails.filter(function(x){
+      if (D.tests[String(x.to_email || '').toLowerCase()]) return false; /* test e-mails are not members */
       if (eq && (x.to_email + ' ' + x.subject).toLowerCase().indexOf(eq) < 0) return false;
       if (eFilter === 'failed') return x.status !== 'sent';
       if (eFilter === 'preview') return /^preview/.test(x.sent_by || '');
@@ -665,6 +678,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     finally { M.busy(btn, false); }
   });
   $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Math.max(0, parseInt($('#s-grace').value, 10) || 0)) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Math.max(1, parseInt($('#s-ttl').value, 10) || 24)) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
+  $('#s-tests-save').addEventListener('click', function(){ var lines = $('#s-tests').value.split(/[\s,;]+/).map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean); var bad = lines.filter(function(x){ return !M.validEmail(x); }); if (bad.length) return M.msg('#m', 'Not an e-mail: ' + bad.slice(0, 3).join(', '), 'bad'); act('test_accounts', { set: lines }, $('#s-tests-save')); });
   $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); var role = $('#r-role').value; if (!confirm('Make ' + em + ' ' + role + '?' + (role === 'owner' || role === 'admin' ? ' Staff see every member and every setting.' : ''))) return; var rb = $('#f-role .btn'); M.busy(rb, true); try { await M.fn('admin', { action: 'set_role', email: em, role: role }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(rb, false); } });
 
   // channels on/off (channels added by a non-staff Telegram start off) + which plans grant access

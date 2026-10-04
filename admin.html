@@ -247,12 +247,6 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
           <button class="btn acc" type="submit" data-busy="Granting">Grant <span class="ar"></span></button>
         </form>
       </div>
-      <div class="card rv d1" style="margin-top:22px"><h3>Members the Whop API hides</h3>
-        <p class="small muted" style="margin-bottom:12px">Members migrated into Whop (January 2025, “Paid once”, no payment on record) never reach the site on their own: the Whop API gives no e-mail for them, so the sync cannot tell who they are. Paste their e-mails exactly as Whop shows them, one per line. The site asks Whop who each one is, imports the membership under that e-mail, and they appear in Members, ready for the invitation. Nothing changes on Whop.</p>
-        <div class="field"><label for="lg-emails">E-mails</label><textarea id="lg-emails" rows="5" spellcheck="false" placeholder="stagg.lm@gmail.com" style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:12px 14px;outline:none;border-radius:0;width:100%;resize:vertical"></textarea></div>
-        <div class="row" style="margin-top:12px"><span class="small muted" id="lg-n"></span><button class="btn acc" id="lg-go" type="button" data-busy="Asking Whop">Find on Whop and attach <span class="ar"></span></button></div>
-        <ul class="attn" id="lg-res" style="margin-top:14px"></ul>
-      </div>
       <div class="card rv d1" style="margin-top:22px"><h3>Manual access</h3><div class="tblw"><table class="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Ends</th><th>Note</th><th></th></tr></thead><tbody id="mrows"></tbody></table></div></div>
     </section>
 
@@ -567,7 +561,6 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
     // settings
     if (document.activeElement !== $('#s-grace')) $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; if (document.activeElement !== $('#s-ttl')) $('#s-ttl').value = D.settings.invite_ttl_hours || 24; /* a refresh must not overwrite a number being typed */
-    try { var ne = JSON.parse(D.settings['reconcile.noemail'] || '{}'); var nn = (ne.ids || []).length; $('#lg-n').textContent = nn ? 'The sync currently knows ' + nn + ' Whop membership' + (nn === 1 ? '' : 's') + ' without an e-mail.' : ''; } catch (e) { $('#lg-n').textContent = ''; }
     if (document.activeElement !== $('#s-tests')) $('#s-tests').value = Object.keys(D.tests).sort().join('\n'); $('#s-tests-n').textContent = Object.keys(D.tests).length ? Object.keys(D.tests).length + ' e-mails' : '';
     renderPlans(); renderNotices();
     $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + X(p.email) + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
@@ -687,24 +680,6 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
   $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Math.max(0, parseInt($('#s-grace').value, 10) || 0)) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Math.max(1, parseInt($('#s-ttl').value, 10) || 24)) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
   $('#s-tests-save').addEventListener('click', function(){ var lines = $('#s-tests').value.split(/[\s,;]+/).map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean); var bad = lines.filter(function(x){ return !M.validEmail(x); }); if (bad.length) return M.msg('#m', 'Not an e-mail: ' + bad.slice(0, 3).join(', '), 'bad'); act('test_accounts', { set: lines }, $('#s-tests-save')); });
-  /* members the Whop API hides: paste e-mails → the admin function asks Whop who they are and imports their memberships */
-  $('#lg-go').addEventListener('click', async function(){
-    var lines = $('#lg-emails').value.split(/[\s,;]+/).map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean);
-    var bad = lines.filter(function(x){ return !M.validEmail(x); }); if (bad.length) return M.msg('#m', 'Not an e-mail: ' + bad.slice(0, 3).join(', '), 'bad');
-    if (!lines.length) return M.msg('#m', 'Paste at least one e-mail.', 'bad');
-    if (lines.length > 50) return M.msg('#m', 'At most 50 e-mails at a time.', 'bad');
-    if (!confirm('Ask Whop about ' + lines.length + ' e-mail(s) and import their memberships into the site?')) return;
-    var btn = this; M.busy(btn, true); M.msg('#m', ''); $('#lg-res').innerHTML = '';
-    try {
-      var r = await M.fn('admin', { action: 'attach_legacy', emails: lines });
-      var W = { attached: ['ok', 'attached'], already: ['ok', 'already on the site'], not_found: ['bad', 'not found on Whop'], ambiguous: ['warn', 'several Whop members match'], no_membership: ['warn', 'found, but no membership'], test_email: ['', 'test e-mail, ignored'], error: ['bad', 'error'] };
-      $('#lg-res').innerHTML = (r.results || []).map(function(x){ var w = W[x.status] || ['', x.status]; var sub = x.status === 'attached' ? (x.attached + ' membership' + (x.attached === 1 ? '' : 's') + (x.how === 'search' ? ' · matched by Whop search' : ' · matched by payment')) : x.status === 'not_found' ? 'Check the spelling against the Whop member page.' : x.status === 'ambiguous' ? (x.candidates || []).join(', ') : x.status === 'error' ? (x.error || '') : ''; return '<li><span>' + X(x.email) + (sub ? '<span class="small muted" style="display:block">' + X(sub) + '</span>' : '') + '</span>' + tag(w[0], w[1]) + '</li>'; }).join('');
-      var n = (r.results || []).filter(function(x){ return x.status === 'attached'; }).length;
-      M.msg('#m', n ? n + ' member' + (n === 1 ? '' : 's') + ' attached. They are in Members now; send them the invitation from there.' : 'Nothing new was attached. See the list below.', n ? 'ok' : 'bad');
-      if (n) { $('#lg-emails').value = (r.results || []).filter(function(x){ return x.status !== 'attached' && x.status !== 'already'; }).map(function(x){ return x.email; }).join('\n'); await load(); }
-    } catch (e) { M.msg('#m', M.human(e), 'bad'); }
-    finally { M.busy(btn, false); }
-  });
   $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); var role = $('#r-role').value; if (!confirm('Make ' + em + ' ' + role + '?' + (role === 'owner' || role === 'admin' ? ' Staff see every member and every setting.' : ''))) return; var rb = $('#f-role .btn'); M.busy(rb, true); try { await M.fn('admin', { action: 'set_role', email: em, role: role }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(rb, false); } });
 
   // channels on/off (channels added by a non-staff Telegram start off) + which plans grant access

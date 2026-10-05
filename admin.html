@@ -340,7 +340,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (m.whop_valid === false) return false; /* refunded / charged back / terminated on Whop */
     if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < now);
     if (st === 'completed' && m.plan_key === 'lifetime') return true;
-    if (st === 'canceled' || st === 'cancelled' || st === 'expired') return m.whop_valid === true || (!!m.cancel_at_period_end && !!end && end > now); /* canceled_rule_fix_2026-10-05.sql: "end" is the end of the paid period when the member cancelled during it (access until then), or the start of the unpaid period Whop rolled into when the cancel came before it (already past: no access) */
+    if (st === 'canceled' || st === 'cancelled' || st === 'expired') return m.whop_valid === true; /* canceled_rule_final_2026-10-05.sql: Whop only says "canceled" once access is gone (a member with paid days left stays "active" + cancel_at_period_end); "end" is the date it ended */
     if (st === 'past_due') { var since = new Date(m.past_due_since || m.updated_at); return since > new Date(now.getTime() - Number(D.settings.grace_days || 3) * 86400000); }
     return false; }
   function rank(m){ if (!valid(m)) return 30; var tier = m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2; var st = (m.status === 'active' || m.status === 'trialing' || m.status === 'completed') ? 0 : m.status === 'past_due' ? 1 : 2; return tier * 3 + st; } /* mirrors my_access() */

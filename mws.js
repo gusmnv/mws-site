@@ -56,6 +56,50 @@ window.MWS = window.MWS || {};
   window.MWS.saveSignup = function(st){ st.at = st.at || Date.now(); window.MWS.store.set('mws_signup', st); };
   window.MWS.fmtDate = function(iso){ if(!iso) return '—'; var d = new Date(iso); return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); };
   window.MWS.validEmail = function(e){ return /^[^\s@"<>()]+@[^\s@]+\.[^\s@]{2,}$/.test(e||''); };
+
+  /* The Desk · the book as a model portfolio (shared by /app and /admin so both show the same numbers).
+     Input: a position carries the weight of the book it took at entry (%), its entry price, side and leverage. Cash earns 0.
+     Every day the book is worth cash + Σ position values; a position opened on day d takes weight% of the book as it was the
+     day before. Values come from daily closes (quote_history) and, for today, from the live quote (or the manual mark when a
+     position has no price feed). Output: per-position P&L, weight now, contribution; book totals; the daily series for the chart. */
+  window.MWS.lev = function(p){ var n = parseFloat(String(p && p.leverage || '').replace(/[^0-9.]/g, '')); return p && p.kind === 'leveraged' && n > 0 ? n : 1; };
+  window.MWS.book = function(positions, quotes, history, opts){
+    opts = opts || {}; quotes = quotes || {}; history = history || {};
+    var today = opts.today || new Date().toISOString().slice(0, 10), MAXD = opts.maxDays || 400;
+    var held = (positions || []).filter(function(p){ return p.status === 'open' && p.kind !== 'order'; });
+    var rows = held.map(function(p){
+      var w0 = p.weight_entry != null ? Number(p.weight_entry) : (p.size_pct != null ? Number(p.size_pct) : null); if (!(w0 >= 0)) w0 = null;
+      var L = window.MWS.lev(p), s = p.side === 'short' ? -1 : 1, entry = Number(p.entry_price) > 0 ? Number(p.entry_price) : null;
+      var q = p.quote_symbol ? quotes[String(p.quote_symbol).toUpperCase()] : null, live = q && q.price != null && !q.error ? Number(q.price) : null;
+      var last = live != null ? live : (p.mark != null ? Number(p.mark) : null);
+      var growth = function(price){ if (entry == null || price == null) return 1; return Math.max(0, 1 + s * L * (price / entry - 1)); };
+      var opened = p.opened_at ? String(p.opened_at).slice(0, 10) : today;
+      return { p: p, w0: w0, L: L, s: s, entry: entry, last: last, live: live, q: q, growth: growth, opened: opened, source: live != null ? 'live' : (p.mark != null ? 'mark' : null),
+        ret: entry != null && last != null ? growth(last) - 1 : null, today: q && q.change_pct != null && live != null && entry != null ? s * L * Number(q.change_pct) : null, capital: null, value: null, prev: null, weightNow: null, contrib: null };
+    });
+    var inBook = rows.filter(function(r){ return r.w0 != null; });
+    var first = inBook.map(function(r){ return r.opened; }).sort()[0] || today;
+    var startMs = Math.max(Date.parse(first), Date.parse(today) - MAXD * 86400000), start = new Date(startMs).toISOString().slice(0, 10);
+    var ptr = {}, H = {}; Object.keys(history).forEach(function(sym){ H[sym.toUpperCase()] = history[sym]; ptr[sym.toUpperCase()] = 0; });
+    var lastClose = {}; var priceAt = function(sym, day){ var h = H[sym]; if (!h) return null; var i = ptr[sym]; while (i < h.length && h[i].day <= day) { lastClose[sym] = Number(h[i].close); i++; } ptr[sym] = i; return lastClose[sym] != null ? lastClose[sym] : null; };
+    var bench = (opts.bench || []).map(function(b){ return String(b).toUpperCase(); }), b0 = {};
+    var series = [], cash = 100, B = 100, open = [];
+    for (var ms = Date.parse(start); ms <= Date.parse(today); ms += 86400000) {
+      var day = new Date(ms).toISOString().slice(0, 10), isToday = day >= today;
+      inBook.forEach(function(r){ if (r.capital == null && r.opened <= day) { r.capital = r.w0 / 100 * B; cash -= r.capital; open.push(r); } });
+      var sum = 0;
+      open.forEach(function(r){ var sym = r.p.quote_symbol ? String(r.p.quote_symbol).toUpperCase() : null; var px = sym ? priceAt(sym, day) : null; if (isToday && r.last != null) px = r.last; r.value = r.capital * r.growth(px); sum += r.value; });
+      B = cash + sum;
+      var pt = { day: day, book: B / 100 - 1 };
+      bench.forEach(function(sym){ var px = priceAt(sym, day); if (isToday && quotes[sym] && quotes[sym].price != null) px = Number(quotes[sym].price); if (px != null) { if (b0[sym] == null) b0[sym] = px; pt[sym] = px / b0[sym] - 1; } });
+      series.push(pt);
+    }
+    var prevSum = 0; open.forEach(function(r){ var pc = r.q && r.q.prev_close != null && r.live != null ? Number(r.q.prev_close) : null; r.prev = pc != null ? r.capital * r.growth(pc) : r.value; prevSum += r.prev; });
+    var Bprev = cash + prevSum;
+    rows.forEach(function(r){ if (r.capital == null) return; r.weightNow = B > 0 ? r.value / B * 100 : null; r.contrib = r.value - r.capital; });
+    var asOf = null; rows.forEach(function(r){ var t = r.q && (r.q.quoted_at || r.q.updated_at); if (t && (!asOf || t > asOf)) asOf = t; });
+    return { rows: rows, cash: cash, B: B, cashNow: B > 0 ? cash / B * 100 : null, invested: B > 0 ? 100 - cash / B * 100 : null, retTotal: B / 100 - 1, todayBook: Bprev > 0 ? B / Bprev - 1 : null, series: series, start: start, first: first, asOf: asOf, n: open.length };
+  };
   /* escape anything that came from a user, Whop or Telegram before it goes into innerHTML */
   window.MWS.esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); };
   /* only same-origin paths are allowed as a post-login destination */

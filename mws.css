@@ -262,6 +262,10 @@ a.tile:hover{background:var(--bg-2)}
 .pt td .nm{display:inline;color:var(--fg-3);font-weight:400;margin-left:8px;font-size:13px}
 .pt td .th{display:block;color:var(--fg-3);font-weight:400;font-size:13px;margin-top:4px;max-width:46ch;line-height:1.45}
 .pt .pos{color:var(--fg)}.pt .neg{color:var(--bad)}
+.pt tr.grp td{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);padding:18px 16px 8px;background:var(--bg-2)}
+.pt .posts{display:block;margin-top:6px}
+.pt .posts a{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--fg-3);text-decoration:none;border:1px solid var(--line-2);padding:3px 7px;margin:0 4px 4px 0}
+.pt .posts a:hover{color:var(--fg);border-color:var(--fg-3)}
 .faq{list-style:none;margin:0;padding:0}
 .faq li{padding:14px 0;border-top:1px solid var(--line)}
 .faq li:first-child{border-top:0;padding-top:0}

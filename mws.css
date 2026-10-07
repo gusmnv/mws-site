@@ -594,3 +594,12 @@ body.app .faq p b{display:inline;margin:0}
 body.app #ov-notices .banner,body.app .page>.banner{margin-bottom:22px}
 body.app #ov-notices:not(:empty){margin-bottom:6px}
 .list li a.link{min-width:0;overflow-wrap:anywhere;text-align:right}
+body.app .page .head h1 .soon{margin-left:14px;vertical-align:middle;font-size:10px;padding:3px 7px;letter-spacing:.08em}
+.chart .lg button.lgb{background:none;border:0;padding:0;font:inherit;color:inherit;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.chart .lg button.lgb:hover{color:var(--fg)}
+.chart .lg button.lgb.off{opacity:.42;text-decoration:line-through;text-decoration-color:var(--fg-3)}
+.chart .lg button.lgb:focus-visible{outline:2px solid var(--fg-2);outline-offset:3px}
+body.app .page .head{display:none}
+body.app .crumbs #bar-tag{margin-left:12px;font-size:9.5px;padding:2px 6px;flex:none}
+body.app .pf-cell .sh .ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+body.app .kpis{margin-top:4px}

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=f20e2939">
+<link rel="stylesheet" href="/mws.css?v=b684fd89">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=f20e2939"></script>
+<script src="/mws.js?v=b684fd89"></script>
 <style>
 body{display:block}
 header.top{display:none}
@@ -170,8 +170,9 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <a href="#telegram" data-v="telegram"><i>07</i>Telegram</a>
       <div class="grp">Manage</div>
       <a href="#access" data-v="access"><i>08</i>Grant access</a>
-      <a href="#portfolio" data-v="portfolio"><i>09</i>Portfolio</a>
-      <a href="#settings" data-v="settings"><i>10</i>Settings</a>
+      <a href="#spot" data-v="spot"><i>09</i>Spot positions</a>
+      <a href="#leveraged" data-v="leveraged"><i>10</i>Leveraged trades</a>
+      <a href="#settings" data-v="settings"><i>11</i>Settings</a>
       <a href="/app" class="mob-ma"><i>→</i>Member area</a>
     </nav>
     <div class="me"><span>Signed in as</span><b id="me-email">…</b><a class="btn sm ghost ma" href="/app">Member area <span class="ar"></span></a><button class="link" id="out" type="button">Log out</button></div>
@@ -256,12 +257,12 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     </section>
 
     <!-- PORTFOLIO -->
-    <section class="view" data-v="portfolio">
+    <section class="view" data-v="spot">
       <div class="card rv"><h3 id="pf-title">Add a position <button class="link" id="pf-cancel" type="button" hidden>Cancel edit</button></h3>
-        <p class="small muted" style="margin-bottom:16px"><b>Spot</b> is the portfolio: each position takes its weight of the $1,000,000 book. <b>Leverage</b> is a trade: long or short at a leverage, ROI only, no size. An <b>order</b> is a resting level. Everything you save is visible to members at once — whether members see The Desk at all is decided in <a class="link" href="#settings">Settings → What goes live</a>. The price feed follows the symbol by itself.</p>
+        <p class="small muted" style="margin-bottom:16px" id="pf-intro"></p>
         <form class="pf" id="f-pos" novalidate>
           <input type="hidden" id="p-id"><input type="hidden" id="p-qsym"><input type="hidden" id="p-qname"><input type="hidden" id="p-qexch"><input type="hidden" id="p-qtype"><input type="hidden" id="p-qcur">
-          <div class="field"><label for="p-kind">Type</label><select id="p-kind"><option value="spot">Spot</option><option value="leveraged">Leverage</option><option value="order">Order</option></select></div>
+          <div class="field"><label for="p-kind">Type</label><select id="p-kind"><option value="spot">Position</option><option value="order">Order</option></select></div>
           <div class="field"><label for="p-class">Category</label><select id="p-class"><option value="crypto">Crypto</option><option value="equity">Stocks</option><option value="etf">ETF</option><option value="commodity">Commodities</option><option value="fx">FX</option><option value="other">Other</option></select></div>
           <div class="field"><label for="p-symbol">Symbol</label><input id="p-symbol" type="text" placeholder="MSTR" autocapitalize="characters"></div>
           <div class="field" id="f-side"><label for="p-side">Side</label><select id="p-side"><option value="long">Long</option><option value="short">Short</option></select></div>
@@ -282,7 +283,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
         </form>
       </div>
       <div class="card rv d1" style="margin-top:22px">
-        <div class="pfbar"><span class="chips" id="pf-filter"><button type="button" data-f="all" class="on">All</button><button type="button" data-f="spot">Spot</button><button type="button" data-f="leveraged">Leverage</button><button type="button" data-f="order">Orders</button></span><span class="small muted" id="pf-qstat"></span></div>
+        <div class="pfbar"><span class="chips" id="pf-filter"><button type="button" data-f="all" class="on">All</button><button type="button" data-f="pos">Positions</button><button type="button" data-f="order">Orders</button></span><span class="small muted" id="pf-qstat"></span></div>
         <div class="tblw"><table class="tbl pfl" id="pf-tbl"><thead id="pf-head"></thead><tbody id="pf-open"></tbody></table></div>
         <p class="small muted" style="margin-top:12px">Click a column to sort · <b>Close</b> asks for the exit and the result and moves the position to the track record · <b>Delete</b> removes it everywhere.</p>
       </div>
@@ -825,14 +826,15 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   // portfolio (The Desk): staff writes public.positions directly (RLS: owner/admin only), members read it in /app#portfolio.
   // Prices: public.quotes (the quotes function, Twelve Data). The numbers here come from M.book, the same model the member page uses.
-  var POS = [], QUOTES = {}, HAS_Q = true, QSTAT = null, pfT = null, showHidden = false, pfFilter = 'all', pfSortA = { k: 'kind', d: 1 }, autoPub = false;
+  var POS = [], QUOTES = {}, HAS_Q = true, QSTAT = null, pfT = null, showHidden = false, pfFilter = 'all', pfSortA = { k: 'kind', d: 1 }, autoPub = false, pfMode = 'spot'; /* pfMode: the section on screen — spot (positions + buy/sell orders) or leveraged (trades + long/short orders) */
+  function isTrade(p){ var k = kindOf(p); return k === 'leveraged' || (k === 'order' && (levOf(p) > 1 || p.side === 'short' || p.side === 'sell' || p.side === 'long')); } /* a long/short order belongs to the leveraged section; buy/sell orders to spot */
   function num(v){ v = String(v == null ? '' : v).trim(); if (!v) return null; var n = Number(v); return isNaN(n) ? null : n; }
   function fmtN(n){ if (n == null) return '—'; n = Number(n); return n >= 1000 ? n.toLocaleString('en-US', { maximumFractionDigits: n >= 10000 ? 0 : 1 }) : n.toLocaleString('en-US', { maximumFractionDigits: n < 1 ? 4 : 2 }); }
   function usdPx(v){ if (v == null || !isFinite(v)) return '—'; v = Number(v); var dp = v >= 10000 ? 0 : v < 1 ? 4 : 2; return (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
   function usdS(v){ if (v == null || !isFinite(v)) return '—'; return '<span class="' + (v > 0 ? 'pos' : v < 0 ? 'neg' : '') + '">' + (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 }) + '</span>'; }
   function pctS(v, dp){ if (v == null || !isFinite(v)) return '—'; return '<span class="' + (v > 0 ? 'pos' : v < 0 ? 'neg' : '') + '">' + (v > 0 ? '+' : '') + Number(v).toFixed(dp == null ? 2 : dp) + '%</span>'; }
   var TYPE_CLASS = { 'Digital Currency': 'crypto', 'Common Stock': 'equity', 'REIT': 'equity', 'Depositary Receipt': 'equity', 'Preferred Stock': 'equity', 'ETF': 'etf', 'Fund': 'etf', 'Physical Currency': 'fx', 'Commodity': 'commodity', 'Index': 'other' };
-  var CLASS_T = { crypto: 'Crypto', equity: 'Stocks', etf: 'ETF', commodity: 'Commodities', fx: 'FX', other: 'Other' }, KIND_N = { spot: 0, leveraged: 1, order: 2 }, KIND_T = { spot: 'Spot', leveraged: 'Leverage', order: 'Order' };
+  var CLASS_T = { crypto: 'Crypto', equity: 'Stocks', etf: 'ETF', commodity: 'Commodities', fx: 'FX', other: 'Other' }, KIND_N = { spot: 0, leveraged: 1, order: 2 }, KIND_T = { spot: 'Position', leveraged: 'Trade', order: 'Order' };
   function kindOf(p){ return KIND_N[p.kind] != null ? p.kind : 'spot'; }
   function levOf(p){ var n = parseFloat(String(p && p.leverage || '').replace(/[^0-9.]/g, '')); return n > 0 ? n : 1; }
   function notional(){ return Number(D.settings && D.settings.portfolio_notional) > 0 ? Number(D.settings.portfolio_notional) : 1000000; }
@@ -857,9 +859,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
   function renderPositions(){
     var N = notional(), book = M.book(POS.filter(function(p){ return kindOf(p) !== 'leveraged'; }), QUOTES, {}, {}), R = {}; book.rows.forEach(function(x){ R[x.p.id] = x; });
-    var open = POS.filter(function(p){ return p.status === 'open'; });
-    M.$$('#pf-filter button').forEach(function(b){ var f = b.dataset.f, n = f === 'all' ? open.length : open.filter(function(p){ return kindOf(p) === f; }).length; b.classList.toggle('on', f === pfFilter); b.innerHTML = { all: 'All', spot: 'Spot', leveraged: 'Leverage', order: 'Orders' }[f] + (n ? ' <i>' + n + '</i>' : ''); });
-    var rows = open.filter(function(p){ return pfFilter === 'all' || kindOf(p) === pfFilter; }).map(function(p){
+    var open = POS.filter(function(p){ return p.status === 'open' && (isTrade(p) === (pfMode === 'leveraged')); });
+    var ofF = function(p, f){ return f === 'all' || (f === 'order' ? kindOf(p) === 'order' : kindOf(p) !== 'order'); };
+    M.$$('#pf-filter button').forEach(function(b){ var f = b.dataset.f, n = open.filter(function(p){ return ofF(p, f); }).length; b.classList.toggle('on', f === pfFilter); b.innerHTML = { all: 'All', pos: pfMode === 'leveraged' ? 'Trades' : 'Positions', order: 'Orders' }[f] + (n ? ' <i>' + n + '</i>' : ''); });
+    var rows = open.filter(function(p){ return ofF(p, pfFilter); }).map(function(p){
       var k = kindOf(p), x = R[p.id], q = p.quote_symbol ? QUOTES[String(p.quote_symbol).toUpperCase()] : null, live = q && q.price != null && !q.error ? Number(q.price) : null, last = live != null ? live : (p.mark != null ? Number(p.mark) : null), entry = Number(p.entry_price) > 0 ? Number(p.entry_price) : null;
       var L = levOf(p), s = p.side === 'short' || p.side === 'sell' ? -1 : 1, chg = q && q.change_pct != null && live != null ? Number(q.change_pct) : null;
       var v = { kind: KIND_N[k], sym: String(p.symbol), side: String(p.side || 'long'), entry: entry, last: last, roi1: null, pl1: null, ret: null, w0: null, wNow: null, since: String(p.opened_at || '') };
@@ -879,7 +882,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       return '<tr data-id="' + X(p.id) + '">' + td('<span class="kd ' + (k === 'spot' ? 'sp' : k === 'leveraged' ? 'lv' : '') + '">' + KIND_T[k] + '</span>') + td(X(p.symbol) + (p.name ? ' <span class="small muted">' + X(p.name) + '</span>' : '') + '<span class="sub">' + X(CLASS_T[p.asset_class] || p.asset_class || '') + (p.quote_symbol ? ' · ' + X(p.quote_symbol) : ' · <span class="neg">no price feed</span>') + sideH + '</span>', 'em')
         + td(v.entry != null ? usdPx(v.entry) : '<span class="neg">—</span>', 'num') + td(lastH, 'num') + td(k === 'order' ? '—' : pctS(v.roi1), 'num') + td(k === 'spot' ? usdS(v.pl1) : '—', 'num') + td(k === 'order' ? '—' : pctS(v.ret, 1), 'num')
         + td(v.w0 != null ? v.w0.toFixed(2) + '%' : (k === 'leveraged' ? '—' : '<span class="neg">—</span>'), 'num') + td(v.wNow != null ? v.wNow.toFixed(2) + '%' : '—', 'num') + td(X(p.opened_at ? M.fmtDate(p.opened_at) : '—')) + td('<span class="rowacts">' + acts + '</span>') + '</tr>'; }).join('')
-      : '<tr><td colspan="11" class="muted">' + (open.length ? 'Nothing of this type open right now.' : 'Nothing yet. Save the first position above.') + '</td></tr>';
+      : '<tr><td colspan="11" class="muted">' + (open.length ? 'Nothing of this type open right now.' : (pfMode === 'leveraged' ? 'No trade yet. Save the first one above.' : 'Nothing yet. Save the first position above.')) + '</td></tr>';
   }
   document.addEventListener('click', function(ev){ var b = ev.target.closest('#pf-filter button'); if (b) { pfFilter = b.dataset.f; renderPositions(); return; } var h = ev.target.closest('#pf-head th[data-k]'); if (!h) return; if (pfSortA.k === h.dataset.k) pfSortA.d = -pfSortA.d; else { pfSortA.k = h.dataset.k; pfSortA.d = /^(sym|side|since|kind)$/.test(h.dataset.k) ? 1 : -1; } renderPositions(); });
   async function loadCalStatus(){
@@ -923,13 +926,15 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#p-size').value = p && (p.weight_entry != null || p.size_pct != null) ? Number(p.weight_entry != null ? p.weight_entry : p.size_pct).toFixed(2) : ''; $('#p-entryp').value = p && p.entry_price != null ? p.entry_price : ''; $('#p-mark').value = p && p.mark != null ? p.mark : '';
     $('#p-qsym').value = p ? (p.quote_symbol || '') : ''; $('#p-qname').value = p ? (p.quote_name || '') : ''; $('#p-qexch').value = p ? (p.quote_exchange || '') : ''; $('#p-qtype').value = p ? (p.quote_type || '') : ''; $('#p-qcur').value = p ? (p.currency || '') : ''; $('#p-findbox').hidden = true; $('#p-findbox').innerHTML = ''; feedLine();
     $('#p-opened').value = p && p.opened_at ? String(p.opened_at).slice(0, 10) : ''; $('#p-more').open = !!(p && (p.mark != null || (Array.isArray(p.links) && p.links.length)));
-    $('#pf-title').childNodes[0].textContent = p ? 'Edit ' + p.symbol + ' ' : 'Add a position '; $('#pf-cancel').hidden = !p; $('#pf-save').firstChild.textContent = p ? 'Save changes ' : 'Save ';
+    $('#pf-title').childNodes[0].textContent = p ? 'Edit ' + p.symbol + ' ' : (pfMode === 'leveraged' ? 'Add a trade ' : 'Add a position '); $('#pf-cancel').hidden = !p; $('#pf-save').firstChild.textContent = p ? 'Save changes ' : 'Save ';
     if (p) window.scrollTo(0, 0);
   }
-  /* the form follows the type: spot has no side and no leverage; a trade has no weight; an order is a level */
-  function kindUI(){ var k = $('#p-kind').value, cur = $('#p-side').value, opts = k === 'order' ? [['buy', 'Buy (spot)'], ['sell', 'Sell (spot)'], ['long', 'Long (leveraged)'], ['short', 'Short (leveraged)']] : [['long', 'Long'], ['short', 'Short']];
+  /* the form follows the section and the type: a spot position has no side and no leverage; a trade has no weight; an order is a level */
+  function kindUI(){ var lev = pfMode === 'leveraged'; var kindSel = $('#p-kind'), want = lev ? [['leveraged', 'Trade'], ['order', 'Order']] : [['spot', 'Position'], ['order', 'Order']]; if (kindSel.options.length !== 2 || kindSel.options[0].value !== want[0][0]) { var kcur = kindSel.value; kindSel.innerHTML = want.map(function(o){ return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join(''); kindSel.value = want.some(function(o){ return o[0] === kcur; }) ? kcur : want[0][0]; }
+    $('#pf-intro').innerHTML = lev ? '<b>Trades</b> run on their own capital: long or short at a leverage, ROI only, no size. An <b>order</b> is a resting long or short level. Everything you save is visible to members at once (whether members see the Desk at all: <a class="link" href="#settings">Settings → What goes live</a>). The price feed follows the symbol by itself.' : '<b>Positions</b> make the portfolio: each one takes its weight of the $1,000,000 book on the day of the call. An <b>order</b> is a resting buy or sell level. Everything you save is visible to members at once (whether members see the Desk at all: <a class="link" href="#settings">Settings → What goes live</a>). The price feed follows the symbol by itself.';
+    var k = kindSel.value, cur = $('#p-side').value, opts = k === 'order' ? (lev ? [['long', 'Long'], ['short', 'Short']] : [['buy', 'Buy'], ['sell', 'Sell']]) : [['long', 'Long'], ['short', 'Short']];
     $('#p-side').innerHTML = opts.map(function(o){ return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join(''); $('#p-side').value = opts.some(function(o){ return o[0] === cur; }) ? cur : opts[0][0];
-    $('#f-side').hidden = k === 'spot'; $('#f-lev').hidden = k === 'spot'; $('#f-size').hidden = k === 'leveraged'; $('#p-lev').placeholder = k === 'order' ? 'only for a leveraged order' : '3x';
+    $('#f-side').hidden = k === 'spot'; $('#f-lev').hidden = !lev; $('#f-size').hidden = lev; $('#p-lev').placeholder = '3x';
     $('#l-entryp').textContent = k === 'order' ? 'Level $' : 'Entry $ (average)'; $('#l-size').textContent = k === 'order' ? 'Planned weight %' : 'Weight at entry %'; $('#l-opened').textContent = k === 'order' ? 'Placed' : 'Since'; }
   $('#p-kind').addEventListener('change', kindUI); kindUI();
   $('#pf-cancel').addEventListener('click', function(){ pfFill(null); });
@@ -938,8 +943,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var symbol = $('#p-symbol').value.trim().toUpperCase(); if (!symbol) return M.msg('#m', 'Symbol is required.', 'bad');
     var id = $('#p-id').value, old = POS.filter(function(p){ return p.id === id; })[0], kind = $('#p-kind').value, cls = $('#p-class').value;
     var entryP = num($('#p-entryp').value); if (entryP == null || entryP <= 0) return M.msg('#m', (kind === 'order' ? 'Level' : 'Entry price') + ' is required (a number, in dollars).', 'bad');
-    var lev = kind === 'spot' ? null : ($('#p-lev').value.trim() || null); if (kind === 'leveraged' && !lev) return M.msg('#m', 'Leverage is required for a trade (e.g. 3x).', 'bad');
-    var w = kind === 'leveraged' ? null : num($('#p-size').value); if (w != null && (w < 0 || w > 100)) return M.msg('#m', 'Weight must be between 0 and 100.', 'bad'); if (kind === 'spot' && w == null) return M.msg('#m', 'Weight at entry is required for a spot position (the share of the book it took).', 'bad');
+    var lev = pfMode === 'leveraged' ? ($('#p-lev').value.trim() || null) : null; if (pfMode === 'leveraged' && !lev) return M.msg('#m', 'Leverage is required (e.g. 3x).', 'bad');
+    var w = pfMode === 'leveraged' ? null : num($('#p-size').value); if (w != null && (w < 0 || w > 100)) return M.msg('#m', 'Weight must be between 0 and 100.', 'bad'); if (kind === 'spot' && w == null) return M.msg('#m', 'Weight at entry is required for a spot position (the share of the book it took).', 'bad');
     var mark = num($('#p-mark').value), linkList = $('#p-links').value.split(/\s+/).map(function(u){ return u.trim(); }).filter(Boolean);
     var badLink = linkList.filter(function(u){ return !/^https:\/\/t\.me\/[A-Za-z0-9_+\/-]+$/.test(u); })[0]; if (badLink) return M.msg('#m', 'Telegram links only (https://t.me/…): ' + badLink, 'bad');
     var btn = $('#pf-save'); M.busy(btn, true); var note = '';
@@ -959,11 +964,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var tr = b.closest('tr'), p = POS.filter(function(x){ return x.id === tr.dataset.id; })[0]; if (!p) return;
     var a = b.dataset.pa;
     try {
-      if (a === 'edit') { pfFill(p); return; }
+      if (a === 'edit') { var want = isTrade(p) ? 'leveraged' : 'spot'; if (pfMode !== want) { location.hash = '#' + want; } pfFill(p); return; }
       if (a === 'close' && kindOf(p) === 'order') { if (!confirm('Cancel this ' + p.side + ' order on ' + p.symbol + '? It leaves the members\' pages.')) return; var r5 = await sb.from('positions').update({ status: 'closed', result: 'cancelled', closed_at: new Date().toISOString().slice(0, 10) }).eq('id', p.id); if (r5.error) throw r5.error; }
       else if (a === 'close') { var ex = prompt('Exit price for ' + p.symbol + ' (e.g. $97 or "100-126K"):', ''); if (ex == null) return; var res = prompt('Result (e.g. "+70%" or "x7" — with the sign):', ''); if (res == null) return; var r2 = await sb.from('positions').update({ status: 'closed', exit: ex.trim() || null, result: res.trim() || null, closed_at: new Date().toISOString().slice(0, 10) }).eq('id', p.id); if (r2.error) throw r2.error; M.msg('#m', p.symbol + ' closed — it is in the track record now.', 'ok'); }
       if (a === 'filled' && p.side === 'sell') { if (!confirm('Mark this sell order on ' + p.symbol + ' as filled? It leaves the pages (a sell reduces a position: edit that position\'s weight if needed).')) return; var r7 = await sb.from('positions').update({ status: 'closed', result: 'filled', closed_at: new Date().toISOString().slice(0, 10) }).eq('id', p.id); if (r7.error) throw r7.error; }
-      else if (a === 'filled') { var lev = p.side === 'long' || p.side === 'short' || levOf(p) > 1; var fp = prompt('Filled at (average price, a number):', p.entry_price != null ? p.entry_price : ''); if (fp == null) return; var fpn = num(fp); if (fpn == null || fpn <= 0) return M.msg('#m', 'Enter the fill price as a number.', 'bad'); var upd = { kind: lev ? 'leveraged' : 'spot', side: lev ? (p.side === 'buy' ? 'long' : p.side) : 'long', entry_price: fpn, entry: usdPx(fpn), opened_at: new Date().toISOString().slice(0, 10), leverage: lev ? (p.leverage || (p.side === 'long' || p.side === 'short' ? prompt('Leverage (e.g. 3x):', '') : null)) : null };
+      else if (a === 'filled') { var lev = isTrade(p); var fp = prompt('Filled at (average price, a number):', p.entry_price != null ? p.entry_price : ''); if (fp == null) return; var fpn = num(fp); if (fpn == null || fpn <= 0) return M.msg('#m', 'Enter the fill price as a number.', 'bad'); var upd = { kind: lev ? 'leveraged' : 'spot', side: lev ? (p.side === 'buy' ? 'long' : p.side) : 'long', entry_price: fpn, entry: usdPx(fpn), opened_at: new Date().toISOString().slice(0, 10), leverage: lev ? (p.leverage || (p.side === 'long' || p.side === 'short' ? prompt('Leverage (e.g. 3x):', '') : null)) : null };
         if (!lev) { var fw = prompt('Weight of the book at entry (%, two decimals):', p.weight_entry != null ? p.weight_entry : (p.size_pct != null ? p.size_pct : '')); if (fw == null) return; upd.size_pct = num(fw); if (HAS_Q) upd.weight_entry = num(fw); } else { upd.size_pct = null; if (HAS_Q) upd.weight_entry = null; }
         var r6 = await sb.from('positions').update(upd).eq('id', p.id); if (r6.error) throw r6.error; M.msg('#m', p.symbol + ' is a ' + (lev ? 'trade' : 'spot position') + ' now.', 'ok'); } /* a resting order that got hit becomes the position it was waiting to be */
       if (a === 'del') { if (!confirm('Delete ' + p.symbol + ' for good? Closing keeps it in the track record; deleting removes it everywhere.')) return; var r4 = await sb.from('positions').delete().eq('id', p.id); if (r4.error) throw r4.error; }
@@ -972,8 +977,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
 
   // routing
-  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'Spot is the portfolio, leverage is a trade, an order is a level. Members see what you save.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
-  function route(){ var v = currentView(); if (!Object.prototype.hasOwnProperty.call(TITLES, v)) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
+  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], spot: ['Spot positions', 'The portfolio members see: each position takes its weight of the book. Buy and sell orders rest here too.'], leveraged: ['Leveraged trades', 'Long or short at a leverage, on their own capital: ROI only, no size. Long and short orders rest here too.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
+  function route(){ var v = currentView(); if (!Object.prototype.hasOwnProperty.call(TITLES, v)) v = 'overview'; var sv = v === 'leveraged' ? 'spot' : v; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === sv); }); if ((v === 'spot' || v === 'leveraged') && pfMode !== v) { pfMode = v; pfFilter = 'all'; if (typeof kindUI === 'function') { pfFill(null); } if (POS.length) renderPositions(); } M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);
   document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-f]'); if (a) setFilter(a.dataset.f); });

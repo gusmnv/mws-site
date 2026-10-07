@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=f20e2939">
+<link rel="stylesheet" href="/mws.css?v=b684fd89">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=f20e2939"></script>
+<script src="/mws.js?v=b684fd89"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -67,7 +67,7 @@
   <div class="mainc">
     <header class="bar">
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><span></span></button>
-      <div class="crumbs"><span id="crumb">Telegram</span></div>
+      <div class="crumbs"><span id="crumb">Private Telegram</span><span class="soon" id="bar-tag" hidden></span></div>
       <span class="tag" id="bar-st">—</span>
     </header>
 
@@ -75,7 +75,7 @@
 
       <!-- 07 membership -->
       <section class="page" data-page="membership">
-        <div class="head rv"><p class="eyebrow"><b>/08</b>Membership</p><h1>Your membership.</h1><p id="mem-sub" hidden></p></div>
+        <div class="head rv"><h1>Your membership.</h1><p id="mem-sub" hidden></p></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="p-access"><div class="ttl"><h3>Plan &amp; billing</h3><span class="tag" id="st">—</span></div><div id="access-body"></div></section>
@@ -100,7 +100,7 @@
 
       <!-- 01 telegram -->
       <section class="page" data-page="telegram">
-        <div class="head rv"><p class="eyebrow"><b>/01</b>Private Telegram</p><h1>Your channels.</h1><p id="tg-sub" hidden></p></div>
+        <div class="head rv"><h1>Your channels.</h1><p id="tg-sub" hidden></p></div>
         <div id="ov-notices"></div>
         <div id="ov-banner"></div>
         <div class="acct">
@@ -129,14 +129,13 @@
 
       <!-- 03–05 the desk -->
       <section class="page" data-page="portfolio">
-        <div class="head rv"><p class="eyebrow"><b>/02</b>Spot positions <span class="soon" id="pf-tag">In development</span></p><h1>Our portfolio.</h1><p id="pf-sub" hidden></p></div>
+        <div class="head rv"><h1>Spot positions. <span class="soon" id="pf-tag">In development</span></h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
-          <div class="pf-top rv"><span class="chips" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span><span class="muted small" id="pf-asof"></span></div>
           <div class="kpis rv" id="pf-kpis"></div>
           <div class="pf-grid rv d1">
             <div class="pf-cell">
-              <div class="sh"><h2>Performance <span class="muted" id="pf-chart-sub"></span></h2><span class="chips sm" id="pf-unit"><button type="button" data-v="pct" class="on">%</button><button type="button" data-v="usd">$</button></span></div>
-              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div><div class="months" id="pf-months" hidden></div></div>
+              <div class="sh"><h2>Performance <span class="muted" id="pf-chart-sub"></span></h2><span class="ctl"><span class="chips sm" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span><span class="chips sm" id="pf-unit"><button type="button" data-v="pct" class="on">%</button><button type="button" data-v="usd">$</button></span></span></div>
+              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div></div>
               <div class="banner" id="pf-perf-empty" hidden><div><b>The curve starts with the first daily closes.</b><p>The book is priced live from today; the line against the S&amp;P 500 and the Nasdaq 100 appears as the days close.</p></div></div>
             </div>
             <div class="pf-cell">
@@ -163,7 +162,7 @@
         </div>
       </section>
       <section class="page" data-page="trades">
-        <div class="head rv"><p class="eyebrow"><b>/03</b>Leveraged trading <span class="soon" id="tr-tag">In development</span></p><h1>Leveraged trading.</h1></div>
+        <div class="head rv"><h1>Leveraged trading. <span class="soon" id="tr-tag">In development</span></h1></div>
         <div id="tr-live" hidden>
           <div class="ptw"><table class="pt cards" id="tr-table"></table></div>
           <div id="tr-orders" hidden><div class="sh" style="margin-top:22px"><h2>Resting orders</h2></div><div class="ptw"><table class="pt cards" id="tr-ord"></table></div></div>
@@ -173,14 +172,14 @@
         <div id="tr-empty" hidden class="banner"><div><b>No trade open right now.</b><p>Leveraged trades appear here the moment one is opened; the portfolio is the spot book.</p></div></div>
       </section>
       <section class="page" data-page="track">
-        <div class="head rv"><p class="eyebrow"><b>/04</b>Track record <span class="soon" id="tk-tag">In development</span></p><h1>Track record.</h1></div>
+        <div class="head rv"><h1>Track record. <span class="soon" id="tk-tag">In development</span></h1></div>
         <div id="tk-live" hidden><div class="ptw"><table class="pt cards" id="tk-table"></table></div><p class="small muted" style="margin-top:18px" id="tk-foot"></p></div>
         <div id="tk-locked" hidden class="banner"><div><b>Members only.</b><p>The track record opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
         <div id="tk-empty" hidden class="banner"><div><b>Nothing closed yet.</b><p>Closed calls land here with entry, exit and result.</p></div></div>
       </section>
       <section class="page" data-page="position"><div id="pos-page"></div></section>
       <section class="page" data-page="calendar">
-        <div class="head rv"><p class="eyebrow"><b>/06</b>Economic calendar <span class="soon" id="cal-tag">In development</span></p><h1>Economic calendar.</h1></div>
+        <div class="head rv"><h1>Economic calendar. <span class="soon" id="cal-tag">In development</span></h1></div>
         <div id="cal-live" hidden>
           <div class="banner next rv" id="cal-next" hidden></div>
           <div class="fbar rv">
@@ -205,7 +204,7 @@
         </div>
       </section>
       <section class="page" data-page="earnings">
-        <div class="head rv"><p class="eyebrow"><b>/05</b>Stock earnings <span class="soon" id="er-tag">In development</span></p><h1>Stock earnings.</h1></div>
+        <div class="head rv"><h1>Stock earnings. <span class="soon" id="er-tag">In development</span></h1></div>
         <div id="er-live" hidden>
           <div class="banner next rv" id="er-strip" hidden></div>
           <div class="fbar rv">
@@ -232,7 +231,7 @@
 
       <!-- 06 account -->
       <section class="page" data-page="account">
-        <div class="head rv"><p class="eyebrow"><b>/07</b>Account</p><h1>Your account.</h1></div>
+        <div class="head rv"><h1>Your account.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv"><div class="ttl"><h3>You</h3><span class="tag" id="acc-tag" hidden>Add your name</span></div>
@@ -261,7 +260,7 @@
 
       <!-- 08 devices -->
       <section class="page" data-page="devices">
-        <div class="head rv"><p class="eyebrow"><b>/09</b>Devices</p><h1>Where you are logged in.</h1></div>
+        <div class="head rv"><h1>Where you are logged in.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv"><div class="ttl"><h3>Sessions</h3><span class="small muted" id="dev-n"></span></div>
@@ -276,7 +275,7 @@
 
       <!-- 08 feedback: the inbox. Members write here; it lands in Admin → Inbox and the answer shows up on this page -->
       <section class="page" data-page="feedback">
-        <div class="head rv"><p class="eyebrow"><b>/10</b>Feedback</p><h1>Tell us.</h1></div>
+        <div class="head rv"><h1>Tell us.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="sup-new"><div class="ttl"><h3>Write to Mr. Wall Street</h3><span class="tag">Inbox</span></div>
@@ -374,13 +373,15 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   /* router: #page */
   var current = '';
+  /* the Live / Only you / In development tag of the page on screen, shown next to the crumb (the pages have no titles) */
+  function syncBarTag(){ var t = document.querySelector('.page.on .head .soon'), b = $('#bar-tag'); if (!b) return; if (!t) { b.hidden = true; return; } b.textContent = t.textContent; b.className = t.className; b.hidden = false; }
   function route(){
     var k = (location.hash || '#telegram').slice(1); var pm = k.match(/^position\/([\w-]+)$/); if (pm) { k = 'position'; posId = pm[1]; } if (k === 'economic') k = 'calendar'; if (k === 'settings') k = 'account'; if (k === 'support' || k === 'chat') k = 'feedback'; if (k === 'overview') k = 'telegram'; if (!Object.prototype.hasOwnProperty.call(PAGES, k) || /=/.test(k)) k = 'telegram';
     if (k === 'devices' && typeof loadDevices === 'function') loadDevices();
     current = k;
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
     $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === (k === 'position' ? posHome : k)); });
-    $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — Mr. Wall Street';
+    $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — Mr. Wall Street'; syncBarTag();
     if (k === 'position' && typeof renderPosition === 'function') renderPosition();
     if ((k === 'portfolio' || k === 'trades' || k === 'track') && typeof renderPortfolio === 'function' && positions) renderPortfolio(); /* the page measures its chart at the width it is shown at */
     drawer(false); window.scrollTo(0, 0);
@@ -511,7 +512,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       renderTg(false);
     }
     $('#ov-banner').innerHTML = banner;
-    renderNotices(); renderPortfolio(); if (current === 'position') renderPosition(); renderCalendar(); renderEarnings(); lastLoad = Date.now();
+    renderNotices(); renderPortfolio(); if (current === 'position') renderPosition(); renderCalendar(); renderEarnings(); syncBarTag(); lastLoad = Date.now();
     paygate(name, grace);
   }
   /* "Check again" (pay gate and Membership panel): one check at a time, at most one every 8 s, same as the server allows */
@@ -620,7 +621,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       : trade
       ? fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Leverage', T.L + '×') + fact('1D ROI', sg(T.roi1, pct(T.roi1))) + fact('All-time ROI', sg(ret, pct(ret)))
       : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt)
-        + fact('Initial weight', r && r.w0 != null ? r.w0.toFixed(2) + '%' : '—') + fact('Current weight', r && r.weightNow != null ? r.weightNow.toFixed(2) + '%' : '—') + fact('Market value', val != null ? usdFull(val) : '—')
+        + fact('Initial weight', r && r.w0 != null ? r.w0.toFixed(2) + '%' : '—') + fact('Invested', cost != null ? usdFull(cost) : '—') + fact('Current weight', r && r.weightNow != null ? r.weightNow.toFixed(2) + '%' : '—') + fact('Market value', val != null ? usdFull(val) : '—')
         + fact('1D ROI', sg(roi1, pct(roi1))) + fact('1D P&amp;L', sg(d1, usdSigned(d1))) + fact('All-time ROI', sg(ret, pct(ret))) + fact('All-time P&amp;L', sg(pl, usdSigned(pl)));
     var ids = pfIds(p);
     var posts = function(){ return ids.length ? ids.map(function(i){ var x = POSTS && POSTS[i]; var when = x && x.t ? fmtWhen(x.t) : 'Telegram post';
@@ -650,6 +651,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       (h.data || []).forEach(function(r){ var days = r.days || [], closes = r.closes || []; qhist[String(r.symbol).toUpperCase()] = days.map(function(d, i){ return { day: String(d).slice(0, 10), close: Number(closes[i]) }; }); }); histFor = key; } catch (e) { qhist = {}; }
   }
   var pfRange = 'all', pfGrp = 'security', pfUnit = 'pct', pfSort = { k: 'wNow', d: -1 }, trSort = { k: 'ret', d: -1 };
+  var pfBench = (function(){ var v = M.store.get('mws_bench'); return v && typeof v === 'object' ? v : { SPY: true, QQQ: true }; })(); /* which benchmark lines are drawn; the member's choice is remembered on this device */
   var RANGES = { '1': '1 day', '7': '1 week', 'mtd': 'Month to date', '30': '1 month', '90': '3 months', 'ytd': 'Year to date', '365': '1 year', '1825': '5 years', 'all': 'All time' };
   function usd(v, dp){ if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v); var s = a >= 1e6 ? (a / 1e6).toFixed(dp == null ? 2 : dp) + 'M' : a >= 1e4 ? (a / 1e3).toFixed(dp == null ? 1 : dp) + 'K' : a.toLocaleString('en-US', { maximumFractionDigits: dp == null ? (a < 100 ? 2 : 0) : dp }); return (v < 0 ? '−$' : '$') + s; }
   function usdFull(v){ if (v == null || !isFinite(v)) return '—'; return (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
@@ -668,7 +670,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#n-pf').textContent = P.spot.length ? String(P.spot.length) : ''; $('#n-tr').textContent = P.lev.length + P.ordT.length ? String(P.lev.length + P.ordT.length) : ''; $('#n-tk').textContent = '';
     var onlyMe = deskTag('pf-tag', unlocked, list.length > 0); deskTag('tr-tag', unlocked, list.length > 0); deskTag('tk-tag', unlocked, list.length > 0);
     $('#desk-grp-tag').textContent = unlocked && list.length ? (onlyMe ? 'Owner preview' : 'Live') : 'In development';
-    renderBook(D, P, unlocked); renderTrades(D, P, unlocked); renderTrack(D, P, unlocked); pressChips();
+    renderBook(D, P, unlocked); renderTrades(D, P, unlocked); renderTrack(D, P, unlocked); pressChips(); syncBarTag();
   }
   /* /02 Portfolio: the spot book. Range chips → KPIs + chart; exposure donut; the holdings grid (a row opens its page). */
   function renderBook(D, P, unlocked){
@@ -688,9 +690,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     else if (hasHist && S.length >= 2) { var seg0 = rangeSeg(S, rk)[0], base = N * (1 + seg0.book); rPL = bookVal - base; rPct = base > 0 ? (bookVal / base - 1) * 100 : null; rSince = seg0.day; }
     var kp = function(k, v, d, big){ return '<div class="kp' + (big ? ' big' : '') + '"><span>' + k + '</span><b>' + v + '</b>' + (d ? '<em>' + d + '</em>' : '') + '</div>'; };
     var sg = function(v, txt){ return v == null ? '<span class="muted">—</span>' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
-    $('#pf-kpis').innerHTML = kp('Portfolio value', usdFull(bookVal) + ' <small>USD</small>', 'Started with <i>' + usdFull(N) + '</i>' + (book.first ? ' on ' + M.fmtDate(book.first) : '') + ' · ' + sg(bookPL, pct(book.retTotal * 100)) + ' all time', true)
-      + kp(RANGES[rk], sg(rPL, usdSigned(rPL)), rPL == null ? (hasHist ? 'the book is younger than the range' : 'waiting for daily closes') : sg(rPct, pct(rPct)) + (rSince ? ' · since ' + M.fmtDate(rSince) : ''))
-      + kp('Last 24 h', sg(pl1, usdSigned(pl1)), pl1 == null ? 'waiting for prices' : sg(roi1, pct(roi1)) + ' · since the previous close');
+    var asOfTxt = book.asOf ? 'prices as of ' + hhmm(book.asOf) + ' (your time)' : (live ? 'live prices' : 'prices: none yet');
+    $('#pf-kpis').innerHTML = kp('Portfolio value', usdFull(bookVal) + ' <small>USD</small>', 'Started with <i>' + usdFull(N) + '</i>' + (book.first ? ' on ' + M.fmtDate(book.first) : '') + ' · ' + sg(bookPL, pct(book.retTotal * 100)) + ' all time · ' + asOfTxt, true)
+      + (pfRange === '1'
+        ? kp('1 day', sg(pl1, usdSigned(pl1)), pl1 == null ? 'waiting for prices' : sg(roi1, pct(roi1)) + ' · since the previous close')
+        : kp(RANGES[rk], sg(rPL, usdSigned(rPL)), rPL == null ? (hasHist ? 'the book is younger than the range' : 'waiting for daily closes') : sg(rPct, pct(rPct)) + (rSince ? ' · since ' + M.fmtDate(rSince) : '')));
     /* exposure: current weights by asset or by class, cash included */
     var groups = {}, keyOf = function(r){ return pfGrp === 'class' ? (PF_CLASS[r.p.asset_class] || 'Other') : String(r.p.symbol); };
     rows.forEach(function(r){ var k = keyOf(r); var g = groups[k] = groups[k] || { k: k, w: 0, v: 0, n: 0 }; g.w += r.weightNow || 0; g.v += val$(r); g.n++; });
@@ -702,24 +706,23 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#pf-perf-empty').hidden = !$('#pf-chart-sec').hidden;
     /* holdings */
     var hrows = rows.map(function(r){ var p = r.p, v1 = pl1d$(r), ro1 = v1 != null && r.prev > 0 ? (r.value - r.prev) / r.prev * 100 : null;
-      return { p: p, r: r, v: { sym: String(p.symbol), since: String(p.opened_at || ''), entry: r.entry, last: r.last, roi1: ro1, pl1: v1, w0: r.w0, wNow: r.weightNow, val: val$(r), ret: r.ret != null ? r.ret * 100 : null, pl: r.entry != null && r.last != null ? pl$(r) : null } }; });
+      return { p: p, r: r, v: { sym: String(p.symbol), since: String(p.opened_at || ''), entry: r.entry, last: r.last, roi1: ro1, pl1: v1, w0: r.w0, cost: cost$(r), wNow: r.weightNow, val: val$(r), ret: r.ret != null ? r.ret * 100 : null, pl: r.entry != null && r.last != null ? pl$(r) : null } }; });
     sortRows(hrows, pfSort);
     var unweighted = P.spot.filter(function(p){ return !R[p.id] || R[p.id].capital == null; });
     var head = '<thead><tr>' + th('Position', 'sym', pfSort) + th('Since', 'since', pfSort) + th('Entry', 'entry', pfSort, 'num') + th('Last', 'last', pfSort, 'num') + th('1D ROI', 'roi1', pfSort, 'num', 'Since the previous close') + th('1D P&amp;L', 'pl1', pfSort, 'num', 'Since the previous close')
-      + th('Initial weight', 'w0', pfSort, 'num', 'Share of the book at entry') + th('Current weight', 'wNow', pfSort, 'num', 'Share of the book now') + th('Market value', 'val', pfSort, 'num') + th('All-time ROI', 'ret', pfSort, 'num') + th('All-time P&amp;L', 'pl', pfSort, 'num') + '</tr></thead>';
+      + th('Initial weight', 'w0', pfSort, 'num', 'Share of the book on the day of the call') + th('Invested', 'cost', pfSort, 'num', 'That share in dollars, on the day of the call') + th('Current weight', 'wNow', pfSort, 'num', 'Share of the book now') + th('Market value', 'val', pfSort, 'num') + th('All-time ROI', 'ret', pfSort, 'num') + th('All-time P&amp;L', 'pl', pfSort, 'num') + '</tr></thead>';
     var lastCell = function(r){ if (r.last == null) return cell('Last', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last', usdPx(r.last) + (r.source === 'mark' ? '<span class="sub muted">mark' + (r.p.mark_at ? ' · ' + M.fmtDate(r.p.mark_at) : '') + '</span>' : ''), 'num'); };
     var row = function(h){ var p = h.p, r = h.r, v = h.v;
       return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
         + cell('Entry', r.entry != null ? usdPx(r.entry) : '—', 'num') + lastCell(r)
         + cell('1D ROI', v.roi1 == null ? '—' : pct(v.roi1), 'num' + sgn(v.roi1)) + cell('1D P&L', v.pl1 == null ? '—' : usdSigned(v.pl1), 'num' + sgn(v.pl1))
-        + cell('Initial weight', v.w0 != null ? v.w0.toFixed(2) + '%' : '—', 'num muted') + cell('Current weight', v.wNow != null ? v.wNow.toFixed(2) + '%' : '—', 'num') + cell('Market value', usdFull(v.val), 'num')
+        + cell('Initial weight', v.w0 != null ? v.w0.toFixed(2) + '%' : '—', 'num muted') + cell('Invested', usdFull(v.cost), 'num muted') + cell('Current weight', v.wNow != null ? v.wNow.toFixed(2) + '%' : '—', 'num') + cell('Market value', usdFull(v.val), 'num')
         + cell('All-time ROI', v.ret == null ? '—' : pct(v.ret), 'num' + sgn(v.ret)) + cell('All-time P&L', v.pl == null ? '—' : usdSigned(v.pl), 'num' + sgn(v.pl)) + '</tr>'; };
     var unwRow = function(p){ var T = tradeNums(p, Q), ret = T.entry && T.last ? (T.last / T.entry - 1) * 100 : null;
       return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry', T.entry != null ? usdPx(T.entry) : '—', 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num')
-        + cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('1D P&L', '—', 'num') + cell('Initial weight', '<span class="muted">—</span>', 'num') + cell('Current weight', '<span class="muted">—</span>', 'num') + cell('Market value', '—', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + cell('All-time P&L', '—', 'num') + '</tr>'; };
-    $('#pf-table').innerHTML = head + '<tbody>' + (hrows.length || unweighted.length ? hrows.map(row).join('') + unweighted.map(unwRow).join('') : '<tr><td colspan="11" class="muted">No spot positions open right now. Cash is a position too.</td></tr>') + '</tbody>';
+        + cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('1D P&L', '—', 'num') + cell('Initial weight', '<span class="muted">—</span>', 'num') + cell('Invested', '—', 'num') + cell('Current weight', '<span class="muted">—</span>', 'num') + cell('Market value', '—', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + cell('All-time P&L', '—', 'num') + '</tr>'; };
+    $('#pf-table').innerHTML = head + '<tbody>' + (hrows.length || unweighted.length ? hrows.map(row).join('') + unweighted.map(unwRow).join('') : '<tr><td colspan="12" class="muted">No spot positions open right now. Cash is a position too.</td></tr>') + '</tbody>';
     $('#pf-hold-n').textContent = '· ' + P.spot.length + ' position' + (P.spot.length === 1 ? '' : 's') + (book.cashNow != null ? ' · ' + book.cashNow.toFixed(2) + '% cash' : '');
-    $('#pf-asof').textContent = book.asOf ? 'Prices as of ' + hhmm(book.asOf) + ' (your time)' : (live ? 'Live prices' : 'Prices: none yet');
     /* resting spot orders */
     var ordRow = function(p){ var T = tradeNums(p, Q), dist = T.entry != null && T.last ? (T.entry / T.last - 1) * 100 : null;
       return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, true), 'em') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) + (T.q && T.q.change_pct != null ? '<span class="sub' + sgn(T.q.change_pct) + '">' + pct(T.q.change_pct) + ' today</span>' : '') : '—', 'num')
@@ -727,11 +730,13 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#pf-orders').hidden = !P.ordS.length;
     if (P.ordS.length) $('#pf-ord').innerHTML = '<thead><tr><th>Asset</th><th class="num">Level</th><th class="num">Last</th><th class="num">Distance</th><th class="num">Planned weight</th></tr></thead><tbody>' + pfGrouped(P.ordS, 5, ordRow) + '</tbody>';
     var nDraft = list.filter(function(p){ return p.published === false; }).length;
-    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'A model book that started with ' + usdFull(N) + '; every position takes its weight of the book the day it is called, cash earns nothing · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · stocks refresh through the US session and at the close, crypto around the clock · click a position for the original Telegram posts · not financial advice: this is what we hold.';
+    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'A model book that started with ' + usdFull(N) + '; every position takes its weight of the book on the day it is called (Initial weight = that share then, Invested = the same in dollars that day), cash earns nothing · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · stocks refresh through the US session and at the close, crypto around the clock · click a position for the original Telegram posts · not financial advice: this is what we hold.';
   }
   /* /03 Trades: leveraged, on their own capital. ROI only — never a size. */
+  var DEV_PAGES = { trades: true, track: true }; /* sections still being built: members (and the owner) see "In development" whatever the data says */
   function renderTrades(D, P, unlocked){
     var Q = D.Q, n = P.lev.length + P.ordT.length;
+    if (DEV_PAGES.trades) { $('#tr-locked').hidden = true; $('#tr-live').hidden = true; $('#tr-empty').hidden = false; $('#tr-empty').innerHTML = '<div><b>In development.</b><p>Leveraged trading is being built. Until it opens, the trades are posted in the Exclusive channel.</p></div>'; var tt = $('#tr-tag'); tt.textContent = 'In development'; tt.className = 'soon'; $('#n-tr').textContent = ''; return; }
     $('#tr-locked').hidden = unlocked; $('#tr-live').hidden = !(unlocked && n); $('#tr-empty').hidden = !(unlocked && !n);
     if (!(unlocked && n)) return;
     var rows = P.lev.map(function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), side: String(p.side || 'long'), L: T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret } }; });
@@ -752,6 +757,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* /04 Track record: every closed call, the latest first */
   function renderTrack(D, P, unlocked){
     var closed = P.closed.slice().sort(function(a, b){ return String(b.closed_at || '').localeCompare(String(a.closed_at || '')); });
+    if (DEV_PAGES.track) { $('#tk-locked').hidden = true; $('#tk-live').hidden = true; $('#tk-empty').hidden = false; $('#tk-empty').innerHTML = '<div><b>In development.</b><p>The track record is being built: every closed call with entry, exit and result, automatically.</p></div>'; var kt = $('#tk-tag'); kt.textContent = 'In development'; kt.className = 'soon'; return; }
     $('#tk-locked').hidden = unlocked; $('#tk-live').hidden = !(unlocked && closed.length); $('#tk-empty').hidden = !(unlocked && !closed.length);
     if (!(unlocked && closed.length)) return;
     var wins = closed.filter(function(p){ return resultSign(p) > 0; }).length;
@@ -780,7 +786,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* the book against the market, daily: in % (rebased to the start of the range) or in $ (what $1,000,000 became — the same for the S&P 500 and the Nasdaq 100) */
   function renderChart(book, Q, N, hasHist){
     var sec = $('#pf-chart-sec'); var S = book.series || [];
-    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-months').hidden = true; $('#pf-chart-sub').textContent = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
+    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-chart-sub').textContent = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
     sec.hidden = false; /* visible before measuring: the chart takes the width it will be drawn at */
     var seg = rangeSeg(S, pfRange), n = seg.length, usdMode = pfUnit === 'usd';
     var raw = pfRange === 'all' || seg[0].day === S[0].day; /* from the start of the book: against the $1,000,000, not rebased */
@@ -788,7 +794,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var disp = usdMode ? function(r){ return N * (1 + r); } : function(r){ return r * 100; };
     var fmtV = usdMode ? function(v){ return usd(v); } : function(v){ return pct(v); };
     var fmtTick = usdMode ? function(v){ return usd(v, Math.abs(hi - lo) < N * 0.1 ? 3 : 2); } : function(v){ return (v > 0 ? '+' : '') + v.toFixed(Math.abs(hi - lo) < 10 ? 1 : 0) + '%'; };
-    var lines = [{ k: 'book', l: 'Portfolio', v: reb('book'), c: 'lb' }, { k: 'SPY', l: 'S&P 500', v: reb('SPY'), c: 'ls' }, { k: 'QQQ', l: 'Nasdaq 100', v: reb('QQQ'), c: 'lq' }].filter(function(x){ return x.v.some(function(v){ return v != null; }); });
+    var allLines = [{ k: 'book', l: 'Portfolio', v: reb('book'), c: 'lb' }, { k: 'SPY', l: 'S&P 500', v: reb('SPY'), c: 'ls' }, { k: 'QQQ', l: 'Nasdaq 100', v: reb('QQQ'), c: 'lq' }].filter(function(x){ return x.v.some(function(v){ return v != null; }); });
+    var lines = allLines.filter(function(x){ return x.k === 'book' || pfBench[x.k] !== false; });
     lines.forEach(function(x){ x.d = x.v.map(function(r){ return r == null ? null : disp(r); }); });
     var all = []; lines.forEach(function(x){ x.d.forEach(function(v){ if (v != null) all.push(v); }); });
     var zeroV = disp(0), lo = Math.min(zeroV, Math.min.apply(null, all)), hi = Math.max(zeroV, Math.max.apply(null, all)); if (hi - lo < (usdMode ? N * 0.02 : 2)) { hi += usdMode ? N * 0.01 : 1; lo -= usdMode ? N * 0.01 : 1; } var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
@@ -806,16 +813,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var area = bookD ? '<path class="a" d="' + path(bookD) + 'L' + X(n - 1).toFixed(1) + ',' + Y(zeroV).toFixed(1) + 'L' + X(0).toFixed(1) + ',' + Y(zeroV).toFixed(1) + 'Z"/>' : '';
     var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" class="cv">' + grid + zero + area + lines.map(function(x){ return '<path class="l ' + x.c + '" d="' + path(x.d) + '"/>'; }).join('') + xl + '<line class="hv" x1="0" x2="0" y1="' + T + '" y2="' + (Hh - Bt) + '" hidden/>' + lines.map(function(x){ return '<circle class="dot ' + x.c + '" r="4" hidden/>'; }).join('') + '</svg>';
     var endTxt = function(x){ var r = x.v[x.v.length - 1]; return r == null ? '—' : usdMode ? usd(disp(r)) + ' <small class="' + sgn(r).trim() + '">' + pct(r * 100) + '</small>' : pct(r * 100); };
-    var legend = '<div class="lg">' + lines.map(function(x){ var r = x.v[x.v.length - 1]; return '<span><i class="' + x.c + '"></i>' + x.l + ' <b class="' + (usdMode ? '' : sgn(r).trim()) + '">' + endTxt(x) + '</b></span>'; }).join('') + '<span class="tip" id="pf-tip"></span></div>';
+    var legend = '<div class="lg">' + allLines.map(function(x){ var r = x.v[x.v.length - 1], off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span><i class="' + x.c + '"></i>' + x.l + ' <b class="' + (usdMode ? '' : sgn(r).trim()) + '">' + endTxt(x) + '</b></span>' : '<button type="button" class="lgb' + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '"><i class="' + x.c + '"></i>' + x.l + ' <b class="' + (usdMode ? '' : sgn(r).trim()) + '">' + endTxt(x) + '</b></button>'; }).join('') + '<span class="tip" id="pf-tip"></span></div>';
     $('#pf-chart').innerHTML = legend + svg;
     $('#pf-chart-sub').textContent = '· ' + M.fmtDate(seg[0].day) + ' → ' + M.fmtDate(seg[n - 1].day) + (usdMode ? ' · ' + usdFull(N) + ' in each' : (raw ? '' : ', rebased'));
-    /* month by month: the book's return per calendar month, last 12 (the current one to date) */
-    var mo = {}; S.forEach(function(p){ var m = p.day.slice(0, 7); mo[m] = p.book; });
-    var mk = Object.keys(mo).sort(), cells = [];
-    mk.forEach(function(m, i){ var end = 1 + mo[m], start = i === 0 ? 1 : 1 + mo[mk[i - 1]]; var r = start > 0 ? end / start - 1 : null; cells.push({ m: m, r: r, partial: i === mk.length - 1 }); });
-    cells = cells.slice(-12);
-    var mbox = $('#pf-months'); mbox.hidden = cells.length < 2;
-    if (cells.length >= 2) mbox.innerHTML = '<span class="k">Month by month</span>' + cells.map(function(c){ var d = new Date(c.m + '-15T00:00:00Z'); return '<span class="mo' + sgn(c.r) + '"><i>' + d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }) + (c.m.slice(0, 4) !== String(new Date().getFullYear()) ? ' ' + c.m.slice(2, 4) : '') + '</i><b>' + (c.r == null ? '—' : pct(c.r * 100, 1)) + '</b>' + (c.partial ? '<em>to date</em>' : '') + '</span>'; }).join('');
     /* hover: nearest day */
     var sv = $('#pf-chart svg'), hv = sv.querySelector('.hv'), dots = M.$$('.dot', sv), tip = $('#pf-tip');
     var show = function(ev){ var rc = sv.getBoundingClientRect(); var px = (ev.clientX - rc.left) / rc.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.hidden = false;
@@ -825,7 +825,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     sv.addEventListener('mousemove', show); sv.addEventListener('touchmove', function(ev){ if (ev.touches[0]) show(ev.touches[0]); }, { passive: true }); sv.addEventListener('mouseleave', hide);
   }
   var pfRz = null; window.addEventListener('resize', function(){ clearTimeout(pfRz); pfRz = setTimeout(function(){ if (current === 'portfolio' && !$('#pf-live').hidden) renderPortfolio(); }, 200); });
-  document.addEventListener('click', function(ev){ var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
+  document.addEventListener('click', function(ev){ var lb = ev.target.closest('#pf-chart button.lgb'); if (lb) { pfBench[lb.dataset.b] = pfBench[lb.dataset.b] === false; M.store.set('mws_bench', pfBench); renderPortfolio(); return; } var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
   function sortBy(h){ var st = h.closest('#pf-table') ? pfSort : trSort; if (st.k === h.dataset.k) st.d = -st.d; else { st.k = h.dataset.k; st.d = h.dataset.k === 'sym' || h.dataset.k === 'since' || h.dataset.k === 'side' ? 1 : -1; } renderPortfolio(); var again = $('#' + (st === pfSort ? 'pf-table' : 'tr-table') + ' th[data-k="' + st.k + '"]'); if (again) again.focus(); }
   document.addEventListener('click', function(ev){ var h = ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) sortBy(h); });
   document.addEventListener('keydown', function(ev){ if (ev.key !== 'Enter' && ev.key !== ' ') return; var h = ev.target.closest && ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) { ev.preventDefault(); sortBy(h); } });
@@ -917,7 +917,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var grp = b.parentNode.id; M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x === b); });
     if (grp === 'cal-imp') calF.imp = Number(b.dataset.v); if (grp === 'cal-reg') calF.reg = b.dataset.v; if (grp === 'cal-wk') { var dv = Number(b.dataset.v); calF.wk = dv === 0 ? 0 : Math.max(-1, Math.min(2, calF.wk + dv)); M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x.dataset.v === '0'); }); }
     if (grp === 'er-scope') erF.scope = b.dataset.v; if (grp === 'er-reg') erF.reg = b.dataset.v; if (grp === 'er-when') erF.when = b.dataset.v;
-    if (/^cal/.test(grp)) renderCalendar(); else renderEarnings(); pressChips();
+    if (/^cal/.test(grp)) renderCalendar(); else renderEarnings(); pressChips(); syncBarTag();
   });
   /* owner preview data */
   var SIM_EVENTS = (function(){ var d = function(h, m, off){ var x = new Date(); x.setHours(h, m, 0, 0); return new Date(x.getTime() + (off || 0) * 864e5).toISOString(); }; return [

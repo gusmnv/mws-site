@@ -302,6 +302,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   sb.auth.onAuthStateChange(function(ev){ if (ev === 'PASSWORD_RECOVERY') { isReset = true; recovering = true; if (typeof showReset === 'function') showReset(); } });
   var user = await M.header();
   if (recovering) isReset = true;
+  var mustSet = !!(user && user.user_metadata && user.user_metadata.must_set_password); /* logged in with a temporary password staff handed over: choose a real one first */
+  if (mustSet) { isReset = true; isInvite = true; }
   function gate(h, sub, opts){ $('#gate').hidden = false; $('#shell').hidden = true; $('#paygate').hidden = true; $('#g-h').textContent = h; $('#g-sub').textContent = sub || ''; $('#g-actions').hidden = !(opts && opts.login); $('#g-reload').hidden = !(opts && opts.reload); $('#g-back').hidden = !(opts && opts.back); $('#f-reset').hidden = !(opts && opts.form); }
   if (hashErr) {
     history.replaceState(null, '', location.pathname + location.search);
@@ -310,7 +312,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
   if (!user && !isReset) { M.go('/login?next=' + encodeURIComponent('/app' + location.search + (/^#[a-z]+$/.test(location.hash) ? location.hash : ''))); return; }
   /* a member who opened a reset link but changed their mind can go back; an invited account has no password yet, so it stays */
-  function showReset(){ gate(isInvite ? 'Welcome. Choose your password.' : 'Set a new password.', isInvite ? 'Your account is ready; this password is how you log in from now on.' : '', { form: true, back: !isInvite }); }
+  function showReset(){ gate(isInvite ? 'Welcome. Choose your password.' : 'Set a new password.', mustSet ? 'The temporary password was for this login only; this one is yours from now on.' : isInvite ? 'Your account is ready; this password is how you log in from now on.' : '', { form: true, back: !isInvite }); }
   /* safe href: only https (and tg://) links from the backend may be clicked */
   function href(u){ u = String(u || ''); return /^(https:\/\/|tg:\/\/)/i.test(u) ? esc(u) : '#'; }
   $('#f-reset').addEventListener('submit', async function(e){
@@ -319,7 +321,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (a.length < 8) return M.msg('#m-reset', 'At least 8 characters.', 'bad');
     if (a !== b) return M.msg('#m-reset', 'The passwords do not match.', 'bad');
     var btn = $('#f-reset .btn'); M.busy(btn, true);
-    try { var r = await sb.auth.updateUser({ password: a }); if (r.error) throw r.error; history.replaceState(null, '', '/app'); location.reload(); }
+    try { var r = await sb.auth.updateUser(mustSet ? { password: a, data: { must_set_password: false } } : { password: a }); if (r.error) throw r.error; history.replaceState(null, '', '/app'); location.reload(); }
     catch (err) { M.msg('#m-reset', M.human(err), 'bad'); M.busy(btn, false); }
   });
   if (isReset) {

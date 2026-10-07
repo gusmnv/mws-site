@@ -354,7 +354,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   route();
 
   /* ---- data ---- */
-  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, history = {}, histFor = '', tgUser = null, notices = [], lastLoad = 0;
+  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, qhist = {}, histFor = '', tgUser = null, notices = [], lastLoad = 0;
   var signup = M.signupState();
   /* the handoff belongs to the e-mail typed at checkout: another account on the same browser must not inherit its receipt or its "paid" state */
   if (signup.email && user.email && String(signup.email).toLowerCase() !== String(user.email).toLowerCase()) { signup = {}; M.store.del('mws_signup'); M.sess.del('mws_signup'); }
@@ -537,20 +537,20 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     return PF_ORDER.filter(function(g){ return by[g]; }).map(function(g){ return '<tr class="grp"><td colspan="' + cols + '">' + g + '</td></tr>' + by[g].map(rowFn).join(''); }).join('');
   }
   async function loadQuotes(){
-    if (!positions || !positions.length) { quotes = {}; history = {}; return; }
+    if (!positions || !positions.length) { quotes = {}; qhist = {}; return; }
     try { var q = await sb.from('quotes').select('*'); quotes = {}; (q.data || []).forEach(function(r){ quotes[String(r.symbol).toUpperCase()] = r; }); } catch (e) { quotes = {}; }
     /* daily closes since the first entry (one compact RPC): the chart and the book path. Re-read only when the set of symbols changes or once an hour. */
     var held = positions.filter(function(p){ return p.status === 'open' && p.kind !== 'order' && p.quote_symbol; });
     var first = held.map(function(p){ return String(p.opened_at || '').slice(0, 10); }).filter(Boolean).sort()[0];
     var key = held.map(function(p){ return p.quote_symbol; }).sort().join(',') + '|' + first + '|' + Math.floor(Date.now() / 3600000);
     if (!first || key === histFor) return;
-    try { var since = new Date(Math.max(Date.parse(first), Date.now() - 400 * 86400000)).toISOString().slice(0, 10); var h = await sb.rpc('quote_history_compact', { since: since }); history = {};
-      (h.data || []).forEach(function(r){ var days = r.days || [], closes = r.closes || []; history[String(r.symbol).toUpperCase()] = days.map(function(d, i){ return { day: String(d).slice(0, 10), close: Number(closes[i]) }; }); }); histFor = key; } catch (e) { history = {}; }
+    try { var since = new Date(Math.max(Date.parse(first), Date.now() - 400 * 86400000)).toISOString().slice(0, 10); var h = await sb.rpc('quote_history_compact', { since: since }); qhist = {};
+      (h.data || []).forEach(function(r){ var days = r.days || [], closes = r.closes || []; qhist[String(r.symbol).toUpperCase()] = days.map(function(d, i){ return { day: String(d).slice(0, 10), close: Number(closes[i]) }; }); }); histFor = key; } catch (e) { qhist = {}; }
   }
   var pfRange = 'all';
   function renderPortfolio(){
     var list = sim ? (sim.key === 'none' || sim.key === 'canceled' ? [] : SIM_POS) : (positions || []);
-    var Q = sim ? SIM_QUOTES : quotes, H = sim ? SIM_HIST : history;
+    var Q = sim ? SIM_QUOTES : quotes, H = sim ? SIM_HIST : qhist;
     var unlocked = !!(access && access.valid);
     var open = list.filter(function(p){ return p.status === 'open'; }), closed = list.filter(function(p){ return p.status === 'closed'; });
     var spot = open.filter(function(p){ return pfKind(p) === 'spot'; }), lev = open.filter(function(p){ return pfKind(p) === 'leveraged'; }), ord = open.filter(function(p){ return pfKind(p) === 'order'; }), held = spot.concat(lev);
@@ -601,7 +601,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* the book against the market since the first entry: % change of the book, S&P 500 (SPY) and Nasdaq 100 (QQQ), daily */
   function renderChart(book, Q){
     var sec = $('#pf-chart-sec'); var S = book.series || [];
-    var H = sim ? SIM_HIST : history, withHist = Object.keys(H).filter(function(k){ return H[k] && H[k].length >= 2; }).length;
+    var H = sim ? SIM_HIST : qhist, withHist = Object.keys(H).filter(function(k){ return H[k] && H[k].length >= 2; }).length;
     if (S.length < 2 || !withHist) { sec.hidden = true; $('#pf-months').hidden = true; return; } /* no daily closes yet (Backfill history in the admin): a flat line with a jump would mislead */
     sec.hidden = false; /* visible before measuring: the chart takes the width it will be drawn at */
     var from = S[0].day; if (pfRange === 'ytd') from = S[S.length - 1].day.slice(0, 4) + '-01-01'; else if (pfRange !== 'all') from = new Date(Date.parse(S[S.length - 1].day) - Number(pfRange) * 86400000).toISOString().slice(0, 10);

@@ -228,10 +228,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     <!-- TELEGRAM -->
     <section class="view" data-v="telegram">
-      <div class="two">
-        <div class="card rv"><h3>Channels the bot manages</h3><div id="chans"></div><p class="small muted" style="margin-top:14px">A channel appears here the moment @MrWallStreetBot is made admin in it (or when its admin rights are edited). The bot needs <b>Invite users via link</b> and <b>Ban users</b>.</p></div>
-        <div class="card rv d1"><h3>Members without Telegram <a class="link" href="#members" data-f="notg">See list</a></h3><ul class="attn" id="notg"></ul></div>
-      </div>
+      <div class="card rv"><h3>Channels the bot manages <span class="small muted" id="chans-hidden"></span></h3><div id="chans"></div><p class="small muted" style="margin-top:14px">A channel appears here the moment @MrWallStreetBot is made admin in it (or when its admin rights are edited). The bot needs <b>Invite users via link</b> and <b>Ban users</b>. "Hide" only takes a channel off this list; nothing is deleted and members are not affected. Members without Telegram: <a class="link" href="#members" data-f="notg">see the list</a>.</p></div>
     </section>
 
     <!-- ACCESS -->
@@ -283,17 +280,20 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
         <p class="small muted" style="margin-bottom:10px">The schedule runs every minute and fetches only what is due: the macro window hourly and every minute around a release; earnings daily and every 15 minutes in the reporting windows. Provider, countries, the provider’s time zone and the portfolio’s refresh cadence are set in the form below.</p>
         <div id="cal-status" class="small">Loading…</div>
         <form class="pf" id="f-mkt" novalidate style="margin-top:16px">
-          <div class="field"><label for="k-calendar_provider">Macro provider</label><select id="k-calendar_provider"><option value="preview">Preview (no key)</option><option value="eodhd">EODHD</option><option value="fmp">FMP</option></select></div>
+          <div class="field"><label for="k-calendar_provider">Macro provider</label><select id="k-calendar_provider"><option value="auto">Auto (EODHD when the key exists)</option><option value="preview">Preview (no key)</option><option value="eodhd">EODHD</option><option value="fmp">FMP</option></select></div>
           <div class="field w2"><label for="k-calendar_countries">Macro countries</label><input id="k-calendar_countries" type="text" placeholder="US,EU,GB,JP,CN,DE,CA,AU,CH"></div>
           <div class="field"><label for="k-calendar_tz">Provider time zone</label><input id="k-calendar_tz" type="text" placeholder="UTC"></div>
           <div class="field w2"><label for="k-earnings_countries">Earnings markets</label><input id="k-earnings_countries" type="text" placeholder="US,GB,DE,JP"></div>
           <div class="field"><label for="k-earnings_days_ahead">Earnings days ahead</label><input id="k-earnings_days_ahead" type="number" min="1" max="60" placeholder="14"></div>
           <div class="field"><label for="k-earnings_days_back">Earnings days back</label><input id="k-earnings_days_back" type="number" min="0" max="60" placeholder="7"></div>
+          <div class="field w2"><label for="k-tg_brief_chat_id">Telegram channel id (posts)</label><input id="k-tg_brief_chat_id" type="text" placeholder="empty = no posts · e.g. -1004330448432"></div>
+          <div class="field"><label for="k-tg_brief_hour">Brief at (Lisbon)</label><input id="k-tg_brief_hour" type="text" placeholder="08:00"></div>
+          <div class="field"><label for="k-tg_alerts">Release alerts</label><select id="k-tg_alerts"><option value="on">On</option><option value="off">Off</option></select></div>
           <div class="field w2"><label for="k-quotes_benchmarks">Portfolio benchmarks</label><input id="k-quotes_benchmarks" type="text" placeholder="SPY,QQQ,BTC/USD"></div>
-          <div class="field"><label for="k-quotes_interval_min">Quote refresh (min)</label><input id="k-quotes_interval_min" type="number" min="1" max="240" placeholder="15"></div>
-          <div class="field"><label for="k-quotes_per_minute">Credits / minute</label><input id="k-quotes_per_minute" type="number" min="1" max="5000" placeholder="8 (Grow 377)"></div>
-          <div class="field"><label for="k-quotes_daily_budget">Credits / day</label><input id="k-quotes_daily_budget" type="number" min="10" placeholder="760 (Grow 500000)"></div>
-          <div class="acts"><button class="btn sm acc" type="submit" id="mkt-save" data-busy="Saving">Save market data settings</button><span class="small muted">Takes effect on the next scheduled run. Keys (TWELVE_DATA_KEY, CALENDAR_KEY) live only in Supabase → Edge Functions → Secrets.</span></div>
+          <div class="field"><label for="k-quotes_interval_min">Quote refresh</label><input id="k-quotes_interval_min" type="text" placeholder="auto"></div>
+          <div class="field"><label for="k-quotes_per_minute">Credits / minute</label><input id="k-quotes_per_minute" type="number" min="1" max="5000" placeholder="auto (from the plan)"></div>
+          <div class="field"><label for="k-quotes_daily_budget">Credits / day</label><input id="k-quotes_daily_budget" type="number" min="10" placeholder="auto (from the plan)"></div>
+          <div class="acts"><button class="btn sm acc" type="submit" id="mkt-save" data-busy="Saving">Save market data settings</button><button class="btn sm ghost" type="button" id="tg-brief-now" data-busy="Posting" title="Post today's brief to the channel now">Post the brief now</button><span class="small muted">Everything here is automatic by default (the plan is read from Twelve Data, the macro source follows the key). Change only what you mean to. Keys (TWELVE_DATA_KEY, CALENDAR_KEY) live only in Supabase → Edge Functions → Secrets.</span></div>
         </form>
       </div>
       <div class="card rv d2" style="margin-top:22px"><h3>Closed · track record <span class="small muted" id="pf-closed-n"></span></h3><div class="tblw"><table class="tbl"><thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>Exit</th><th>Result</th><th>Opened</th><th>Closed</th><th>Thesis</th><th></th></tr></thead><tbody id="pf-closed"></tbody></table></div></div>
@@ -582,8 +582,13 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
     // telegram
     var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
-    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + D.channels.map(function(c){ return '<li><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + ' <button class="link" data-ch="' + X(c.chat_id) + '" data-on="' + (c.enabled ? '0' : '1') + '">' + (c.enabled ? 'Switch off' : 'Switch on') + '</button></span></li>'; }).join('') + '</ul>' : '<p class="muted">No channels registered yet. Make @MrWallStreetBot admin in a channel (from a Telegram account connected to an owner account) and it appears here.</p>';
-    $('#notg').innerHTML = rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 12).map(function(e){ return '<li><span>' + X(e.email) + '</span><span class="small muted">' + X(e.best.plan_key || '') + '</span></li>'; }).join('') || '<li class="muted">Everyone with access is connected.</li>';
+    var hiddenCh = []; try { hiddenCh = JSON.parse(D.settings.tg_hidden_channels || '[]').map(Number); } catch (e) { hiddenCh = []; }
+    var chRow = function(c){ var hid = hiddenCh.indexOf(Number(c.chat_id)) >= 0; return '<li' + (hid ? ' class="muted"' : '') + '><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + ' <button class="link" data-ch="' + X(c.chat_id) + '" data-on="' + (c.enabled ? '0' : '1') + '">' + (c.enabled ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-chh="' + X(c.chat_id) + '" data-hide="' + (hid ? '0' : '1') + '">' + (hid ? 'Unhide' : 'Hide') + '</button></span></li>'; };
+    var shown = D.channels.filter(function(c){ return showHidden || hiddenCh.indexOf(Number(c.chat_id)) < 0; });
+    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + shown.map(chRow).join('') + '</ul>' : '<p class="muted">No channels registered yet. Make @MrWallStreetBot admin in a channel (from a Telegram account connected to an owner account) and it appears here.</p>';
+    var nHid = D.channels.filter(function(c){ return hiddenCh.indexOf(Number(c.chat_id)) >= 0; }).length;
+    $('#chans-hidden').innerHTML = nHid ? '· <button class="link" id="chans-show" type="button">' + (showHidden ? 'Hide the ' + nHid + ' hidden' : 'Show ' + nHid + ' hidden') + '</button>' : '';
+    var sh = $('#chans-show'); if (sh) sh.addEventListener('click', function(){ showHidden = !showHidden; render(); });
 
     // access (manual)
     var man = D.memberships.filter(function(m){ return m.id.indexOf('manual_') === 0; });
@@ -726,6 +731,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     try { await M.fn('admin', { action: 'channel_toggle', chat_id: Number(b.dataset.ch), enabled: on }); M.msg('#m', on ? 'Channel switched on. Members get their links on the next sync or when they open the Telegram page.' : 'Channel switched off.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
   });
   document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-chh]'); if (!b) return; var hide = b.dataset.hide === '1';
+    try { await M.fn('admin', { action: 'channel_hide', chat_id: Number(b.dataset.chh), hidden: hide }); M.msg('#m', hide ? 'Channel hidden from this list (nothing deleted; members unaffected).' : 'Channel shown again.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  document.addEventListener('click', async function(ev){
     var b = ev.target.closest('button[data-plan]'); if (!b) return; ev.stopPropagation();
     var on = b.dataset.on === '1'; if (!on && !confirm('Stop this plan from granting access? Members on it lose access on the next sync.')) return;
     try { await M.fn('admin', { action: 'plan_access', plan_id: b.dataset.plan, grants_access: on }); M.msg('#m', 'Plan updated.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
@@ -760,7 +769,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   // portfolio (The Desk): staff writes public.positions directly (RLS: owner/admin only), members read it in /app#portfolio.
   // Prices: public.quotes (the quotes function, Twelve Data). The numbers here come from M.book, the same model the member page uses.
-  var POS = [], QUOTES = {}, HAS_Q = true, QSTAT = null, pfT = null;
+  var POS = [], QUOTES = {}, HAS_Q = true, QSTAT = null, pfT = null, showHidden = false;
   function num(v){ v = String(v == null ? '' : v).trim(); if (!v) return null; var n = Number(v); return isNaN(n) ? null : n; }
   function fmtN(n){ if (n == null) return '—'; n = Number(n); return n >= 1000 ? n.toLocaleString('en-US', { maximumFractionDigits: n >= 10000 ? 0 : 1 }) : n.toLocaleString('en-US', { maximumFractionDigits: n < 1 ? 4 : 2 }); }
   function pctS(v, dp){ if (v == null || !isFinite(v)) return '—'; return '<span class="' + (v > 0 ? 'pos' : v < 0 ? 'neg' : '') + '">' + (v > 0 ? '+' : '') + Number(v).toFixed(dp == null ? 2 : dp) + '%</span>'; }
@@ -801,11 +810,13 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var el = $('#cal-status'); if (!el) return;
     try { var r = await M.fn('calendar', { action: 'status' }); var st = r.state || {}; var t = function(x){ return x ? new Date(x).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'never'; };
       var S0 = r.settings || {}; Object.keys(S0).forEach(function(k){ var f = $('#k-' + k); if (f && document.activeElement !== f) f.value = S0[k]; });
-      el.innerHTML = '<div><b>Macro calendar</b> · provider <b>' + X(r.provider) + '</b>' + (r.provider !== 'preview' && !r.has_calendar_key ? ' <span class="neg">· CALENDAR_KEY missing in Edge Functions → Secrets</span>' : '') + (r.provider === 'preview' ? ' <span class="muted">· preview feed (this week only, no actuals): set calendar_provider to eodhd or fmp with a key</span>' : '') + ' · countries ' + X(r.countries || '—') + ' · ' + r.events + ' events loaded · last window ' + t(st.macro_full_at) + (st.macro_quick_at ? ' · last release check ' + t(st.macro_quick_at) : '') + (st.macro_error ? ' · <span class="neg">' + X(st.macro_error) + '</span>' : '') + (r.next_high ? '<br><span class="muted">Next high impact: ' + X(r.next_high.country + ' ' + r.next_high.title) + ' · ' + t(r.next_high.at) + '</span>' : '') + '</div>'
+      el.innerHTML = '<div><b>Macro calendar</b> · provider <b>' + X(r.provider) + '</b>' + (r.provider !== 'preview' && !r.has_calendar_key ? ' <span class="neg">· CALENDAR_KEY missing in Edge Functions → Secrets</span>' : '') + (r.provider === 'preview' ? ' <span class="muted">· preview feed (this week only, no actuals) until CALENDAR_KEY exists in Secrets — then EODHD takes over by itself</span>' : '') + ' · countries ' + X(r.countries || '—') + ' · ' + r.events + ' events loaded · last window ' + t(st.macro_full_at) + (st.macro_quick_at ? ' · last release check ' + t(st.macro_quick_at) : '') + (st.macro_error ? ' · <span class="neg">' + X(st.macro_error) + '</span>' : '') + (r.next_high ? '<br><span class="muted">Next high impact: ' + X(r.next_high.country + ' ' + r.next_high.title) + ' · ' + t(r.next_high.at) + '</span>' : '') + '</div>'
+        + '<div style="margin-top:8px"><b>Telegram posts</b> · ' + (S0.tg_brief_chat_id ? 'channel ' + X(S0.tg_brief_chat_id) + ' · brief at ' + X(S0.tg_brief_hour || '08:00') + ' Lisbon · alerts ' + X(S0.tg_alerts || 'on') : '<span class="muted">off (no channel set)</span>') + '</div>'
         + '<div style="margin-top:8px"><b>Earnings</b> · Twelve Data' + (!r.has_td_key ? ' <span class="neg">· TWELVE_DATA_KEY missing</span>' : '') + ' · markets ' + X(r.earnings_countries || '—') + ' · ' + r.earnings + ' reports from today on · last window ' + t(st.earnings_full_at) + (st.earnings_today_at ? ' · last intraday check ' + t(st.earnings_today_at) : '') + (st.earnings_error ? ' · <span class="neg">' + X(st.earnings_error) + (/credits/i.test(st.earnings_error) ? ' (needs the Grow plan: 40 credits a request)' : '') + '</span>' : '') + '</div>';
     } catch (e) { el.innerHTML = '<span class="neg">' + X(M.human(e)) + '</span> <span class="muted">· is the calendar function deployed?</span>'; }
   }
-  $('#f-mkt').addEventListener('submit', async function(ev){ ev.preventDefault(); var btn = $('#mkt-save'); M.busy(btn, true); var keys = ['calendar_provider', 'calendar_countries', 'calendar_tz', 'earnings_countries', 'earnings_days_ahead', 'earnings_days_back', 'quotes_benchmarks', 'quotes_interval_min', 'quotes_per_minute', 'quotes_daily_budget']; var done = 0; try { for (var i = 0; i < keys.length; i++) { var v = $('#k-' + keys[i]).value.trim(); if (v === '' && keys[i] !== 'calendar_countries') continue; await M.fn('calendar', { action: 'configure', key: keys[i], value: v }); done++; } M.msg('#m', 'Market data settings saved (' + done + ').', 'ok'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); loadCalStatus(); } });
+  $('#f-mkt').addEventListener('submit', async function(ev){ ev.preventDefault(); var btn = $('#mkt-save'); M.busy(btn, true); var keys = ['calendar_provider', 'calendar_countries', 'calendar_tz', 'earnings_countries', 'earnings_days_ahead', 'earnings_days_back', 'quotes_benchmarks', 'quotes_interval_min', 'quotes_per_minute', 'quotes_daily_budget', 'tg_brief_chat_id', 'tg_brief_hour', 'tg_alerts']; var done = 0; try { for (var i = 0; i < keys.length; i++) { var v = $('#k-' + keys[i]).value.trim(); if (v === '' && keys[i] !== 'calendar_countries' && keys[i] !== 'tg_brief_chat_id') continue; await M.fn('calendar', { action: 'configure', key: keys[i], value: v }); done++; } M.msg('#m', 'Market data settings saved (' + done + ').', 'ok'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); loadCalStatus(); } });
+  $('#tg-brief-now').addEventListener('click', async function(){ if (!confirm('Post today\'s brief to the Telegram channel now? Members see it the moment you confirm.')) return; M.busy(this, true); try { var r = await M.fn('calendar', { action: 'brief_now' }); M.msg('#m', r.ok ? 'Brief posted to the channel.' : 'Nothing posted (check the channel id).', r.ok ? 'ok' : 'bad'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); } });
   $('#cal-refresh').addEventListener('click', async function(){ M.busy(this, true); try { var r = await M.fn('calendar', { action: 'refresh_macro' }); M.msg('#m', 'Calendar: ' + r.written + ' events from ' + r.provider + ' (' + r.from + ' → ' + r.to + ').', 'ok'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); loadCalStatus(); } });
   $('#er-refresh').addEventListener('click', async function(){ M.busy(this, true); try { var r = await M.fn('calendar', { action: 'refresh_earnings' }); M.msg('#m', 'Earnings: ' + r.written + ' reports (' + r.from + ' → ' + r.to + ')' + (r.failed && r.failed.length ? ', failed: ' + r.failed.join(', ') : '') + '.', r.failed && r.failed.length ? 'bad' : 'ok'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); loadCalStatus(); } });
   function feedLine(){

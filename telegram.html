@@ -19,9 +19,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=7a0476e3">
+<link rel="stylesheet" href="/mws.css?v=e384d95c">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=7a0476e3"></script>
+<script src="/mws.js?v=e384d95c"></script>
 <style>
 .sc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(32px,5vw,72px);align-items:start}
 .sc .lock{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line-2);padding:4px 8px;color:var(--fg-2);margin-left:6px;white-space:nowrap}
@@ -115,7 +115,7 @@
   var user = await M.header(); if (!user) return;
   /* a member goes straight in; anyone else logged in sees the door with their own next step */
   try { var r = await sb.rpc('my_access'); if (r.data && r.data.valid) { $('#cta').innerHTML = '<div class="row2"><a class="btn acc" href="/app#' + KEY + '">Opening your member area <span class="ar"></span></a></div>'; location.replace('/app#' + KEY); return; } } catch (e) {}
-  $('#cta').innerHTML = '<div class="row2"><a class="btn acc" href="/join">Choose your entry <span class="ar"></span></a><a class="link" href="/app">Your account</a></div><p class="small muted">You are logged in as ' + M.esc(user.email) + ' without an active membership. Paid on Whop with another email? Open your account and use "Find my membership".</p>';
+  $('#cta').innerHTML = '<div class="row2"><a class="btn acc" href="/join">Choose your entry <span class="ar"></span></a><a class="link" href="/app">Your account</a></div><p class="small muted">You are logged in as ' + M.esc(user.email) + ' without an active membership. Paid on Whop with another email? Open your account and press "Check again" on the Membership page.</p>';
 })();
 </script>
 </body></html>

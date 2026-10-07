@@ -19,9 +19,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=7a0476e3">
+<link rel="stylesheet" href="/mws.css?v=e384d95c">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=7a0476e3"></script>
+<script src="/mws.js?v=e384d95c"></script>
 </head>
 <body>
 <header class="top"><div class="wrap">
@@ -35,7 +35,7 @@
   <form class="panel rv d1" id="f-login" novalidate>
     <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com"></div>
     <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Your password"></div>
-    <div class="msg" id="m"></div>
+    <div class="msg" id="m" aria-live="polite"></div>
     <button class="btn acc wide" type="submit" data-busy="Logging in">Log in <span class="ar"></span></button>
     <div class="row" style="margin-top:16px"><button class="link" type="button" id="forgot">Forgot password?</button><a class="link" href="/join">No account yet? Join</a></div>
   </form>
@@ -44,7 +44,7 @@
     <div class="ttl"><h3>Reset your password</h3></div>
     <p class="muted small" style="margin-bottom:16px">Enter your email and we will send you a link to set a new password.</p>
     <div class="field"><label for="femail">Email</label><input id="femail" type="email" autocomplete="email" inputmode="email"></div>
-    <div class="msg" id="m-forgot"></div>
+    <div class="msg" id="m-forgot" aria-live="polite"></div>
     <div class="row"><button class="link" type="button" id="back">← Back to log in</button><button class="btn acc" type="submit" data-busy="Sending">Send reset link <span class="ar"></span></button></div>
   </form>
 
@@ -52,10 +52,11 @@
     <div class="ttl"><h3>Confirm your email</h3></div>
     <p class="muted small" style="margin-bottom:16px">This account was never confirmed. We just sent a 6-digit code to <b id="otp-email"></b> from <b>contact@mrofwallstreet.com</b>. Enter it to finish.</p>
     <div class="field"><label for="otp">Code</label><div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></div></div>
-    <div class="msg" id="m-otp"></div>
+    <div class="msg" id="m-otp" aria-live="polite"></div>
     <button class="btn acc wide" type="submit" data-busy="Confirming">Confirm and log in <span class="ar"></span></button>
     <p class="small muted" style="margin-top:14px">No email? Check Spam, Junk or Promotions, or <button class="link" type="button" id="resend" data-busy="sending a new code">send a new code</button>.</p>
     <p class="small muted" style="margin-top:8px">Didn’t receive anything? Write to <a href="mailto:contact@mrofwallstreet.com?subject=Verify%20my%20account">contact@mrofwallstreet.com</a> from this address and we answer within 24 hours — usually within 6.</p>
+    <p class="small" style="margin-top:12px"><button class="link" type="button" id="otp-back">← Back to log in</button></p>
   </form>
 
   <p class="small muted rv d2" style="margin-top:22px">Already a member through Whop? Log in with the same email, or <a href="/signup">create your account</a> with it and your membership is recognised automatically.</p>
@@ -104,6 +105,7 @@
 
   $('#forgot').addEventListener('click', function(){ $('#femail').value = $('#email').value; $('#f-login').hidden = true; $('#f-forgot').hidden = false; $('#femail').focus(); });
   $('#back').addEventListener('click', function(){ $('#f-forgot').hidden = true; $('#f-login').hidden = false; });
+  $('#otp-back').addEventListener('click', function(){ $('#f-otp').hidden = true; $('#f-login').hidden = false; $('#email').focus(); });
   $('#f-forgot').addEventListener('submit', async function(e){
     e.preventDefault();
     var email = $('#femail').value.trim().toLowerCase();

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=7a0476e3">
+<link rel="stylesheet" href="/mws.css?v=e384d95c">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=7a0476e3"></script>
+<script src="/mws.js?v=e384d95c"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -21,7 +21,7 @@
     <div class="ttl"><h3>Set a new password</h3></div>
     <div class="field"><label for="npw">New password</label><input id="npw" type="password" autocomplete="new-password" minlength="8"></div>
     <div class="field"><label for="npw2">Confirm</label><input id="npw2" type="password" autocomplete="new-password"></div>
-    <div class="msg" id="m-reset"></div>
+    <div class="msg" id="m-reset" aria-live="polite"></div>
     <button class="btn acc" type="submit" data-busy="Saving">Save password <span class="ar"></span></button>
   </form>
   <div class="row" id="g-back" hidden style="margin-top:18px"><a class="link" href="/app">Not now, back to the member area</a></div>
@@ -44,15 +44,17 @@
     </div>
     <nav class="snav" id="snav">
       <a href="#telegram" data-p="telegram"><i>01</i>Telegram<span class="cnt" id="n-tg"></span></a>
-      <a href="#portfolio" data-p="portfolio"><i>02</i>Portfolio<span class="cnt" id="n-pf"></span></a>
       <p class="grp">The Desk <span class="soon" id="desk-grp-tag">In development</span></p>
-      <a href="#calendar" data-p="calendar"><i>03</i>Calendar<span class="cnt" id="n-cal"></span></a>
-      <a href="#earnings" data-p="earnings"><i>04</i>Earnings<span class="cnt" id="n-er"></span></a>
+      <a href="#portfolio" data-p="portfolio"><i>02</i>Portfolio<span class="cnt" id="n-pf"></span></a>
+      <a href="#trades" data-p="trades"><i>03</i>Trades<span class="cnt" id="n-tr"></span></a>
+      <a href="#track" data-p="track"><i>04</i>Track record<span class="cnt" id="n-tk"></span></a>
+      <a href="#calendar" data-p="calendar"><i>05</i>Calendar<span class="cnt" id="n-cal"></span></a>
+      <a href="#earnings" data-p="earnings"><i>06</i>Earnings<span class="cnt" id="n-er"></span></a>
       <p class="grp">Settings</p>
-      <a href="#account" data-p="account"><i>05</i>Account</a>
-      <a href="#membership" data-p="membership"><i>06</i>Membership<span class="cnt" id="n-mem"></span></a>
-      <a href="#devices" data-p="devices"><i>07</i>Devices</a>
-      <a href="#feedback" data-p="feedback"><i>08</i>Feedback<span class="cnt" id="n-fb"></span></a>
+      <a href="#account" data-p="account"><i>07</i>Account</a>
+      <a href="#membership" data-p="membership"><i>08</i>Membership<span class="cnt" id="n-mem"></span></a>
+      <a href="#devices" data-p="devices"><i>09</i>Devices</a>
+      <a href="#feedback" data-p="feedback"><i>10</i>Feedback<span class="cnt" id="n-fb"></span></a>
     </nav>
     <div class="side-foot">
       <a class="adm" href="/admin" id="side-admin" hidden>Admin <span>→</span></a>
@@ -72,13 +74,13 @@
 
       <!-- 07 membership -->
       <section class="page" data-page="membership">
-        <div class="head rv"><p class="eyebrow"><b>/06</b>Membership</p><h1>Your membership.</h1><p id="mem-sub" hidden></p></div>
+        <div class="head rv"><p class="eyebrow"><b>/08</b>Membership</p><h1>Your membership.</h1><p id="mem-sub" hidden></p></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="p-access"><div class="ttl"><h3>Plan &amp; billing</h3><span class="tag" id="st">—</span></div><div id="access-body"></div></section>
             <section class="panel rv d1" id="p-manage"><div class="ttl"><h3>Manage your plan</h3><span class="small muted" id="mg-n"></span></div>
               <div id="mg-list"></div>
-              <div class="msg" id="m-mg"></div>
+              <div class="msg" id="m-mg" aria-live="polite"></div>
               <p class="small muted" style="margin-top:14px">Cancelling stops the next charge; your access runs to the end of what you paid. Changed your mind? Resume with one tap. Card details are the one thing entered on Whop's secure page.</p>
             </section>
             <section class="panel rv d1" id="p-bill"><div class="ttl"><h3>Billing history</h3><span class="small muted" id="bill-n"></span></div>
@@ -126,23 +128,24 @@
 
       <!-- 03–05 the desk -->
       <section class="page" data-page="portfolio">
-        <div class="pfh"><p class="eyebrow"><b>/02</b>Portfolio <span class="soon" id="pf-tag">In development</span></p><p id="pf-sub" hidden></p></div>
+        <div class="head rv"><p class="eyebrow"><b>/02</b>Portfolio <span class="soon" id="pf-tag">In development</span></p><h1>Our portfolio.</h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
-          <div class="fbar rv" style="margin-top:0"><span class="chips" id="pf-book"><button type="button" data-v="spot" class="on">Spot</button><button type="button" data-v="lev">Leveraged trades</button><button type="button" data-v="orders">Orders</button><button type="button" data-v="closed">Track record</button></span></div>
-          <div class="fbar" style="margin-top:10px"><span class="chips" id="pf-view"><button type="button" data-v="pl" class="on">Profit/Loss</button><button type="button" data-v="exposure">Exposure</button><button type="button" data-v="perf">Performance</button></span></div>
-          <div class="sumbar rv" id="pf-sum"></div>
-          <div id="pf-pl"><div class="ptw"><table class="pt cards" id="pf-table"></table></div></div>
-          <div id="pf-exposure" hidden>
-            <div class="fbar" style="margin-top:0"><span class="chips" id="pf-grp"><button type="button" data-v="security" class="on">By position</button><button type="button" data-v="class">By asset class</button><button type="button" data-v="side">Long / short</button></span></div>
-            <div class="expo"><div class="donut" id="pf-donut"></div><div class="ptw"><table class="pt cards" id="pf-expo-table"></table></div></div>
+          <div class="pf-top rv"><span class="chips" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span><span class="muted small" id="pf-asof"></span></div>
+          <div class="kpis rv" id="pf-kpis"></div>
+          <div class="pf-grid rv d1">
+            <div class="pf-cell">
+              <div class="sh"><h2>Performance <span class="muted" id="pf-chart-sub"></span></h2><span class="chips sm" id="pf-unit"><button type="button" data-v="pct" class="on">%</button><button type="button" data-v="usd">$</button></span></div>
+              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div><div class="months" id="pf-months" hidden></div></div>
+              <div class="banner" id="pf-perf-empty" hidden><div><b>The curve starts with the first daily closes.</b><p>The book is priced live from today; the line against the S&amp;P 500 and the Nasdaq 100 appears as the days close.</p></div></div>
+            </div>
+            <div class="pf-cell">
+              <div class="sh"><h2>Exposure</h2><span class="chips sm" id="pf-grp"><button type="button" data-v="security" class="on">By asset</button><button type="button" data-v="class">By class</button></span></div>
+              <div class="donut" id="pf-donut"></div>
+            </div>
           </div>
-          <div id="pf-perf" hidden>
-            <div class="sec" id="pf-chart-sec" hidden style="margin-top:0"><div class="sh"><h2>Book vs the market <span class="muted" id="pf-chart-sub"></span></h2><span class="rng" id="pf-rng"><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="180">6M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="all" class="on">All</button></span></div><div class="chart" id="pf-chart"></div><div class="stats" id="pf-stats"></div><div class="months" id="pf-months" hidden></div></div>
-            <div class="banner" id="pf-perf-empty" hidden><div><b>The curve starts with the first daily closes.</b><p>The book is priced live from today; the chart against the S&amp;P 500 and the Nasdaq appears once there is history.</p></div></div>
-            <div class="alloc rv" id="pf-alloc" style="margin-top:18px;border-top:1px solid var(--line)"></div>
-          </div>
-          <div id="pf-orders" hidden><div class="ptw"><table class="pt cards" id="pf-ord"></table></div><p class="small muted" style="margin-top:12px">Resting orders: where we add or open if the market comes to us.</p></div>
-          <div id="pf-closed" hidden><div class="ptw"><table class="pt cards" id="pf-closed-table"></table></div></div>
+          <div class="sh rv d2" style="margin-top:22px"><h2>Holdings <span class="muted" id="pf-hold-n"></span></h2></div>
+          <div class="ptw rv d2"><table class="pt cards" id="pf-table"></table></div>
+          <div id="pf-orders" hidden><div class="sh" style="margin-top:22px"><h2>Resting orders</h2></div><div class="ptw"><table class="pt cards" id="pf-ord"></table></div></div>
           <p class="small muted" style="margin-top:18px" id="pf-foot"></p>
         </div>
         <div id="pf-locked" hidden class="banner"><div><b>Members only.</b><p>The portfolio opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
@@ -158,9 +161,25 @@
         <p class="small muted rv d2" style="margin-top:18px">Until it opens, positions and updates are posted in the Exclusive channel. Members are told in the channels the day the Desk goes live.</p>
         </div>
       </section>
+      <section class="page" data-page="trades">
+        <div class="head rv"><p class="eyebrow"><b>/03</b>Trades <span class="soon" id="tr-tag">In development</span></p><h1>Our trades.</h1></div>
+        <div id="tr-live" hidden>
+          <div class="ptw"><table class="pt cards" id="tr-table"></table></div>
+          <div id="tr-orders" hidden><div class="sh" style="margin-top:22px"><h2>Resting orders</h2></div><div class="ptw"><table class="pt cards" id="tr-ord"></table></div></div>
+          <p class="small muted" style="margin-top:18px" id="tr-foot"></p>
+        </div>
+        <div id="tr-locked" hidden class="banner"><div><b>Members only.</b><p>The trades open with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
+        <div id="tr-empty" hidden class="banner"><div><b>No trade open right now.</b><p>Leveraged trades appear here the moment one is opened; the portfolio is the spot book.</p></div></div>
+      </section>
+      <section class="page" data-page="track">
+        <div class="head rv"><p class="eyebrow"><b>/04</b>Track record <span class="soon" id="tk-tag">In development</span></p><h1>Every call, closed.</h1></div>
+        <div id="tk-live" hidden><div class="ptw"><table class="pt cards" id="tk-table"></table></div><p class="small muted" style="margin-top:18px" id="tk-foot"></p></div>
+        <div id="tk-locked" hidden class="banner"><div><b>Members only.</b><p>The track record opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
+        <div id="tk-empty" hidden class="banner"><div><b>Nothing closed yet.</b><p>Closed calls land here with entry, exit and result.</p></div></div>
+      </section>
       <section class="page" data-page="position"><div id="pos-page"></div></section>
       <section class="page" data-page="calendar">
-        <div class="head rv"><p class="eyebrow"><b>/03</b>The Desk · Calendar <span class="soon" id="cal-tag">In development</span></p><h1>The week, before it happens.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/05</b>The Desk · Calendar <span class="soon" id="cal-tag">In development</span></p><h1>The week, before it happens.</h1></div>
         <div id="cal-live" hidden>
           <div class="banner next rv" id="cal-next" hidden></div>
           <div class="fbar rv">
@@ -185,7 +204,7 @@
         </div>
       </section>
       <section class="page" data-page="earnings">
-        <div class="head rv"><p class="eyebrow"><b>/04</b>The Desk · Earnings <span class="soon" id="er-tag">In development</span></p><h1>Report season, covered.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/06</b>The Desk · Earnings <span class="soon" id="er-tag">In development</span></p><h1>Report season, covered.</h1></div>
         <div id="er-live" hidden>
           <div class="banner next rv" id="er-strip" hidden></div>
           <div class="fbar rv">
@@ -212,7 +231,7 @@
 
       <!-- 06 account -->
       <section class="page" data-page="account">
-        <div class="head rv"><p class="eyebrow"><b>/05</b>Account</p><h1>Your account.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/07</b>Account</p><h1>Your account.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv"><div class="ttl"><h3>You</h3><span class="tag" id="acc-tag" hidden>Add your name</span></div>
@@ -224,15 +243,15 @@
               </dl>
               <form id="f-name" hidden style="margin-top:22px" novalidate>
                 <div class="field"><label for="cname">New name</label><input id="cname" type="text" maxlength="24" autocomplete="name" spellcheck="false"><span class="small muted" style="display:block;margin-top:6px">3 to 24 characters.</span></div>
-                <div class="msg" id="m-name"></div>
+                <div class="msg" id="m-name" aria-live="polite"></div>
                 <div class="row"><button class="btn sm acc" type="submit" data-busy="Saving">Save name</button><button class="link" type="button" id="name-cancel">Cancel</button></div>
               </form>
               <form id="f-pw" hidden style="margin-top:22px" novalidate>
                 <div class="field"><label for="cpw">New password</label><input id="cpw" type="password" autocomplete="new-password" minlength="8"></div>
-                <div class="msg" id="m-pw"></div>
+                <div class="msg" id="m-pw" aria-live="polite"></div>
                 <div class="row"><button class="btn sm acc" type="submit" data-busy="Saving">Save password</button><button class="link" type="button" id="pw-cancel">Cancel</button></div>
               </form>
-              <div class="msg" id="m-sec"></div>
+              <div class="msg" id="m-sec" aria-live="polite"></div>
             </section>
           </div>
           <div></div>
@@ -241,12 +260,12 @@
 
       <!-- 08 devices -->
       <section class="page" data-page="devices">
-        <div class="head rv"><p class="eyebrow"><b>/07</b>Devices</p><h1>Where you are logged in.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/09</b>Devices</p><h1>Where you are logged in.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv"><div class="ttl"><h3>Sessions</h3><span class="small muted" id="dev-n"></span></div>
               <div id="dev-list"><p class="small muted">Loading…</p></div>
-              <div class="msg" id="m-dev"></div>
+              <div class="msg" id="m-dev" aria-live="polite"></div>
               <div class="row" style="margin-top:18px"><button class="btn sm ghost" id="out-others" type="button" data-busy="Ending">Log out of all other devices</button></div>
             </section>
           </div>
@@ -256,14 +275,14 @@
 
       <!-- 08 feedback: the inbox. Members write here; it lands in Admin → Inbox and the answer shows up on this page -->
       <section class="page" data-page="feedback">
-        <div class="head rv"><p class="eyebrow"><b>/08</b>Feedback</p><h1>Tell us.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/10</b>Feedback</p><h1>Tell us.</h1></div>
         <div class="acct">
           <div>
             <section class="panel rv" id="sup-new"><div class="ttl"><h3>Write to Mr. Wall Street</h3><span class="tag">Inbox</span></div>
               <form id="f-sup" novalidate>
                 <div class="field"><label for="sup-subject">Subject</label><input id="sup-subject" type="text" maxlength="120" placeholder="An idea for the Desk, a question, a problem…"></div>
                 <div class="field"><label for="sup-body">Message</label><textarea id="sup-body" class="ta" rows="5" maxlength="4000" placeholder="Say it plainly. For payment issues, add the receipt email and date."></textarea></div>
-                <div class="msg" id="m-sup"></div>
+                <div class="msg" id="m-sup" aria-live="polite"></div>
                 <div class="row"><span class="small muted">Answers arrive here, usually within a day.</span><button class="btn acc" type="submit" data-busy="Sending">Send <span class="ar"></span></button></div>
               </form>
             </section>
@@ -292,11 +311,12 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { telegram:'Telegram', portfolio:'Portfolio', position:'Portfolio', calendar:'Calendar', earnings:'Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
-  var posId = null; /* #position/<id>: one position, its numbers, the reasoning and the Telegram posts */
+  var PAGES = { telegram:'Telegram', portfolio:'Portfolio', trades:'Trades', track:'Track record', position:'Portfolio', calendar:'Calendar', earnings:'Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
+  var posId = null, posHome = 'portfolio'; /* #position/<id>: one position, its numbers and the Telegram posts; posHome = the section it belongs to */
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
-  var isInvite = M.qs('invited') === '1' || /type=invite/.test(initialHash);
+  var invitedQs = M.qs('invited') === '1';
+  var isInvite = /type=invite/.test(initialHash) || invitedQs;
   var isReset = M.qs('reset') === '1' || /type=recovery/.test(initialHash) || isInvite;
   var recovering = false;
   sb.auth.onAuthStateChange(function(ev){ if (ev === 'PASSWORD_RECOVERY') { isReset = true; recovering = true; if (typeof showReset === 'function') showReset(); } });
@@ -304,10 +324,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   if (recovering) isReset = true;
   var mustSet = !!(user && user.user_metadata && user.user_metadata.must_set_password); /* logged in with a temporary password staff handed over: choose a real one first */
   if (mustSet) { isReset = true; isInvite = true; }
+  else if (invitedQs && user && !/type=invite/.test(initialHash) && !recovering && user.last_sign_in_at && Date.now() - new Date(user.last_sign_in_at).getTime() > 10 * 60000) isInvite = false; /* a bookmarked /app?invited=1 opened long after the login: an ordinary reset form, with a way back (a fresh arrival from the invite link keeps the form until a password exists) */
   function gate(h, sub, opts){ $('#gate').hidden = false; $('#shell').hidden = true; $('#paygate').hidden = true; $('#g-h').textContent = h; $('#g-sub').textContent = sub || ''; $('#g-actions').hidden = !(opts && opts.login); $('#g-reload').hidden = !(opts && opts.reload); $('#g-back').hidden = !(opts && opts.back); $('#f-reset').hidden = !(opts && opts.form); }
   if (hashErr) {
     history.replaceState(null, '', location.pathname + location.search);
-    gate('This link has expired.', isInvite ? 'Invitation links work once. On the login page press "Forgot password?" with the email you were invited on, and we send you a fresh one.' : isReset ? 'Password links work once and for one hour. Ask for a new one from the login page.' : 'Confirmation links work for one hour. Log in and we send you a fresh code.', { login: true });
+    gate('This link has expired.', isInvite ? 'Invitation links work once. On the login page press "Forgot password?" with the email you were invited on, and we send you a fresh one.' : isReset ? 'Password links work once and expire. Ask for a new one from the login page.' : 'Confirmation links work once and expire. Log in and we send you a fresh code.', user ? { back: true } : { login: true });
     return;
   }
   if (!user && !isReset) { M.go('/login?next=' + encodeURIComponent('/app' + location.search + (/^#[a-z]+$/.test(location.hash) ? location.hash : ''))); return; }
@@ -325,7 +346,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     catch (err) { M.msg('#m-reset', M.human(err), 'bad'); M.busy(btn, false); }
   });
   if (isReset) {
-    if (!user) { gate('This link has expired.', isInvite ? 'Invitation links work once. On the login page press "Forgot password?" with the email you were invited on, and we send you a fresh one.' : 'Password links work once and for one hour. Ask for a new one from the login page.', { login: true }); return; }
+    if (!user) { gate('This link has expired.', isInvite ? 'Invitation links work once. On the login page press "Forgot password?" with the email you were invited on, and we send you a fresh one.' : 'Password links work once and expire. Ask for a new one from the login page.', { login: true }); return; }
     showReset(); return; /* the reset form owns the page until the password is saved */
   }
 
@@ -357,9 +378,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (k === 'devices' && typeof loadDevices === 'function') loadDevices();
     current = k;
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
-    $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === (k === 'position' ? 'portfolio' : k)); });
+    $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === (k === 'position' ? posHome : k)); });
     $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — Mr. Wall Street';
     if (k === 'position' && typeof renderPosition === 'function') renderPosition();
+    if ((k === 'portfolio' || k === 'trades' || k === 'track') && typeof renderPortfolio === 'function' && positions) renderPortfolio(); /* the page measures its chart at the width it is shown at */
     drawer(false); window.scrollTo(0, 0);
     if (k === 'telegram' && access && access.valid && !invites) { fetchInvites(false).then(paintInvites); }
   }
@@ -412,7 +434,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!supLoaded) { supLoaded = true; loadSupport(); }
   }
   /* in preview, buttons and checkout links inside the pages do nothing (they act on real members' accounts) */
-  $('#content').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button, a[target=_blank], a[href^="/join"]'); if (!b) return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this button works.'); }, true);
+  $('#content').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button[type=submit], button[data-mg], button[data-reclaim], #tg-refresh, #tg-unlink, #out-others, a[target=_blank], a[href^="/join"]'); if (!b) return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this button works.'); }, true);
 
   function planName(k){ if (k === 'owner') return 'Owner'; return (C.PLANS[k] && C.PLANS[k].title) || (k ? k.charAt(0).toUpperCase()+k.slice(1) : 'Membership'); }
   function graceEnd(){ var from = access.past_due_since ? new Date(access.past_due_since) : new Date(); return new Date(from.getTime() + (Number(access.grace_days) || 3) * 86400000); }
@@ -432,10 +454,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#side-admin').hidden = !staff;
 
     var st = $('#st'), body = $('#access-body'), bar = $('#bar-st');
-    var paid = !sim && (paidQs || (!!(signup && signup.paid) && Date.now() - (signup.paidAt || signup.at || 0) < 2 * 3600000));
+    var paid = !sim && (paidQs || M.paidRecently(signup));
     if (access.valid && (paidQs || welcomeOnce)) { paidQs = false; welcomeOnce = false; try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} } /* one-time flags: a reload shows the normal page */
     var grace = Number(access.grace_days) || 3;
-    var manage = '<a class="btn sm ghost" href="' + (access.manage_url ? href(access.manage_url) : 'https://whop.com/orders/') + '" target="_blank" rel="noopener">Manage subscription</a>'; /* card, invoices, cancel or resume: Whop's secure page for this membership */
     var joined = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length;
     var banner = '';
     (function(){ var n = channels.length, j = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length, who = link ? (link.telegram_username || tgUser) : null;
@@ -454,7 +475,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       if (!pastDue && channels.length && left > 0) banner = '<div class="banner good rv"><div><b>' + (joined ? (left === 1 ? 'One channel left to join.' : left + ' channels left to join.') : 'Join your channels.') + '</b><p>Personal links, one tap each. You are approved automatically.</p></div><a class="btn sm acc" href="#telegram">Open Telegram links <span class="ar"></span></a></div>';
       if (pastDue) banner = '<div class="banner warn rv"><div><b>Payment failed.</b><p>Update your card within ' + grace + ' days of the failed charge to keep your access.</p></div>' + (access.manage_url ? '<a class="btn sm acc" href="' + href(access.manage_url) + '" target="_blank" rel="noopener">Update your card <span class="ar"></span></a>' : '') + '</div>';
       body.innerHTML = '<dl class="kv"><dt>Plan</dt><dd>' + esc(planName(access.plan_key)) + '</dd><dt>Billing</dt><dd>' + esc(renews) + '</dd></dl>'
-        + (pastDue ? '<div class="msg on bad" style="margin-top:16px">Your last payment failed. Update your card under Manage subscription within ' + grace + ' days of the failed charge to keep your access.</div>' : '')
+        + (pastDue ? '<div class="msg on bad" style="margin-top:16px">Your last payment failed. Update your card under Manage your plan → Card &amp; invoices within ' + grace + ' days of the failed charge to keep your access.</div>' : '')
         + (owner ? '<div class="row" style="margin-top:20px"><span class="small muted">Owner access. Everything members get, plus the <a href="/admin">admin</a>.</span></div>' : lifetime ? '<div class="row" style="margin-top:20px"><span class="small muted">Lifetime access. Nothing to renew, nothing to manage.</span></div>' : '')
         + '';
       $('#n-mem').textContent = ''; $('#n-mem').className = 'cnt';
@@ -464,7 +485,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       gateState = 'pending'; paidTries++;
       st.textContent = 'Pending'; st.className = 'tag warn'; bar.textContent = 'Pending'; bar.className = 'tag warn'; $('#mem-sub').textContent = 'Waiting for the payment confirmation.';
       body.innerHTML = '<p class="small muted"><span class="spin"></span>Waiting for the payment confirmation.</p>';
-      clearTimeout(pollT); pollT = setTimeout(function(){ load(paidTries % 3 === 1); }, 4000); /* re-check access every 4s; ask Whop again every 12s */
+      clearTimeout(pollT); pollT = setTimeout(function(){ load(paidTries % 3 === 0); }, 4000); /* re-check access every 4s; ask Whop again every 12s */
       renderTg(false);
     } else if (paid && !access.valid) {
       gateState = 'unmatched';
@@ -545,54 +566,73 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function pfDraft(p){ return p.published === false ? '<span class="tag warn" style="margin-left:8px">Draft</span>' : ''; } /* only staff ever receive drafts (RLS); the tag shows what members do not see yet */
   function pfLinks(p){ var l = Array.isArray(p.links) ? p.links.filter(function(u){ return /^https:\/\/t\.me\//.test(String(u)); }) : []; return l.length ? '<span class="posts">' + l.map(function(u, i){ return '<a href="' + esc(u) + '" target="_blank" rel="noopener" title="Open the call in Telegram">' + (l.length > 1 ? 'post ' + (i + 1) : 'post') + '</a>'; }).join('') + '</span>' : ''; }
   function pfSide(p){ var s = String(p.side || 'long'); var warn = s === 'short' || s === 'sell'; return '<span class="tag ' + (warn ? 'warn' : 'ok') + '">' + esc(s) + (p.kind === 'leveraged' && p.leverage ? ' ' + esc(p.leverage) : '') + '</span>'; }
-  function pfName(p, side){ var s = String(p.side || 'long'); var says = side && (s === 'short' || s === 'sell' || pfKind(p) !== 'spot'); return '<span class="sym">' + esc(p.symbol) + '</span>' + (p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + (says ? ' ' + pfSide(p) : '') + pfDraft(p); } /* the row stays clean: everything else lives in the detail panel */
+  function pfName(p, side){ var s = String(p.side || 'long'); var says = side && (s === 'short' || s === 'sell' || pfKind(p) !== 'spot'); return '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + (p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + (says ? ' ' + pfSide(p) : '') + pfDraft(p); } /* the row stays clean: everything else lives on the position page (the symbol is the link, the whole row a shortcut) */
   function pfIds(p){ return (Array.isArray(p.links) ? p.links : []).map(function(u){ var m = String(u).match(/t\.me\/c\/2077854583\/(\d+)/); return m ? m[1] : null; }).filter(Boolean); }
   /* the calls behind a position: a screenshot of each Telegram post (posts/<id>.png, listed in posts/index.json with the time it was posted) */
   var POSTS = null, postsReq = null;
-  function loadPosts(){ if (POSTS || postsReq) return postsReq; postsReq = fetch('posts/index.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; }).then(function(j){ POSTS = j || {}; return POSTS; }); return postsReq; }
+  function loadPosts(){ if (POSTS || postsReq) return postsReq; postsReq = fetch('/posts/index.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; }).then(function(j){ POSTS = j || {}; return POSTS; }); return postsReq; }
   function fmtWhen(iso){ if (!iso) return ''; var d = new Date(iso); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   /* prices and money on the page: a price always carries its dollar sign */
   function usdPx(v){ if (v == null || !isFinite(v)) return '—'; v = Number(v); var dp = v >= 10000 ? 0 : v < 1 ? 4 : 2; return (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
-  /* the numbers behind the book, shared by the table and the position page (the same model the admin uses) */
+  /* the numbers behind the pages, shared by the tables and the position page (the same model the admin uses).
+     The portfolio is the spot book on its own capital ($1,000,000 model book); leveraged trades run on their own capital and only ever show ROI. */
   function pfData(){
     var list = sim ? (sim.key === 'none' || sim.key === 'canceled' ? [] : SIM_POS) : (positions || []);
     var Q = sim ? SIM_QUOTES : quotes, H = sim ? SIM_HIST : qhist;
-    var book = M.book(list, Q, H, { bench: ['SPY', 'QQQ'] }); var R = {}; book.rows.forEach(function(r){ R[r.p.id] = r; });
+    var book = M.book(list.filter(function(p){ return pfKind(p) !== 'leveraged'; }), Q, H, { bench: ['SPY', 'QQQ'] }); var R = {}; book.rows.forEach(function(r){ R[r.p.id] = r; });
     return { list: list, Q: Q, H: H, book: book, R: R, N: NOTIONAL };
   }
   function pfQuote(p, Q){ var q = p.quote_symbol ? Q[String(p.quote_symbol).toUpperCase()] : null; return q && q.price != null && !q.error ? q : null; }
+  /* leverage as written ("3x", "x3", "3"); 1 when absent */
+  function levOf(p){ var n = parseFloat(String(p && p.leverage || '').replace(/[^0-9.]/g, '')); return n > 0 ? n : 1; }
+  /* a trade is anything leveraged, or an order that will open one (it carries a leverage or is a short) */
+  function isTrade(p){ var k = pfKind(p); return k === 'leveraged' || (k === 'order' && (levOf(p) > 1 || p.side === 'short' || p.side === 'sell')); }
+  function pfHome(p){ return p.status === 'closed' ? '#track' : isTrade(p) ? '#trades' : '#portfolio'; }
+  function pfSplit(list){
+    var open = list.filter(function(p){ return p.status === 'open'; }), closed = list.filter(function(p){ return p.status === 'closed'; });
+    return { open: open, closed: closed, spot: open.filter(function(p){ return pfKind(p) === 'spot'; }), lev: open.filter(function(p){ return pfKind(p) === 'leveraged'; }),
+      ordS: open.filter(function(p){ return pfKind(p) === 'order' && !isTrade(p); }), ordT: open.filter(function(p){ return pfKind(p) === 'order' && isTrade(p); }) };
+  }
+  /* a trade's numbers straight from the quote: ROI on the margin at the stated leverage, no size */
+  function tradeNums(p, Q){
+    var q = pfQuote(p, Q), last = q ? Number(q.price) : (p.mark != null ? Number(p.mark) : null), entry = Number(p.entry_price) > 0 ? Number(p.entry_price) : null, L = levOf(p), s = p.side === 'short' || p.side === 'sell' ? -1 : 1;
+    return { q: q, last: last, entry: entry, L: L, s: s, ret: entry != null && last != null ? s * L * (last / entry - 1) * 100 : null, roi1: q && q.change_pct != null ? (String(p.opened_at || '').slice(0, 10) >= new Date().toISOString().slice(0, 10) && entry != null && last != null ? s * L * (last / entry - 1) * 100 : s * L * Number(q.change_pct)) : null, mark: q ? null : (p.mark != null ? p.mark_at : null) };
+  }
+  function resultSign(p){ var t = String(p.result || ''); return /^\s*(\+|x)/i.test(t) ? 1 : /^\s*(-|−)/.test(t) ? -1 : 0; }
   /* one position, as a page: #position/<id> */
   function renderPosition(){
     var box = $('#pos-page'); if (!box) return;
     if (!(access && access.valid)) { box.innerHTML = '<p class="small muted">Members only.</p>'; return; }
     var D = pfData(); var p = D.list.filter(function(x){ return String(x.id) === String(posId); })[0];
     if (!p) { box.innerHTML = '<p class="back"><a href="#portfolio">← Portfolio</a></p><p class="muted">' + (positions ? 'This position is no longer in the book.' : 'Loading…') + '</p>'; return; }
-    var r = D.R[p.id], N = D.N, lev = pfKind(p) === 'leveraged', closed = p.status === 'closed', q = pfQuote(p, D.Q);
+    var r = D.R[p.id], N = D.N, trade = isTrade(p), closed = p.status === 'closed', order = pfKind(p) === 'order', T = tradeNums(p, D.Q);
     var val = r && r.capital != null ? r.value / 100 * N : null, cost = r && r.capital != null ? r.capital / 100 * N : null, pl = val != null && r.entry != null && r.last != null ? val - cost : null;
-    var d1 = r && r.prev != null && r.q && r.q.prev_close != null ? (r.value - r.prev) / 100 * N : null, roi1 = d1 != null && r.prev > 0 ? (r.value - r.prev) / r.prev * 100 : null;
-    var last = r && r.last != null ? r.last : (q ? Number(q.price) : null), avg = r && r.entry != null ? r.entry : (p.entry_price != null ? Number(p.entry_price) : null);
-    var ret = r && r.ret != null ? r.ret * 100 : (avg && last ? (last / avg - 1) * 100 * (String(p.side) === 'short' ? -1 : 1) * (r ? r.L : 1) : null);
-    var c1 = q && q.change_pct != null ? Number(q.change_pct) : null;
+    var d1 = r && r.prev != null && r.q && r.q.prev_close != null ? (r.value - r.prev) / 100 * N : null, roi1 = d1 != null && r.prev > 0 ? (r.value - r.prev) / r.prev * 100 : (T.roi1 != null && !trade ? T.roi1 : null);
+    var ret = r && r.ret != null ? r.ret * 100 : (trade ? T.ret : (T.entry && T.last ? (T.last / T.entry - 1) * 100 : null));
     var fact = function(k, v){ return v == null || v === '' ? '' : '<div><span>' + k + '</span><b>' + v + '</b></div>'; };
     var sg = function(v, txt){ return v == null ? '—' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
+    var lastTxt = T.last != null ? usdPx(T.last) + (T.mark ? ' <small>mark · ' + esc(M.fmtDate(T.mark)) + '</small>' : '') : '—';
     var facts = closed
-      ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (/^\s*(\+|x)/i.test(p.result || '') ? 'pos' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + fact('Leverage', p.leverage ? esc(p.leverage) : null)
-      : fact('Purchase date', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Average cost', avg != null ? usdPx(avg) : '—') + fact('Last price', last != null ? usdPx(last) + (r && r.source === 'mark' ? ' <small>mark</small>' : '') : '—')
-        + fact('Weight', r && r.weightNow != null ? r.weightNow.toFixed(2) + '%' : '—') + fact(lev ? 'Margin' : 'Market value', cost != null ? usdFull(lev ? cost : val) : '—') + (lev ? fact('Leverage', r ? r.L + '×' : esc(p.leverage || '—')) : '')
-        + fact('1D ROI', sg(roi1 != null ? roi1 : c1, pct(roi1 != null ? roi1 : c1))) + fact('1D P&amp;L', sg(d1, usdSigned(d1)))
-        + fact('All-time ROI', sg(ret, pct(ret))) + fact('All-time P&amp;L', sg(pl, usdSigned(pl))) + fact('Target', p.target ? esc(p.target) : null);
+      ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (resultSign(p) > 0 ? 'pos' : resultSign(p) < 0 ? 'neg' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (pfKind(p) === 'leveraged' ? fact('Leverage', esc(p.leverage || '—')) : '')
+      : order
+      ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.entry != null && T.last ? Math.abs((T.entry / T.last - 1) * 100).toFixed(1) + '% ' + (T.entry < T.last ? 'below' : 'above') + ' market' : '—') + (trade ? fact('Leverage', T.L + '×') : fact('Planned weight', p.weight_entry != null ? Number(p.weight_entry).toFixed(2) + '%' : '—')) + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
+      : trade
+      ? fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Leverage', T.L + '×') + fact('1D ROI', sg(T.roi1, pct(T.roi1))) + fact('All-time ROI', sg(ret, pct(ret)))
+      : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt)
+        + fact('Initial weight', r && r.w0 != null ? r.w0.toFixed(2) + '%' : '—') + fact('Current weight', r && r.weightNow != null ? r.weightNow.toFixed(2) + '%' : '—') + fact('Market value', val != null ? usdFull(val) : '—')
+        + fact('1D ROI', sg(roi1, pct(roi1))) + fact('1D P&amp;L', sg(d1, usdSigned(d1))) + fact('All-time ROI', sg(ret, pct(ret))) + fact('All-time P&amp;L', sg(pl, usdSigned(pl)));
     var ids = pfIds(p);
     var posts = function(){ return ids.length ? ids.map(function(i){ var x = POSTS && POSTS[i]; var when = x && x.t ? fmtWhen(x.t) : 'Telegram post';
-        return x && x.img ? '<figure class="post"><figcaption><span>' + esc(when) + '</span><span>Exclusive channel</span></figcaption><img src="' + esc(x.img) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"></figure>'
+        return x && x.img ? '<figure class="post"><figcaption><span>' + esc(when) + '</span><span>Exclusive channel</span></figcaption><img src="' + esc(/^(https?:)?\//.test(x.img) ? x.img : '/' + x.img) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"></figure>'
           : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; }).join('') : '<p class="small muted">No posts attached to this position.</p>'; };
-    box.innerHTML = '<p class="back"><a href="#portfolio">← Portfolio</a></p>'
-      + '<div class="pos-hd"><h1><span class="sym">' + esc(p.symbol) + '</span>' + (p.name ? '<span class="nm">' + esc(p.name) + '</span>' : '') + '</h1><p class="tags">' + pfSide(p) + ' <span class="tag">' + esc(closed ? 'closed' : pfKind(p)) + '</span><span class="tag">' + esc(PF_CLASS[p.asset_class] || 'Other') + '</span>' + pfDraft(p) + '</p></div>'
+    var home = pfHome(p), homeName = { '#track': 'Track record', '#trades': 'Trades', '#portfolio': 'Portfolio' }[home]; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
+    box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
+      + '<div class="pos-hd"><h1><span class="sym">' + esc(p.symbol) + '</span>' + (p.name ? '<span class="nm">' + esc(p.name) + '</span>' : '') + '</h1><p class="tags">' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(PF_CLASS[p.asset_class] || 'Other') + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
-      + (p.thesis ? '<h2 class="k">Why we hold it</h2><p class="why">' + esc(p.thesis) + '</p>' : '')
       + '<h2 class="k">The calls' + (ids.length ? ' <span class="muted">· ' + ids.length + ' post' + (ids.length === 1 ? '' : 's') + ' in the Exclusive channel</span>' : '') + '</h2><div class="posts-list" id="pf-posts">' + (POSTS ? posts() : '<p class="small muted">Loading…</p>') + '</div>';
     if (!POSTS) loadPosts().then(function(){ var el = $('#pf-posts'); if (el && current === 'position') el.innerHTML = posts(); });
   }
-  document.addEventListener('click', function(ev){ var tr = ev.target.closest('#pf-table tr.clk, #pf-closed-table tr.clk, #pf-ord tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
+  document.addEventListener('click', function(ev){ var tr = ev.target.closest('#pf-table tr.clk, #pf-ord tr.clk, #tr-table tr.clk, #tr-ord tr.clk, #tk-table tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
   function pfGrouped(rows, cols, rowFn){ /* one heading row per asset class, in a fixed order */
     var by = {}; rows.forEach(function(p){ var g = PF_CLASS[p.asset_class] || 'Other'; (by[g] = by[g] || []).push(p); });
     return PF_ORDER.filter(function(g){ return by[g]; }).map(function(g){ return '<tr class="grp"><td colspan="' + cols + '">' + g + '</td></tr>' + by[g].map(rowFn).join(''); }).join('');
@@ -608,160 +648,188 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     try { var since = new Date(Math.max(Date.parse(first), Date.now() - 400 * 86400000)).toISOString().slice(0, 10); var h = await sb.rpc('quote_history_compact', { since: since }); qhist = {};
       (h.data || []).forEach(function(r){ var days = r.days || [], closes = r.closes || []; qhist[String(r.symbol).toUpperCase()] = days.map(function(d, i){ return { day: String(d).slice(0, 10), close: Number(closes[i]) }; }); }); histFor = key; } catch (e) { qhist = {}; }
   }
-  var pfRange = 'all', pfTab = { book: 'spot', view: 'pl', grp: 'security' };
+  var pfRange = 'all', pfGrp = 'security', pfUnit = 'pct', pfSort = { k: 'wNow', d: -1 }, trSort = { k: 'ret', d: -1 };
+  var RANGES = { '1': '1 day', '7': '1 week', 'mtd': 'Month to date', '30': '1 month', '90': '3 months', 'ytd': 'Year to date', '365': '1 year', '1825': '5 years', 'all': 'All time' };
   function usd(v, dp){ if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v); var s = a >= 1e6 ? (a / 1e6).toFixed(dp == null ? 2 : dp) + 'M' : a >= 1e4 ? (a / 1e3).toFixed(dp == null ? 1 : dp) + 'K' : a.toLocaleString('en-US', { maximumFractionDigits: dp == null ? (a < 100 ? 2 : 0) : dp }); return (v < 0 ? '−$' : '$') + s; }
   function usdFull(v){ if (v == null || !isFinite(v)) return '—'; return (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
   function usdSigned(v){ if (v == null || !isFinite(v)) return '—'; return (v > 0 ? '+' : '') + usdFull(v); }
   function qtyFmt(q){ if (q == null || !isFinite(q)) return '—'; return q >= 1000 ? q.toLocaleString('en-US', { maximumFractionDigits: 0 }) : q.toLocaleString('en-US', { maximumFractionDigits: q < 1 ? 4 : 2 }); }
+  /* the first day of the selected range, in the daily series */
+  function rangeFrom(S, rng){ var last = S[S.length - 1].day; if (rng === 'all') return S[0].day; if (rng === 'ytd') return last.slice(0, 4) + '-01-01'; if (rng === 'mtd') return last.slice(0, 7) + '-01'; return new Date(Date.parse(last) - Number(rng) * 86400000).toISOString().slice(0, 10); }
+  function rangeSeg(S, rng){ if (rng === '1') return S.slice(-2); var from = rangeFrom(S, rng); var i0 = Math.max(0, S.findIndex(function(p){ return p.day >= from; })); if (i0 > 0 && rng !== 'all') i0 -= 1; /* one point before the range so the lines start at the edge */ var seg = S.slice(i0); if (seg.length < 2) seg = S.slice(-2); return seg; }
+  /* the section tag: Live for members, a warning for the owner while members do not see it yet */
+  function deskTag(id, unlocked, has){ var onlyMe = staffRole && !sim && !deskLive.portfolio; var t = $('#' + id); t.textContent = unlocked && has ? (onlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); t.className = 'soon' + (onlyMe && has ? ' warn' : ''); return onlyMe; }
+  /* sortable tables: every row carries its values; a header click sorts by that column, again to flip */
+  function sortRows(rows, st){ rows.sort(function(a, b){ var x = a.v[st.k], y = b.v[st.k]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return typeof x === 'string' ? st.d * x.localeCompare(y) : st.d * (x - y); }); return rows; }
+  function th(label, k, st, cls, title){ return '<th class="' + (cls || '') + (st.k === k ? ' on' : '') + '" data-k="' + k + '" tabindex="0" role="button" aria-sort="' + (st.k === k ? (st.d < 0 ? 'descending' : 'ascending') : 'none') + '"' + (title ? ' title="' + title + '"' : '') + '>' + label + (st.k === k ? ' <i aria-hidden="true">' + (st.d < 0 ? '↓' : '↑') + '</i>' : '') + '</th>'; }
   function renderPortfolio(){
-    var D = pfData(), list = D.list, Q = D.Q, H = D.H;
-    var unlocked = !!(access && access.valid);
-    var open = list.filter(function(p){ return p.status === 'open'; }), closed = list.filter(function(p){ return p.status === 'closed'; });
-    var spot = open.filter(function(p){ return pfKind(p) === 'spot'; }), lev = open.filter(function(p){ return pfKind(p) === 'leveraged'; }), ord = open.filter(function(p){ return pfKind(p) === 'order'; }), held = spot.concat(lev);
-    $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && list.length); $('#pf-empty').hidden = !(unlocked && !list.length);
-    var pfOnlyMe = staffRole && !sim && !deskLive.portfolio;
-    $('#pf-tag').textContent = unlocked && list.length ? (pfOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#pf-tag').className = 'soon' + (pfOnlyMe && list.length ? ' warn' : ''); $('#desk-grp-tag').textContent = unlocked && list.length ? (pfOnlyMe ? 'Owner preview' : 'Portfolio live') : 'In development';
-    $('#n-pf').textContent = held.length ? String(held.length) : '';
-    if (!(unlocked && list.length)) { $('#pf-sub').hidden = true; return; }
-    var N = D.N, book = D.book, R = D.R;
-    $('#pf-sub').hidden = true;
-    /* tabs */
-    M.$$('#pf-book button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfTab.book); });
-    M.$$('#pf-view button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfTab.view); });
-    M.$$('#pf-grp button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfTab.grp); });
-    var isBook = pfTab.book === 'spot' || pfTab.book === 'lev';
-    $('#pf-view').hidden = !isBook; $('#pf-sum').hidden = !isBook;
-    $('#pf-pl').hidden = !(isBook && pfTab.view === 'pl'); $('#pf-exposure').hidden = !(isBook && pfTab.view === 'exposure'); $('#pf-perf').hidden = !(isBook && pfTab.view === 'perf');
-    $('#pf-orders').hidden = pfTab.book !== 'orders'; $('#pf-closed').hidden = pfTab.book !== 'closed';
-    M.$$('#pf-book button').forEach(function(b){ var n = b.dataset.v === 'spot' ? spot.length : b.dataset.v === 'lev' ? lev.length : b.dataset.v === 'orders' ? ord.length : closed.length; b.innerHTML = esc({ spot: 'Spot', lev: 'Leveraged trades', orders: 'Orders', closed: 'Track record' }[b.dataset.v]) + (n ? ' <i>' + n + '</i>' : ''); });
-    var rowsAll = book.rows.filter(function(r){ return r.capital != null; });
-    var rowsTab = rowsAll.filter(function(r){ return (pfTab.book === 'lev') === (pfKind(r.p) === 'leveraged'); });
-    var val$ = function(r){ return r.value / 100 * N; }, cost$ = function(r){ return r.capital / 100 * N; }, pl$ = function(r){ return (r.value - r.capital) / 100 * N; }, pl1d$ = function(r){ return r.prev != null && r.q && r.q.prev_close != null ? (r.value - r.prev) / 100 * N : null; };
-    var live = rowsAll.filter(function(r){ return r.source === 'live'; }).length, priced = rowsAll.filter(function(r){ return r.source; }).length;
-    /* summary strip, Koyfin-style: the whole book first, then this tab's slice */
-    var bookVal = book.B / 100 * N, bookPL = (book.B - 100) / 100 * N, cash$ = Math.max(0, book.cash) / 100 * N;
-    var tabVal = rowsTab.reduce(function(a, r){ return a + val$(r); }, 0), tabCost = rowsTab.reduce(function(a, r){ return a + cost$(r); }, 0), tabPL = tabVal - tabCost, tab1d = rowsTab.reduce(function(a, r){ var d = pl1d$(r); return a + (d || 0); }, 0);
-    var sumCell = function(k, v, d, cls){ return '<div class="sc"><b class="' + (cls || '') + '">' + v + '</b><span>' + k + '</span>' + (d ? '<em>' + d + '</em>' : '') + '</div>'; };
-    var asOf = book.asOf ? hhmm(book.asOf) : null;
-    $('#pf-sum').innerHTML = '<div class="sc big"><b>' + usdFull(bookVal) + ' <small>USD</small></b><span class="' + sgn(bookPL).trim() + '">' + usdSigned(bookPL) + ' (' + pct(book.retTotal * 100) + ')</span><em>' + (asOf ? 'Last updated · ' + asOf : (live ? 'Live' : 'Prices: none yet')) + (book.todayBook != null && live ? ' · today <i class="' + sgn(book.todayBook).trim() + '">' + pct(book.todayBook * 100) + '</i>' : '') + '</em></div>'
-      + sumCell('P/L (' + (pfTab.book === 'lev' ? 'leveraged' : 'spot') + ')', '<span class="' + sgn(tabPL).trim() + '">' + usdSigned(tabPL) + '</span>', tabCost ? pct(tabPL / tabCost * 100) + ' on ' + usdFull(tabCost) + (pfTab.book === 'lev' ? ' margin' : ' invested') : '—')
-      + sumCell('P/L (1D)', '<span class="' + sgn(tab1d).trim() + '">' + (live ? usdSigned(tab1d) : '—') + '</span>', live ? 'since yesterday’s close' : 'waiting for prices')
-      + sumCell('Cash balance', usdFull(cash$), (book.cashNow != null ? book.cashNow.toFixed(2) + '% of the book' : '') + (book.cash < -0.005 ? ' · over-allocated' : ''))
-      + sumCell('# of ' + (pfTab.book === 'lev' ? 'trades' : 'holdings'), String(rowsTab.length), (priced < rowsAll.length ? (rowsAll.length - priced) + ' without a price feed' : (pfTab.book === 'lev' && rowsTab.length ? 'avg leverage ' + (rowsTab.reduce(function(a, r){ return a + r.L; }, 0) / rowsTab.length).toFixed(1) + '×' : (spot.length + ' spot · ' + lev.length + ' leveraged'))));
-    var lastCell = function(r){ if (r.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', usdPx(r.last) + (r.source === 'mark' ? '<span class="sub muted">mark' + (r.p.mark_at ? ' · ' + M.fmtDate(r.p.mark_at) : '') + '</span>' : ''), 'num'); };
-    var nameCell = function(p){ return cell('Position', pfName(p, true), 'em'); };
-    /* Profit/Loss table: one line per position, numbers only — the story (target, thesis, the posts) opens on click */
-    var sorted = rowsTab.slice().sort(function(a, b){ return (b.weightNow || 0) - (a.weightNow || 0); });
-    var unweighted = (pfTab.book === 'lev' ? lev : spot).filter(function(p){ return !R[p.id] || R[p.id].capital == null; });
-    var levHead = pfTab.book === 'lev';
-    var head = '<thead><tr><th>Position</th><th>Purchase date</th>' + (levHead ? '<th class="num">Leverage</th>' : '') + '<th class="num">Avg cost</th><th class="num">Last price</th><th class="num">Weight</th><th class="num">' + (levHead ? 'Margin' : 'Market value') + '</th><th class="num" title="Since the previous close">1D ROI</th><th class="num" title="Since the previous close">1D P&amp;L</th><th class="num">All-time ROI</th><th class="num">All-time P&amp;L</th></tr></thead>';
-    var nCols = levHead ? 11 : 10;
-    var row = function(r){ var p = r.p, v1 = pl1d$(r), roi1 = v1 != null && r.prev > 0 ? (r.value - r.prev) / r.prev * 100 : null, plv = r.entry != null && r.last != null ? pl$(r) : null, plp = r.ret != null ? r.ret * 100 : null;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + nameCell(p) + cell('Purchase date', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
-        + (levHead ? cell('Leverage', r.L + '×', 'num') : '')
-        + cell('Avg cost', r.entry != null ? usdPx(r.entry) : '—', 'num') + lastCell(r) + cell('Weight', r.weightNow != null ? r.weightNow.toFixed(2) + '%' : '—', 'num')
-        + cell(levHead ? 'Margin' : 'Market value', usdFull(levHead ? cost$(r) : val$(r)), 'num')
-        + cell('1D ROI', roi1 == null ? '—' : pct(roi1), 'num' + sgn(roi1)) + cell('1D P&L', v1 == null ? '—' : usdSigned(v1), 'num' + sgn(v1))
-        + cell('All-time ROI', plp == null ? '—' : pct(plp), 'num' + sgn(plp)) + cell('All-time P&L', plv == null ? '—' : usdSigned(plv), 'num' + sgn(plv)) + '</tr>'; };
-    var unwRow = function(p){ var q = pfQuote(p, Q), last = q ? Number(q.price) : (p.mark != null ? Number(p.mark) : null), avg = p.entry_price != null ? Number(p.entry_price) : null, c1 = q && q.change_pct != null ? Number(q.change_pct) : null, ret = avg && last ? (last / avg - 1) * 100 * (String(p.side) === 'short' ? -1 : 1) * (pfKind(p) === 'leveraged' ? (M.lev(p) || 1) : 1) : null;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + nameCell(p) + cell('Purchase date', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + (levHead ? cell('Leverage', esc(p.leverage || '—'), 'num') : '') + cell('Avg cost', avg != null ? usdPx(avg) : '—', 'num') + cell('Last price', last != null ? usdPx(last) : '—', 'num') + cell('Weight', '<span class="muted">—</span>', 'num') + cell(levHead ? 'Margin' : 'Market value', '—', 'num') + cell('1D ROI', c1 == null ? '—' : pct(c1), 'num' + sgn(c1)) + cell('1D P&L', '—', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + cell('All-time P&L', '—', 'num') + '</tr>'; };
-    $('#pf-table').innerHTML = head + '<tbody>' + (sorted.length || unweighted.length ? sorted.map(row).join('') + unweighted.map(unwRow).join('') : '<tr><td colspan="' + nCols + '" class="muted">' + (pfTab.book === 'lev' ? 'No leveraged trades open right now.' : 'No spot positions open right now. Cash is a position too.') + '</td></tr>') + '</tbody>';
-    /* Exposure: a donut of the current weights and the same numbers as a table; by position, by asset class or long/short */
-    if (isBook && pfTab.view === 'exposure') {
-      var groups = {};
-      var keyOf = function(r){ return pfTab.grp === 'class' ? (PF_CLASS[r.p.asset_class] || 'Other') : pfTab.grp === 'side' ? (r.s < 0 ? 'Short' : 'Long') : String(r.p.symbol); };
-      rowsTab.forEach(function(r){ var k = keyOf(r); var g = groups[k] = groups[k] || { k: k, name: pfTab.grp === 'security' ? (r.p.name || '') : '', w: 0, v: 0, n: 0 }; g.w += r.weightNow || 0; g.v += val$(r); g.n++; });
-      var segs = Object.keys(groups).map(function(k){ return groups[k]; }).sort(function(a, b){ return b.w - a.w; });
-      if (pfTab.book === 'spot' && book.cashNow > 0) segs.push({ k: 'Cash', name: 'Unallocated · earns nothing', w: book.cashNow, v: cash$, n: 0, cash: true });
-      $('#pf-donut').innerHTML = donut(segs);
-      $('#pf-expo-table').innerHTML = '<thead><tr><th>' + (pfTab.grp === 'class' ? 'Asset class' : pfTab.grp === 'side' ? 'Direction' : 'Ticker') + '</th><th>Name</th><th>Current weight</th><th>Current value</th></tr></thead><tbody>' + segs.map(function(g, i){ return '<tr>' + cell(pfTab.grp === 'security' ? 'Ticker' : 'Group', '<i class="sw c' + Math.min(i, 7) + (g.cash ? ' cash' : '') + '"></i>' + esc(g.k), 'em') + cell('Name', esc(g.name || (g.n ? g.n + ' position' + (g.n === 1 ? '' : 's') : '')), 'muted') + cell('Current weight', g.w.toFixed(2) + '%', 'num') + cell('Current value', usdFull(g.v), 'num') + '</tr>'; }).join('') + (segs.length ? '' : '<tr><td colspan="4" class="muted">Nothing to show yet.</td></tr>') + '</tbody>';
-    }
-    /* Performance: the chart against the market, stats, month by month, and the allocation bar */
-    if (isBook && pfTab.view === 'perf') {
-      renderChart(book, Q);
-      $('#pf-perf-empty').hidden = !$('#pf-chart-sec').hidden;
-      var byC = {}; rowsAll.forEach(function(r){ if (r.weightNow == null) return; var g = PF_CLASS[r.p.asset_class] || 'Other'; byC[g] = (byC[g] || 0) + r.weightNow; });
-      var segsA = PF_ORDER.filter(function(g){ return byC[g] > 0; }).map(function(g, i){ return { l: g, v: byC[g], c: 'c' + i }; }); if (book.cashNow > 0) segsA.push({ l: 'Cash', v: book.cashNow, c: 'cash' });
-      var longW = 0, shortW = 0; rowsAll.forEach(function(r){ if (r.weightNow == null) return; if (r.s < 0) shortW += r.weightNow; else longW += r.weightNow; });
-      $('#pf-alloc').innerHTML = segsA.length ? '<div class="abar">' + segsA.map(function(x){ return '<i class="' + x.c + '" style="width:' + Math.max(0, x.v).toFixed(2) + '%" title="' + x.l + ' ' + x.v.toFixed(2) + '%"></i>'; }).join('') + '</div><div class="leg">' + segsA.map(function(x){ return '<span><i class="' + x.c + '"></i>' + x.l + ' <b>' + x.v.toFixed(2) + '%</b></span>'; }).join('') + (shortW > 0 ? '<span class="r">Long <b>' + longW.toFixed(2) + '%</b> · Short <b>' + shortW.toFixed(2) + '%</b></span>' : '') + '</div>' : '';
-    }
-    /* Orders */
-    var ordRow = function(p){ var lvl = Number(p.entry_price) > 0 ? Number(p.entry_price) : null, q = p.quote_symbol ? Q[String(p.quote_symbol).toUpperCase()] : null, px = q && q.price != null ? Number(q.price) : null, dist = lvl != null && px ? (lvl / px - 1) * 100 : null;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, true), 'em') + cell('Levels', (lvl != null ? fmtN(lvl) : '') + (p.entry ? '<span class="sub muted">' + esc(p.entry) + '</span>' : (lvl == null ? '—' : ''))) + cell('Last', px != null ? fmtN(px) + (q.change_pct != null ? '<span class="sub' + sgn(q.change_pct) + '">' + pct(q.change_pct) + ' today</span>' : '') : '—')
-        + cell('Distance', dist != null ? Math.abs(dist).toFixed(1) + '% ' + (dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num') + cell('Size', p.weight_entry != null || p.size_pct != null ? Number(p.weight_entry != null ? p.weight_entry : p.size_pct).toFixed(2) + '%' + '<span class="sub muted">' + usdFull(Number(p.weight_entry != null ? p.weight_entry : p.size_pct) / 100 * N) + '</span>' : '—', 'num') + '</tr>'; };
-    $('#pf-ord').innerHTML = '<thead><tr><th>Asset</th><th>Levels</th><th>Last</th><th>Distance</th><th>Size</th></tr></thead><tbody>' + (ord.length ? pfGrouped(ord, 5, ordRow) : '<tr><td colspan="5" class="muted">No resting orders right now.</td></tr>') + '</tbody>';
-    /* Track record */
-    var wins = closed.filter(function(p){ return /^\s*(\+|x)/i.test(p.result || ''); }).length;
-    $('#pf-closed-table').innerHTML = '<thead><tr><th>Position</th><th>Side</th><th>Entry</th><th>Exit</th><th>Result</th><th>Opened</th><th>Closed</th></tr></thead><tbody>' + (closed.length ? closed.map(function(p){ var pos = /^\s*(\+|x)/i.test(p.result || ''); return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', '<span class="sym">' + esc(p.symbol) + '</span>' + (p.name ? '<span class="nm">' + esc(p.name) + '</span>' : '') + (pfKind(p) !== 'spot' ? '<span class="nm">' + esc(pfKind(p)) + '</span>' : '') + pfDraft(p), 'em') + cell('Side', pfSide(p)) + cell('Entry', esc(p.entry || usdPx(p.entry_price))) + cell('Exit', esc(p.exit || '—')) + cell('Result', esc(p.result || '—'), (pos ? 'pos' : '') + ' em') + cell('Opened', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Closed', esc(p.closed_at ? M.fmtDate(p.closed_at) : '—'), 'muted') + '</tr>'; }).join('') : '<tr><td colspan="7" class="muted">Nothing closed yet.</td></tr>') + '</tbody>';
-    var nDraft = list.filter(function(p){ return p.published === false; }).length, latest = list.map(function(p){ return p.updated_at; }).filter(Boolean).sort().pop();
-    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + (closed.length ? 'Track record ' + wins + ' / ' + closed.length + ' closed calls positive · ' : '') + (book.asOf ? 'prices as of ' + hhmm(book.asOf) + ' (your time)' : (live ? 'live prices' : 'prices: none yet')) + ' · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · stocks refresh through the US session and at the close, crypto around the clock · weights are the share of the book, cash earns nothing · click a position for the target, the reasoning and the original posts · not financial advice: this is what we hold and why.';
+    var D = pfData(), list = D.list, unlocked = !!(access && access.valid), P = pfSplit(list);
+    $('#n-pf').textContent = P.spot.length ? String(P.spot.length) : ''; $('#n-tr').textContent = P.lev.length + P.ordT.length ? String(P.lev.length + P.ordT.length) : ''; $('#n-tk').textContent = '';
+    var onlyMe = deskTag('pf-tag', unlocked, list.length > 0); deskTag('tr-tag', unlocked, list.length > 0); deskTag('tk-tag', unlocked, list.length > 0);
+    $('#desk-grp-tag').textContent = unlocked && list.length ? (onlyMe ? 'Owner preview' : 'Live') : 'In development';
+    renderBook(D, P, unlocked); renderTrades(D, P, unlocked); renderTrack(D, P, unlocked); pressChips();
   }
+  /* /02 Portfolio: the spot book. Range chips → KPIs + chart; exposure donut; the holdings grid (a row opens its page). */
+  function renderBook(D, P, unlocked){
+    var list = D.list, Q = D.Q, N = D.N, book = D.book, R = D.R;
+    $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && list.length); $('#pf-empty').hidden = !(unlocked && !list.length); $('#pf-sub').hidden = true;
+    if (!(unlocked && list.length)) return;
+    M.$$('#pf-rng button').forEach(function(b){ b.classList.toggle('on', b.dataset.r === pfRange); });
+    M.$$('#pf-grp button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfGrp); });
+    M.$$('#pf-unit button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfUnit); });
+    var rows = book.rows.filter(function(r){ return r.capital != null; }), live = rows.filter(function(r){ return r.source === 'live'; }).length;
+    var val$ = function(r){ return r.value / 100 * N; }, cost$ = function(r){ return r.capital / 100 * N; }, pl$ = function(r){ return (r.value - r.capital) / 100 * N; }, pl1d$ = function(r){ return r.prev != null && r.q && r.q.prev_close != null ? (r.value - r.prev) / 100 * N : null; };
+    var S = book.series || [], hasHist = Object.keys(D.H).some(function(k){ return D.H[k] && D.H[k].length >= 2; });
+    /* KPIs: the value of the book against the $1,000,000 it started with; the selected range; the last 24 h */
+    var bookVal = book.B / 100 * N, bookPL = bookVal - N, pl1 = book.todayBook != null && live ? bookVal - bookVal / (1 + book.todayBook) : null, roi1 = book.todayBook != null && live ? book.todayBook * 100 : null;
+    var rk = pfRange === '1' ? 'all' : pfRange, rPL = null, rPct = null, rSince = null;
+    if (rk === 'all' || (S.length >= 2 && rangeFrom(S, rk) <= S[0].day)) { rPL = bookPL; rPct = book.retTotal * 100; rSince = book.first; }
+    else if (hasHist && S.length >= 2) { var seg0 = rangeSeg(S, rk)[0], base = N * (1 + seg0.book); rPL = bookVal - base; rPct = base > 0 ? (bookVal / base - 1) * 100 : null; rSince = seg0.day; }
+    var kp = function(k, v, d, big){ return '<div class="kp' + (big ? ' big' : '') + '"><span>' + k + '</span><b>' + v + '</b>' + (d ? '<em>' + d + '</em>' : '') + '</div>'; };
+    var sg = function(v, txt){ return v == null ? '<span class="muted">—</span>' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
+    $('#pf-kpis').innerHTML = kp('Portfolio value', usdFull(bookVal) + ' <small>USD</small>', 'Started with <i>' + usdFull(N) + '</i>' + (book.first ? ' on ' + M.fmtDate(book.first) : '') + ' · ' + sg(bookPL, pct(book.retTotal * 100)) + ' all time', true)
+      + kp(RANGES[rk], sg(rPL, usdSigned(rPL)), rPL == null ? (hasHist ? 'the book is younger than the range' : 'waiting for daily closes') : sg(rPct, pct(rPct)) + (rSince ? ' · since ' + M.fmtDate(rSince) : ''))
+      + kp('Last 24 h', sg(pl1, usdSigned(pl1)), pl1 == null ? 'waiting for prices' : sg(roi1, pct(roi1)) + ' · since the previous close');
+    /* exposure: current weights by asset or by class, cash included */
+    var groups = {}, keyOf = function(r){ return pfGrp === 'class' ? (PF_CLASS[r.p.asset_class] || 'Other') : String(r.p.symbol); };
+    rows.forEach(function(r){ var k = keyOf(r); var g = groups[k] = groups[k] || { k: k, w: 0, v: 0, n: 0 }; g.w += r.weightNow || 0; g.v += val$(r); g.n++; });
+    var segs = Object.keys(groups).map(function(k){ return groups[k]; }).sort(function(a, b){ return b.w - a.w; });
+    if (book.cashNow > 0) segs.push({ k: 'Cash', w: book.cashNow, v: Math.max(0, book.cash) / 100 * N, n: 0, cash: true });
+    $('#pf-donut').innerHTML = donut(segs) + '<div class="xl">' + segs.map(function(g, i){ return '<div><span><i class="sw c' + Math.min(i, 7) + (g.cash ? ' cash' : '') + '"></i>' + esc(g.k) + (g.n > 1 ? ' <small>· ' + g.n + ' positions</small>' : '') + '</span><b>' + g.w.toFixed(2) + '%</b><em>' + usdFull(g.v) + '</em></div>'; }).join('') + '</div>';
+    /* performance */
+    renderChart(book, Q, N, hasHist);
+    $('#pf-perf-empty').hidden = !$('#pf-chart-sec').hidden;
+    /* holdings */
+    var hrows = rows.map(function(r){ var p = r.p, v1 = pl1d$(r), ro1 = v1 != null && r.prev > 0 ? (r.value - r.prev) / r.prev * 100 : null;
+      return { p: p, r: r, v: { sym: String(p.symbol), since: String(p.opened_at || ''), entry: r.entry, last: r.last, roi1: ro1, pl1: v1, w0: r.w0, wNow: r.weightNow, val: val$(r), ret: r.ret != null ? r.ret * 100 : null, pl: r.entry != null && r.last != null ? pl$(r) : null } }; });
+    sortRows(hrows, pfSort);
+    var unweighted = P.spot.filter(function(p){ return !R[p.id] || R[p.id].capital == null; });
+    var head = '<thead><tr>' + th('Position', 'sym', pfSort) + th('Since', 'since', pfSort) + th('Entry', 'entry', pfSort, 'num') + th('Last', 'last', pfSort, 'num') + th('1D ROI', 'roi1', pfSort, 'num', 'Since the previous close') + th('1D P&amp;L', 'pl1', pfSort, 'num', 'Since the previous close')
+      + th('Initial weight', 'w0', pfSort, 'num', 'Share of the book at entry') + th('Current weight', 'wNow', pfSort, 'num', 'Share of the book now') + th('Market value', 'val', pfSort, 'num') + th('All-time ROI', 'ret', pfSort, 'num') + th('All-time P&amp;L', 'pl', pfSort, 'num') + '</tr></thead>';
+    var lastCell = function(r){ if (r.last == null) return cell('Last', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last', usdPx(r.last) + (r.source === 'mark' ? '<span class="sub muted">mark' + (r.p.mark_at ? ' · ' + M.fmtDate(r.p.mark_at) : '') + '</span>' : ''), 'num'); };
+    var row = function(h){ var p = h.p, r = h.r, v = h.v;
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
+        + cell('Entry', r.entry != null ? usdPx(r.entry) : '—', 'num') + lastCell(r)
+        + cell('1D ROI', v.roi1 == null ? '—' : pct(v.roi1), 'num' + sgn(v.roi1)) + cell('1D P&L', v.pl1 == null ? '—' : usdSigned(v.pl1), 'num' + sgn(v.pl1))
+        + cell('Initial weight', v.w0 != null ? v.w0.toFixed(2) + '%' : '—', 'num muted') + cell('Current weight', v.wNow != null ? v.wNow.toFixed(2) + '%' : '—', 'num') + cell('Market value', usdFull(v.val), 'num')
+        + cell('All-time ROI', v.ret == null ? '—' : pct(v.ret), 'num' + sgn(v.ret)) + cell('All-time P&L', v.pl == null ? '—' : usdSigned(v.pl), 'num' + sgn(v.pl)) + '</tr>'; };
+    var unwRow = function(p){ var T = tradeNums(p, Q), ret = T.entry && T.last ? (T.last / T.entry - 1) * 100 : null;
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry', T.entry != null ? usdPx(T.entry) : '—', 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num')
+        + cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('1D P&L', '—', 'num') + cell('Initial weight', '<span class="muted">—</span>', 'num') + cell('Current weight', '<span class="muted">—</span>', 'num') + cell('Market value', '—', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + cell('All-time P&L', '—', 'num') + '</tr>'; };
+    $('#pf-table').innerHTML = head + '<tbody>' + (hrows.length || unweighted.length ? hrows.map(row).join('') + unweighted.map(unwRow).join('') : '<tr><td colspan="11" class="muted">No spot positions open right now. Cash is a position too.</td></tr>') + '</tbody>';
+    $('#pf-hold-n').textContent = '· ' + P.spot.length + ' position' + (P.spot.length === 1 ? '' : 's') + (book.cashNow != null ? ' · ' + book.cashNow.toFixed(2) + '% cash' : '');
+    $('#pf-asof').textContent = book.asOf ? 'Prices as of ' + hhmm(book.asOf) + ' (your time)' : (live ? 'Live prices' : 'Prices: none yet');
+    /* resting spot orders */
+    var ordRow = function(p){ var T = tradeNums(p, Q), dist = T.entry != null && T.last ? (T.entry / T.last - 1) * 100 : null;
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, true), 'em') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) + (T.q && T.q.change_pct != null ? '<span class="sub' + sgn(T.q.change_pct) + '">' + pct(T.q.change_pct) + ' today</span>' : '') : '—', 'num')
+        + cell('Distance', dist != null ? Math.abs(dist).toFixed(1) + '% ' + (dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num') + cell('Planned weight', p.weight_entry != null ? Number(p.weight_entry).toFixed(2) + '%' : '—', 'num') + '</tr>'; };
+    $('#pf-orders').hidden = !P.ordS.length;
+    if (P.ordS.length) $('#pf-ord').innerHTML = '<thead><tr><th>Asset</th><th class="num">Level</th><th class="num">Last</th><th class="num">Distance</th><th class="num">Planned weight</th></tr></thead><tbody>' + pfGrouped(P.ordS, 5, ordRow) + '</tbody>';
+    var nDraft = list.filter(function(p){ return p.published === false; }).length;
+    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'A model book that started with ' + usdFull(N) + '; every position takes its weight of the book the day it is called, cash earns nothing · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · stocks refresh through the US session and at the close, crypto around the clock · click a position for the original Telegram posts · not financial advice: this is what we hold.';
+  }
+  /* /03 Trades: leveraged, on their own capital. ROI only — never a size. */
+  function renderTrades(D, P, unlocked){
+    var Q = D.Q, n = P.lev.length + P.ordT.length;
+    $('#tr-locked').hidden = unlocked; $('#tr-live').hidden = !(unlocked && n); $('#tr-empty').hidden = !(unlocked && !n);
+    if (!(unlocked && n)) return;
+    var rows = P.lev.map(function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), side: String(p.side || 'long'), L: T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret } }; });
+    sortRows(rows, trSort);
+    var head = '<thead><tr>' + th('Trade', 'sym', trSort) + th('Side', 'side', trSort) + th('Leverage', 'L', trSort, 'num') + th('Since', 'since', trSort) + th('Entry', 'entry', trSort, 'num') + th('Last', 'last', trSort, 'num') + th('1D ROI', 'roi1', trSort, 'num', 'Since the previous close, at the stated leverage') + th('All-time ROI', 'ret', trSort, 'num', 'On the margin, at the stated leverage') + '</tr></thead>';
+    var row = function(h){ var p = h.p, T = h.T, v = h.v;
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Trade', pfName(p, false), 'em') + cell('Side', pfSideOnly(p)) + cell('Leverage', T.L + '×', 'num') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
+        + cell('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : '') : '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num')
+        + cell('1D ROI', v.roi1 == null ? '—' : pct(v.roi1), 'num' + sgn(v.roi1)) + cell('All-time ROI', v.ret == null ? '—' : pct(v.ret), 'num' + sgn(v.ret)) + '</tr>'; };
+    $('#tr-table').innerHTML = head + '<tbody>' + (rows.length ? rows.map(row).join('') : '<tr><td colspan="8" class="muted">No leveraged trade open right now.</td></tr>') + '</tbody>';
+    var ordRow = function(p){ var T = tradeNums(p, Q), dist = T.entry != null && T.last ? (T.entry / T.last - 1) * 100 : null;
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, false), 'em') + cell('Side', pfSideOnly(p)) + cell('Leverage', T.L + '×', 'num') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num') + cell('Distance', dist != null ? Math.abs(dist).toFixed(1) + '% ' + (dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num') + '</tr>'; };
+    $('#tr-orders').hidden = !P.ordT.length;
+    if (P.ordT.length) $('#tr-ord').innerHTML = '<thead><tr><th>Asset</th><th>Side</th><th class="num">Leverage</th><th class="num">Level</th><th class="num">Last</th><th class="num">Distance</th></tr></thead><tbody>' + pfGrouped(P.ordT, 6, ordRow) + '</tbody>';
+    var asOf = rows.map(function(h){ return h.T.q && (h.T.q.updated_at || h.T.q.quoted_at); }).filter(Boolean).sort().pop();
+    $('#tr-foot').innerHTML = 'Trades run on their own capital, apart from the portfolio · ROI is on the margin at the stated leverage (a 3× short gains 3% when the price drops 1%) · 1D = since the previous close' + (asOf ? ' · prices as of ' + hhmm(asOf) + ' (your time)' : '') + ' · click a trade for the original Telegram posts · not financial advice.';
+  }
+  /* /04 Track record: every closed call, the latest first */
+  function renderTrack(D, P, unlocked){
+    var closed = P.closed.slice().sort(function(a, b){ return String(b.closed_at || '').localeCompare(String(a.closed_at || '')); });
+    $('#tk-locked').hidden = unlocked; $('#tk-live').hidden = !(unlocked && closed.length); $('#tk-empty').hidden = !(unlocked && !closed.length);
+    if (!(unlocked && closed.length)) return;
+    var wins = closed.filter(function(p){ return resultSign(p) > 0; }).length;
+    $('#tk-table').innerHTML = '<thead><tr><th>Position</th><th>Type</th><th>Side</th><th class="num">Entry</th><th class="num">Exit</th><th class="num">Result</th><th>Opened</th><th>Closed</th></tr></thead><tbody>'
+      + closed.map(function(p){ var s = resultSign(p); return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + (p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + pfDraft(p), 'em') + cell('Type', pfKind(p) === 'leveraged' ? 'Trade' + (p.leverage ? ' · ' + esc(p.leverage) : '') : 'Spot', 'muted') + cell('Side', pfSideOnly(p))
+        + cell('Entry', esc(p.entry || usdPx(p.entry_price)), 'num') + cell('Exit', esc(p.exit || '—'), 'num') + cell('Result', '<b>' + esc(p.result || '—') + '</b>', 'num' + (s > 0 ? ' pos' : s < 0 ? ' neg' : '')) + cell('Opened', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Closed', esc(p.closed_at ? M.fmtDate(p.closed_at) : '—'), 'muted') + '</tr>'; }).join('') + '</tbody>';
+    $('#tk-foot').innerHTML = wins + ' of ' + closed.length + ' closed calls positive · results as called in the Exclusive channel, without leverage unless stated · click a call for the original posts · the audited track record (entry, exit and result at the prices of the day) is being built.';
+  }
+  function pfSideOnly(p){ var s = String(p.side || 'long'); var warn = s === 'short' || s === 'sell'; return '<span class="tag ' + (warn ? 'warn' : 'ok') + '">' + esc(s) + '</span>'; }
   /* a donut of weights: monochrome slices, labels outside, the biggest first */
   function donut(segs){
     var tot = segs.reduce(function(a, s){ return a + Math.max(0, s.w); }, 0); if (!(tot > 0)) return '<p class="small muted">Nothing to show yet.</p>';
-    var W = 420, cx = W / 2, cy = 190, R0 = 118, R1 = 70, a0 = -Math.PI / 2, out = '', labels = '';
-    segs.forEach(function(s, i){ var f = Math.max(0, s.w) / tot; if (f <= 0) return; var a1 = a0 + f * Math.PI * 2, big = f > 0.5 ? 1 : 0;
+    var W = 420, cx = W / 2, cy = 190, R0 = 118, R1 = 70, a0 = -Math.PI / 2, out = '', labels = '', lab = [];
+    segs.forEach(function(s, i){ var f = Math.min(0.9999, Math.max(0, s.w) / tot); if (f <= 0) return; var a1 = a0 + f * Math.PI * 2, big = f > 0.5 ? 1 : 0;
       var p = function(r, a){ return (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1); };
       var d = 'M' + p(R0, a0) + 'A' + R0 + ',' + R0 + ' 0 ' + big + ',1 ' + p(R0, a1) + 'L' + p(R1, a1) + 'A' + R1 + ',' + R1 + ' 0 ' + big + ',0 ' + p(R1, a0) + 'Z';
-      out += '<path class="sl c' + Math.min(i, 7) + (s.cash ? ' cash' : '') + '" d="' + d + '"><title>' + esc(s.k) + ' · ' + s.w.toFixed(2) + '%</title></path>';
-      if (f >= 0.025) { var am = (a0 + a1) / 2, lx = cx + (R0 + 26) * Math.cos(am), ly = cy + (R0 + 26) * Math.sin(am), right = Math.cos(am) >= 0; labels += '<line class="ll" x1="' + p(R0 + 3, am).split(',')[0] + '" y1="' + p(R0 + 3, am).split(',')[1] + '" x2="' + (cx + (R0 + 18) * Math.cos(am)).toFixed(1) + '" y2="' + (cy + (R0 + 18) * Math.sin(am)).toFixed(1) + '"/><text class="lt" x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + (right ? 'start' : 'end') + '">' + esc(s.k) + ' <tspan class="lp">' + s.w.toFixed(1) + '%</tspan></text>'; }
+      out += '<path class="sl c' + Math.min(i, 7) + (s.cash ? ' cash' : '') + '" d="' + d + '"><title>' + esc(s.k) + ' · ' + s.w.toFixed(2) + '%' + (s.v != null ? ' · ' + usdFull(s.v) : '') + '</title></path>';
+      if (f >= 0.02) { var am = (a0 + a1) / 2; lab.push({ k: s.k, w: s.w, am: am, right: Math.cos(am) >= 0, y: cy + (R0 + 26) * Math.sin(am) }); }
       a0 = a1; });
-    return '<svg viewBox="0 0 ' + W + ' 380" class="dn">' + out + labels + '<text class="dc" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + segs.filter(function(s){ return !s.cash; }).length + '</text><text class="dl" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">' + (segs.filter(function(s){ return !s.cash; }).length === 1 ? 'holding' : 'holdings') + '</text></svg>';
+    [true, false].forEach(function(side){ var L = lab.filter(function(l){ return l.right === side; }).sort(function(a, b){ return a.y - b.y; }); for (var i = 1; i < L.length; i++) if (L[i].y - L[i - 1].y < 15) L[i].y = L[i - 1].y + 15; for (var j = L.length - 2; j >= 0; j--) if (L[j + 1].y - L[j].y < 15) L[j].y = L[j + 1].y - 15; });
+    lab.forEach(function(l){ var x1 = cx + (R0 + 3) * Math.cos(l.am), y1 = cy + (R0 + 3) * Math.sin(l.am), x2 = cx + (R0 + 20) * Math.cos(l.am), lx = cx + (R0 + 26) * Math.cos(l.am);
+      labels += '<line class="ll" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + l.y.toFixed(1) + '"/><text class="lt" x="' + lx.toFixed(1) + '" y="' + (l.y + 4).toFixed(1) + '" text-anchor="' + (l.right ? 'start' : 'end') + '">' + esc(l.k) + ' <tspan class="lp">' + l.w.toFixed(1) + '%</tspan></text>'; });
+    var n = segs.filter(function(s){ return !s.cash; }).length;
+    return '<svg viewBox="0 0 ' + W + ' 380" class="dn">' + out + labels + '<text class="dc" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + n + '</text><text class="dl" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">' + (pfGrp === 'class' ? (n === 1 ? 'class' : 'classes') : (n === 1 ? 'holding' : 'holdings')) + '</text></svg>';
   }
-  /* the book against the market since the first entry: % change of the book, S&P 500 (SPY) and Nasdaq 100 (QQQ), daily */
-  function renderChart(book, Q){
+  /* the book against the market, daily: in % (rebased to the start of the range) or in $ (what $1,000,000 became — the same for the S&P 500 and the Nasdaq 100) */
+  function renderChart(book, Q, N, hasHist){
     var sec = $('#pf-chart-sec'); var S = book.series || [];
-    var H = sim ? SIM_HIST : qhist, withHist = Object.keys(H).filter(function(k){ return H[k] && H[k].length >= 2; }).length;
-    if (S.length < 2 || !withHist) { sec.hidden = true; $('#pf-months').hidden = true; return; } /* no daily closes yet (Backfill history in the admin): a flat line with a jump would mislead */
+    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-months').hidden = true; $('#pf-chart-sub').textContent = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
     sec.hidden = false; /* visible before measuring: the chart takes the width it will be drawn at */
-    var from = S[0].day; if (pfRange === 'ytd') from = S[S.length - 1].day.slice(0, 4) + '-01-01'; else if (pfRange !== 'all') from = new Date(Date.parse(S[S.length - 1].day) - Number(pfRange) * 86400000).toISOString().slice(0, 10);
-    var i0 = Math.max(0, S.findIndex(function(p){ return p.day >= from; })); if (i0 > 0) i0 -= 1; /* one point before the range so the lines start at the edge */
-    var seg = S.slice(i0); if (seg.length < 2) seg = S.slice(-2);
-    var reb = function(k){ if (pfRange === 'all') return seg.map(function(p){ return p[k] == null ? null : p[k]; }); var b = seg[0][k]; return seg.map(function(p){ return p[k] == null || b == null ? null : (1 + p[k]) / (1 + b) - 1; }); };
-    var lines = [{ k: 'book', l: 'Book', v: reb('book'), c: 'lb' }, { k: 'SPY', l: 'S&P 500', v: reb('SPY'), c: 'ls' }, { k: 'QQQ', l: 'Nasdaq 100', v: reb('QQQ'), c: 'lq' }].filter(function(x){ return x.v.some(function(v){ return v != null; }); });
-    var all = []; lines.forEach(function(x){ x.v.forEach(function(v){ if (v != null) all.push(v); }); });
-    var lo = Math.min(0, Math.min.apply(null, all)), hi = Math.max(0, Math.max.apply(null, all)); if (hi - lo < 0.02) { hi += 0.01; lo -= 0.01; } var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
-    var cw = $('#pf-chart').clientWidth || 1000, W = Math.max(300, cw - 36), Hh = W < 560 ? 240 : 320, L = 8, Rr = W < 560 ? 48 : 58, T = 14, Bt = 30, n = seg.length;
+    var seg = rangeSeg(S, pfRange), n = seg.length, usdMode = pfUnit === 'usd';
+    var raw = pfRange === 'all' || seg[0].day === S[0].day; /* from the start of the book: against the $1,000,000, not rebased */
+    var reb = function(k){ if (raw) return seg.map(function(p){ return p[k] == null ? null : p[k]; }); var b = seg[0][k]; return seg.map(function(p){ return p[k] == null || b == null ? null : (1 + p[k]) / (1 + b) - 1; }); };
+    var disp = usdMode ? function(r){ return N * (1 + r); } : function(r){ return r * 100; };
+    var fmtV = usdMode ? function(v){ return usd(v); } : function(v){ return pct(v); };
+    var fmtTick = usdMode ? function(v){ return usd(v, Math.abs(hi - lo) < N * 0.1 ? 3 : 2); } : function(v){ return (v > 0 ? '+' : '') + v.toFixed(Math.abs(hi - lo) < 10 ? 1 : 0) + '%'; };
+    var lines = [{ k: 'book', l: 'Portfolio', v: reb('book'), c: 'lb' }, { k: 'SPY', l: 'S&P 500', v: reb('SPY'), c: 'ls' }, { k: 'QQQ', l: 'Nasdaq 100', v: reb('QQQ'), c: 'lq' }].filter(function(x){ return x.v.some(function(v){ return v != null; }); });
+    lines.forEach(function(x){ x.d = x.v.map(function(r){ return r == null ? null : disp(r); }); });
+    var all = []; lines.forEach(function(x){ x.d.forEach(function(v){ if (v != null) all.push(v); }); });
+    var zeroV = disp(0), lo = Math.min(zeroV, Math.min.apply(null, all)), hi = Math.max(zeroV, Math.max.apply(null, all)); if (hi - lo < (usdMode ? N * 0.02 : 2)) { hi += usdMode ? N * 0.01 : 1; lo -= usdMode ? N * 0.01 : 1; } var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
+    var cw = $('#pf-chart').clientWidth || 800, W = Math.max(300, cw - 36), Hh = W < 560 ? 240 : 300, L = 8, Rr = W < 560 ? 54 : (usdMode ? 70 : 58), T = 14, Bt = 30;
     var X = function(i){ return L + (W - L - Rr) * i / (n - 1); }, Y = function(v){ return T + (Hh - T - Bt) * (1 - (v - lo) / (hi - lo)); };
     var step = (hi - lo) / 4, ticks = []; for (var t = 0; t <= 4; t++) ticks.push(lo + step * t);
-    var grid = ticks.map(function(v){ return '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" class="g"/><text x="' + (W - Rr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="tk">' + (v > 0 ? '+' : '') + (v * 100).toFixed(Math.abs(hi - lo) < 0.1 ? 1 : 0) + '%</text>'; }).join('');
-    var zero = '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(0).toFixed(1) + '" y2="' + Y(0).toFixed(1) + '" class="z"/>';
+    var grid = ticks.map(function(v){ return '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" class="g"/><text x="' + (W - Rr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="tk">' + fmtTick(v) + '</text>'; }).join('');
+    var zero = '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(zeroV).toFixed(1) + '" y2="' + Y(zeroV).toFixed(1) + '" class="z"/>';
     var months = []; seg.forEach(function(p, i){ var m = p.day.slice(0, 7); if (!months.length || months[months.length - 1].m !== m) months.push({ m: m, i: i }); });
-    var every = Math.max(1, Math.ceil(months.length / (W < 560 ? 4 : 8)));
-    var xl = months.filter(function(_, j){ return j % every === 0; }).map(function(o){ var d = new Date(o.m + '-01T00:00:00Z'); return '<text x="' + X(o.i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk">' + d.toLocaleDateString('en-GB', { month: 'short', year: months.length > 12 ? '2-digit' : undefined, timeZone: 'UTC' }) + '</text>'; }).join('');
+    var xl;
+    if (months.length >= 3) { var every = Math.max(1, Math.ceil(months.length / (W < 560 ? 4 : 8))); xl = months.filter(function(_, j){ return j % every === 0; }).map(function(o){ var d = new Date(o.m + '-01T00:00:00Z'); return '<text x="' + X(o.i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk">' + d.toLocaleDateString('en-GB', { month: 'short', year: months.length > 12 ? '2-digit' : undefined, timeZone: 'UTC' }) + '</text>'; }).join(''); }
+    else { var k = Math.max(1, Math.ceil(n / (W < 560 ? 4 : 7))); xl = seg.map(function(p, i){ return i % k === 0 || i === n - 1 ? '<text x="' + X(i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk" text-anchor="' + (i === n - 1 ? 'end' : i === 0 ? 'start' : 'middle') + '">' + new Date(p.day + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }) + '</text>' : ''; }).join(''); }
     var path = function(v){ var d = '', on = false; v.forEach(function(y, i){ if (y == null) { on = false; return; } d += (on ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(y).toFixed(1); on = true; }); return d; };
-    var bookV = lines[0] && lines[0].k === 'book' ? lines[0].v : null, lastB = bookV ? bookV[bookV.length - 1] : null;
-    var area = bookV ? '<path class="a" d="' + path(bookV) + 'L' + X(n - 1).toFixed(1) + ',' + Y(0).toFixed(1) + 'L' + X(0).toFixed(1) + ',' + Y(0).toFixed(1) + 'Z"/>' : '';
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" class="cv">' + grid + zero + area + lines.map(function(x){ return '<path class="l ' + x.c + '" d="' + path(x.v) + '"/>'; }).join('') + xl + '<line class="hv" x1="0" x2="0" y1="' + T + '" y2="' + (Hh - Bt) + '" hidden/>' + lines.map(function(x){ return '<circle class="dot ' + x.c + '" r="4" hidden/>'; }).join('') + '</svg>';
-    var legend = '<div class="lg">' + lines.map(function(x){ var v = x.v[x.v.length - 1]; return '<span><i class="' + x.c + '"></i>' + x.l + ' <b class="' + sgn(v).trim() + '">' + (v == null ? '—' : pct(v * 100)) + '</b></span>'; }).join('') + '<span class="tip" id="pf-tip"></span></div>';
+    var bookD = lines[0] && lines[0].k === 'book' ? lines[0].d : null, bookR = bookD ? lines[0].v : null;
+    var area = bookD ? '<path class="a" d="' + path(bookD) + 'L' + X(n - 1).toFixed(1) + ',' + Y(zeroV).toFixed(1) + 'L' + X(0).toFixed(1) + ',' + Y(zeroV).toFixed(1) + 'Z"/>' : '';
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" class="cv">' + grid + zero + area + lines.map(function(x){ return '<path class="l ' + x.c + '" d="' + path(x.d) + '"/>'; }).join('') + xl + '<line class="hv" x1="0" x2="0" y1="' + T + '" y2="' + (Hh - Bt) + '" hidden/>' + lines.map(function(x){ return '<circle class="dot ' + x.c + '" r="4" hidden/>'; }).join('') + '</svg>';
+    var endTxt = function(x){ var r = x.v[x.v.length - 1]; return r == null ? '—' : usdMode ? usd(disp(r)) + ' <small class="' + sgn(r).trim() + '">' + pct(r * 100) + '</small>' : pct(r * 100); };
+    var legend = '<div class="lg">' + lines.map(function(x){ var r = x.v[x.v.length - 1]; return '<span><i class="' + x.c + '"></i>' + x.l + ' <b class="' + (usdMode ? '' : sgn(r).trim()) + '">' + endTxt(x) + '</b></span>'; }).join('') + '<span class="tip" id="pf-tip"></span></div>';
     $('#pf-chart').innerHTML = legend + svg;
-    $('#pf-chart-sub').textContent = '· ' + M.fmtDate(seg[0].day) + ' → ' + M.fmtDate(seg[n - 1].day) + (pfRange === 'all' ? '' : ', rebased');
-    /* stats for the range: book vs S&P, best and worst day, drawdown */
-    var dd = 0, peak = -Infinity; (bookV || []).forEach(function(v){ if (v == null) return; peak = Math.max(peak, 1 + v); dd = Math.min(dd, (1 + v) / peak - 1); });
-    var days = []; for (var i = 1; i < n; i++) if (bookV && bookV[i] != null && bookV[i - 1] != null) days.push({ d: seg[i].day, r: (1 + bookV[i]) / (1 + bookV[i - 1]) - 1 });
-    var best = days.slice().sort(function(a, b){ return b.r - a.r; })[0], worst = days.slice().sort(function(a, b){ return a.r - b.r; })[0];
-    var spy = lines.filter(function(x){ return x.k === 'SPY'; })[0], spyV = spy ? spy.v[spy.v.length - 1] : null;
-    var st = function(k, v, d){ return '<div class="st"><span class="k">' + k + '</span><span class="v">' + v + '</span>' + (d ? '<span class="d">' + d + '</span>' : '') + '</div>'; };
-    $('#pf-stats').innerHTML = st('Book', '<span class="' + sgn(lastB).trim() + '">' + (lastB == null ? '—' : pct(lastB * 100)) + '</span>', 'in the range') + st('vs S&amp;P 500', spyV != null && lastB != null ? '<span class="' + sgn(lastB - spyV).trim() + '">' + pct((lastB - spyV) * 100) + '</span>' : '—', spyV != null ? 'S&amp;P 500 ' + pct(spyV * 100) : 'no benchmark data yet') + st('Max drawdown', '<span class="' + (dd < 0 ? 'neg' : '') + '">' + pct(dd * 100, 1, false) + '</span>', 'peak to trough') + st('Best day', best ? '<span class="pos">' + pct(best.r * 100) + '</span>' : '—', best ? M.fmtDate(best.d) : '') + st('Worst day', worst ? '<span class="' + sgn(worst.r).trim() + '">' + pct(worst.r * 100) + '</span>' : '—', worst ? M.fmtDate(worst.d) : '');
+    $('#pf-chart-sub').textContent = '· ' + M.fmtDate(seg[0].day) + ' → ' + M.fmtDate(seg[n - 1].day) + (usdMode ? ' · ' + usdFull(N) + ' in each' : (raw ? '' : ', rebased'));
     /* month by month: the book's return per calendar month, last 12 (the current one to date) */
     var mo = {}; S.forEach(function(p){ var m = p.day.slice(0, 7); mo[m] = p.book; });
-    var mk = Object.keys(mo).sort(), prev = null, cells = [];
-    mk.forEach(function(m, i){ var end = 1 + mo[m], start = i === 0 ? 1 + (S[0].book || 0) : 1 + mo[mk[i - 1]]; var r = start > 0 ? end / start - 1 : null; cells.push({ m: m, r: r, partial: i === mk.length - 1 }); });
+    var mk = Object.keys(mo).sort(), cells = [];
+    mk.forEach(function(m, i){ var end = 1 + mo[m], start = i === 0 ? 1 : 1 + mo[mk[i - 1]]; var r = start > 0 ? end / start - 1 : null; cells.push({ m: m, r: r, partial: i === mk.length - 1 }); });
     cells = cells.slice(-12);
     var mbox = $('#pf-months'); mbox.hidden = cells.length < 2;
     if (cells.length >= 2) mbox.innerHTML = '<span class="k">Month by month</span>' + cells.map(function(c){ var d = new Date(c.m + '-15T00:00:00Z'); return '<span class="mo' + sgn(c.r) + '"><i>' + d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }) + (c.m.slice(0, 4) !== String(new Date().getFullYear()) ? ' ' + c.m.slice(2, 4) : '') + '</i><b>' + (c.r == null ? '—' : pct(c.r * 100, 1)) + '</b>' + (c.partial ? '<em>to date</em>' : '') + '</span>'; }).join('');
-    sec.hidden = false;
     /* hover: nearest day */
     var sv = $('#pf-chart svg'), hv = sv.querySelector('.hv'), dots = M.$$('.dot', sv), tip = $('#pf-tip');
-    var show = function(ev){ var r = sv.getBoundingClientRect(); var px = (ev.clientX - r.left) / r.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.hidden = false;
-      lines.forEach(function(x, j){ var v = x.v[i]; if (v == null) { dots[j].hidden = true; return; } dots[j].hidden = false; dots[j].setAttribute('cx', X(i)); dots[j].setAttribute('cy', Y(v)); });
-      tip.innerHTML = '<b>' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var v = x.v[i]; return ' · ' + x.l + ' <b class="' + sgn(v).trim() + '">' + (v == null ? '—' : pct(v * 100)) + '</b>'; }).join(''); };
+    var show = function(ev){ var rc = sv.getBoundingClientRect(); var px = (ev.clientX - rc.left) / rc.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.hidden = false;
+      lines.forEach(function(x, j){ var v = x.d[i]; if (v == null) { dots[j].hidden = true; return; } dots[j].hidden = false; dots[j].setAttribute('cx', X(i)); dots[j].setAttribute('cy', Y(v)); });
+      tip.innerHTML = '<b>' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var r = x.v[i]; return ' · ' + x.l + ' <b class="' + sgn(r).trim() + '">' + (r == null ? '—' : fmtV(disp(r))) + '</b>'; }).join(''); };
     var hide = function(){ hv.hidden = true; dots.forEach(function(d){ d.hidden = true; }); tip.innerHTML = ''; };
     sv.addEventListener('mousemove', show); sv.addEventListener('touchmove', function(ev){ if (ev.touches[0]) show(ev.touches[0]); }, { passive: true }); sv.addEventListener('mouseleave', hide);
   }
   var pfRz = null; window.addEventListener('resize', function(){ clearTimeout(pfRz); pfRz = setTimeout(function(){ if (current === 'portfolio' && !$('#pf-live').hidden) renderPortfolio(); }, 200); });
-  document.addEventListener('click', function(ev){ var b = ev.target.closest('#pf-book button, #pf-view button, #pf-grp button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-book') pfTab.book = b.dataset.v; if (g === 'pf-view') pfTab.view = b.dataset.v; if (g === 'pf-grp') pfTab.grp = b.dataset.v; renderPortfolio(); });
-  document.addEventListener('click', function(ev){ var b = ev.target.closest('#pf-rng button'); if (!b) return; pfRange = b.dataset.r; M.$$('#pf-rng button').forEach(function(x){ x.classList.toggle('on', x === b); }); renderPortfolio(); });
+  document.addEventListener('click', function(ev){ var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
+  function sortBy(h){ var st = h.closest('#pf-table') ? pfSort : trSort; if (st.k === h.dataset.k) st.d = -st.d; else { st.k = h.dataset.k; st.d = h.dataset.k === 'sym' || h.dataset.k === 'since' || h.dataset.k === 'side' ? 1 : -1; } renderPortfolio(); var again = $('#' + (st === pfSort ? 'pf-table' : 'tr-table') + ' th[data-k="' + st.k + '"]'); if (again) again.focus(); }
+  document.addEventListener('click', function(ev){ var h = ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) sortBy(h); });
+  document.addEventListener('keydown', function(ev){ if (ev.key !== 'Enter' && ev.key !== ' ') return; var h = ev.target.closest && ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) { ev.preventDefault(); sortBy(h); } });
+  /* every chip row tells assistive tech which one is pressed */
+  function pressChips(){ $$('.chips button').forEach(function(b){ b.setAttribute('aria-pressed', b.classList.contains('on') ? 'true' : 'false'); }); }
   /* owner preview data: a plausible book with live-looking prices, so "View as" shows the page members get */
   var SIM_POS = [
     { id: 's1', symbol:'MSTR', name:'Strategy', kind:'spot', side:'long', asset_class:'equity', entry:'$100, $90', entry_price:95, quote_symbol:'MSTR', weight_entry:20, target:'$950', status:'open', opened_at:'2026-07-23', thesis:'Leveraged Bitcoin with a balance sheet. Not selling one share.', links:['https://t.me/c/2077854583/4373'], updated_at:'2026-09-24T00:00:00Z' },
@@ -801,7 +869,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#cal-tag').textContent = unlocked && list.length ? (calOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#cal-tag').className = 'soon' + (calOnlyMe && list.length ? ' warn' : '');
     if (!(unlocked && list.length)) return;
     var now = Date.now();
-    var nx = list.filter(function(e){ return e.importance >= 3 && new Date(e.at).getTime() > now - 60000 && e.actual == null; })[0];
+    var nx = list.filter(function(e){ return e.importance >= 3 && new Date(e.at).getTime() > now - 60000 && e.actual == null; }).sort(function(a, b){ return String(a.at).localeCompare(String(b.at)); })[0];
     var nb = $('#cal-next'); nb.hidden = !nx; if (nx) nb.innerHTML = '<div><b>Next: ' + esc(CNAME[nx.country] || nx.country) + ' · ' + esc(nx.title) + '</b><p>' + new Date(nx.at).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + (nx.estimate != null ? ' · estimate ' + fmtV(nx.estimate, nx.unit) : '') + (nx.previous != null ? ' · previous ' + fmtV(nx.previous, nx.unit) : '') + '</p></div><span class="cd">' + countdown(new Date(nx.at).getTime() - now) + '</span>';
     /* the week in view: Monday to Sunday, local time */
     var base = new Date(now); base.setHours(0, 0, 0, 0); var dow = (base.getDay() + 6) % 7; var mon = new Date(base.getTime() - dow * 864e5 + calF.wk * 7 * 864e5), sun = new Date(mon.getTime() + 7 * 864e5);
@@ -835,8 +903,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var strip = $('#er-strip'); strip.hidden = !tdy.length; if (tdy.length) strip.innerHTML = '<div><b>Today: ' + tdy.length + ' report' + (tdy.length === 1 ? '' : 's') + '</b><p>' + (pre ? pre + ' before the open' : '') + (pre && aft ? ' · ' : '') + (aft ? aft + ' after the close' : '') + (tdyBook ? ' · <b>' + tdyBook + ' from the book</b>' : '') + (done ? ' · ' + done + ' already out' : '') + '</p></div>';
     var by = {}; rows.forEach(function(e){ (by[e.day] = by[e.day] || []).push(e); });
     var keys = Object.keys(by).sort(); if (erF.when === 'past') keys.reverse();
-    var timeTxt = function(t){ return /pre/i.test(t || '') ? 'Before the open' : /after/i.test(t || '') ? 'After the close' : /\d{1,2}:\d{2}/.test(t || '') ? t : 'Time not set'; };
-    $('#er-days').innerHTML = keys.length ? keys.map(function(k){ var l = by[k].sort(function(a, b){ return (book[b.symbol] ? 1 : 0) - (book[a.symbol] ? 1 : 0) || String(a.time).localeCompare(String(b.time)) || a.symbol.localeCompare(b.symbol); }); return '<div class="sec cal"><div class="sh"><h2>' + dayTitle(k) + '</h2><span class="small muted">' + l.length + ' report' + (l.length === 1 ? '' : 's') + '</span></div><div class="ptw"><table class="pt cards er"><thead><tr><th>Company</th><th>When</th><th>EPS estimate</th><th>EPS actual</th><th>Surprise</th></tr></thead><tbody>' + l.map(function(e){
+    var timeTxt = function(t){ return /pre/i.test(t || '') ? 'Before the open' : /after/i.test(t || '') ? 'After the close' : /\d{1,2}:\d{2}/.test(t || '') ? esc(t) : 'Time not set'; };
+    $('#er-days').innerHTML = keys.length ? keys.map(function(k){ var l = by[k].sort(function(a, b){ return (book[String(b.symbol).toUpperCase()] ? 1 : 0) - (book[String(a.symbol).toUpperCase()] ? 1 : 0) || String(a.time).localeCompare(String(b.time)) || a.symbol.localeCompare(b.symbol); }); return '<div class="sec cal"><div class="sh"><h2>' + dayTitle(k) + '</h2><span class="small muted">' + l.length + ' report' + (l.length === 1 ? '' : 's') + '</span></div><div class="ptw"><table class="pt cards er"><thead><tr><th>Company</th><th>When</th><th>EPS estimate</th><th>EPS actual</th><th>Surprise</th></tr></thead><tbody>' + l.map(function(e){
       var inBook = book[String(e.symbol).toUpperCase()], out = e.eps_actual != null, fresh = out && e.reported_at && now - new Date(e.reported_at).getTime() < 60 * 60000;
       var q = inBook && inBook.quote_symbol ? (sim ? SIM_QUOTES : quotes)[String(inBook.quote_symbol).toUpperCase()] : null, px = q && q.price != null ? '<span class="sub' + sgn(q.change_pct) + '">' + fmtN(q.price) + (q.change_pct != null ? ' · ' + pct(q.change_pct) + ' today' : '') + '</span>' : '';
       return '<tr class="' + (inBook ? 'mine' : '') + (fresh ? ' fresh' : '') + '">' + cell('Company', '<span class="sym">' + esc(e.symbol) + '</span>' + (e.name ? '<span class="nm">' + esc(e.name) + '</span>' : '') + (inBook ? '<a class="tag ok" style="margin-left:8px" href="#portfolio" title="Open the position">in the book</a>' : '') + (fresh ? '<span class="tag ok" style="margin-left:8px">just reported</span>' : '') + '<span class="sub muted">' + esc(e.exchange || '') + (e.country ? ' · ' + esc(e.country) : '') + '</span>' + px, 'em') + cell('When', timeTxt(e.time)) + cell('EPS estimate', e.eps_estimate != null ? Number(e.eps_estimate).toFixed(2) : '—', 'num') + cell('EPS actual', out ? '<b>' + Number(e.eps_actual).toFixed(2) + '</b>' : '<span class="muted">—</span>', 'num') + cell('Surprise', (e.surprise_pct != null ? pct(e.surprise_pct, 1) : (out && e.eps_estimate != null && e.difference != null ? pct(e.difference / Math.abs(e.eps_estimate) * 100, 1) : '—')) + (out && e.eps_estimate != null ? '<span class="sub">' + (e.eps_actual > e.eps_estimate ? 'beat' : e.eps_actual < e.eps_estimate ? '<span class="neg">miss</span>' : 'in line') + '</span>' : ''), 'num' + sgn(e.surprise_pct)) + '</tr>'; }).join('') + '</tbody></table></div></div>'; }).join('') : '<div class="banner"><div><b>' + (erF.scope === 'book' ? 'No reports from the book in this window.' : 'Nothing in this view.') + '</b><p>' + (erF.scope === 'book' ? 'Switch to "Everyone" to see the whole tape.' : 'Try another market or the other tab.') + '</p></div></div>';
@@ -846,9 +914,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   document.addEventListener('click', function(ev){
     var b = ev.target.closest('#cal-imp button, #cal-reg button, #cal-wk button, #er-scope button, #er-reg button, #er-when button'); if (!b) return;
     var grp = b.parentNode.id; M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x === b); });
-    if (grp === 'cal-imp') calF.imp = Number(b.dataset.v); if (grp === 'cal-reg') calF.reg = b.dataset.v; if (grp === 'cal-wk') { calF.wk = Number(b.dataset.v); if (calF.wk !== 0) { M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x.dataset.v === '0'); }); } }
+    if (grp === 'cal-imp') calF.imp = Number(b.dataset.v); if (grp === 'cal-reg') calF.reg = b.dataset.v; if (grp === 'cal-wk') { var dv = Number(b.dataset.v); calF.wk = dv === 0 ? 0 : Math.max(-1, Math.min(2, calF.wk + dv)); M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x.dataset.v === '0'); }); }
     if (grp === 'er-scope') erF.scope = b.dataset.v; if (grp === 'er-reg') erF.reg = b.dataset.v; if (grp === 'er-when') erF.when = b.dataset.v;
-    if (/^cal/.test(grp)) renderCalendar(); else renderEarnings();
+    if (/^cal/.test(grp)) renderCalendar(); else renderEarnings(); pressChips();
   });
   /* owner preview data */
   var SIM_EVENTS = (function(){ var d = function(h, m, off){ var x = new Date(); x.setHours(h, m, 0, 0); return new Date(x.getTime() + (off || 0) * 864e5).toISOString(); }; return [
@@ -891,7 +959,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!channels.length) { body.innerHTML = '<p class="small muted">Channels are being prepared. Your links will appear here.</p>'; return; }
     var who = link ? (link.telegram_username || tgUser) : null;
     var allIn = channels.length && joined === channels.length;
-    body.innerHTML = (allIn ? '' : '<p class="small muted" style="margin-bottom:14px">Personal links: each one works for you only, once.</p>') + '<ul class="list" id="tg-list"><li><span class="small muted"><span class="spin"></span>Preparing your links…</span></li></ul><div class="row" style="margin-top:16px"><span class="small muted">' + (link ? 'Connected as <b>' + (who ? '@' + esc(who) : esc(link.telegram_name || 'your Telegram account')) + '</b>' : 'No Telegram connected yet') + '</span><span class="small">' + (allIn ? '' : '<button class="link" id="tg-refresh" type="button">Links not working? Get new ones</button>') + (link ? (allIn ? '' : ' · ') + '<button class="link" id="tg-unlink" type="button">Disconnect Telegram</button>' : '') + '</span></div><div class="msg" id="m-tg"></div>';
+    body.innerHTML = (allIn ? '' : '<p class="small muted" style="margin-bottom:14px">Personal links: each one works for you only, once.</p>') + '<ul class="list" id="tg-list"><li><span class="small muted"><span class="spin"></span>Preparing your links…</span></li></ul><div class="row" style="margin-top:16px"><span class="small muted">' + (link ? 'Connected as <b>' + (who ? '@' + esc(who) : esc(link.telegram_name || 'your Telegram account')) + '</b>' : 'No Telegram connected yet') + '</span><span class="small">' + (allIn ? '' : '<button class="link" id="tg-refresh" type="button">Links not working? Get new ones</button>') + (link ? (allIn ? '' : ' · ') + '<button class="link" id="tg-unlink" type="button">Disconnect Telegram</button>' : '') + '</span></div><div class="msg" id="m-tg" aria-live="polite"></div>';
     var rf = $('#tg-refresh'); if (rf) rf.addEventListener('click', async function(){ if (this.disabled) return; var b = this; b.disabled = true; b.textContent = 'Refreshing…'; try { await fetchInvites(true); paintInvites(); } finally { b.disabled = false; b.textContent = 'Links not working? Get new ones'; } });
     var un = $('#tg-unlink'); if (un) un.addEventListener('click', async function(){ if (!confirm('Disconnect Telegram? You will be removed from the channels and can join again with new links.')) return; var b = this; b.disabled = true; b.textContent = 'Disconnecting…'; try { await M.fn('tg-link', { action: 'unlink' }); invites = null; load(false); } catch(e){ M.msg('#m-tg', M.human(e), 'bad'); b.disabled = false; b.textContent = 'Disconnect Telegram'; } });
     if (invites && invitesFor === user.id && !sim) { paintInvites(); } else if (current === 'telegram' || sim) { fetchInvites(false).then(paintInvites); }
@@ -1000,7 +1068,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   async function loadDevices(){
     if (!DEV || DEV.loading || !access) return; DEV.loading = true;
     try { var r = await sb.rpc('my_sessions'); if (r.error) throw r.error; DEV.list = r.data || []; }
-    catch (e) { DEV.list = null; $('#dev-list').innerHTML = '<li><span class="muted">Could not load your sessions.</span></li>'; DEV.loading = false; return; }
+    catch (e) { DEV.list = null; $('#dev-list').innerHTML = '<div class="muted small">Could not load your sessions.</div>'; DEV.loading = false; return; }
     DEV.loading = false; renderDevices();
   }
   function renderDevices(){
@@ -1009,7 +1077,6 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     el.innerHTML = list.length ? '<table class="bill devs"><thead><tr><th>Device</th><th>IP</th><th>Last active</th><th>Since</th><th></th></tr></thead><tbody>' + list.map(function(d){ var cur = !!d.current; return '<tr' + (cur ? ' class="cur"' : '') + '><td>' + esc(ua(d.user_agent)) + (cur ? '<span class="small muted" style="display:block">This device</span>' : '') + '</td><td class="mono">' + esc(String(d.ip || '—').replace(/\/\d+$/, '')) + '</td><td class="mono">' + esc(fmtWhen(d.last_at)) + '</td><td class="mono">' + esc(M.fmtDate(d.created_at)) + '</td><td class="act">' + (cur ? '<button class="link" id="signout2" type="button">Log out</button>' : '<button class="link" data-end="' + esc(d.id) + '" type="button">End session</button>') + '</td></tr>'; }).join('') + '</tbody></table>' : '<p class="small muted">No open sessions.</p>';
     $('#out-others').hidden = list.length < 2;
   }
-  function fmtWhen(iso){ var d = new Date(iso); return M.fmtDate(iso) + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   $('#dev-list').addEventListener('click', async function(e){
     var b = e.target.closest('button'); if (!b) return;
     if (b.id === 'signout2') { M.signOut('/'); return; }
@@ -1022,7 +1089,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   $('#pg-out').addEventListener('click', function(){ M.signOut('/'); });
 
   /* ---- support: conversations with Mr. Wall Street (writes go through the support function; reads via RLS) ---- */
-  var SUP = { threads: [], msgs: {}, open: null, loading: false };
+  var SUP = { threads: [], msgs: {}, open: undefined, loading: false };
   async function loadSupport(){
     if (sim) { SUP.threads = []; renderSupport(); return; }
     try {
@@ -1037,7 +1104,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var wrap = $('#sup-threads-wrap'), el = $('#sup-threads'); if (!wrap) return;
     wrap.hidden = !SUP.threads.length; $('#sup-count').textContent = SUP.threads.length ? SUP.threads.length + (SUP.threads.length === 1 ? ' conversation' : ' conversations') : '';
     if (!SUP.threads.length) { el.innerHTML = ''; return; }
-    if (!SUP.open) SUP.open = SUP.threads[0].id;
+    if (SUP.open === undefined) SUP.open = SUP.threads[0].id; /* the newest opens by itself the first time; afterwards whatever the member chose, closed included */
     el.innerHTML = SUP.threads.map(function(t){
       var open = t.id === SUP.open, msgs = SUP.msgs[t.id] || [];
       var st = t.status === 'answered' ? '<span class="tag ok">Answered</span>' : t.status === 'closed' ? '<span class="tag">Closed</span>' : '<span class="tag warn">Waiting</span>';
@@ -1073,7 +1140,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       .on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_events' }, function(pl){ var e = pl && pl.new; if (!e || !e.id || !events) return; var i = events.findIndex(function(x){ return x.id === e.id; }); if (i >= 0) events[i] = e; else events.push(e); if (current === 'calendar') renderCalendar(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'earnings' }, function(pl){ var e = pl && pl.new; if (!e || !e.symbol || !earnings) return; var i = earnings.findIndex(function(x){ return x.symbol === e.symbol && x.mic_code === e.mic_code && x.day === e.day; }); if (i >= 0) earnings[i] = e; else earnings.push(e); if (current === 'earnings') renderEarnings(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'quotes' }, function(pl){ var q = pl && pl.new; if (q && q.symbol) { quotes[String(q.symbol).toUpperCase()] = q; if (current === 'portfolio') renderPortfolio(); if (current === 'position') renderPosition(); } })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quotes' }, function(pl){ var q = pl && pl.new; if (q && q.symbol) { quotes[String(q.symbol).toUpperCase()] = q; if (current === 'portfolio' || current === 'trades') renderPortfolio(); if (current === 'position') renderPosition(); } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, function(){ loadSupport(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, function(){ loadSupport(); }).subscribe();

@@ -54,7 +54,8 @@ window.MWS = window.MWS || {};
   };
   window.MWS.paidRecently = function(st){ return !!(st && st.paid && Date.now() - (st.paidAt || st.at || 0) < window.MWS.PAID_WINDOW); };
   window.MWS.saveSignup = function(st){ st.at = st.at || Date.now(); window.MWS.store.set('mws_signup', st); };
-  window.MWS.fmtDate = function(iso){ if(!iso) return '—'; var d = new Date(iso); return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); };
+  /* a date-only value (positions.opened_at, chart days) is a calendar day, not an instant: shown as that day everywhere in the world */
+  window.MWS.fmtDate = function(iso){ if(!iso) return '—'; var s = String(iso), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); var d = m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])) : new Date(s); if (isNaN(d)) return '—'; return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', timeZone: m ? 'UTC' : undefined }); };
   window.MWS.validEmail = function(e){ return /^[^\s@"<>()]+@[^\s@]+\.[^\s@]{2,}$/.test(e||''); };
 
   /* The Desk · the book as a model portfolio (shared by /app and /admin so both show the same numbers).
@@ -75,7 +76,7 @@ window.MWS = window.MWS || {};
       var growth = function(price){ if (entry == null || price == null) return 1; return Math.max(0, 1 + s * L * (price / entry - 1)); };
       var opened = p.opened_at ? String(p.opened_at).slice(0, 10) : today;
       return { p: p, w0: w0, L: L, s: s, entry: entry, last: last, live: live, q: q, growth: growth, opened: opened, source: live != null ? 'live' : (p.mark != null ? 'mark' : null),
-        ret: entry != null && last != null ? growth(last) - 1 : null, today: q && q.change_pct != null && live != null && entry != null ? s * L * Number(q.change_pct) : null, capital: null, value: null, prev: null, weightNow: null, contrib: null };
+        ret: entry != null && last != null ? growth(last) - 1 : null, today: opened >= today ? (entry != null && live != null ? growth(live) - 1 : null) : (q && q.change_pct != null && live != null && entry != null ? s * L * Number(q.change_pct) : null), capital: null, value: null, prev: null, weightNow: null, contrib: null };
     });
     var inBook = rows.filter(function(r){ return r.w0 != null; });
     var first = inBook.map(function(r){ return r.opened; }).sort()[0] || today;
@@ -94,7 +95,7 @@ window.MWS = window.MWS || {};
       bench.forEach(function(sym){ var px = priceAt(sym, day); if (isToday && quotes[sym] && quotes[sym].price != null) px = Number(quotes[sym].price); if (px != null) { if (b0[sym] == null) b0[sym] = px; pt[sym] = px / b0[sym] - 1; } });
       series.push(pt);
     }
-    var prevSum = 0; open.forEach(function(r){ var pc = r.q && r.q.prev_close != null && r.live != null ? Number(r.q.prev_close) : null; r.prev = pc != null ? r.capital * r.growth(pc) : r.value; prevSum += r.prev; });
+    var prevSum = 0; open.forEach(function(r){ var pc = r.q && r.q.prev_close != null && r.live != null ? Number(r.q.prev_close) : null; r.prev = r.opened >= today ? r.capital : (pc != null ? r.capital * r.growth(pc) : r.value); prevSum += r.prev; }); /* opened today: the day's move starts at the entry, not at yesterday's close */
     var Bprev = cash + prevSum;
     rows.forEach(function(r){ if (r.capital == null) return; r.weightNow = B > 0 ? r.value / B * 100 : null; r.contrib = r.value - r.capital; });
     var asOf = null; rows.forEach(function(r){ var t = r.q && (r.q.updated_at || r.q.quoted_at); if (t && (!asOf || t > asOf)) asOf = t; });

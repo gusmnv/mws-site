@@ -539,3 +539,58 @@ details.adv>summary::-webkit-details-marker{display:none}details.adv>summary::be
 details.adv>summary:hover{color:var(--fg)}
 
 .list li .btn{flex:none}
+
+/* ===== member area as one sheet (designed for 1800×1169): the whole width, the title at the top, no boxes — hairlines and the same spacing everywhere ===== */
+body.app .content{max-width:none;padding:22px var(--pad) 96px}
+body.app .page .head{margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+body.app .page .head .eyebrow{margin-bottom:10px}
+body.app .page .head h1{font-size:clamp(26px,2.2vw,36px);letter-spacing:-.02em}
+body.app .page .head p:not(.eyebrow){margin-top:8px}
+/* panels (Telegram, Account, Membership, Devices, Feedback): sections on the sheet */
+body.app .panel{background:none;border:0;padding:0 0 28px}
+body.app .panel+.panel{margin-top:0;border-top:1px solid var(--line);padding-top:24px}
+body.app .panel .ttl{margin-bottom:16px}
+body.app .panel .ttl h3{font-size:16px;letter-spacing:-.01em}
+body.app .acct{gap:0 64px;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr)}
+body.app .acct>div+div{border-left:1px solid var(--line);padding-left:48px}
+body.app .acct>div>.panel:first-child{padding-top:0}
+@media (max-width:900px){body.app .acct{gap:0}body.app .acct>div+div{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:24px}}
+/* portfolio: KPIs as a line of numbers, chart and donut without frames, tables with hairlines only */
+body.app .pf-top{margin:0 0 18px}
+body.app .kpis{display:flex;gap:0 64px;background:none;border:0;border-bottom:1px solid var(--line);margin:0 0 26px;padding:0 0 22px}
+body.app .kpis .kp{background:none;padding:0;flex:0 1 auto;min-width:0}
+body.app .kpis .kp.big{flex:0 1 auto;padding-right:64px;border-right:1px solid var(--line)}
+body.app .kpis .kp.big>b{font-size:40px}
+body.app .kpis .kp>b{font-size:28px}
+body.app .pf-grid{gap:0 56px;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:stretch}
+body.app .pf-cell+.pf-cell{border-left:1px solid var(--line);padding-left:48px}
+body.app .chart{border:0;background:none;padding:8px 0 4px}
+body.app .months{border:0;border-top:1px solid var(--line);background:none;gap:0;margin-top:6px}
+body.app .months .k{padding:12px 0 4px}
+body.app .months .mo{background:none;padding:6px 18px 10px 0}
+body.app .donut{border:0;background:none;padding:0}
+body.app .pf-cell .donut svg{max-height:none;max-width:560px;margin:0 auto}
+body.app .donut .lt{font-size:12px}
+body.app .ptw{border:0;background:none}
+body.app .pt th{background:none;border-bottom:1px solid var(--line-2)}
+body.app .pt tr.grp td{background:none}
+body.app .pt tr.clk:hover td{background:var(--bg-2)}
+body.app #pf-live>.sh,body.app #tr-live>.sh,body.app #tk-live>.sh,body.app #pf-orders .sh,body.app #tr-orders .sh{margin-top:34px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+body.app .pf-cell .sh{padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:12px}
+/* position page: facts as a ruled line */
+body.app #pos-page .facts{gap:0 32px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:22px}
+body.app #pos-page .facts div{background:none;box-shadow:none;padding:14px 0}
+body.app #pos-page .post{background:none}
+/* calendar + earnings: day sections as ruled blocks */
+body.app .sec.cal{margin-top:30px}
+body.app .sec .sh{padding-bottom:10px;border-bottom:1px solid var(--line)}
+/* the tables take the whole width at 1800 */
+body.app #pf-table{font-size:13.5px}
+@media (min-width:1500px){body.app #pf-table td,body.app #tr-table td,body.app #tk-table td,body.app #pf-ord td,body.app #tr-ord td{padding:12px 10px}body.app .pt td.em .nm{max-width:170px}}
+@media (max-width:1000px){body.app .pf-cell+.pf-cell{border-left:0;padding-left:0;margin-top:30px}}
+@media (max-width:760px){body.app .kpis{flex-direction:column;gap:18px}body.app .kpis .kp.big{padding-right:0;border-right:0;padding-bottom:18px;border-bottom:1px solid var(--line)}body.app .kpis .kp.big>b{font-size:32px}body.app .content{padding-top:18px}}
+body.app .page .head .eyebrow{white-space:nowrap}
+body.app .faq p b{display:inline;margin:0}
+body.app #ov-notices .banner,body.app .page>.banner{margin-bottom:22px}
+body.app #ov-notices:not(:empty){margin-bottom:6px}
+.list li a.link{min-width:0;overflow-wrap:anywhere;text-align:right}

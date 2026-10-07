@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=e384d95c">
+<link rel="stylesheet" href="/mws.css?v=f20e2939">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=e384d95c"></script>
+<script src="/mws.js?v=f20e2939"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -43,13 +43,14 @@
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
-      <a href="#telegram" data-p="telegram"><i>01</i>Telegram<span class="cnt" id="n-tg"></span></a>
-      <p class="grp">The Desk <span class="soon" id="desk-grp-tag">In development</span></p>
-      <a href="#portfolio" data-p="portfolio"><i>02</i>Portfolio<span class="cnt" id="n-pf"></span></a>
-      <a href="#trades" data-p="trades"><i>03</i>Trades<span class="cnt" id="n-tr"></span></a>
+      <a href="#telegram" data-p="telegram"><i>01</i>Private Telegram<span class="cnt" id="n-tg"></span></a>
+      <p class="grp">Portfolio <span class="soon" id="desk-grp-tag">In development</span></p>
+      <a href="#portfolio" data-p="portfolio"><i>02</i>Spot positions<span class="cnt" id="n-pf"></span></a>
+      <a href="#trades" data-p="trades"><i>03</i>Leveraged trading<span class="cnt" id="n-tr"></span></a>
       <a href="#track" data-p="track"><i>04</i>Track record<span class="cnt" id="n-tk"></span></a>
-      <a href="#calendar" data-p="calendar"><i>05</i>Calendar<span class="cnt" id="n-cal"></span></a>
-      <a href="#earnings" data-p="earnings"><i>06</i>Earnings<span class="cnt" id="n-er"></span></a>
+      <p class="grp">The Desk</p>
+      <a href="#earnings" data-p="earnings"><i>05</i>Stock earnings<span class="cnt" id="n-er"></span></a>
+      <a href="#calendar" data-p="calendar"><i>06</i>Economic calendar<span class="cnt" id="n-cal"></span></a>
       <p class="grp">Settings</p>
       <a href="#account" data-p="account"><i>07</i>Account</a>
       <a href="#membership" data-p="membership"><i>08</i>Membership<span class="cnt" id="n-mem"></span></a>
@@ -99,7 +100,7 @@
 
       <!-- 01 telegram -->
       <section class="page" data-page="telegram">
-        <div class="head rv"><p class="eyebrow"><b>/01</b>Telegram</p><h1>Your channels.</h1><p id="tg-sub" hidden></p></div>
+        <div class="head rv"><p class="eyebrow"><b>/01</b>Private Telegram</p><h1>Your channels.</h1><p id="tg-sub" hidden></p></div>
         <div id="ov-notices"></div>
         <div id="ov-banner"></div>
         <div class="acct">
@@ -128,7 +129,7 @@
 
       <!-- 03–05 the desk -->
       <section class="page" data-page="portfolio">
-        <div class="head rv"><p class="eyebrow"><b>/02</b>Portfolio <span class="soon" id="pf-tag">In development</span></p><h1>Our portfolio.</h1><p id="pf-sub" hidden></p></div>
+        <div class="head rv"><p class="eyebrow"><b>/02</b>Spot positions <span class="soon" id="pf-tag">In development</span></p><h1>Our portfolio.</h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
           <div class="pf-top rv"><span class="chips" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span><span class="muted small" id="pf-asof"></span></div>
           <div class="kpis rv" id="pf-kpis"></div>
@@ -162,7 +163,7 @@
         </div>
       </section>
       <section class="page" data-page="trades">
-        <div class="head rv"><p class="eyebrow"><b>/03</b>Trades <span class="soon" id="tr-tag">In development</span></p><h1>Our trades.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/03</b>Leveraged trading <span class="soon" id="tr-tag">In development</span></p><h1>Leveraged trading.</h1></div>
         <div id="tr-live" hidden>
           <div class="ptw"><table class="pt cards" id="tr-table"></table></div>
           <div id="tr-orders" hidden><div class="sh" style="margin-top:22px"><h2>Resting orders</h2></div><div class="ptw"><table class="pt cards" id="tr-ord"></table></div></div>
@@ -172,14 +173,14 @@
         <div id="tr-empty" hidden class="banner"><div><b>No trade open right now.</b><p>Leveraged trades appear here the moment one is opened; the portfolio is the spot book.</p></div></div>
       </section>
       <section class="page" data-page="track">
-        <div class="head rv"><p class="eyebrow"><b>/04</b>Track record <span class="soon" id="tk-tag">In development</span></p><h1>Every call, closed.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/04</b>Track record <span class="soon" id="tk-tag">In development</span></p><h1>Track record.</h1></div>
         <div id="tk-live" hidden><div class="ptw"><table class="pt cards" id="tk-table"></table></div><p class="small muted" style="margin-top:18px" id="tk-foot"></p></div>
         <div id="tk-locked" hidden class="banner"><div><b>Members only.</b><p>The track record opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
         <div id="tk-empty" hidden class="banner"><div><b>Nothing closed yet.</b><p>Closed calls land here with entry, exit and result.</p></div></div>
       </section>
       <section class="page" data-page="position"><div id="pos-page"></div></section>
       <section class="page" data-page="calendar">
-        <div class="head rv"><p class="eyebrow"><b>/05</b>The Desk · Calendar <span class="soon" id="cal-tag">In development</span></p><h1>The week, before it happens.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/06</b>Economic calendar <span class="soon" id="cal-tag">In development</span></p><h1>Economic calendar.</h1></div>
         <div id="cal-live" hidden>
           <div class="banner next rv" id="cal-next" hidden></div>
           <div class="fbar rv">
@@ -204,7 +205,7 @@
         </div>
       </section>
       <section class="page" data-page="earnings">
-        <div class="head rv"><p class="eyebrow"><b>/06</b>The Desk · Earnings <span class="soon" id="er-tag">In development</span></p><h1>Report season, covered.</h1></div>
+        <div class="head rv"><p class="eyebrow"><b>/05</b>Stock earnings <span class="soon" id="er-tag">In development</span></p><h1>Stock earnings.</h1></div>
         <div id="er-live" hidden>
           <div class="banner next rv" id="er-strip" hidden></div>
           <div class="fbar rv">
@@ -311,7 +312,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { telegram:'Telegram', portfolio:'Portfolio', trades:'Trades', track:'Track record', position:'Portfolio', calendar:'Calendar', earnings:'Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
+  var PAGES = { telegram:'Private Telegram', portfolio:'Spot positions', trades:'Leveraged trading', track:'Track record', position:'Spot positions', calendar:'Economic calendar', earnings:'Stock earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
   var posId = null, posHome = 'portfolio'; /* #position/<id>: one position, its numbers and the Telegram posts; posHome = the section it belongs to */
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
@@ -625,7 +626,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var posts = function(){ return ids.length ? ids.map(function(i){ var x = POSTS && POSTS[i]; var when = x && x.t ? fmtWhen(x.t) : 'Telegram post';
         return x && x.img ? '<figure class="post"><figcaption><span>' + esc(when) + '</span><span>Exclusive channel</span></figcaption><img src="' + esc(/^(https?:)?\//.test(x.img) ? x.img : '/' + x.img) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"></figure>'
           : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; }).join('') : '<p class="small muted">No posts attached to this position.</p>'; };
-    var home = pfHome(p), homeName = { '#track': 'Track record', '#trades': 'Trades', '#portfolio': 'Portfolio' }[home]; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
+    var home = pfHome(p), homeName = { '#track': 'Track record', '#trades': 'Leveraged trading', '#portfolio': 'Spot positions' }[home]; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
       + '<div class="pos-hd"><h1><span class="sym">' + esc(p.symbol) + '</span>' + (p.name ? '<span class="nm">' + esc(p.name) + '</span>' : '') + '</h1><p class="tags">' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(PF_CLASS[p.asset_class] || 'Other') + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
@@ -695,7 +696,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     rows.forEach(function(r){ var k = keyOf(r); var g = groups[k] = groups[k] || { k: k, w: 0, v: 0, n: 0 }; g.w += r.weightNow || 0; g.v += val$(r); g.n++; });
     var segs = Object.keys(groups).map(function(k){ return groups[k]; }).sort(function(a, b){ return b.w - a.w; });
     if (book.cashNow > 0) segs.push({ k: 'Cash', w: book.cashNow, v: Math.max(0, book.cash) / 100 * N, n: 0, cash: true });
-    $('#pf-donut').innerHTML = donut(segs) + '<div class="xl">' + segs.map(function(g, i){ return '<div><span><i class="sw c' + Math.min(i, 7) + (g.cash ? ' cash' : '') + '"></i>' + esc(g.k) + (g.n > 1 ? ' <small>· ' + g.n + ' positions</small>' : '') + '</span><b>' + g.w.toFixed(2) + '%</b><em>' + usdFull(g.v) + '</em></div>'; }).join('') + '</div>';
+    $('#pf-donut').innerHTML = donut(segs);
     /* performance */
     renderChart(book, Q, N, hasHist);
     $('#pf-perf-empty').hidden = !$('#pf-chart-sec').hidden;
@@ -763,18 +764,18 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* a donut of weights: monochrome slices, labels outside, the biggest first */
   function donut(segs){
     var tot = segs.reduce(function(a, s){ return a + Math.max(0, s.w); }, 0); if (!(tot > 0)) return '<p class="small muted">Nothing to show yet.</p>';
-    var W = 420, cx = W / 2, cy = 190, R0 = 118, R1 = 70, a0 = -Math.PI / 2, out = '', labels = '', lab = [];
+    var W = 560, cx = W / 2, cy = 230, R0 = 150, R1 = 94, a0 = -Math.PI / 2, out = '', labels = '', lab = [];
     segs.forEach(function(s, i){ var f = Math.min(0.9999, Math.max(0, s.w) / tot); if (f <= 0) return; var a1 = a0 + f * Math.PI * 2, big = f > 0.5 ? 1 : 0;
       var p = function(r, a){ return (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1); };
       var d = 'M' + p(R0, a0) + 'A' + R0 + ',' + R0 + ' 0 ' + big + ',1 ' + p(R0, a1) + 'L' + p(R1, a1) + 'A' + R1 + ',' + R1 + ' 0 ' + big + ',0 ' + p(R1, a0) + 'Z';
       out += '<path class="sl c' + Math.min(i, 7) + (s.cash ? ' cash' : '') + '" d="' + d + '"><title>' + esc(s.k) + ' · ' + s.w.toFixed(2) + '%' + (s.v != null ? ' · ' + usdFull(s.v) : '') + '</title></path>';
-      if (f >= 0.02) { var am = (a0 + a1) / 2; lab.push({ k: s.k, w: s.w, am: am, right: Math.cos(am) >= 0, y: cy + (R0 + 26) * Math.sin(am) }); }
+      if (f >= 0.015) { var am = (a0 + a1) / 2; lab.push({ k: s.k, w: s.w, am: am, right: Math.cos(am) >= 0, y: cy + (R0 + 34) * Math.sin(am) }); }
       a0 = a1; });
-    [true, false].forEach(function(side){ var L = lab.filter(function(l){ return l.right === side; }).sort(function(a, b){ return a.y - b.y; }); for (var i = 1; i < L.length; i++) if (L[i].y - L[i - 1].y < 15) L[i].y = L[i - 1].y + 15; for (var j = L.length - 2; j >= 0; j--) if (L[j + 1].y - L[j].y < 15) L[j].y = L[j + 1].y - 15; });
-    lab.forEach(function(l){ var x1 = cx + (R0 + 3) * Math.cos(l.am), y1 = cy + (R0 + 3) * Math.sin(l.am), x2 = cx + (R0 + 20) * Math.cos(l.am), lx = cx + (R0 + 26) * Math.cos(l.am);
+    [true, false].forEach(function(side){ var L = lab.filter(function(l){ return l.right === side; }).sort(function(a, b){ return a.y - b.y; }); for (var i = 1; i < L.length; i++) if (L[i].y - L[i - 1].y < 18) L[i].y = L[i - 1].y + 18; for (var j = L.length - 2; j >= 0; j--) if (L[j + 1].y - L[j].y < 18) L[j].y = L[j + 1].y - 18; });
+    lab.forEach(function(l){ var x1 = cx + (R0 + 4) * Math.cos(l.am), y1 = cy + (R0 + 4) * Math.sin(l.am), x2 = cx + (R0 + 28) * Math.cos(l.am), lx = cx + (R0 + 34) * Math.cos(l.am);
       labels += '<line class="ll" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + l.y.toFixed(1) + '"/><text class="lt" x="' + lx.toFixed(1) + '" y="' + (l.y + 4).toFixed(1) + '" text-anchor="' + (l.right ? 'start' : 'end') + '">' + esc(l.k) + ' <tspan class="lp">' + l.w.toFixed(1) + '%</tspan></text>'; });
     var n = segs.filter(function(s){ return !s.cash; }).length;
-    return '<svg viewBox="0 0 ' + W + ' 380" class="dn">' + out + labels + '<text class="dc" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + n + '</text><text class="dl" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">' + (pfGrp === 'class' ? (n === 1 ? 'class' : 'classes') : (n === 1 ? 'holding' : 'holdings')) + '</text></svg>';
+    return '<svg viewBox="0 0 ' + W + ' 470" class="dn">' + out + labels + '<text class="dc" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + n + '</text><text class="dl" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">' + (pfGrp === 'class' ? (n === 1 ? 'class' : 'classes') : (n === 1 ? 'holding' : 'holdings')) + '</text></svg>';
   }
   /* the book against the market, daily: in % (rebased to the start of the range) or in $ (what $1,000,000 became — the same for the S&P 500 and the Nasdaq 100) */
   function renderChart(book, Q, N, hasHist){

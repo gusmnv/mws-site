@@ -354,7 +354,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   route();
 
   /* ---- data ---- */
-  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, qhist = {}, histFor = '', tgUser = null, notices = [], lastLoad = 0;
+  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, qhist = {}, histFor = '', deskLive = { portfolio: true, calendar: true, earnings: true }, tgUser = null, notices = [], lastLoad = 0;
   var signup = M.signupState();
   /* the handoff belongs to the e-mail typed at checkout: another account on the same browser must not inherit its receipt or its "paid" state */
   if (signup.email && user.email && String(signup.email).toLowerCase() !== String(user.email).toLowerCase()) { signup = {}; M.store.del('mws_signup'); M.sess.del('mws_signup'); }
@@ -388,6 +388,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!simOn) M.store.set('mws_access', { valid: !!acc.valid, at: Date.now() });
     try { var ps = await sb.from('positions').select('*').order('sort').order('opened_at', { ascending: false }); positions = ps.error ? null : (ps.data || []); } catch (e) { positions = null; } /* RLS: empty for non-members */
     await loadQuotes(); await loadCalendar();
+    try { var ds = await sb.rpc('desk_state'); if (!ds.error && ds.data) deskLive = ds.data; } catch (e) {} /* which sections are live for members (before desk_visibility.sql: everything counts as live) */
     try { var ns = await sb.from('notices').select('id,body,kind,link,link_label,created_at').eq('active', true).order('created_at', { ascending: false }).limit(3); notices = ns.error ? [] : (ns.data || []); } catch (e) { notices = []; }
     /* owner preview: a preset replaces the data (never touches the database) */
     sim = simOn ? M.sim(channels) : null;
@@ -555,7 +556,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var open = list.filter(function(p){ return p.status === 'open'; }), closed = list.filter(function(p){ return p.status === 'closed'; });
     var spot = open.filter(function(p){ return pfKind(p) === 'spot'; }), lev = open.filter(function(p){ return pfKind(p) === 'leveraged'; }), ord = open.filter(function(p){ return pfKind(p) === 'order'; }), held = spot.concat(lev);
     $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && list.length); $('#pf-empty').hidden = !(unlocked && !list.length);
-    $('#pf-tag').textContent = unlocked && list.length ? 'Live' : (unlocked ? 'In development' : 'Members'); $('#desk-grp-tag').textContent = unlocked && list.length ? 'Portfolio live' : 'In development';
+    var pfOnlyMe = staffRole && !sim && !deskLive.portfolio;
+    $('#pf-tag').textContent = unlocked && list.length ? (pfOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#pf-tag').className = 'soon' + (pfOnlyMe && list.length ? ' warn' : ''); $('#desk-grp-tag').textContent = unlocked && list.length ? (pfOnlyMe ? 'Owner preview' : 'Portfolio live') : 'In development';
     if (!(unlocked && list.length)) return;
     var book = M.book(list, Q, H, { bench: ['SPY', 'QQQ'] });
     var R = {}; book.rows.forEach(function(r){ R[r.p.id] = r; });
@@ -686,7 +688,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function renderCalendar(){
     var unlocked = !!(access && access.valid), list = sim ? SIM_EVENTS : (events || []);
     $('#cal-locked').hidden = unlocked; $('#cal-live').hidden = !(unlocked && list.length); $('#cal-empty').hidden = !(unlocked && !list.length);
-    $('#cal-tag').textContent = unlocked && list.length ? 'Live' : (unlocked ? 'In development' : 'Members');
+    var calOnlyMe = staffRole && !sim && !deskLive.calendar;
+    $('#cal-tag').textContent = unlocked && list.length ? (calOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#cal-tag').className = 'soon' + (calOnlyMe && list.length ? ' warn' : '');
     if (!(unlocked && list.length)) return;
     var now = Date.now();
     var nx = list.filter(function(e){ return e.importance >= 3 && new Date(e.at).getTime() > now - 60000 && e.actual == null; })[0];
@@ -712,7 +715,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function renderEarnings(){
     var unlocked = !!(access && access.valid), list = sim ? SIM_EARNINGS : (earnings || []);
     $('#er-locked').hidden = unlocked; $('#er-live').hidden = !(unlocked && list.length); $('#er-empty').hidden = !(unlocked && !list.length);
-    $('#er-tag').textContent = unlocked && list.length ? 'Live' : (unlocked ? 'In development' : 'Members');
+    var erOnlyMe = staffRole && !sim && !deskLive.earnings;
+    $('#er-tag').textContent = unlocked && list.length ? (erOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#er-tag').className = 'soon' + (erOnlyMe && list.length ? ' warn' : '');
     if (!(unlocked && list.length)) return;
     var now = Date.now(), today = dayKey(now);
     var book = {}; (sim ? SIM_POS : (positions || [])).forEach(function(p){ if (p.status !== 'open') return; book[String(p.symbol).toUpperCase()] = p; if (p.quote_symbol) book[String(p.quote_symbol).toUpperCase().replace(/\/.*$/, '')] = p; });

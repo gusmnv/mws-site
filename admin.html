@@ -249,8 +249,12 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     <!-- PORTFOLIO -->
     <section class="view" data-v="portfolio">
-      <div class="card rv"><h3 id="pf-title">Add a position <button class="link" id="pf-cancel" type="button" hidden>Cancel edit</button></h3>
-        <p class="small muted" style="margin-bottom:16px">Everything you save here starts as a <b>draft</b>: members cannot see it, you can (open the member area as yourself). Press <b>Publish</b> on a row, or <b>Publish all drafts</b>, when it is right. The book members see: <b>spot</b> positions, <b>leveraged</b> positions and resting <b>orders</b>, each grouped Crypto / Stocks / Commodities. Type the ticker and press <b>Find</b>: pick the exact instrument and the price feed follows it (live P&amp;L, weight that moves with the market). <b>Weight at entry</b> is the share of the book the position took, to two decimals; <b>Entry price</b> is the average you paid. "Bought at" and target stay free text. Paste the Telegram posts behind the call, one link per line.</p>
+      <div class="card rv"><h3>What members can see</h3>
+        <p class="small muted" style="margin-bottom:12px">Each part of the Desk is <b>only you</b> (owner and admins see it in the member area, members see "In development") until you make it live. Live means every member with access sees it — published positions, the calendar, the earnings.</p>
+        <ul class="attn" id="desk-live"></ul>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3 id="pf-title">Add a position <button class="link" id="pf-cancel" type="button" hidden>Cancel edit</button></h3>
+        <p class="small muted" style="margin-bottom:16px">Everything you save here starts as a <b>draft</b>: members cannot see it, you can (open the member area as yourself). Press <b>Publish</b> on a row, or <b>Publish all drafts</b>, when it is right — and members only see published positions once the Portfolio is <b>live</b> (card above). The book members see: <b>spot</b> positions, <b>leveraged</b> positions and resting <b>orders</b>, each grouped Crypto / Stocks / Commodities. Type the ticker and press <b>Find</b>: pick the exact instrument and the price feed follows it (live P&amp;L, weight that moves with the market). <b>Weight at entry</b> is the share of the book the position took, to two decimals; <b>Entry price</b> is the average you paid. "Bought at" and target stay free text. Paste the Telegram posts behind the call, one link per line.</p>
         <form class="pf" id="f-pos" novalidate>
           <input type="hidden" id="p-id"><input type="hidden" id="p-qsym"><input type="hidden" id="p-qname"><input type="hidden" id="p-qexch"><input type="hidden" id="p-qtype"><input type="hidden" id="p-qcur">
           <div class="field"><label for="p-kind">Type</label><select id="p-kind"><option value="spot">Spot position</option><option value="leveraged">Leveraged position</option><option value="order">Order (resting)</option></select></div>
@@ -276,26 +280,6 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <div class="card rv d1" style="margin-top:22px"><h3>Open · spot, leveraged and orders <span class="small muted" id="pf-open-n"></span> <button class="btn sm ghost" id="pf-publish-all" type="button" hidden data-busy="Publishing" style="margin-left:12px">Publish all drafts</button> <button class="btn sm ghost" id="pf-refresh" type="button" data-busy="Fetching" style="margin-left:6px" title="Fetch the latest prices now (the schedule does it every few minutes)">Refresh prices</button> <button class="btn sm ghost" id="pf-backfill" type="button" data-busy="Fetching" style="margin-left:6px" title="Daily closes since the first entry, for the chart">Backfill history</button></h3>
         <p class="small muted" id="pf-qstat" style="margin:-6px 0 12px"></p>
         <div class="tblw"><table class="tbl"><thead><tr><th>Visible</th><th>Type</th><th>Symbol</th><th>Feed</th><th>Side</th><th>Entry</th><th>Last</th><th>P&amp;L</th><th>Weight</th><th>Target</th><th>Since</th><th>Posts</th><th>Thesis</th><th></th></tr></thead><tbody id="pf-open"></tbody></table></div></div>
-      <div class="card rv d2" style="margin-top:22px"><h3>Calendar &amp; earnings feeds <button class="btn sm ghost" id="cal-refresh" type="button" data-busy="Fetching" style="margin-left:12px" title="Fetch the macro calendar now">Refresh calendar</button> <button class="btn sm ghost" id="er-refresh" type="button" data-busy="Fetching" style="margin-left:6px" title="Fetch the earnings window now (Twelve Data, 40 credits per market)">Refresh earnings</button></h3>
-        <p class="small muted" style="margin-bottom:10px">The schedule runs every minute and fetches only what is due: the macro window hourly and every minute around a release; earnings daily and every 15 minutes in the reporting windows. Provider, countries, the provider’s time zone and the portfolio’s refresh cadence are set in the form below.</p>
-        <div id="cal-status" class="small">Loading…</div>
-        <form class="pf" id="f-mkt" novalidate style="margin-top:16px">
-          <div class="field"><label for="k-calendar_provider">Macro provider</label><select id="k-calendar_provider"><option value="auto">Auto (EODHD when the key exists)</option><option value="preview">Preview (no key)</option><option value="eodhd">EODHD</option><option value="fmp">FMP</option></select></div>
-          <div class="field w2"><label for="k-calendar_countries">Macro countries</label><input id="k-calendar_countries" type="text" placeholder="US,EU,GB,JP,CN,DE,CA,AU,CH"></div>
-          <div class="field"><label for="k-calendar_tz">Provider time zone</label><input id="k-calendar_tz" type="text" placeholder="UTC"></div>
-          <div class="field w2"><label for="k-earnings_countries">Earnings markets</label><input id="k-earnings_countries" type="text" placeholder="US,GB,DE,JP"></div>
-          <div class="field"><label for="k-earnings_days_ahead">Earnings days ahead</label><input id="k-earnings_days_ahead" type="number" min="1" max="60" placeholder="14"></div>
-          <div class="field"><label for="k-earnings_days_back">Earnings days back</label><input id="k-earnings_days_back" type="number" min="0" max="60" placeholder="7"></div>
-          <div class="field w2"><label for="k-tg_brief_chat_id">Telegram channel id (posts)</label><input id="k-tg_brief_chat_id" type="text" placeholder="empty = no posts · e.g. -1004330448432"></div>
-          <div class="field"><label for="k-tg_brief_hour">Brief at (Lisbon)</label><input id="k-tg_brief_hour" type="text" placeholder="08:00"></div>
-          <div class="field"><label for="k-tg_alerts">Release alerts</label><select id="k-tg_alerts"><option value="on">On</option><option value="off">Off</option></select></div>
-          <div class="field w2"><label for="k-quotes_benchmarks">Portfolio benchmarks</label><input id="k-quotes_benchmarks" type="text" placeholder="SPY,QQQ,BTC/USD"></div>
-          <div class="field"><label for="k-quotes_interval_min">Quote refresh</label><input id="k-quotes_interval_min" type="text" placeholder="auto"></div>
-          <div class="field"><label for="k-quotes_per_minute">Credits / minute</label><input id="k-quotes_per_minute" type="number" min="1" max="5000" placeholder="auto (from the plan)"></div>
-          <div class="field"><label for="k-quotes_daily_budget">Credits / day</label><input id="k-quotes_daily_budget" type="number" min="10" placeholder="auto (from the plan)"></div>
-          <div class="acts"><button class="btn sm acc" type="submit" id="mkt-save" data-busy="Saving">Save market data settings</button><button class="btn sm ghost" type="button" id="tg-brief-now" data-busy="Posting" title="Post today's brief to the channel now">Post the brief now</button><span class="small muted">Everything here is automatic by default (the plan is read from Twelve Data, the macro source follows the key). Change only what you mean to. Keys (TWELVE_DATA_KEY, CALENDAR_KEY) live only in Supabase → Edge Functions → Secrets.</span></div>
-        </form>
-      </div>
       <div class="card rv d2" style="margin-top:22px"><h3>Closed · track record <span class="small muted" id="pf-closed-n"></span></h3><div class="tblw"><table class="tbl"><thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>Exit</th><th>Result</th><th>Opened</th><th>Closed</th><th>Thesis</th><th></th></tr></thead><tbody id="pf-closed"></tbody></table></div></div>
     </section>
 
@@ -330,6 +314,26 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
           <form class="team" id="f-role" novalidate><input id="r-email" type="email" placeholder="email of an existing account"><select id="r-role"><option value="admin">Admin</option><option value="owner">Owner</option><option value="member">Member</option></select><button class="btn sm ghost" type="submit">Set</button></form>
           <p class="small muted" style="margin-top:16px">Links: <a href="https://whop.com/dashboard/biz_RcxWC0ig56n1mw/" target="_blank" rel="noopener">Whop dashboard</a> · <a href="https://supabase.com/dashboard/project/rgvyyxphqhtedhgvwopy" target="_blank" rel="noopener">Database</a></p>
         </div>
+      </div>
+      <div class="card rv d2" style="margin-top:22px"><h3>Market data · automatic <button class="btn sm ghost" id="cal-refresh" type="button" data-busy="Fetching" style="margin-left:12px" title="Fetch the macro calendar now">Refresh calendar</button> <button class="btn sm ghost" id="er-refresh" type="button" data-busy="Fetching" style="margin-left:6px" title="Fetch the earnings window now (Twelve Data, 40 credits per market)">Refresh earnings</button></h3>
+        <p class="small muted" style="margin-bottom:10px">Nothing here needs touching day to day. The schedule runs every minute and fetches only what is due: the macro window hourly and every minute around a release; earnings daily and every 15 minutes in the reporting windows. Provider, countries, the provider’s time zone and the portfolio’s refresh cadence are set in the form below.</p>
+        <div id="cal-status" class="small">Loading…</div>
+        <form class="pf" id="f-mkt" novalidate style="margin-top:16px">
+          <div class="field"><label for="k-calendar_provider">Macro provider</label><select id="k-calendar_provider"><option value="auto">Auto (EODHD when the key exists)</option><option value="preview">Preview (no key)</option><option value="eodhd">EODHD</option><option value="fmp">FMP</option></select></div>
+          <div class="field w2"><label for="k-calendar_countries">Macro countries</label><input id="k-calendar_countries" type="text" placeholder="US,EU,GB,JP,CN,DE,CA,AU,CH"></div>
+          <div class="field"><label for="k-calendar_tz">Provider time zone</label><input id="k-calendar_tz" type="text" placeholder="UTC"></div>
+          <div class="field w2"><label for="k-earnings_countries">Earnings markets</label><input id="k-earnings_countries" type="text" placeholder="US,GB,DE,JP"></div>
+          <div class="field"><label for="k-earnings_days_ahead">Earnings days ahead</label><input id="k-earnings_days_ahead" type="number" min="1" max="60" placeholder="14"></div>
+          <div class="field"><label for="k-earnings_days_back">Earnings days back</label><input id="k-earnings_days_back" type="number" min="0" max="60" placeholder="7"></div>
+          <div class="field w2"><label for="k-tg_brief_chat_id">Telegram channel id (posts)</label><input id="k-tg_brief_chat_id" type="text" placeholder="empty = no posts · e.g. -1004330448432"></div>
+          <div class="field"><label for="k-tg_brief_hour">Brief at (Lisbon)</label><input id="k-tg_brief_hour" type="text" placeholder="08:00"></div>
+          <div class="field"><label for="k-tg_alerts">Release alerts</label><select id="k-tg_alerts"><option value="on">On</option><option value="off">Off</option></select></div>
+          <div class="field w2"><label for="k-quotes_benchmarks">Portfolio benchmarks</label><input id="k-quotes_benchmarks" type="text" placeholder="SPY,QQQ,BTC/USD"></div>
+          <div class="field"><label for="k-quotes_interval_min">Quote refresh</label><input id="k-quotes_interval_min" type="text" placeholder="auto"></div>
+          <div class="field"><label for="k-quotes_per_minute">Credits / minute</label><input id="k-quotes_per_minute" type="number" min="1" max="5000" placeholder="auto (from the plan)"></div>
+          <div class="field"><label for="k-quotes_daily_budget">Credits / day</label><input id="k-quotes_daily_budget" type="number" min="10" placeholder="auto (from the plan)"></div>
+          <div class="acts"><button class="btn sm acc" type="submit" id="mkt-save" data-busy="Saving">Save market data settings</button><button class="btn sm ghost" type="button" id="tg-brief-now" data-busy="Posting" title="Post today's brief to the channel now">Post the brief now</button><span class="small muted">Everything here is automatic by default (the plan is read from Twelve Data, the macro source follows the key). Change only what you mean to. Keys (TWELVE_DATA_KEY, CALENDAR_KEY) live only in Supabase → Edge Functions → Secrets.</span></div>
+        </form>
       </div>
     </section>
   </main>
@@ -582,6 +586,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
     // telegram
     var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
+    var DESK = { portfolio: 'Portfolio', calendar: 'Calendar', earnings: 'Earnings' };
+    $('#desk-live').innerHTML = Object.keys(DESK).map(function(k){ var on = D.settings['desk_' + k + '_live'] === 'on'; return '<li><span>' + DESK[k] + ' <span class="small muted">' + (on ? 'members with access see it' : 'only you see it (members: In development)') + '</span></span><span>' + (on ? tag('ok', 'live for members') : tag('warn', 'only you')) + ' <button class="link" data-desk="' + k + '" data-on="' + (on ? '0' : '1') + '">' + (on ? 'Take it back' : 'Make it live') + '</button></span></li>'; }).join('');
     var hiddenCh = []; try { hiddenCh = JSON.parse(D.settings.tg_hidden_channels || '[]').map(Number); } catch (e) { hiddenCh = []; }
     var chRow = function(c){ var hid = hiddenCh.indexOf(Number(c.chat_id)) >= 0; return '<li' + (hid ? ' class="muted"' : '') + '><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + ' <button class="link" data-ch="' + X(c.chat_id) + '" data-on="' + (c.enabled ? '0' : '1') + '">' + (c.enabled ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-chh="' + X(c.chat_id) + '" data-hide="' + (hid ? '0' : '1') + '">' + (hid ? 'Unhide' : 'Hide') + '</button></span></li>'; };
     var shown = D.channels.filter(function(c){ return showHidden || hiddenCh.indexOf(Number(c.chat_id)) < 0; });
@@ -729,6 +735,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var b = ev.target.closest('button[data-ch]'); if (!b) return; ev.stopPropagation();
     var on = b.dataset.on === '1'; if (!on && !confirm('Switch this channel off? Members lose their links to it and new invites stop. Existing members are not removed.')) return;
     try { await M.fn('admin', { action: 'channel_toggle', chat_id: Number(b.dataset.ch), enabled: on }); M.msg('#m', on ? 'Channel switched on. Members get their links on the next sync or when they open the Telegram page.' : 'Channel switched off.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-desk]'); if (!b) return; var on = b.dataset.on === '1', name = b.dataset.desk;
+    if (!confirm(on ? 'Make the ' + name + ' live for every member with access? They see it the moment you confirm.' : 'Take the ' + name + ' back to "only you"? Members go back to "In development".')) return;
+    try { await M.fn('admin', { action: 'desk_live', section: name, on: on }); M.msg('#m', on ? name + ' is live for members.' : name + ' is only you again.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
   });
   document.addEventListener('click', async function(ev){
     var b = ev.target.closest('button[data-chh]'); if (!b) return; var hide = b.dataset.hide === '1';

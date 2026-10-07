@@ -411,6 +411,7 @@ a.tile:hover{background:var(--bg-2)}
 }
 
 /* The Desk · Calendar + Earnings */
+.soon.warn{border-color:rgba(230,194,122,.55);color:var(--warn)}
 .fbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:18px 0 6px}
 .chips{display:inline-flex;border:1px solid var(--line-2);flex-wrap:wrap}
 .chips button{background:none;border:0;border-left:1px solid var(--line-2);color:var(--fg-3);font:inherit;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 12px;cursor:pointer;white-space:nowrap}

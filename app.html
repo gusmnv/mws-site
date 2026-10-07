@@ -577,7 +577,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var N = NOTIONAL;
     var book = M.book(list, Q, H, { bench: ['SPY', 'QQQ'] });
     var R = {}; book.rows.forEach(function(r){ R[r.p.id] = r; });
-    $('#pf-sub').hidden = false; $('#pf-sub').textContent = 'A ' + usdFull(N) + ' model book, run exactly as we trade it. Spot and leveraged trades sit in the same book; cash inside it counts, nothing sits outside.';
+    $('#pf-sub').hidden = true;
     /* tabs */
     M.$$('#pf-book button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfTab.book); });
     M.$$('#pf-view button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfTab.view); });

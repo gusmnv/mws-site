@@ -97,7 +97,7 @@ window.MWS = window.MWS || {};
     var prevSum = 0; open.forEach(function(r){ var pc = r.q && r.q.prev_close != null && r.live != null ? Number(r.q.prev_close) : null; r.prev = pc != null ? r.capital * r.growth(pc) : r.value; prevSum += r.prev; });
     var Bprev = cash + prevSum;
     rows.forEach(function(r){ if (r.capital == null) return; r.weightNow = B > 0 ? r.value / B * 100 : null; r.contrib = r.value - r.capital; });
-    var asOf = null; rows.forEach(function(r){ var t = r.q && (r.q.quoted_at || r.q.updated_at); if (t && (!asOf || t > asOf)) asOf = t; });
+    var asOf = null; rows.forEach(function(r){ var t = r.q && (r.q.updated_at || r.q.quoted_at); if (t && (!asOf || t > asOf)) asOf = t; });
     return { rows: rows, cash: cash, B: B, cashNow: B > 0 ? cash / B * 100 : null, invested: B > 0 ? 100 - cash / B * 100 : null, retTotal: B / 100 - 1, todayBook: Bprev > 0 ? B / Bprev - 1 : null, series: series, start: start, first: first, asOf: asOf, n: open.length };
   };
   /* escape anything that came from a user, Whop or Telegram before it goes into innerHTML */

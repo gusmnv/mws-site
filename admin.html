@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css">
+<link rel="stylesheet" href="/mws.css?v=7a0476e3">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js"></script>
+<script src="/mws.js?v=7a0476e3"></script>
 <style>
 body{display:block}
 header.top{display:none}
@@ -249,11 +249,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
 
     <!-- PORTFOLIO -->
     <section class="view" data-v="portfolio">
-      <div class="card rv"><h3>What members can see</h3>
-        <p class="small muted" style="margin-bottom:12px">Each part of the Desk is <b>only you</b> (owner and admins see it in the member area, members see "In development") until you make it live. Live means every member with access sees it — published positions, the calendar, the earnings.</p>
-        <ul class="attn" id="desk-live"></ul>
-      </div>
-      <div class="card rv d1" style="margin-top:22px"><h3 id="pf-title">Add a position <button class="link" id="pf-cancel" type="button" hidden>Cancel edit</button></h3>
+      <div class="card rv"><h3 id="pf-title">Add a position <button class="link" id="pf-cancel" type="button" hidden>Cancel edit</button></h3>
         <p class="small muted" style="margin-bottom:16px">Everything you save here starts as a <b>draft</b>: members cannot see it, you can (open the member area as yourself). Press <b>Publish</b> on a row, or <b>Publish all drafts</b>, when it is right — and members only see published positions once the Portfolio is <b>live</b> (card above). The book members see: <b>spot</b> positions, <b>leveraged</b> positions and resting <b>orders</b>, each grouped Crypto / Stocks / Commodities. Type the ticker and press <b>Find</b>: pick the exact instrument and the price feed follows it (live P&amp;L, weight that moves with the market). <b>Weight at entry</b> is the share of the book the position took, to two decimals; <b>Entry price</b> is the average you paid. "Bought at" and target stay free text. Paste the Telegram posts behind the call, one link per line.</p>
         <form class="pf" id="f-pos" novalidate>
           <input type="hidden" id="p-id"><input type="hidden" id="p-qsym"><input type="hidden" id="p-qname"><input type="hidden" id="p-qexch"><input type="hidden" id="p-qtype"><input type="hidden" id="p-qcur">
@@ -286,17 +282,17 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     <!-- SETTINGS -->
     <section class="view" data-v="settings">
       <div class="two">
-        <div class="card rv"><h3>Rules</h3>
+        <div class="card rv"><h3>What goes live</h3>
+        <p class="small muted" style="margin-bottom:12px">Each part of the Desk is <b>only you</b> (owner and admins see it in the member area, members see "In development") until you make it live. Live means every member with access sees it — published positions, the calendar, the earnings.</p>
+        <ul class="attn" id="desk-live"></ul>
+        </div>
+        <div class="card rv d1"><h3>Rules</h3>
           <div class="setrow"><div><b>Grace period after a failed payment</b><span>Days the member keeps access while Whop retries the card.</span></div><div><input id="s-grace" type="number" min="0" max="30"> <span>days</span></div></div>
           <div class="setrow"><div><b>Invite link validity</b><span>Each Telegram invite works once and expires after this.</span></div><div><input id="s-ttl" type="number" min="1" max="168"> <span>hours</span></div></div>
           <div class="row" style="margin-top:16px"><span></span><button class="btn sm acc" id="s-save" type="button" data-busy="Saving">Save rules</button></div>
         </div>
-        <div class="card rv d1"><h3>Test e-mails</h3>
-          <p class="small muted" style="margin-bottom:12px">E-mails used for test purchases, one per line. They are not members: nothing under them is imported from Whop or shown anywhere on the site. Whop itself is not touched. Purchases on the internal test plan are ignored automatically.</p>
-          <div class="field"><label for="s-tests">E-mails</label><textarea id="s-tests" rows="6" spellcheck="false" placeholder="test1@gmail.com&#10;test2@gmail.com" style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:12px 14px;outline:none;border-radius:0;width:100%;resize:vertical"></textarea></div>
-          <div class="row" style="margin-top:12px"><span class="small muted" id="s-tests-n"></span><button class="btn sm acc" id="s-tests-save" type="button" data-busy="Saving">Save</button></div>
-        </div>
-        <div class="card rv d1"><h3>Notice to members</h3>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3>Notice to members</h3>
           <p class="small muted" style="margin-bottom:12px">Shows at the top of the member area for everyone logged in, until they dismiss it or you switch it off.</p>
           <form id="f-notice" novalidate>
             <div class="field"><label for="n-body">Message</label><textarea id="n-body" rows="3" placeholder="The Desk opens Monday. Portfolio first." style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:12px 14px;outline:none;border-radius:0;resize:vertical;width:100%"></textarea></div>
@@ -309,10 +305,17 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
           </form>
           <div id="notices" style="margin-top:14px"></div>
         </div>
+      <details class="adv rv d2" id="adv"><summary>Advanced · feeds, plans, team, test e-mails</summary>
+      <div class="two" style="margin-top:14px">
         <div class="card rv d1"><h3>Plans that grant access</h3><div id="plans"></div></div>
         <div class="card rv d2"><h3>Team</h3><div id="team"></div>
           <form class="team" id="f-role" novalidate><input id="r-email" type="email" placeholder="email of an existing account"><select id="r-role"><option value="admin">Admin</option><option value="owner">Owner</option><option value="member">Member</option></select><button class="btn sm ghost" type="submit">Set</button></form>
           <p class="small muted" style="margin-top:16px">Links: <a href="https://whop.com/dashboard/biz_RcxWC0ig56n1mw/" target="_blank" rel="noopener">Whop dashboard</a> · <a href="https://supabase.com/dashboard/project/rgvyyxphqhtedhgvwopy" target="_blank" rel="noopener">Database</a></p>
+        </div>
+        <div class="card rv d1"><h3>Test e-mails</h3>
+          <p class="small muted" style="margin-bottom:12px">E-mails used for test purchases, one per line. They are not members: nothing under them is imported from Whop or shown anywhere on the site. Whop itself is not touched. Purchases on the internal test plan are ignored automatically.</p>
+          <div class="field"><label for="s-tests">E-mails</label><textarea id="s-tests" rows="6" spellcheck="false" placeholder="test1@gmail.com&#10;test2@gmail.com" style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:12px 14px;outline:none;border-radius:0;width:100%;resize:vertical"></textarea></div>
+          <div class="row" style="margin-top:12px"><span class="small muted" id="s-tests-n"></span><button class="btn sm acc" id="s-tests-save" type="button" data-busy="Saving">Save</button></div>
         </div>
       </div>
       <div class="card rv d2" style="margin-top:22px"><h3>Market data · automatic <button class="btn sm ghost" id="cal-refresh" type="button" data-busy="Fetching" style="margin-left:12px" title="Fetch the macro calendar now">Refresh calendar</button> <button class="btn sm ghost" id="er-refresh" type="button" data-busy="Fetching" style="margin-left:6px" title="Fetch the earnings window now (Twelve Data, 40 credits per market)">Refresh earnings</button></h3>
@@ -336,6 +339,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
           <div class="acts"><button class="btn sm acc" type="submit" id="mkt-save" data-busy="Saving">Save market data settings</button><button class="btn sm ghost" type="button" id="tg-brief-now" data-busy="Posting" title="Post today's brief to the channel now">Post the brief now</button><span class="small muted">Everything here is automatic by default (the plan is read from Twelve Data, the macro source follows the key). Change only what you mean to. Keys (TWELVE_DATA_KEY, CALENDAR_KEY) live only in Supabase → Edge Functions → Secrets.</span></div>
         </form>
       </div>
+      </details>
     </section>
   </main>
 </div>
@@ -899,7 +903,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
 
   // routing
-  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'Rules and team.'] };
+  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
   function route(){ var v = currentView(); if (!Object.prototype.hasOwnProperty.call(TITLES, v)) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);

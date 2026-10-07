@@ -470,3 +470,27 @@ a.tile:hover{background:var(--bg-2)}
 @media (max-width:1100px){.sumbar{grid-template-columns:repeat(3,minmax(0,1fr))}.sumbar .sc.big{grid-column:span 3}}
 @media (max-width:960px){.expo{grid-template-columns:1fr}}
 @media (max-width:760px){.sumbar{grid-template-columns:repeat(2,minmax(0,1fr))}.sumbar .sc.big{grid-column:span 2}.sumbar .sc.big b{font-size:26px}}
+/* portfolio rows open a detail panel: the numbers stay in the table, the story (target, reasoning, the Telegram posts) lives here */
+.pt tr.clk{cursor:pointer}.pt tr.clk:hover td{background:var(--bg-2)}
+#pf-table td.em{min-width:150px}
+.pfd{position:fixed;inset:0;z-index:97;display:flex;justify-content:flex-end;background:rgba(0,0,0,.6)}
+.pfd[hidden]{display:none}
+.pfd .pan{width:min(600px,100%);height:100%;overflow:auto;background:var(--bg);border-left:1px solid var(--line);padding:22px 26px 48px;animation:pfdIn .18s ease-out}
+@keyframes pfdIn{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+.pfd .hd{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pfd .hd h2{font-size:26px;margin:0;letter-spacing:-.01em}.pfd .hd h2 .nm{color:var(--fg-3);font-weight:400;font-size:16px;margin-left:8px}
+.pfd .x{background:none;border:1px solid var(--line-2);color:var(--fg-2);width:36px;height:36px;cursor:pointer;font-size:20px;line-height:1;flex:0 0 auto}.pfd .x:hover{color:var(--fg);border-color:var(--fg-3)}
+.pfd .tags{margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px}
+.pfd .facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin:16px 0 0}
+.pfd .facts div{background:var(--bg);padding:10px 12px;min-width:0}
+.pfd .facts div>span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+.pfd .facts b span,.pfd .facts b small{font:inherit;letter-spacing:0;text-transform:none}.pfd .facts b small{color:var(--fg-3);font-size:12px}
+.pfd .facts b{display:block;font-weight:500;font-size:15px;margin-top:4px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.pfd .facts b .pos{color:var(--fg)}.pfd .facts b .neg{color:var(--bad)}
+.pfd .why{color:var(--fg-2);line-height:1.55;margin:16px 0 0;border-left:2px solid var(--line-2);padding-left:12px}
+.pfd h3{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;margin:24px 0 10px}
+.pfd .post{margin:0 0 14px;border:1px solid var(--line);background:var(--bg-2)}
+.pfd .post figcaption{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);padding:8px 10px;border-bottom:1px solid var(--line)}
+.pfd .post img{display:block;width:100%;height:auto}
+.pfd .post.none{padding:12px;color:var(--fg-3);font-size:13px}.pfd .post.none a{color:var(--fg-2)}
+@media (max-width:760px){.pfd .pan{width:100%;padding:18px 16px 40px}.pfd .hd h2{font-size:22px}}

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=b684fd89">
+<link rel="stylesheet" href="/mws.css?v=e52dc2a0">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=b684fd89"></script>
+<script src="/mws.js?v=e52dc2a0"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -131,6 +131,7 @@
       <section class="page" data-page="portfolio">
         <div class="head rv"><h1>Spot positions. <span class="soon" id="pf-tag">In development</span></h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
+          <p class="pf-intro rv" id="pf-intro"></p>
           <div class="kpis rv" id="pf-kpis"></div>
           <div class="pf-grid rv d1">
             <div class="pf-cell">
@@ -691,7 +692,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var kp = function(k, v, d, big){ return '<div class="kp' + (big ? ' big' : '') + '"><span>' + k + '</span><b>' + v + '</b>' + (d ? '<em>' + d + '</em>' : '') + '</div>'; };
     var sg = function(v, txt){ return v == null ? '<span class="muted">—</span>' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
     var asOfTxt = book.asOf ? 'prices as of ' + hhmm(book.asOf) + ' (your time)' : (live ? 'live prices' : 'prices: none yet');
-    $('#pf-kpis').innerHTML = kp('Portfolio value', usdFull(bookVal) + ' <small>USD</small>', 'Started with <i>' + usdFull(N) + '</i>' + (book.first ? ' on ' + M.fmtDate(book.first) : '') + ' · ' + sg(bookPL, pct(book.retTotal * 100)) + ' all time · ' + asOfTxt, true)
+    $('#pf-intro').innerHTML = 'A model portfolio that tracks our calls: it started with <b>' + usdFull(N) + '</b>' + (book.first ? ' on ' + M.fmtDate(book.first) : '') + ' and shows what a member who followed every call, at the size we gave, would hold today — and the return: <b class="' + sgn(bookPL).trim() + '">' + pct(book.retTotal * 100) + '</b> all time. Prices and weights move with the market; ' + asOfTxt + '.';
+    $('#pf-kpis').innerHTML = kp('Portfolio value', usdFull(bookVal) + ' <small>USD</small>', '', true)
       + (pfRange === '1'
         ? kp('1 day', sg(pl1, usdSigned(pl1)), pl1 == null ? 'waiting for prices' : sg(roi1, pct(roi1)) + ' · since the previous close')
         : kp(RANGES[rk], sg(rPL, usdSigned(rPL)), rPL == null ? (hasHist ? 'the book is younger than the range' : 'waiting for daily closes') : sg(rPct, pct(rPct)) + (rSince ? ' · since ' + M.fmtDate(rSince) : '')));
@@ -810,18 +812,18 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     else { var k = Math.max(1, Math.ceil(n / (W < 560 ? 4 : 7))); xl = seg.map(function(p, i){ return i % k === 0 || i === n - 1 ? '<text x="' + X(i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk" text-anchor="' + (i === n - 1 ? 'end' : i === 0 ? 'start' : 'middle') + '">' + new Date(p.day + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }) + '</text>' : ''; }).join(''); }
     var path = function(v){ var d = '', on = false; v.forEach(function(y, i){ if (y == null) { on = false; return; } d += (on ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(y).toFixed(1); on = true; }); return d; };
     var bookD = lines[0] && lines[0].k === 'book' ? lines[0].d : null, bookR = bookD ? lines[0].v : null;
-    var area = bookD ? '<path class="a" d="' + path(bookD) + 'L' + X(n - 1).toFixed(1) + ',' + Y(zeroV).toFixed(1) + 'L' + X(0).toFixed(1) + ',' + Y(zeroV).toFixed(1) + 'Z"/>' : '';
+    var area = '';
     var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" class="cv">' + grid + zero + area + lines.map(function(x){ return '<path class="l ' + x.c + '" d="' + path(x.d) + '"/>'; }).join('') + xl + '<line class="hv" x1="0" x2="0" y1="' + T + '" y2="' + (Hh - Bt) + '" hidden/>' + lines.map(function(x){ return '<circle class="dot ' + x.c + '" r="4" hidden/>'; }).join('') + '</svg>';
     var endTxt = function(x){ var r = x.v[x.v.length - 1]; return r == null ? '—' : usdMode ? usd(disp(r)) + ' <small class="' + sgn(r).trim() + '">' + pct(r * 100) + '</small>' : pct(r * 100); };
-    var legend = '<div class="lg">' + allLines.map(function(x){ var r = x.v[x.v.length - 1], off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span><i class="' + x.c + '"></i>' + x.l + ' <b class="' + (usdMode ? '' : sgn(r).trim()) + '">' + endTxt(x) + '</b></span>' : '<button type="button" class="lgb' + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '"><i class="' + x.c + '"></i>' + x.l + ' <b class="' + (usdMode ? '' : sgn(r).trim()) + '">' + endTxt(x) + '</b></button>'; }).join('') + '<span class="tip" id="pf-tip"></span></div>';
+    var legend = '<div class="lg">' + allLines.map(function(x){ var off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span><i class="' + x.c + '"></i>' + x.l + '</span>' : '<button type="button" class="lgb' + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '"><i class="' + x.c + '"></i>' + x.l + '</button>'; }).join('') + '<span class="tip" id="pf-tip"></span></div>';
     $('#pf-chart').innerHTML = legend + svg;
-    $('#pf-chart-sub').textContent = '· ' + M.fmtDate(seg[0].day) + ' → ' + M.fmtDate(seg[n - 1].day) + (usdMode ? ' · ' + usdFull(N) + ' in each' : (raw ? '' : ', rebased'));
+    $('#pf-chart-sub').textContent = '';
     /* hover: nearest day */
     var sv = $('#pf-chart svg'), hv = sv.querySelector('.hv'), dots = M.$$('.dot', sv), tip = $('#pf-tip');
-    var show = function(ev){ var rc = sv.getBoundingClientRect(); var px = (ev.clientX - rc.left) / rc.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.hidden = false;
-      lines.forEach(function(x, j){ var v = x.d[i]; if (v == null) { dots[j].hidden = true; return; } dots[j].hidden = false; dots[j].setAttribute('cx', X(i)); dots[j].setAttribute('cy', Y(v)); });
+    var show = function(ev){ var rc = sv.getBoundingClientRect(); var px = (ev.clientX - rc.left) / rc.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.removeAttribute('hidden');
+      lines.forEach(function(x, j){ var v = x.d[i]; if (v == null) { dots[j].setAttribute('hidden', ''); return; } dots[j].removeAttribute('hidden'); dots[j].setAttribute('cx', X(i)); dots[j].setAttribute('cy', Y(v)); });
       tip.innerHTML = '<b>' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var r = x.v[i]; return ' · ' + x.l + ' <b class="' + sgn(r).trim() + '">' + (r == null ? '—' : fmtV(disp(r))) + '</b>'; }).join(''); };
-    var hide = function(){ hv.hidden = true; dots.forEach(function(d){ d.hidden = true; }); tip.innerHTML = ''; };
+    var hide = function(){ hv.setAttribute('hidden', ''); dots.forEach(function(d){ d.setAttribute('hidden', ''); }); tip.innerHTML = ''; };
     sv.addEventListener('mousemove', show); sv.addEventListener('touchmove', function(ev){ if (ev.touches[0]) show(ev.touches[0]); }, { passive: true }); sv.addEventListener('mouseleave', hide);
   }
   var pfRz = null; window.addEventListener('resize', function(){ clearTimeout(pfRz); pfRz = setTimeout(function(){ if (current === 'portfolio' && !$('#pf-live').hidden) renderPortfolio(); }, 200); });

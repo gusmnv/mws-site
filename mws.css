@@ -603,3 +603,13 @@ body.app .page .head{display:none}
 body.app .crumbs #bar-tag{margin-left:12px;font-size:9.5px;padding:2px 6px;flex:none}
 body.app .pf-cell .sh .ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 body.app .kpis{margin-top:4px}
+/* chart: the portfolio in white, the benchmarks thin and in full colour; a solid hover line */
+.chart .l{stroke-width:1.5}
+.chart .lb{stroke:var(--fg);stroke-width:1.75}
+.chart .ls{stroke:#3B82F6;stroke-width:1.25}.chart .lq{stroke:#F59E0B;stroke-width:1.25;stroke-dasharray:none}
+.chart .lg i.ls{background:#3B82F6}.chart .lg i.lq{background:#F59E0B}
+.chart .dot.ls{stroke:#3B82F6}.chart .dot.lq{stroke:#F59E0B}
+.chart .hv{stroke:var(--fg-2);stroke-width:1;stroke-dasharray:none;opacity:.9}
+body.app .pf-intro{max-width:92ch;color:var(--fg-2);font-size:14px;line-height:1.6;margin:0 0 22px}
+body.app .pf-intro b{color:var(--fg);font-weight:500}
+body.app .pf-intro b.pos{color:var(--good)}body.app .pf-intro b.neg{color:var(--bad)}

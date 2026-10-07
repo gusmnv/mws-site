@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Become a member — Mr. Wall Street</title>
+<meta name="description" content="Become a member: private Telegram channels with every trade, every investment and every market call in real time. Mr. Wall Street Core (monthly or yearly) or Lifetime.">
+<link rel="canonical" href="https://mrofwallstreet.com/join">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mr. Wall Street">
+<meta property="og:title" content="Become a member — Mr. Wall Street">
+<meta property="og:description" content="Become a member: private Telegram channels with every trade, every investment and every market call in real time. Mr. Wall Street Core (monthly or yearly) or Lifetime.">
+<meta property="og:url" content="https://mrofwallstreet.com/join">
+<meta property="og:image" content="https://mrofwallstreet.com/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@mrofwallstreet">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/mws.css?v=7a0476e3">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
+<script src="/mws.js?v=7a0476e3"></script>
+<script>/* Whop calls this when the payment completes; if it ever fires before the page script defined MWS.onPaid, the result is kept and picked up below */
+window.onWhopComplete = function(planId, receiptId){ if (window.MWS && window.MWS.onPaid) window.MWS.onPaid(planId, receiptId); else window.__whopPaid = [planId, receiptId]; };</script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<a class="brand" href="/" aria-label="Mr. Wall Street"><img src="/lion.svg" width="30" height="30" alt=""><span>MR. WALL STREET</span></a>
+<nav aria-label="Primary"><a href="/telegram" data-nav="telegram">Telegram</a><a href="/portfolio" data-nav="portfolio">Portfolio</a><a href="/earnings" data-nav="earnings">Earnings</a><a href="/calendar" data-nav="calendar">Calendar</a></nav>
+<div class="right" id="hdr-actions"></div>
+</div></header>
+<main><div class="wrap">
+<div class="stage wide" id="stage">
+
+  <!-- step 1: plan -->
+  <section id="s-plan">
+    <div class="head rv"><h1>Choose your plan.</h1></div>
+    <div class="plans rv d2" id="plans"></div>
+    <div class="assure rv d3"><span>Secure checkout</span><span>Apple Pay · Google Pay · Card</span><span>Telegram access in seconds</span></div>
+  </section>
+
+  <!-- step 2: email -->
+  <section id="s-email" hidden>
+    <div class="head"><h1>Where should your access go?</h1></div>
+    <div class="stage" style="margin:0">
+      <form class="panel" id="f-email" novalidate>
+        <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required></div>
+        <div class="msg" id="m-email"></div>
+        <div class="row"><button class="link" type="button" id="back-plan">← Change plan</button><button class="btn acc" type="submit" data-busy="Preparing">Continue to payment <span class="ar"></span></button></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- step 3: payment -->
+  <section id="s-pay" hidden>
+    <div class="head"><h1 id="pay-title">Secure checkout.</h1></div>
+    <div class="co">
+      <div class="pay"><div id="whop-checkout"></div><div class="msg" id="m-pay"></div></div>
+      <aside class="sum">
+        <p class="eyebrow">Order</p>
+        <div><div class="big" id="sum-price"></div><p class="muted small" id="sum-sub" style="margin-top:10px"></p></div>
+        <dl class="kv"><dt>Plan</dt><dd id="sum-plan"></dd><dt>Email</dt><dd id="sum-email"></dd><dt>Access</dt><dd>All Mr. Wall Street Telegram channels</dd></dl>
+        <p class="small muted" id="after-pay">After payment you will create your password and connect Telegram. Takes one minute.</p>
+        <button class="link" type="button" id="back-email">← Change email or plan</button>
+      </aside>
+    </div>
+  </section>
+
+</div>
+</div></main>
+<footer class="site"><div class="wrap">
+<nav class="fnav" aria-label="Site">
+<div><h4>Features</h4><a href="/telegram">Telegram</a><a href="/portfolio">Portfolio</a><a href="/earnings">Earnings</a><a href="/calendar">Calendar</a></div>
+<div><h4>Membership</h4><a href="/join">Become a member</a><a href="/#membership">Plans and pricing</a><a href="/#faq">Questions</a></div>
+<div><h4>Account</h4><a href="/login">Log in</a><a href="/signup">Create account</a><a href="/app">Member area</a><a href="mailto:contact@mrofwallstreet.com">Contact</a></div>
+<div><h4>More</h4><a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a><a href="/terms">Terms of service</a><a href="/privacy">Privacy policy</a></div>
+</nav>
+<div class="fbar"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span>Educational content and market opinion only. Not financial advice.</span></div>
+</div></footer>
+<script>
+(async function(){
+  var M = window.MWS, C = M.config, $ = M.$, sb = M.sb();
+  var user = await M.header();
+  var state = M.signupState();
+  var qsPlan = M.qs('plan');
+  if (qsPlan && C.PLANS[qsPlan] && !C.PLANS[qsPlan].hidden) state.plan = qsPlan;
+  if (user && user.email) { state.email = user.email; $('#after-pay').textContent = 'After payment your membership updates within seconds. Nothing else to do.'; }
+  /* a logged-in member with a live recurring plan must not buy a second one by accident. If the plan check itself fails
+     (network, server) no checkout is mounted: without knowing the current plan the page could sell a member the plan they already have */
+  var access = null;
+  if (user) {
+    var ac = null; try { ac = await sb.rpc('my_access'); } catch (e) { ac = { error: e }; }
+    if (!ac || ac.error || !ac.data) { $('#plans').innerHTML = '<div class="msg on bad">Could not check your current plan. Reload the page and try again.</div>'; return; }
+    access = ac.data;
+  }
+  if (access && access.valid && M.qs('from') !== 'app') { M.go('/app#membership'); return; } /* already a member: nothing to buy here */
+  /* a live recurring plan (monthly / yearly, not cancelling) can only be upgraded to a higher tier here: monthly → yearly or Lifetime, yearly → Lifetime */
+  var TIER = { monthly: 1, yearly: 2, lifetime: 3 };
+  function hasRecurring(){ return access && access.valid && (access.plan_key === 'monthly' || access.plan_key === 'yearly') && !/^(cancel|expir)/.test(access.status || '') && !access.cancel_at_period_end; }
+  function blocked(k){ if (access && access.valid && access.plan_key === 'lifetime') return 'lifetime'; return hasRecurring() && (TIER[k] || 0) <= (TIER[access.plan_key] || 0) ? 'same' : ''; }
+
+  /* plans */
+  var order = ['monthly','yearly','lifetime'];
+  $('#plans').innerHTML = order.map(function(k){ var p = C.PLANS[k]; return '<div class="plan" data-k="'+k+'" role="button" tabindex="0"><span class="k">'+p.title+'<em>'+p.tag+'</em></span><div class="price">'+p.price+'<small>'+p.per+'</small></div><p class="sub">'+p.sub+'</p><span class="btn">Select '+p.title+' <span class="ar"></span></span></div>'; }).join('');
+  M.$$('.plan').forEach(function(el){ el.addEventListener('click', function(){ choose(el.dataset.k); }); el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') choose(el.dataset.k); }); });
+
+  function show(id){ ['s-plan','s-email','s-pay'].forEach(function(s){ $('#'+s).hidden = (s!==id); }); window.scrollTo({top:0,behavior:'smooth'}); }
+  function save(){ M.saveSignup(state); }
+
+  /* logged in: the account email is the one; anyone else confirms the address first (pre-filled if this browser typed one before) */
+  function choose(k){ state.plan = k; save(); M.$$('.plan').forEach(function(el){ el.classList.toggle('sel', el.dataset.k===k); }); if (user && state.email) { pay(); } else { $('#email').value = state.email || ''; show('s-email'); setTimeout(function(){ $('#email').focus(); }, 300); } }
+
+  $('#back-plan').addEventListener('click', function(){ show('s-plan'); });
+  $('#back-email').addEventListener('click', function(){ if (user) { show('s-plan'); } else { show('s-email'); } });
+
+  $('#f-email').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('#email').value.trim().toLowerCase();
+    if (!M.validEmail(v)) { M.msg('#m-email', 'Enter a valid email address.', 'bad'); $('#email').closest('.field').classList.add('err'); return; }
+    state.email = v; save(); pay();
+  });
+
+  var loaded = false;
+  function pay(){
+    var p = C.PLANS[state.plan]; if (!p) { show('s-plan'); return; }
+    var why = blocked(state.plan);
+    if (why) {
+      var cur = (C.PLANS[access.plan_key] || {}).title || 'current', life = why === 'lifetime';
+      show('s-pay');
+      $('#pay-title').textContent = life ? 'You already have Lifetime' : 'You already have an active ' + cur + ' plan';
+      $('#sum-plan').textContent = cur; $('#sum-price').textContent = ''; $('#sum-sub').textContent = life ? 'Paid once. Never renews.' : 'Renews ' + M.fmtDate(access.renewal_period_end); $('#sum-email').textContent = state.email;
+      var up = access.plan_key === 'monthly' ? '<p class="small muted" style="margin-top:14px">Want more? <a href="/join?plan=yearly&amp;from=app">Switch to yearly</a> or <a href="/join?plan=lifetime&amp;from=app">go Lifetime</a>, then cancel the current plan from your membership page.</p>' : access.plan_key === 'yearly' ? '<p class="small muted" style="margin-top:14px">Want Lifetime instead? <a href="/join?plan=lifetime&amp;from=app">Upgrade here</a>, then cancel the current plan from your membership page.</p>' : '';
+      $('#whop-checkout').innerHTML = '<div class="msg on">Nothing to pay. ' + (life ? 'Lifetime is the top: everything, forever, already yours.' : 'Your ' + M.esc(cur) + ' membership is active and renews on ' + M.esc(M.fmtDate(access.renewal_period_end)) + '.') + '</div><div class="row" style="margin-top:18px"><a class="btn acc" href="/app#membership">Go to my membership <span class="ar"></span></a>' + (!life && access.manage_url ? '<a class="btn ghost" href="' + (/^https:\/\//i.test(access.manage_url) ? M.esc(access.manage_url) : '#') + '" target="_blank" rel="noopener">Manage subscription</a>' : '') + '</div>' + up;
+      return;
+    }
+    /* the same plan, already paid and set to end: resuming is free, paying again is not (a reminder, not a block: the person may want a fresh start) */
+    var ending = access && access.valid && access.plan_key === state.plan && (access.cancel_at_period_end || /^(cancel|expir)/.test(access.status || ''));
+    if (ending) M.msg('#m-pay', 'Your ' + ((C.PLANS[access.plan_key] || {}).title || 'current') + ' plan is set to end' + (access.renewal_period_end ? ' on ' + M.fmtDate(access.renewal_period_end) : '') + '. You can resume it from your membership page instead of paying again.');
+    $('#sum-price').innerHTML = p.price + '<small>' + p.per + '</small>';
+    $('#sum-sub').textContent = p.sub;
+    $('#sum-plan').textContent = p.title;
+    $('#sum-email').textContent = state.email;
+    $('#pay-title').textContent = p.title + ' · ' + p.price + ' ' + p.per.replace('/ ','per ');
+    var box = $('#whop-checkout');
+    var el = document.createElement('div');
+    el.id = 'whop-checkout';
+    el.innerHTML = '<p class="small muted" style="padding:24px 0"><span class="spin"></span>Loading secure checkout…</p>'; /* replaced by the Whop iframe when it mounts */
+    el.setAttribute('data-whop-checkout-plan-id', p.id);
+    el.setAttribute('data-whop-checkout-theme', 'dark');
+    el.setAttribute('data-whop-checkout-prefill-email', state.email);
+    el.setAttribute('data-whop-checkout-return-url', C.SITE + (user ? '/app?paid=1' : '/signup?status=success'));
+    el.setAttribute('data-whop-checkout-on-complete', 'onWhopComplete');
+    box.replaceWith(el);
+    show('s-pay');
+    if (!loaded) { loaded = true; var s = document.createElement('script'); s.src = C.WHOP_LOADER; s.async = true; s.defer = true; s.onerror = function(){ M.msg('#m-pay', 'The secure checkout could not load. Disable ad blockers for this page or try another browser.', 'bad'); }; document.head.appendChild(s); }
+    else if (window.wco && window.wco.load) { try { window.wco.load(); } catch(e){} }
+  }
+
+  M.onPaid = function(planId, receiptId){
+    state.paid = true; state.receipt = (typeof receiptId === 'string' && receiptId) ? receiptId : null; state.paidAt = Date.now(); save();
+    M.go(user ? '/app?paid=1' : '/signup?status=success');
+  };
+  if (window.__whopPaid) { var wp = window.__whopPaid; window.__whopPaid = null; M.onPaid(wp[0], wp[1]); return; }
+
+  /* entry */
+  if (M.qs('status') === 'error') M.msg('#m-pay', 'The payment did not go through. You can try again.', 'bad');
+  if (state.plan && qsPlan) { choose(state.plan); }
+  else if (state.plan) { M.$$('.plan').forEach(function(el){ el.classList.toggle('sel', el.dataset.k===state.plan); }); }
+})();
+</script>
+</body></html>

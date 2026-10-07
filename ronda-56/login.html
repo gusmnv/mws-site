@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Member login — Mr. Wall Street</title>
+<meta name="description" content="Log in to your Mr. Wall Street member area: your membership, your Telegram channels and The Desk.">
+<link rel="canonical" href="https://mrofwallstreet.com/login">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mr. Wall Street">
+<meta property="og:title" content="Member login — Mr. Wall Street">
+<meta property="og:description" content="Log in to your Mr. Wall Street member area: your membership, your Telegram channels and The Desk.">
+<meta property="og:url" content="https://mrofwallstreet.com/login">
+<meta property="og:image" content="https://mrofwallstreet.com/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@mrofwallstreet">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/mws.css?v=7a0476e3">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
+<script src="/mws.js?v=7a0476e3"></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<a class="brand" href="/" aria-label="Mr. Wall Street"><img src="/lion.svg" width="30" height="30" alt=""><span>MR. WALL STREET</span></a>
+<nav aria-label="Primary"><a href="/telegram" data-nav="telegram">Telegram</a><a href="/portfolio" data-nav="portfolio">Portfolio</a><a href="/earnings" data-nav="earnings">Earnings</a><a href="/calendar" data-nav="calendar">Calendar</a></nav>
+<div class="right" id="hdr-actions"></div>
+</div></header>
+<main><div class="wrap"><div class="stage">
+  <div class="head rv"><p class="eyebrow"><b>/</b>Log in</p><h1>Welcome back.</h1><p>Your account, your plan, your Telegram access.</p></div>
+
+  <form class="panel rv d1" id="f-login" novalidate>
+    <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com"></div>
+    <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Your password"></div>
+    <div class="msg" id="m"></div>
+    <button class="btn acc wide" type="submit" data-busy="Logging in">Log in <span class="ar"></span></button>
+    <div class="row" style="margin-top:16px"><button class="link" type="button" id="forgot">Forgot password?</button><a class="link" href="/join">No account yet? Join</a></div>
+  </form>
+
+  <form class="panel rv" id="f-forgot" hidden novalidate>
+    <div class="ttl"><h3>Reset your password</h3></div>
+    <p class="muted small" style="margin-bottom:16px">Enter your email and we will send you a link to set a new password.</p>
+    <div class="field"><label for="femail">Email</label><input id="femail" type="email" autocomplete="email" inputmode="email"></div>
+    <div class="msg" id="m-forgot"></div>
+    <div class="row"><button class="link" type="button" id="back">← Back to log in</button><button class="btn acc" type="submit" data-busy="Sending">Send reset link <span class="ar"></span></button></div>
+  </form>
+
+  <form class="panel rv" id="f-otp" hidden novalidate>
+    <div class="ttl"><h3>Confirm your email</h3></div>
+    <p class="muted small" style="margin-bottom:16px">This account was never confirmed. We just sent a 6-digit code to <b id="otp-email"></b> from <b>contact@mrofwallstreet.com</b>. Enter it to finish.</p>
+    <div class="field"><label for="otp">Code</label><div class="otp"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></div></div>
+    <div class="msg" id="m-otp"></div>
+    <button class="btn acc wide" type="submit" data-busy="Confirming">Confirm and log in <span class="ar"></span></button>
+    <p class="small muted" style="margin-top:14px">No email? Check Spam, Junk or Promotions, or <button class="link" type="button" id="resend" data-busy="sending a new code">send a new code</button>.</p>
+    <p class="small muted" style="margin-top:8px">Company e-mail? Some company filters hold our message. Write to <a href="mailto:contact@mrofwallstreet.com?subject=Verify%20my%20account">contact@mrofwallstreet.com</a> from this address and we confirm your account by hand.</p>
+  </form>
+
+  <p class="small muted rv d2" style="margin-top:22px">Already a member through Whop? Log in with the same email, or <a href="/signup">create your account</a> with it and your membership is recognised automatically.</p>
+</div></div></main>
+<footer class="site"><div class="wrap">
+<nav class="fnav" aria-label="Site">
+<div><h4>Features</h4><a href="/telegram">Telegram</a><a href="/portfolio">Portfolio</a><a href="/earnings">Earnings</a><a href="/calendar">Calendar</a></div>
+<div><h4>Membership</h4><a href="/join">Become a member</a><a href="/#membership">Plans and pricing</a><a href="/#faq">Questions</a></div>
+<div><h4>Account</h4><a href="/login">Log in</a><a href="/signup">Create account</a><a href="/app">Member area</a><a href="mailto:contact@mrofwallstreet.com">Contact</a></div>
+<div><h4>More</h4><a href="https://x.com/mrofwallstreet" target="_blank" rel="noopener">@mrofwallstreet on X</a><a href="/terms">Terms of service</a><a href="/privacy">Privacy policy</a></div>
+</nav>
+<div class="fbar"><span>© 2026 Mr. Wall Street · mrofwallstreet.com</span><span>Educational content and market opinion only. Not financial advice.</span></div>
+</div></footer>
+<script>
+(async function(){
+  var M = window.MWS, $ = M.$, sb = M.sb();
+  var user = await M.header();
+  if (user) { M.go(M.safeNext(M.qs('next'))); return; }
+  var next = M.safeNext(M.qs('next'));
+
+  $('#f-login').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var email = $('#email').value.trim().toLowerCase(), pw = $('#pw').value;
+    if (!M.validEmail(email)) return M.msg('#m', 'Enter a valid email address.', 'bad');
+    if (!pw) return M.msg('#m', 'Enter your password.', 'bad');
+    var btn = $('#f-login .btn'); M.busy(btn, true); M.msg('#m', '');
+    try { var r = await sb.auth.signInWithPassword({ email: email, password: pw }); if (r.error) throw r.error; M.go(next); }
+    catch (err) {
+      if (/Email not confirmed/i.test(err && err.message || '')) { pending = email; await sendCode(); $('#f-login').hidden = true; $('#f-otp').hidden = false; $('#otp').focus(); M.busy(btn, false); return; }
+      M.msg('#m', M.human(err), 'bad'); M.busy(btn, false);
+    }
+  });
+
+  /* account created but never confirmed (the code never arrived, or expired): send a fresh code and confirm here */
+  var pending = null;
+  async function sendCode(){ $('#otp-email').textContent = pending; try { var r = await sb.auth.resend({ type: 'signup', email: pending }); if (r.error) throw r.error; M.msg('#m-otp', 'Code sent. It can take a few seconds.', 'ok'); } catch (e) { M.msg('#m-otp', M.human(e), 'bad'); } }
+  $('#resend').addEventListener('click', async function(){ if (this.disabled) return; M.busy(this, true); try { await sendCode(); } finally { M.busy(this, false); } }); /* one code per tap */
+  $('#f-otp').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var code = $('#otp').value.replace(/\D/g, '');
+    if (code.length !== 6) return M.msg('#m-otp', 'Enter the 6-digit code.', 'bad');
+    var btn = $('#f-otp .btn'); M.busy(btn, true); M.msg('#m-otp', '');
+    try { var r = await sb.auth.verifyOtp({ email: pending, token: code, type: 'signup' }); if (r.error) throw r.error; M.go(next); }
+    catch (err) { M.msg('#m-otp', M.human(err), 'bad'); M.busy(btn, false); }
+  });
+
+  $('#forgot').addEventListener('click', function(){ $('#femail').value = $('#email').value; $('#f-login').hidden = true; $('#f-forgot').hidden = false; $('#femail').focus(); });
+  $('#back').addEventListener('click', function(){ $('#f-forgot').hidden = true; $('#f-login').hidden = false; });
+  $('#f-forgot').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var email = $('#femail').value.trim().toLowerCase();
+    if (!M.validEmail(email)) return M.msg('#m-forgot', 'Enter a valid email address.', 'bad');
+    var btn = $('#f-forgot .btn'); M.busy(btn, true);
+    try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: M.config.SITE + '/app?reset=1' }); if (r.error) throw r.error; M.msg('#m-forgot', 'If that email has an account, a reset link is on its way.', 'ok'); }
+    catch (err) { M.msg('#m-forgot', M.human(err), 'bad'); }
+    finally { M.busy(btn, false); }
+  });
+})();
+</script>
+</body></html>

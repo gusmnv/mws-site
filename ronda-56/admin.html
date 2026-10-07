@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin — Mr. Wall Street</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/mws.css?v=7a0476e3">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
+<script src="/mws.js?v=7a0476e3"></script>
+<style>
+body{display:block}
+header.top{display:none}
+.dash{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100svh}
+.side{border-right:1px solid var(--line);background:var(--bg);position:sticky;top:0;height:100svh;display:flex;flex-direction:column;padding:18px 14px}
+.side .brand{padding:6px 10px 22px}
+.side .brand span{font-size:12px;letter-spacing:.2em;white-space:nowrap}
+.side nav{display:flex;flex-direction:column;gap:2px}
+.side nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;color:var(--fg-2);text-decoration:none;font-size:14px;font-weight:500;border:1px solid transparent;transition:background .2s,color .2s}
+.side nav a i{font-family:var(--mono);font-size:11px;color:var(--fg-3);width:18px;text-align:center;font-style:normal}
+.side nav a:hover{color:var(--fg);background:var(--bg-2)}
+.side nav a.on{color:var(--fg);background:var(--bg-3);border-color:var(--line-2)}
+.side nav a.on i{color:var(--fg)}
+.side .grp{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:18px 12px 8px}
+.side .me{margin-top:auto;padding:14px 12px 4px;border-top:1px solid var(--line);font-size:13px;color:var(--fg-2)}
+.side .me b{display:block;color:var(--fg);font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.side .me .ma{display:flex;width:100%;margin:14px 0 8px;padding-block:12px}
+.side .me #out{display:block;padding:8px 0}
+.side nav a.mob-ma{display:none}
+.side nav .nn,.bell b{font-family:var(--mono);font-size:10.5px;color:#0A0A0B;background:var(--fg);padding:2px 6px;margin-left:auto;line-height:1.3;min-width:18px;text-align:center}
+.bell{position:relative;display:inline-flex;align-items:center;gap:6px;color:var(--fg-3);text-decoration:none;padding:8px;border:1px solid transparent}
+.bell:hover{color:var(--fg);border-color:var(--line-2)}
+.bell svg{width:18px;height:18px}
+.bell b{margin-left:0}
+.act-list{font-size:14px}
+.act-list .day{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:22px 0 8px}
+.act-list .day:first-child{padding-top:0}
+.ev{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px;padding:11px 0;border-top:1px solid var(--line);align-items:start}
+.ev .dot{width:8px;height:8px;border-radius:50%;background:var(--line-2);margin-top:8px}
+.ev.ok .dot{background:var(--fg)}.ev.warn .dot{background:var(--warn)}.ev.bad .dot{background:var(--bad)}
+.ev b{font-weight:500;color:var(--fg);display:block;word-break:break-word}
+.ev.bad b{color:var(--bad)}
+.ev .sub{display:block;color:var(--fg-3);font-size:13px;margin-top:2px;word-break:break-word}
+.ev time{font-family:var(--mono);font-size:11px;color:var(--fg-3);padding-top:5px;white-space:nowrap}
+.ev.new{background:linear-gradient(90deg,var(--bg-3),transparent 70%);margin:0 -12px;padding-left:12px;padding-right:12px}
+.ev.new b::after{content:"NEW";font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--warn);margin-left:8px;vertical-align:1px}
+.chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.sup2{grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr)}
+#slist li{cursor:pointer;flex-wrap:nowrap}
+#slist li.on{background:var(--bg-2);margin:0 -12px;padding-left:12px;padding-right:12px}
+#slist li>span:first-child{display:flex;flex-direction:column;gap:2px;min-width:0;word-break:normal}
+#slist li b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+#slist li .small{white-space:nowrap}
+.thread{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.tm{border:1px solid var(--line);padding:12px 14px;max-width:88%;align-self:flex-start;background:var(--bg-2)}
+.tm.staff{align-self:flex-end;background:var(--bg);border-color:var(--line-2)}
+.tm .who{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin-bottom:6px}
+.tm p{font-size:14.5px;line-height:1.55;word-break:break-word}
+.ta{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;line-height:1.5;padding:12px 14px;outline:none;border-radius:0;resize:vertical;width:100%;min-height:90px}
+.ta:focus{border-color:var(--fg-2)}
+@media (max-width:1100px){.sup2{grid-template-columns:minmax(0,1fr)}}
+.chk input{accent-color:var(--fg);width:14px;height:14px;margin:0}
+.mainx{padding:26px clamp(20px,3vw,44px) 60px;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
+.topbar h1{font-size:28px;letter-spacing:-.03em}
+.topbar .sub{color:var(--fg-3);font-size:14px;margin-top:4px}
+.topbar .acts{display:flex;gap:10px;align-items:center}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:22px}
+.kpis.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:1100px){.kpis.five{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){.kpis.five{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpis>div{background:var(--bg);padding:20px 22px;min-height:118px;display:flex;flex-direction:column;min-width:0}
+.kpis b{display:block;font-size:32px;line-height:1;letter-spacing:-.04em;font-weight:400;font-variant-numeric:tabular-nums;margin-top:14px}
+.kpis span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+.kpis em{font-style:normal;font-size:12.5px;color:var(--fg-3);margin-top:auto;padding-top:8px;display:block}
+.two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
+.card{background:var(--bg);border:1px solid var(--line);padding:22px;min-width:0}
+.card h3{font-size:15px;font-weight:500;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.card h3 .link{font-size:13px;color:var(--fg-3)}
+.attn li{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.attn li>span:first-child{word-break:break-all}
+.attn li:first-child{border-top:0}
+.attn{list-style:none;margin:0;padding:0}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar input[type=search]{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:10px 14px;outline:none;width:280px;max-width:100%;border-radius:0;-webkit-appearance:none}
+.bar input:focus{border-color:var(--fg-2)}
+.seg{display:flex;border:1px solid var(--line-2);overflow:auto}
+.seg button{background:none;border:0;color:var(--fg-3);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 13px;cursor:pointer;border-right:1px solid var(--line-2);white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button.on{color:var(--fg);background:var(--bg-3)}
+.sp{flex:1}
+.tblw{overflow-x:auto;border:1px solid var(--line)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:820px}
+.tbl th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--bg-2);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--fg-2);white-space:nowrap}
+.tbl td.em{color:var(--fg);font-weight:500}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover td{background:var(--bg-2)}
+.tbl .act{display:flex;gap:10px;justify-content:flex-end}
+.tbl .link{font-size:13px}
+.link.bad{color:var(--bad)}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+.grant{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,2fr) auto;gap:12px;align-items:end}
+.grant .field{margin:0}
+.grant .chk{grid-column:1/-2;min-width:0;white-space:normal}.grant .btn{grid-column:-2/-1;justify-self:end} /* the long checkbox label used to run under the Grant button */
+select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:16px;line-height:1.55;padding:14px 16px;outline:none;border-radius:0;-webkit-appearance:none;width:100%;height:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--bg);border-left:1px solid var(--line-2);z-index:80;padding:26px;overflow:auto;transform:translateX(102%);transition:transform .35s var(--ease)}
+.drawer.on{transform:none}
+.drawer .x{position:absolute;top:18px;right:18px}
+.drawer h2{font-size:20px;letter-spacing:-.02em;word-break:break-all;margin:0 40px 6px 0}
+.drawer .kv{margin:18px 0}
+.drawer .stack{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.drawer .stack .btn{justify-content:center}
+.drawer .mailframe{width:100%;height:min(70vh,760px);border:1px solid var(--line-2);background:#0A0A0B;margin-top:16px}
+.row-link{cursor:pointer}.tbl tr.row-link:hover td{background:var(--bg-2)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.view{display:none}.view.on{display:block}
+.pf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;align-items:end}
+.pf .field{margin:0}.pf .field.w2{grid-column:span 2}.pf .field.w3{grid-column:span 3}.pf .field.w6{grid-column:span 6}
+.pf textarea{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:12px 14px;outline:none;border-radius:0;min-height:74px;resize:vertical;width:100%}
+.pf .acts{grid-column:span 6;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pf select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:16px;line-height:1.55;padding:14px 16px;outline:none;border-radius:0;-webkit-appearance:none;width:100%}
+@media (max-width:1100px){.pf{grid-template-columns:repeat(3,minmax(0,1fr))}.pf .field.w3,.pf .field.w6,.pf .acts{grid-column:span 3}}
+@media (max-width:640px){.pf{grid-template-columns:1fr}.pf .field.w2,.pf .field.w3,.pf .field.w6,.pf .acts{grid-column:span 1}}
+.tbl td.wrap{white-space:normal;min-width:200px;max-width:300px;color:var(--fg-3);font-size:13px}
+.tbl td.acts{white-space:normal;min-width:130px;line-height:1.9}
+.tbl .pos{color:var(--fg)}.tbl .neg{color:var(--bad)}
+.setrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0}
+.setrow+.setrow{border-top:1px solid var(--line)}
+.setrow>div:last-child{white-space:nowrap}
+.team{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;margin-top:14px}
+.team input,.team select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:0 12px;height:42px;outline:none;border-radius:0;-webkit-appearance:none;min-width:0}
+.team .btn.sm{height:42px;padding-block:0}
+.setrow b{font-weight:500;display:block}
+.setrow span{font-size:13px;color:var(--fg-3)}
+.setrow input{width:90px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;padding:8px 10px;outline:none;text-align:right}
+.mob{display:none}
+.linkw input{flex:1;min-width:0;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:0 12px;height:40px;outline:none}
+.linkw .row{gap:8px;margin-top:8px}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}.grant{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grant .field:first-child,.grant .field:nth-child(4),.grant .btn,.grant .chk{grid-column:1/-1}.grant .btn{justify-self:stretch}}
+@media (max-width:860px){.dash{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}.side,.mainx{min-width:0}.topbar{flex-wrap:wrap}.topbar h1{font-size:24px}.bar input[type=search]{width:100%}.side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px 14px}.side nav{flex-direction:row;overflow:auto;gap:4px}.side nav a{white-space:nowrap;padding:9px 12px}.side nav a.mob-ma{display:flex}.side .grp,.side .me,.side .brand span{display:none}.side .brand{padding:0 0 10px}.mob{display:block}}
+@media (max-width:600px){.kpis{grid-template-columns:minmax(0,1fr)}.kpis>div{min-height:0;padding:16px 18px}.kpis b{margin-top:8px}.kpis em{margin-top:6px}.mainx{padding:18px 16px 48px}.team{grid-template-columns:minmax(0,1fr) auto}.team .btn{grid-column:1/-1}.drawer{padding:22px 18px}}
+</style>
+</head>
+<body class="adm">
+<div class="dash">
+  <aside class="side">
+    <a class="brand" href="/"><img src="/lion.svg" width="30" height="30" alt=""><span>MR. WALL STREET</span></a>
+    <nav id="nav">
+      <a href="#overview" data-v="overview"><i>01</i>Overview</a>
+      <a href="#activity" data-v="activity"><i>02</i>Activity <span class="nn" id="nav-n" hidden>0</span></a>
+      <a href="#support" data-v="support"><i>03</i>Inbox <span class="nn" id="nav-sup" hidden>0</span></a>
+      <a href="#emails" data-v="emails"><i>04</i>Emails</a>
+      <a href="#members" data-v="members"><i>05</i>Members</a>
+      <a href="#payments" data-v="payments"><i>06</i>Payments</a>
+      <a href="#telegram" data-v="telegram"><i>07</i>Telegram</a>
+      <div class="grp">Manage</div>
+      <a href="#access" data-v="access"><i>08</i>Grant access</a>
+      <a href="#portfolio" data-v="portfolio"><i>09</i>Portfolio</a>
+      <a href="#settings" data-v="settings"><i>10</i>Settings</a>
+      <a href="/app" class="mob-ma"><i>→</i>Member area</a>
+    </nav>
+    <div class="me"><span>Signed in as</span><b id="me-email">…</b><a class="btn sm ghost ma" href="/app">Member area <span class="ar"></span></a><button class="link" id="out" type="button">Log out</button></div>
+  </aside>
+
+  <main class="mainx">
+    <div class="topbar"><div><h1 id="title">Overview</h1><div class="sub" id="subtitle">Loading…</div></div><div class="acts"><span class="small muted" id="upd"></span><a class="bell" id="bell" href="#activity" aria-label="Activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><b id="bell-n" hidden>0</b></a><button class="btn sm ghost" id="sync" type="button" data-busy="Syncing">Sync with Whop</button></div></div>
+    <div class="msg" id="m"></div>
+
+    <!-- OVERVIEW -->
+    <section class="view" data-v="overview">
+      <div class="kpis rv">
+        <div><span>Active members</span><b id="k-active">–</b><em id="k-active-sub"></em></div>
+        <div><span>Monthly run-rate</span><b id="k-mrr">–</b><em>From active plans · est.</em></div>
+        <div><span>Revenue · 30 days</span><b id="k-rev">–</b><em id="k-rev-sub">Payments via the site</em></div>
+        <div><span>Telegram connected</span><b id="k-tg">–</b><em id="k-tg-sub"></em></div>
+      </div>
+      <div class="two">
+        <div class="card rv d1"><h3>Needs attention <a class="link" href="#members">All members</a></h3><ul class="attn" id="attn"></ul></div>
+        <div class="card rv d2"><h3>Recent activity <a class="link" href="#activity">See all</a></h3><div class="act-list" id="feed"></div></div>
+      </div>
+    </section>
+
+    <!-- ACTIVITY -->
+    <section class="view" data-v="activity">
+      <div class="bar"><div class="seg" id="aseg"><button class="on" data-c="all">All</button><button data-c="telegram">Telegram</button><button data-c="billing">Billing</button><button data-c="accounts">Accounts</button><button data-c="support">Support</button><button data-c="system">System</button></div><span class="sp"></span><label class="small muted chk"><input type="checkbox" id="a-minor"> Show routine events</label><span class="small muted" id="a-count"></span></div>
+      <div class="card rv"><div class="act-list" id="alist"></div></div>
+      <p class="small muted" style="margin-top:14px">Everything the system does with members, in plain words, as it happens. Failures also reach you as a Telegram message from the bot.</p>
+    </section>
+
+    <!-- SUPPORT -->
+    <section class="view" data-v="support">
+      <div class="two sup2">
+        <div class="card rv"><h3>Conversations <span class="small muted" id="sup-n"></span></h3>
+          <div class="seg" id="sseg" style="margin-bottom:14px"><button class="on" data-s="open">Waiting</button><button data-s="answered">Answered</button><button data-s="closed">Closed</button><button data-s="all">All</button></div>
+          <ul class="attn" id="slist"></ul>
+        </div>
+        <div class="card rv d1" id="sview"><p class="muted">Pick a conversation on the left.</p></div>
+      </div>
+      <p class="small muted" style="margin-top:14px">Members write from their member area → Feedback. Every message pings you on Telegram; when you answer here, they get a Telegram note (if connected) and see it in their page.</p>
+    </section>
+
+    <!-- EMAILS -->
+    <section class="view" data-v="emails">
+      <div class="bar"><input id="eq" type="search" placeholder="Search email or subject…"><div class="seg" id="eseg"><button class="on" data-f="all">All</button><button data-f="billing">Billing</button><button data-f="account">Account</button><button data-f="support">Support</button><button data-f="preview">Previews</button><button data-f="failed">Failed</button></div><span class="sp"></span><span class="small muted" id="ecount"></span></div>
+      <div class="tblw"><table class="tbl" id="etbl"><thead><tr><th>When</th><th>To</th><th>Email</th><th>Type</th><th>Status</th></tr></thead><tbody id="erows"></tbody></table></div>
+      <p class="small muted" style="margin-top:14px">Every email the site sends, exactly as sent, from contact@mrofwallstreet.com. Click one to open it. Account emails (codes, password links) are sent by the login system and show in Resend for now.</p>
+    </section>
+
+    <!-- MEMBERS -->
+    <section class="view" data-v="members">
+      <div class="bar"><input id="q" type="search" placeholder="Search email…"><div class="seg" id="seg"><button class="on" data-f="all">All</button><button data-f="active">Active</button><button data-f="site">On site</button><button data-f="whop">No account yet</button><button data-f="notg">No Telegram</button><button data-f="ending">Ending</button><button data-f="ended">Ended</button></div><span class="sp"></span><button class="btn sm ghost" id="invite-all" type="button" hidden data-busy="Inviting">Invite all without an account</button><span class="small muted" id="count"></span></div>
+      <div class="tblw"><table class="tbl" id="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Account</th><th>Telegram</th><th>Renews / ends</th><th>Since</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </section>
+
+    <!-- PAYMENTS -->
+    <section class="view" data-v="payments">
+      <div class="kpis five rv"><div><span>Payments · 30 days</span><b id="p-n">–</b><em>Membership plans</em></div><div><span>Revenue · 30 days</span><b id="p-rev">–</b><em>Membership plans</em></div><div><span>Failed · 30 days</span><b id="p-fail">–</b></div><div><span>All-time</span><b id="p-all">–</b><em>Membership, since 2 Oct 2026</em></div><div><span>Other · 30 days</span><b id="p-other">–</b><em id="p-other-sub"></em></div></div>
+      <div class="bar"><div class="seg" id="pseg"><button class="on" data-f="plans">Membership</button><button data-f="other">Other links</button><button data-f="all">All</button></div><span class="sp"></span><span class="small muted">Only the site's plans count as membership revenue. Invoices and extra links for private clients show under Other.</span></div>
+      <div class="tblw"><table class="tbl"><thead><tr><th>When</th><th>Member</th><th>Plan</th><th class="num">Amount</th><th>Status</th><th>Reference</th></tr></thead><tbody id="prow"></tbody></table></div>
+    </section>
+
+    <!-- TELEGRAM -->
+    <section class="view" data-v="telegram">
+      <div class="card rv"><h3>Channels the bot manages <span class="small muted" id="chans-hidden"></span></h3><div id="chans"></div><p class="small muted" style="margin-top:14px">A channel appears here the moment @MrWallStreetBot is made admin in it (or when its admin rights are edited). The bot needs <b>Invite users via link</b> and <b>Ban users</b>. "Hide" only takes a channel off this list; nothing is deleted and members are not affected. Members without Telegram: <a class="link" href="#members" data-f="notg">see the list</a>.</p></div>
+    </section>
+
+    <!-- ACCESS -->
+    <section class="view" data-v="access">
+      <div class="card rv"><h3>Grant access manually</h3><p class="small muted" style="margin-bottom:16px">For members you bring in by hand, crypto, wire or courtesy access. "Paid on" starts the period on the real payment date (leave empty for today). If the member already has an account with this email, access is live immediately; otherwise it activates the moment they create their account with it.</p>
+        <form class="grant" id="f-grant" novalidate>
+          <div class="field"><label for="g-email">Email</label><input id="g-email" type="email" placeholder="member@email.com"></div>
+          <div class="field"><label for="g-plan">Plan</label><select id="g-plan"><option value="monthly">Monthly</option><option value="yearly">Yearly</option><option value="lifetime" selected>Lifetime</option></select></div>
+          <div class="field"><label for="g-months">Months</label><input id="g-months" type="number" min="1" max="120" placeholder="auto"></div>
+          <div class="field"><label for="g-paid">Paid on</label><input id="g-paid" type="date"></div>
+          <div class="field"><label for="g-note">Note</label><input id="g-note" type="text" placeholder="paid in USDT · 27 Sep"></div>
+          <label class="chk" for="g-invite"><input id="g-invite" type="checkbox" checked> Email the invitation now (if they have no account yet)</label>
+          <button class="btn acc" type="submit" data-busy="Granting">Grant <span class="ar"></span></button>
+        </form>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3>Manual access</h3><div class="tblw"><table class="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Ends</th><th>Note</th><th></th></tr></thead><tbody id="mrows"></tbody></table></div></div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section class="view" data-v="portfolio">
+      <div class="card rv"><h3 id="pf-title">Add a position <button class="link" id="pf-cancel" type="button" hidden>Cancel edit</button></h3>
+        <p class="small muted" style="margin-bottom:16px">Everything you save here starts as a <b>draft</b>: members cannot see it, you can (open the member area as yourself). Press <b>Publish</b> on a row, or <b>Publish all drafts</b>, when it is right — and members only see published positions once the Portfolio is <b>live</b> (card above). The book members see: <b>spot</b> positions, <b>leveraged</b> positions and resting <b>orders</b>, each grouped Crypto / Stocks / Commodities. Type the ticker and press <b>Find</b>: pick the exact instrument and the price feed follows it (live P&amp;L, weight that moves with the market). <b>Weight at entry</b> is the share of the book the position took, to two decimals; <b>Entry price</b> is the average you paid. "Bought at" and target stay free text. Paste the Telegram posts behind the call, one link per line.</p>
+        <form class="pf" id="f-pos" novalidate>
+          <input type="hidden" id="p-id"><input type="hidden" id="p-qsym"><input type="hidden" id="p-qname"><input type="hidden" id="p-qexch"><input type="hidden" id="p-qtype"><input type="hidden" id="p-qcur">
+          <div class="field"><label for="p-kind">Type</label><select id="p-kind"><option value="spot">Spot position</option><option value="leveraged">Leveraged position</option><option value="order">Order (resting)</option></select></div>
+          <div class="field"><label for="p-symbol">Symbol</label><div style="display:flex;gap:6px;align-items:stretch"><input id="p-symbol" type="text" placeholder="MSTR" autocapitalize="characters" style="min-width:0;flex:1"><button class="btn sm ghost" type="button" id="p-find" data-busy="…" title="Find the instrument in the price feed" style="padding:0 12px;flex:0 0 auto">Find</button></div></div>
+          <div class="field w2"><label for="p-name">Name</label><input id="p-name" type="text" placeholder="Strategy"></div>
+          <div class="field"><label for="p-side">Side</label><select id="p-side"><option value="long">Long</option><option value="short">Short</option></select></div>
+          <div class="field"><label for="p-class">Class</label><select id="p-class"><option value="crypto">Crypto</option><option value="equity">Stocks</option><option value="etf">ETF (shown under Stocks)</option><option value="commodity">Commodities</option><option value="fx">FX</option><option value="other">Other</option></select></div>
+          <div class="field w6" id="p-findbox" hidden></div>
+          <div class="field w6"><div class="small muted" id="p-feed">No price feed yet: press <b>Find</b> next to the symbol. Without a feed the P&amp;L uses the Mark you type.</div></div>
+          <div class="field"><label for="p-lev">Leverage</label><input id="p-lev" type="text" placeholder="10x"></div>
+          <div class="field"><label for="p-size">Weight at entry %</label><input id="p-size" type="number" step="0.01" min="0" max="100" placeholder="12.50"></div>
+          <div class="field w2"><label for="p-entry">Bought at / levels (text)</label><input id="p-entry" type="text" placeholder="$120, $125, $130"></div>
+          <div class="field"><label for="p-entryp">Entry price (avg)</label><input id="p-entryp" type="number" step="any" placeholder="125"></div>
+          <div class="field"><label for="p-mark">Mark (manual)</label><input id="p-mark" type="number" step="any" placeholder="only without feed"></div>
+          <div class="field"><label for="p-target">Target</label><input id="p-target" type="text" placeholder="130K"></div>
+          <div class="field"><label for="p-opened">Opened</label><input id="p-opened" type="date"></div>
+          <div class="field"><label for="p-sort">Order</label><input id="p-sort" type="number" placeholder="100"></div>
+          <div class="field w3"><label for="p-thesis">Thesis</label><textarea id="p-thesis" placeholder="Why we hold it, in two or three lines."></textarea></div>
+          <div class="field w3"><label for="p-links">Telegram posts (one link per line)</label><textarea id="p-links" placeholder="https://t.me/c/2077854583/4373"></textarea></div>
+          <div class="acts"><button class="btn acc" type="submit" id="pf-save" data-busy="Saving">Save as draft <span class="ar"></span></button><span class="small muted" id="pf-hint">Saved as a draft: only you see it until you publish.</span></div>
+        </form>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3>Open · spot, leveraged and orders <span class="small muted" id="pf-open-n"></span> <button class="btn sm ghost" id="pf-publish-all" type="button" hidden data-busy="Publishing" style="margin-left:12px">Publish all drafts</button> <button class="btn sm ghost" id="pf-refresh" type="button" data-busy="Fetching" style="margin-left:6px" title="Fetch the latest prices now (the schedule does it every few minutes)">Refresh prices</button> <button class="btn sm ghost" id="pf-backfill" type="button" data-busy="Fetching" style="margin-left:6px" title="Daily closes since the first entry, for the chart">Backfill history</button></h3>
+        <p class="small muted" id="pf-qstat" style="margin:-6px 0 12px"></p>
+        <div class="tblw"><table class="tbl"><thead><tr><th>Visible</th><th>Type</th><th>Symbol</th><th>Feed</th><th>Side</th><th>Entry</th><th>Last</th><th>P&amp;L</th><th>Weight</th><th>Target</th><th>Since</th><th>Posts</th><th>Thesis</th><th></th></tr></thead><tbody id="pf-open"></tbody></table></div></div>
+      <div class="card rv d2" style="margin-top:22px"><h3>Closed · track record <span class="small muted" id="pf-closed-n"></span></h3><div class="tblw"><table class="tbl"><thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>Exit</th><th>Result</th><th>Opened</th><th>Closed</th><th>Thesis</th><th></th></tr></thead><tbody id="pf-closed"></tbody></table></div></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" data-v="settings">
+      <div class="two">
+        <div class="card rv"><h3>What goes live</h3>
+        <p class="small muted" style="margin-bottom:12px">Each part of the Desk is <b>only you</b> (owner and admins see it in the member area, members see "In development") until you make it live. Live means every member with access sees it — published positions, the calendar, the earnings.</p>
+        <ul class="attn" id="desk-live"></ul>
+        </div>
+        <div class="card rv d1"><h3>Rules</h3>
+          <div class="setrow"><div><b>Grace period after a failed payment</b><span>Days the member keeps access while Whop retries the card.</span></div><div><input id="s-grace" type="number" min="0" max="30"> <span>days</span></div></div>
+          <div class="setrow"><div><b>Invite link validity</b><span>Each Telegram invite works once and expires after this.</span></div><div><input id="s-ttl" type="number" min="1" max="168"> <span>hours</span></div></div>
+          <div class="row" style="margin-top:16px"><span></span><button class="btn sm acc" id="s-save" type="button" data-busy="Saving">Save rules</button></div>
+        </div>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3>Notice to members</h3>
+          <p class="small muted" style="margin-bottom:12px">Shows at the top of the member area for everyone logged in, until they dismiss it or you switch it off.</p>
+          <form id="f-notice" novalidate>
+            <div class="field"><label for="n-body">Message</label><textarea id="n-body" rows="3" placeholder="The Desk opens Monday. Portfolio first." style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:12px 14px;outline:none;border-radius:0;resize:vertical;width:100%"></textarea></div>
+            <div class="grant" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:12px">
+              <div class="field"><label for="n-kind">Tone</label><select id="n-kind"><option value="info">Neutral</option><option value="good">Good news</option><option value="warn">Warning</option></select></div>
+              <div class="field"><label for="n-label">Button text (if there is a link)</label><input id="n-label" type="text" placeholder="Open"></div>
+            </div>
+            <div class="field"><label for="n-link">Link (optional, https only)</label><input id="n-link" type="url" placeholder="https://mrofwallstreet.com/app#portfolio"></div>
+            <div class="row"><span class="small muted">Members see it the second you post.</span><button class="btn sm acc" type="submit" data-busy="Posting">Post notice</button></div>
+          </form>
+          <div id="notices" style="margin-top:14px"></div>
+        </div>
+      <details class="adv rv d2" id="adv"><summary>Advanced · feeds, plans, team, test e-mails</summary>
+      <div class="two" style="margin-top:14px">
+        <div class="card rv d1"><h3>Plans that grant access</h3><div id="plans"></div></div>
+        <div class="card rv d2"><h3>Team</h3><div id="team"></div>
+          <form class="team" id="f-role" novalidate><input id="r-email" type="email" placeholder="email of an existing account"><select id="r-role"><option value="admin">Admin</option><option value="owner">Owner</option><option value="member">Member</option></select><button class="btn sm ghost" type="submit">Set</button></form>
+          <p class="small muted" style="margin-top:16px">Links: <a href="https://whop.com/dashboard/biz_RcxWC0ig56n1mw/" target="_blank" rel="noopener">Whop dashboard</a> · <a href="https://supabase.com/dashboard/project/rgvyyxphqhtedhgvwopy" target="_blank" rel="noopener">Database</a></p>
+        </div>
+        <div class="card rv d1"><h3>Test e-mails</h3>
+          <p class="small muted" style="margin-bottom:12px">E-mails used for test purchases, one per line. They are not members: nothing under them is imported from Whop or shown anywhere on the site. Whop itself is not touched. Purchases on the internal test plan are ignored automatically.</p>
+          <div class="field"><label for="s-tests">E-mails</label><textarea id="s-tests" rows="6" spellcheck="false" placeholder="test1@gmail.com&#10;test2@gmail.com" style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:14px;padding:12px 14px;outline:none;border-radius:0;width:100%;resize:vertical"></textarea></div>
+          <div class="row" style="margin-top:12px"><span class="small muted" id="s-tests-n"></span><button class="btn sm acc" id="s-tests-save" type="button" data-busy="Saving">Save</button></div>
+        </div>
+      </div>
+      <div class="card rv d2" style="margin-top:22px"><h3>Market data · automatic <button class="btn sm ghost" id="cal-refresh" type="button" data-busy="Fetching" style="margin-left:12px" title="Fetch the macro calendar now">Refresh calendar</button> <button class="btn sm ghost" id="er-refresh" type="button" data-busy="Fetching" style="margin-left:6px" title="Fetch the earnings window now (Twelve Data, 40 credits per market)">Refresh earnings</button></h3>
+        <p class="small muted" style="margin-bottom:10px">Nothing here needs touching day to day. The schedule runs every minute and fetches only what is due: the macro window hourly and every minute around a release; earnings daily and every 15 minutes in the reporting windows. Provider, countries, the provider’s time zone and the portfolio’s refresh cadence are set in the form below.</p>
+        <div id="cal-status" class="small">Loading…</div>
+        <form class="pf" id="f-mkt" novalidate style="margin-top:16px">
+          <div class="field"><label for="k-calendar_provider">Macro provider</label><select id="k-calendar_provider"><option value="auto">Auto (EODHD when the key exists)</option><option value="preview">Preview (no key)</option><option value="eodhd">EODHD</option><option value="fmp">FMP</option></select></div>
+          <div class="field w2"><label for="k-calendar_countries">Macro countries</label><input id="k-calendar_countries" type="text" placeholder="US,EU,GB,JP,CN,DE,CA,AU,CH"></div>
+          <div class="field"><label for="k-calendar_tz">Provider time zone</label><input id="k-calendar_tz" type="text" placeholder="UTC"></div>
+          <div class="field w2"><label for="k-earnings_countries">Earnings markets</label><input id="k-earnings_countries" type="text" placeholder="US,GB,DE,JP"></div>
+          <div class="field"><label for="k-earnings_days_ahead">Earnings days ahead</label><input id="k-earnings_days_ahead" type="number" min="1" max="60" placeholder="14"></div>
+          <div class="field"><label for="k-earnings_days_back">Earnings days back</label><input id="k-earnings_days_back" type="number" min="0" max="60" placeholder="7"></div>
+          <div class="field w2"><label for="k-tg_brief_chat_id">Telegram channel id (posts)</label><input id="k-tg_brief_chat_id" type="text" placeholder="empty = no posts · e.g. -1004330448432"></div>
+          <div class="field"><label for="k-tg_brief_hour">Brief at (Lisbon)</label><input id="k-tg_brief_hour" type="text" placeholder="08:00"></div>
+          <div class="field"><label for="k-tg_alerts">Release alerts</label><select id="k-tg_alerts"><option value="on">On</option><option value="off">Off</option></select></div>
+          <div class="field"><label for="k-portfolio_notional">Model book (USD)</label><input id="k-portfolio_notional" type="number" min="1000" step="1000" placeholder="1000000"></div>
+          <div class="field w2"><label for="k-quotes_benchmarks">Portfolio benchmarks</label><input id="k-quotes_benchmarks" type="text" placeholder="SPY,QQQ,BTC/USD"></div>
+          <div class="field"><label for="k-quotes_interval_min">Quote refresh</label><input id="k-quotes_interval_min" type="text" placeholder="auto"></div>
+          <div class="field"><label for="k-quotes_per_minute">Credits / minute</label><input id="k-quotes_per_minute" type="number" min="1" max="5000" placeholder="auto (from the plan)"></div>
+          <div class="field"><label for="k-quotes_daily_budget">Credits / day</label><input id="k-quotes_daily_budget" type="number" min="10" placeholder="auto (from the plan)"></div>
+          <div class="acts"><button class="btn sm acc" type="submit" id="mkt-save" data-busy="Saving">Save market data settings</button><button class="btn sm ghost" type="button" id="tg-brief-now" data-busy="Posting" title="Post today's brief to the channel now">Post the brief now</button><span class="small muted">Everything here is automatic by default (the plan is read from Twelve Data, the macro source follows the key). Change only what you mean to. Keys (TWELVE_DATA_KEY, CALENDAR_KEY) live only in Supabase → Edge Functions → Secrets.</span></div>
+        </form>
+      </div>
+      </details>
+    </section>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"><button class="link x" id="dx" type="button">Close</button><div id="dbody"></div></aside>
+
+<script>
+if (top !== self) { try { top.location = location; } catch (e) { document.documentElement.innerHTML = ''; } }
+(async function(){
+  var M = window.MWS, $ = M.$, sb = M.sb();
+  var s = await sb.auth.getSession(); var user = s.data.session && s.data.session.user;
+  if (!user) { M.go('/login?next=/admin'); return; }
+  var me = (await sb.from('profiles').select('role,email').eq('id', user.id).maybeSingle()).data;
+  if (!me || ['owner','admin'].indexOf(me.role) < 0) { $('#subtitle').textContent = 'This page is for the owner.'; setTimeout(function(){ M.go('/app'); }, 1200); return; }
+  $('#me-email').textContent = me.email;
+  M.viewAs.set('');
+  $('#out').addEventListener('click', function(){ M.signOut('/'); });
+  /* "Preview what they see" (member drawer): a preset replaces the data on /app; a bar brings you back. The Member area button opens your own real account. */
+  function previewAs(key){ M.viewAs.set(key || 'active'); M.go('/app'); }
+  function presetFor(e){ var m = e.best; if (!m) return 'none'; if (!e.valid) return 'canceled'; if (m.status === 'past_due') return 'pastdue'; if (m.cancel_at_period_end || m.status === 'canceling') return 'ending'; if (m.plan_key === 'lifetime') return 'lifetime'; if (!e.link) return 'joined'; return 'active'; }
+
+  var X = M.esc; /* every value that came from a user, Whop or Telegram is escaped before innerHTML */
+  var D = { tests: {}, profiles: [], memberships: [], links: [], access: [], log: [], channels: [], events: [], settings: {}, plans: [] };
+  var filter = 'all', q = '', pFilter = 'plans';
+  /* Sign in with Apple "Hide My Email": a relay address only forwards mail from senders Apple knows for Whop, so nothing we send
+     arrives. These members create the account with a real e-mail at /signup and staff link the Whop e-mail to it. */
+  function isRelay(email){ return /@privaterelay\.appleid\.com$/i.test(String(email || '')); }
+  var fmtMoney = function(n){ return '$' + (Math.round(n) === n ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); };
+
+  /* mirrors public.membership_is_valid (legacy_counts_again.sql): every paid membership counts, whatever its date */
+  function valid(m){ var st = m.status, now = new Date(), end = m.renewal_period_end ? new Date(m.renewal_period_end) : null;
+    if (D.planOn && m.id.indexOf('manual_') !== 0 && !D.planOn[m.plan_id]) return false; /* mirrors security.sql: only plans that grant access count */
+    if (m.whop_valid === false) return false; /* refunded / charged back / terminated on Whop */
+    if (st === 'active' || st === 'trialing' || st === 'canceling') return !(m.id.indexOf('manual_') === 0 && end && end < now);
+    if (st === 'completed' && m.plan_key === 'lifetime') return true;
+    if (st === 'canceled' || st === 'cancelled' || st === 'expired') return m.whop_valid === true; /* canceled_rule_final_2026-10-05.sql: Whop only says "canceled" once access is gone (a member with paid days left stays "active" + cancel_at_period_end); "end" is the date it ended */
+    if (st === 'past_due') { var since = new Date(m.past_due_since || m.updated_at); return since > new Date(now.getTime() - Number(D.settings.grace_days || 3) * 86400000); }
+    return false; }
+  function rank(m){ if (!valid(m)) return 30; var tier = m.plan_key === 'lifetime' ? 0 : m.plan_key === 'yearly' ? 1 : 2; var st = (m.status === 'active' || m.status === 'trialing' || m.status === 'completed') ? 0 : m.status === 'past_due' ? 1 : 2; return tier * 3 + st; } /* mirrors my_access() */
+
+  var loading = false, loadAgain = false;
+  async function load(){
+    if (loading) { loadAgain = true; return; } /* realtime bursts, the 90 s timer and a click can all ask at once: one load at a time */
+    loading = true;
+    try { await doLoad(); } catch (e) { M.msg('#m', 'Could not refresh: ' + M.human(e), 'bad'); } /* a failed refresh is said out loud, and the page keeps running (timer, realtime) */
+    finally { loading = false; if (loadAgain) { loadAgain = false; setTimeout(load, 500); } }
+  }
+  async function doLoad(){
+    var r = await Promise.all([
+      sb.from('profiles').select('id,email,role,created_at').order('created_at', { ascending: false }),
+      sb.from('memberships').select('id,email,user_id,plan_id,plan_key,status,renewal_period_end,cancel_at_period_end,past_due_since,whop_valid,created_at,updated_at,metadata').order('updated_at', { ascending: false }),
+      sb.from('telegram_links').select('user_id,telegram_username,telegram_id,linked_at'),
+      sb.from('telegram_access').select('user_id,chat_id,status'),
+      sb.from('audit_log').select('id,at,actor,action,subject,detail').order('at', { ascending: false }).limit(300),
+      sb.from('channels').select('chat_id,title,username,enabled,sort').order('sort'),
+      sb.from('plans').select('*'),
+      sb.from('notices').select('*').order('created_at', { ascending: false }).limit(20),
+      sb.from('whop_events').select('id,type,received_at,payload').like('type', 'payment.%').order('received_at', { ascending: false }).limit(300),
+      M.fn('admin', { action: 'overview' }).catch(function(){ return { settings: [] }; }),
+      sb.from('support_threads').select('id,user_id,subject,status,last_at,created_at').order('last_at', { ascending: false }).limit(200),
+      sb.from('support_messages').select('id,thread_id,user_id,from_staff,body,created_at').order('created_at').limit(2000),
+      sb.from('sent_emails').select('id,user_id,to_email,type,subject,status,provider_id,error,sent_by,created_at').order('created_at', { ascending: false }).limit(500)
+    ]);
+    var bad = r.filter(function(x, i){ return i !== 9 && x && x.error; })[0]; if (bad) M.msg('#m', 'Some data could not be read: ' + M.human(bad.error), 'bad'); /* an RLS or grant problem must not look like an empty dashboard */
+    D.profiles = r[0].data || []; D.memberships = r[1].data || []; D.links = r[2].data || []; D.access = r[3].data || []; D.log = r[4].data || []; D.channels = r[5].data || []; D.plans = r[6].data || []; D.notices = r[7].error ? null : (r[7].data || []); D.events = r[8].data || [];
+    D.settings = {}; ((r[9] && r[9].settings) || []).forEach(function(x){ D.settings[x.key] = x.value; }); D.invited = (r[9] && r[9].invited) || {};
+    D.tests = {}; try { (JSON.parse(D.settings.test_emails || '[]') || []).forEach(function(x){ D.tests[String(x).toLowerCase()] = true; }); } catch (e) {} /* the owner's test accounts: hidden from lists and numbers, never deleted */
+    D.unconf = {}; ((r[9] && r[9].unconfirmed) || []).forEach(function(u){ if (!D.tests[u.email]) D.unconf[u.email] = u; }); /* accounts whose 6-digit code was never entered: the code did not arrive, usually (company mail filters) */
+    D.emails = r[12] && !r[12].error ? (r[12].data || []) : null;
+    D.sup = r[10].error ? null : (r[10].data || []); D.supMsgs = {}; ((r[11] && r[11].data) || []).forEach(function(m){ (D.supMsgs[m.thread_id] = D.supMsgs[m.thread_id] || []).push(m); });
+    D.planOn = null; if (D.plans.some(function(p){ return typeof p.grants_access === 'boolean'; })) { D.planOn = {}; D.plans.forEach(function(p){ D.planOn[p.plan_id] = !!p.grants_access; }); }
+    $('#upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    render();
+  }
+
+  /* one row per person: the account (if any) plus every membership under it; a membership bound to an account belongs to
+     that account even if Whop recorded another email at checkout */
+  function people(){
+    var by = {};
+    var emailOf = {}; D.profiles.forEach(function(p){ emailOf[p.id] = p.email; by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; });
+    D.memberships.forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
+    var linkBy = {}; D.links.forEach(function(l){ linkBy[l.user_id] = l; });
+    var accBy = {}; D.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
+    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; e.test = isTest(e); return e; });
+  }
+  /* a test account: listed by the owner in Settings → Test accounts, or someone whose only purchases are on the hidden test plan */
+  function testPlan(m){ var C = M.config.PLANS; for (var k in C) if (C[k].hidden && (C[k].id === m.plan_id || k === m.plan_key)) return true; return false; }
+  function isTest(e){ if (D.tests[e.email]) return true; return !!(e.mems && e.mems.length && e.mems.every(testPlan) && !(e.profile && e.profile.role !== 'member')); }
+  function payments(){
+    return D.events.map(function(ev){ var d = (ev.payload && ev.payload.data) || {}; var tot = d.total != null ? d.total : (d.amount != null ? d.amount : 0); var amt = Number(tot && typeof tot === 'object' ? (tot.amount != null ? tot.amount : 0) : tot) || 0; if (amt > 5000 && Number.isInteger(amt)) amt = amt / 100; return { id: ev.id, at: d.paid_at ? new Date(typeof d.paid_at === 'number' ? d.paid_at * 1000 : d.paid_at) : new Date(ev.received_at), email: d.customer_email || (d.user && d.user.email) || (d.member && d.member.email) || '', plan: (d.plan && (d.plan.id || d.plan)) || d.plan_id || '', amount: amt, currency: ((tot && tot.currency) || d.currency || 'usd').toUpperCase(), ok: ev.type === 'payment.succeeded', type: ev.type.replace('payment.', ''), ref: d.id || ev.id }; });
+  }
+  function planName(pid){ var C = M.config.PLANS; for (var k in C) if (C[k].id === pid) return C[k].hidden ? 'Other link' : C[k].title; return pid ? 'Other link' : '–'; }
+  /* a payment counts for the membership only when it came through one of the site's plans; invoices and extra links are shown apart */
+  function isPlanPay(p){ var C = M.config.PLANS; for (var k in C) if (C[k].id === p.plan) return !C[k].hidden; return false; }
+  function tag(cls, text){ return '<span class="tag ' + cls + '">' + X(text) + '</span>'; }
+
+  /* ---- activity: every audit row, payment and signup as one plain sentence; unread = newer than the last time you opened Activity ---- */
+  var SEEN_KEY = 'mws_act_seen', aCat = 'all', aMinor = false, hlSince = 0, baseTitle = document.title;
+  function seenAt(){ var v = Number(M.store.get(SEEN_KEY)) || 0; if (!v) { v = Date.now() - 86400000; M.store.set(SEEN_KEY, v); } return v; } /* first visit on this device: the last 24 h count as new */
+  function markSeen(){ M.store.set(SEEN_KEY, Date.now()); }
+  function currentView(){ return (location.hash || '#overview').slice(1); }
+  function who(s, d){ /* subject → the email when it is an account id; otherwise the email / Telegram handle we have */
+    if (!s) return ''; s = String(s);
+    var p = D.profiles.filter(function(x){ return x.id === s; })[0]; if (p) return p.email;
+    if (/@/.test(s)) return s;
+    if (d && d.username) return '@' + d.username;
+    if (/^\d+$/.test(s)) return 'Telegram user ' + s;
+    return s; }
+  function chanName(id){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(id); })[0]; return c ? String(c.title || id).replace(/^Mr\. Wall Street \| /, '') : (id ? 'channel ' + id : 'a channel'); }
+  function planTitle(pid){ var p = D.plans.filter(function(x){ return x.plan_id === pid; })[0]; return p ? p.title : planName(pid); }
+  var WHY = { 'no invite link': 'came in without a personal link', 'unknown link': 'used a link that is not one of ours, or one already used', 'blocked': 'is blocked (removed by you)', 'link used by a different Telegram account': 'opened the link from a different Telegram than the one connected', 'telegram already linked to another account': 'that Telegram is already connected to another member', 'no active membership': 'has no valid plan' };
+  function describe(l){
+    var a = l.action, d = l.detail || {}, s = who(l.subject, d);
+    var R = function(cat, tone, text, sub, minor){ return { cat: cat, tone: tone, text: text, sub: sub || '', minor: !!minor }; };
+    var by = /^admin:/.test(l.actor || '') ? (l.actor.slice(6) === me.email ? 'You' : l.actor.slice(6)) : 'Staff';
+    var err = d.error ? String(d.error).slice(0, 160) : '';
+    var title = d.title || chanName(l.subject);
+    switch (a) {
+      case 'link.created': return R('telegram', 'ok', s + ' connected Telegram' + (d.username ? ' @' + d.username : ''), d.via === 'join_request' ? 'Through a personal invite link.' : 'Through the bot.');
+      case 'link.removed': return R('telegram', '', s + ' disconnected their Telegram', 'Removed from the channels; they can connect another account.');
+      case 'join.approved': return R('telegram', 'ok', s + ' joined ' + chanName(d.chat_id), d.username ? '@' + d.username : '');
+      case 'join.declined': return R('telegram', 'bad', 'Join request declined' + (s ? ' for ' + s : ''), 'Tried to enter ' + chanName(d.chat_id) + ' but ' + (WHY[d.why] || d.why || 'was not allowed') + '.' + (d.username ? ' Telegram: @' + d.username + '.' : ''));
+      case 'join.approve_failed': return R('telegram', 'bad', 'Could not approve ' + s + ' in ' + chanName(d.chat_id), 'Telegram answered: ' + err + '. They can tap Join again.');
+      case 'telegram.revoked': { var r = d.reason || ''; var sub = r === 'removed by Mr. Wall Street' ? 'Removed and banned by staff, until you let them back in.' : r === 'membership ended' ? 'Their membership ended, so the system removed them from every channel.' : r === 'no active membership' ? 'They got in without a valid plan and were removed.' : r === 'Telegram account changed' ? 'They connected a different Telegram; the old one was removed.' : r === 'Telegram disconnected' ? 'They disconnected Telegram in the member area.' : r; return R('telegram', r === 'Telegram disconnected' ? '' : 'warn', s + ' removed from the channels', sub); }
+      case 'telegram.invites_ready': return R('telegram', '', 'Invite links prepared for ' + s, (d.created || 0) + ' link(s) created' + (d.failed ? ', ' + d.failed + ' failed' : '') + '.', true);
+      case 'telegram.invite_failed': return R('telegram', 'bad', 'Could not create an invite link for ' + s, (d.title || chanName(d.chat_id)) + ': ' + err + '. Check the bot is admin with "Invite users via link".');
+      case 'telegram.kick_failed': return R('telegram', 'bad', 'Could not remove ' + s + ' from ' + chanName(d.chat_id), 'Telegram answered: ' + err + '. Remove them by hand in the channel.');
+      case 'telegram.dm_failed': return R('telegram', '', 'Could not message ' + s + ' on Telegram', 'They never started the bot, or blocked it. Nothing else is affected.', true);
+      case 'channel.added': return R('telegram', 'ok', 'Bot is admin in ' + title, 'The channel is live: members get personal links to it.');
+      case 'channel.pending': return R('telegram', 'warn', 'Bot was added to ' + title + ' by someone who is not staff', 'Kept off. If it is yours, switch it on under Telegram.');
+      case 'channel.rights_missing': return R('telegram', 'bad', title + ': the bot is missing rights', 'Missing: ' + ((d.missing || []).join(', ') || '?') + '. Edit the bot\'s admin rights in Telegram.');
+      case 'channel.removed': return R('telegram', 'warn', 'Bot was removed from ' + title, 'Nobody can be invited to it until the bot is admin again.');
+      case 'channel.demoted': return R('telegram', 'warn', 'Bot lost admin rights in ' + title, 'Make it admin again with "Invite users via link" and "Ban users".');
+      case 'channel.migrated': return R('telegram', '', (d.title || 'A group') + ' became a supergroup', 'Telegram gave it a new id; links were moved over.');
+      case 'channel.enabled': return R('telegram', 'ok', by + ' switched on ' + chanName(l.subject), '');
+      case 'channel.disabled': return R('telegram', 'warn', by + ' switched off ' + chanName(l.subject), 'Members lost their links to it. Nobody was removed.');
+      case 'membership.status': { var ST = { active: 'active', trialing: 'on trial', canceling: 'cancelling', past_due: 'payment failing', canceled: 'cancelled', cancelled: 'cancelled', expired: 'expired', completed: 'paid in full' }; var to = d.to || '', from = d.from && (ST[d.from] || d.from), em = d.email || s; var toTxt = ST[to] || to; var tone = (to === 'active' || to === 'trialing' || to === 'completed') ? 'ok' : to === 'past_due' ? 'warn' : (to === 'canceled' || to === 'cancelled' || to === 'expired') ? 'bad' : ''; var sub2 = to === 'past_due' ? 'Card failed. Whop retries; they keep access during the grace period.' : (to === 'canceled' || to === 'cancelled') ? 'Access ends when the paid period ends, unless Whop marked it terminated.' : to === 'expired' ? 'The paid period is over. Telegram access is removed automatically.' : (to === 'active' && d.from === 'past_due') ? 'Payment went through again.' : to === 'completed' ? 'Lifetime, paid in full.' : (to === 'active' && !d.from) ? 'New paying member.' : ''; return R('billing', tone, !from ? em + ' is now ' + toTxt : em + ': ' + from + ' → ' + toTxt, sub2); }
+      case 'admin.grant': return R('accounts', 'ok', by + ' granted ' + (d.plan_key || '') + ' access to ' + s, d.months ? d.months + ' month(s).' : '');
+      case 'admin.revoke': return R('accounts', 'warn', by + ' revoked manual access for ' + s, '');
+      case 'admin.set_role': return R('accounts', 'warn', by + ' made ' + s + ' ' + (d.role || ''), '');
+      case 'admin.setting': return R('system', '', by + ' changed ' + (l.subject === 'grace_days' ? 'the grace period' : l.subject === 'invite_ttl_hours' ? 'the invite link validity' : l.subject) + ' to ' + (d.value != null ? d.value : ''), '', true);
+      case 'admin.sync': return R('system', '', by + ' synced with Whop', (d.memberships || 0) + ' memberships checked' + (d.no_email ? ', ' + d.no_email + ' without email' : '') + '.', true);
+      case 'admin.sync.access_error': case 'reconcile.user_error': return R('system', 'bad', 'Access check failed for ' + s, err);
+      case 'admin.sync.plans_error': case 'reconcile.plans_error': return R('system', 'bad', 'Could not refresh the plan list from Whop', err);
+      case 'plan.new': return R('billing', d.grants_access ? 'ok' : 'warn', 'New plan on Whop: ' + (d.title || l.subject), (d.price != null ? '$' + d.price + ' · ' : '') + (d.grants_access ? 'grants access.' : 'does not grant access (under $5). Turn it on in Settings if it should.'));
+      case 'plan.access_on': return R('billing', 'ok', by + ' turned on ' + planTitle(l.subject), 'Members on this plan have access.');
+      case 'plan.access_off': return R('billing', 'warn', by + ' turned off ' + planTitle(l.subject), 'Members on this plan lose access on the next check.');
+      case 'reconcile': { var ch = Number(d.changed || 0), rv = Number(d.revoked || 0), gr = Number(d.granted || 0); return R('system', rv ? 'warn' : '', 'Routine check: ' + (d.checked != null ? d.checked : (d.users || 0)) + ' checked, ' + ch + ' changed', (gr ? gr + ' granted · ' : '') + (rv ? rv + ' removed · ' : '') + 'took ' + Math.round((d.ms || 0) / 1000) + 's.', !ch && !rv && !gr); }
+      case 'reconcile.error': return R('system', 'bad', 'Routine check failed', err + '. It runs again in 6 hours; nothing is lost.');
+      case 'api.error': return R('system', 'bad', 'Whop did not answer for ' + (l.subject || 'a membership'), err);
+      case 'event.ignored': return R('system', '', 'Whop event ignored: ' + (l.subject || ''), d.reason || '', true);
+      case 'event.unhandled': return R('system', '', 'Whop event not used: ' + (l.subject || ''), '', true);
+      case 'claim': return R('accounts', d.found ? 'ok' : '', s + ' looked for their Whop membership', d.found ? d.found + ' found and attached to the account.' : 'Nothing under this email. If they paid with another one, grant access manually.');
+      case 'claim.receipt': return R('accounts', d.matched ? 'ok' : 'warn', s + ' attached receipt ' + (d.receipt || ''), d.matched ? 'Whop email matches the account.' : 'Paid on Whop as ' + (d.whop_email || '?') + '; the account is ' + (d.account_email || '?') + '.');
+      case 'claim.receipt_rejected': return R('accounts', 'warn', 'Receipt rejected for ' + s, (d.paid === false ? 'Not paid yet' : d.fresh === false ? 'Older than 6 hours' : (d.reason || 'Already attached to another account')) + (d.status ? ' · ' + d.status : '') + '.');
+      case 'claim.throttled': return R('accounts', '', s + ' is retrying too fast', '', true);
+      case 'claim.error': case 'claim.receipt_error': return R('accounts', 'bad', 'Membership check failed for ' + s, err);
+      case 'grant_error': return R('telegram', 'bad', 'Could not prepare Telegram access for ' + s, err);
+      case 'support.new': return R('support', 'warn', (d.email || s) + ' wrote to you: "' + (d.subject || '') + '"', 'Waiting for your answer in the Inbox.');
+      case 'support.message': return R('support', 'warn', (d.email || s) + ' replied in "' + (d.subject || '') + '"', 'Waiting for your answer in the Inbox.');
+      case 'support.reply': return R('support', 'ok', by + ' answered ' + s, '"' + (d.subject || '') + '"');
+      case 'support.closed': return R('support', '', by + ' closed "' + (d.subject || '') + '"', s);
+      case 'support.reopened': return R('support', '', by + ' reopened "' + (d.subject || '') + '"', s);
+      case 'support.error': return R('support', 'bad', 'Inbox message failed for ' + s, err);
+      case 'invite.sent': return R('accounts', 'ok', by + ' invited ' + s + ' to create their account', 'They got an email with a one-tap link; the account counts as "invited" until they open it.');
+      case 'error': return R('system', 'bad', 'Telegram update failed' + (d.kind ? ' (' + d.kind + ')' : ''), err);
+      default: return R('system', '', a + (s ? ' · ' + s : ''), '', true);
+    }
+  }
+  function events(){
+    var out = D.log.map(function(l){ var r = describe(l); r.at = new Date(l.at); return r; });
+    payments().forEach(function(p){ out.push({ at: p.at, cat: 'billing', tone: p.ok ? 'ok' : (p.type === 'failed' ? 'bad' : ''), text: p.ok ? 'Payment of ' + fmtMoney(p.amount) + ' from ' + (p.email || 'unknown email') : 'Payment ' + p.type + (p.email ? ' for ' + p.email : ''), sub: planName(p.plan) + (p.type === 'failed' ? ' · card declined; Whop retries on its own.' : ''), minor: !p.ok && p.type !== 'failed' }); });
+    D.profiles.forEach(function(p){ out.push({ at: new Date(p.created_at), cat: 'accounts', tone: 'ok', text: p.email + ' created an account', sub: '', minor: false }); });
+    return out.sort(function(a, b){ return b.at - a.at; });
+  }
+  function isTestText(t){ t = String(t || '').toLowerCase(); for (var k in D.tests) if (t.indexOf(k) >= 0) return true; return false; }
+  function evHtml(e, hl){ return '<div class="ev ' + (e.tone || '') + (hl && !e.minor && e.at.getTime() > hl ? ' new' : '') + '"><span class="dot"></span><div><b>' + X(e.text) + '</b>' + (e.sub ? '<span class="sub">' + X(e.sub) + '</span>' : '') + '</div><time>' + e.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</time></div>'; }
+  function dayLabel(t){ var now = new Date(), same = function(a, b){ return a.toDateString() === b.toDateString(); }; if (same(t, now)) return 'Today'; if (same(t, new Date(now.getTime() - 86400000))) return 'Yesterday'; return t.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
+  function renderActivity(){
+    var all = events().filter(function(e){ return !isTestText(e.text) && !isTestText(e.sub); }), seen = seenAt();
+    var unread = all.filter(function(e){ return !e.minor && e.at.getTime() > seen; }).length;
+    [$('#bell-n'), $('#nav-n')].forEach(function(b){ b.hidden = !unread; b.textContent = unread > 99 ? '99+' : String(unread); });
+    document.title = (unread ? '(' + unread + ') ' : '') + baseTitle;
+    $('#feed').innerHTML = all.filter(function(e){ return !e.minor; }).slice(0, 8).map(function(e){ return evHtml(e, seen); }).join('') || '<p class="muted">Nothing yet.</p>';
+    var list = all.filter(function(e){ return (aCat === 'all' || e.cat === aCat) && (aMinor || !e.minor); }).slice(0, 250);
+    var html = '', day = '';
+    list.forEach(function(e){ var dl = dayLabel(e.at); if (dl !== day) { day = dl; html += '<div class="day">' + X(dl) + '</div>'; } html += evHtml(e, hlSince); });
+    $('#alist').innerHTML = html || '<p class="muted">Nothing here yet.</p>';
+    $('#a-count').textContent = list.length + (list.length === 1 ? ' event' : ' events');
+    if (currentView() === 'activity') { markSeen(); [$('#bell-n'), $('#nav-n')].forEach(function(b){ b.hidden = true; }); document.title = baseTitle; }
+  }
+  M.$$('#aseg button').forEach(function(b){ b.addEventListener('click', function(){ aCat = b.dataset.c; M.$$('#aseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); renderActivity(); }); });
+  $('#a-minor').addEventListener('change', function(){ aMinor = this.checked; renderActivity(); });
+
+  function render(){
+    var everyone = people(), tests = everyone.filter(function(e){ return e.test; }), rows = everyone.filter(function(e){ return !e.test; }), now = Date.now(), d30 = now - 30 * 86400000;
+    var active = rows.filter(function(e){ return e.valid; });
+    var mrr = active.reduce(function(s, e){ var k = e.best.plan_key; return s + (k === 'monthly' ? 99 : k === 'yearly' ? 990 / 12 : 0); }, 0);
+    var allPays = payments().filter(function(p){ return !D.tests[String(p.email || '').toLowerCase()]; }), pays = allPays.filter(isPlanPay), other = allPays.filter(function(p){ return !isPlanPay(p); }); var p30 = pays.filter(function(p){ return p.at.getTime() > d30; });
+    var rev30 = p30.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0);
+    var newMonth = rows.filter(function(e){ return e.since && new Date(e.since).getTime() > d30; }).length;
+    $('#k-active').textContent = active.length; $('#k-active-sub').textContent = newMonth + ' new in 30 days · ' + active.filter(function(e){ return e.best.plan_key === 'lifetime'; }).length + ' lifetime';
+    $('#k-mrr').textContent = fmtMoney(Math.round(mrr));
+    $('#k-rev').textContent = fmtMoney(rev30); $('#k-rev-sub').textContent = p30.filter(function(p){ return p.ok; }).length + ' membership payments';
+    $('#k-tg').textContent = rows.filter(function(e){ return e.link; }).length; $('#k-tg-sub').textContent = active.filter(function(e){ return e.profile && !e.link; }).length + ' active without Telegram';
+    // attention
+    var attn = [];
+    Object.keys(D.unconf).map(function(k){ return D.unconf[k]; }).filter(function(u){ return Date.now() - new Date(u.created_at).getTime() > 15 * 60000; }).sort(function(a, b){ return a.created_at < b.created_at ? 1 : -1; }).slice(0, 8).forEach(function(u){ attn.push('<li><span>' + X(u.email) + ' <span class="small muted">account created ' + X(M.fmtDate(u.created_at)) + ' · code never entered</span></span><span>' + tag('warn', 'not confirmed') + ' <button class="link" data-a="confirm_account" data-u="' + X(u.id) + '" data-busy="Confirming">Confirm account</button></span></li>'); }); /* the code did not reach them: once they prove the address (a message from it, or from the Whop account that paid), one click lets them in */
+    rows.filter(function(e){ return e.valid && !e.profile; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + (isRelay(e.email) ? ' <span class="small muted">Apple hidden e-mail: our mail cannot reach it — they sign up with a real e-mail, you link this one</span>' : '') + '</span>' + tag(isRelay(e.email) ? 'warn' : '', isRelay(e.email) ? 'no account · cannot be e-mailed' : 'paid · no account yet') + '</li>'); });
+    rows.filter(function(e){ return e.valid && e.profile && !e.link; }).slice(0, 6).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'no Telegram') + '</li>'); });
+    rows.filter(function(e){ return e.best && e.best.status === 'past_due'; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('warn', 'card failing · grace') + '</li>'); });
+    rows.filter(function(e){ return e.best && e.best.cancel_at_period_end && e.valid; }).forEach(function(e){ attn.push('<li><span>' + X(e.email) + '</span>' + tag('', 'ends ' + M.fmtDate(e.best.renewal_period_end)) + '</li>'); });
+    var waiting = (D.sup || []).filter(function(t){ return t.status === 'open'; }).length; if (waiting) attn.unshift('<li><span>' + waiting + (waiting === 1 ? ' member is waiting for an answer' : ' members are waiting for an answer') + '</span><a class="link" href="#support">Open Inbox</a></li>');
+    $('#attn').innerHTML = attn.join('') || '<li class="muted">Everything is in order.</li>';
+    renderActivity();
+
+    // members table
+    var list = rows.filter(function(e){
+      if (q && e.email.indexOf(q) < 0) return false;
+      if (filter === 'active') return e.valid;
+      if (filter === 'site') return !!e.profile;
+      if (filter === 'whop') return e.valid && !e.profile;
+      if (filter === 'notg') return e.valid && e.profile && !e.link;
+      if (filter === 'ending') return e.valid && e.best && (e.best.cancel_at_period_end || e.best.status === 'canceling' || e.best.status === 'past_due');
+      if (filter === 'ended') return e.best && !e.valid;
+      return true;
+    }).sort(function(a, b){ return (b.valid - a.valid) || a.email.localeCompare(b.email); });
+    $('#rows').innerHTML = list.map(function(e){
+      var m = e.best || {};
+      var st = !e.best ? tag('', 'no plan') : e.valid ? tag('ok', m.status === 'past_due' ? 'grace' : (m.cancel_at_period_end || m.status === 'canceling') ? 'ending' : 'active') : tag('bad', m.status);
+      var inv = D.invited && D.invited[e.email];
+      var acct = e.profile ? ((inv && !inv.accepted) ? tag('warn', 'invited') : D.unconf[e.email] ? tag('warn', 'not confirmed') : tag('ok', 'on site')) + (e.profile.role !== 'member' ? ' ' + tag('', e.profile.role) : '') : (isRelay(e.email) ? tag('warn', 'no account · Apple e-mail') : tag('', 'no account'));
+      var joined = e.acc.filter(function(a){ return a.status === 'joined'; }).length;
+      var tg = e.link ? tag('ok', '@' + X(e.link.telegram_username || e.link.telegram_id)) + ' <span class="small muted">' + joined + ' ch</span>' : (e.profile ? tag('warn', 'not connected') : '<span class="muted">–</span>');
+      var when = m.plan_key === 'lifetime' ? 'Lifetime' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–');
+      return '<tr data-e="' + X(e.email) + '"><td class="em">' + X(e.email) + '</td><td>' + X(m.plan_key || '–') + (m.id && m.id.indexOf('manual_') === 0 ? ' <span class="small muted">manual</span>' : '') + '</td><td>' + st + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + when + '</td><td>' + (e.since ? M.fmtDate(e.since) : '–') + '</td></tr>';
+    }).join('') || '<tr><td colspan="7" class="muted">Nothing here.</td></tr>';
+    $('#count').textContent = list.length + ' of ' + rows.length;
+    var inviteN = rows.filter(function(e){ return e.valid && !e.profile && !isRelay(e.email); }).length, relayN = rows.filter(function(e){ return e.valid && !e.profile && isRelay(e.email); }).length; $('#invite-all').hidden = !(filter === 'whop' && inviteN); $('#invite-all').textContent = 'Email the invitation to all without an account (' + inviteN + ')' + (relayN ? ' · ' + relayN + ' Apple hidden e-mail' + (relayN === 1 ? '' : 's') + ' left out' : '');
+    renderSupport(); renderEmails();
+
+    // payments
+    $('#p-n').textContent = p30.filter(function(p){ return p.ok; }).length; $('#p-rev').textContent = fmtMoney(rev30); $('#p-fail').textContent = p30.filter(function(p){ return p.type === 'failed'; }).length;
+    $('#p-all').textContent = fmtMoney(pays.filter(function(p){ return p.ok; }).reduce(function(s, p){ return s + p.amount; }, 0));
+    var o30 = other.filter(function(p){ return p.ok && p.at.getTime() > d30; }); $('#p-other').textContent = fmtMoney(o30.reduce(function(s, p){ return s + p.amount; }, 0)); $('#p-other-sub').textContent = o30.length + ' invoices and extra links · not membership';
+    var shown = pFilter === 'other' ? other : pFilter === 'all' ? allPays : pays;
+    $('#prow').innerHTML = shown.slice(0, 200).map(function(p){ return '<tr><td>' + M.fmtDate(p.at) + ' ' + p.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + X(p.email || '–') + '</td><td>' + X(planName(p.plan)) + '</td><td class="num">' + fmtMoney(p.amount) + ' ' + X(p.currency) + '</td><td>' + (p.ok ? tag('ok', 'paid') : tag(p.type === 'failed' ? 'bad' : '', p.type)) + '</td><td class="small muted">' + X(p.ref) + '</td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No payments through the site yet.</td></tr>';
+
+    // telegram
+    var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
+    var DESK = { portfolio: 'Portfolio', calendar: 'Calendar', earnings: 'Earnings' };
+    $('#desk-live').innerHTML = Object.keys(DESK).map(function(k){ var on = D.settings['desk_' + k + '_live'] === 'on'; return '<li><span>' + DESK[k] + ' <span class="small muted">' + (on ? 'members with access see it' : 'only you see it (members: In development)') + '</span></span><span>' + (on ? tag('ok', 'live for members') : tag('warn', 'only you')) + ' <button class="link" data-desk="' + k + '" data-on="' + (on ? '0' : '1') + '">' + (on ? 'Take it back' : 'Make it live') + '</button></span></li>'; }).join('');
+    var hiddenCh = []; try { hiddenCh = JSON.parse(D.settings.tg_hidden_channels || '[]').map(Number); } catch (e) { hiddenCh = []; }
+    var chRow = function(c){ var hid = hiddenCh.indexOf(Number(c.chat_id)) >= 0; return '<li' + (hid ? ' class="muted"' : '') + '><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + ' <button class="link" data-ch="' + X(c.chat_id) + '" data-on="' + (c.enabled ? '0' : '1') + '">' + (c.enabled ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-chh="' + X(c.chat_id) + '" data-hide="' + (hid ? '0' : '1') + '">' + (hid ? 'Unhide' : 'Hide') + '</button></span></li>'; };
+    var shown = D.channels.filter(function(c){ return showHidden || hiddenCh.indexOf(Number(c.chat_id)) < 0; });
+    $('#chans').innerHTML = D.channels.length ? '<ul class="attn">' + shown.map(chRow).join('') + '</ul>' : '<p class="muted">No channels registered yet. Make @MrWallStreetBot admin in a channel (from a Telegram account connected to an owner account) and it appears here.</p>';
+    var nHid = D.channels.filter(function(c){ return hiddenCh.indexOf(Number(c.chat_id)) >= 0; }).length;
+    $('#chans-hidden').innerHTML = nHid ? '· <button class="link" id="chans-show" type="button">' + (showHidden ? 'Hide the ' + nHid + ' hidden' : 'Show ' + nHid + ' hidden') + '</button>' : '';
+    var sh = $('#chans-show'); if (sh) sh.addEventListener('click', function(){ showHidden = !showHidden; render(); });
+
+    // access (manual)
+    var man = D.memberships.filter(function(m){ return m.id.indexOf('manual_') === 0; });
+    $('#mrows').innerHTML = man.map(function(m){ return '<tr><td class="em">' + X(m.email) + '</td><td>' + X(m.plan_key) + '</td><td>' + (valid(m) ? tag('ok', 'active') : tag('bad', m.status)) + '</td><td>' + (m.plan_key === 'lifetime' ? 'Never' : M.fmtDate(m.renewal_period_end)) + '</td><td class="small muted">' + X((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? '<button class="link bad" data-a="revoke" data-id="' + X(m.id) + '">Revoke</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No manual access yet.</td></tr>';
+
+    // settings
+    if (document.activeElement !== $('#s-grace')) $('#s-grace').value = D.settings.grace_days != null ? D.settings.grace_days : 3; if (document.activeElement !== $('#s-ttl')) $('#s-ttl').value = D.settings.invite_ttl_hours || 24; /* a refresh must not overwrite a number being typed */
+    if (document.activeElement !== $('#s-tests')) $('#s-tests').value = Object.keys(D.tests).sort().join('\n'); $('#s-tests-n').textContent = Object.keys(D.tests).length ? Object.keys(D.tests).length + ' e-mails' : '';
+    renderPlans(); renderNotices();
+    $('#team').innerHTML = '<ul class="attn">' + D.profiles.filter(function(p){ return p.role !== 'member'; }).map(function(p){ return '<li><span>' + X(p.email) + '</span>' + tag('ok', p.role) + '</li>'; }).join('') + '</ul>';
+  }
+
+  // drawer
+  function openDrawer(email){
+    var e = people().filter(function(x){ return x.email === email; })[0]; if (!e) return;
+    var m = e.best || {};
+    var html = '<p class="eyebrow">' + (e.test ? 'Test account' : 'Member') + '</p><h2>' + X(e.email) + '</h2>';
+    html += '<dl class="kv"><dt>Status</dt><dd>' + X(e.valid ? 'Active' : (e.best ? m.status : 'No plan')) + '</dd><dt>Plan</dt><dd>' + X(m.plan_key || '–') + (m.id ? ' <span class="small muted">' + X(m.id) + '</span>' : '') + '</dd><dt>Renews</dt><dd>' + (m.plan_key === 'lifetime' ? 'Never' : (m.renewal_period_end ? M.fmtDate(m.renewal_period_end) : '–')) + '</dd><dt>Account</dt><dd>' + (e.profile ? 'Created ' + M.fmtDate(e.profile.created_at) + ' · ' + X(e.profile.role) + (D.unconf[e.email] ? ' · <b>not confirmed</b> (code never entered)' : '') : 'Not created yet') + '</dd><dt>Telegram</dt><dd>' + (e.link ? '@' + X(e.link.telegram_username || e.link.telegram_id) + ' · linked ' + M.fmtDate(e.link.linked_at) : 'Not connected') + '</dd></dl>';
+    if (e.acc.length) html += '<ul class="attn">' + e.acc.map(function(a){ var c = D.channels.filter(function(x){ return String(x.chat_id) === String(a.chat_id); })[0]; return '<li><span>' + X(c ? c.title : a.chat_id) + '</span>' + tag(a.status === 'joined' ? 'ok' : (a.status === 'removed' || a.status === 'blocked' || a.status === 'kick_failed') ? 'bad' : 'warn', a.status === 'kick_failed' ? 'remove failed' : a.status) + '</li>'; }).join('') + '</ul>';
+    if ((e.mems || []).length > 1) html += '<p class="small muted" style="margin-top:14px">All memberships: ' + e.mems.map(function(x){ return X(x.plan_key) + ' · ' + X(x.status); }).join(' / ') + '</p>';
+    var mine = (D.emails || []).filter(function(x){ return x.to_email === e.email; });
+    if (mine.length) html += '<p class="eyebrow" style="margin-top:18px">Emails · ' + mine.length + '</p><ul class="attn">' + mine.slice(0, 8).map(function(x){ return '<li data-mail="' + X(x.id) + '" class="row-link"><span>' + X(x.subject) + '<span class="small muted">' + X(M.fmtDate(x.created_at)) + '</span></span>' + tag(x.status === 'sent' ? 'ok' : 'bad', x.status) + '</li>'; }).join('') + '</ul>';
+    html += '<div class="stack">';
+    var blocked = e.acc.some(function(a){ return a.status === 'blocked'; });
+    if (blocked) html += '<p class="small muted">Removed by you. Automatic invites are paused for this member until you resend.</p>';
+    if (e.profile && e.link && e.valid) html += '<button class="btn ghost" data-a="resend" data-u="' + e.profile.id + '" data-busy="Sending">' + (blocked ? 'Let them back in (resend invites)' : 'Resend Telegram invites') + '</button>';
+    if (e.profile && e.link && !blocked) html += '<button class="btn ghost" data-a="kick" data-u="' + e.profile.id + '" data-busy="Removing">Remove from all channels</button>';
+    if (m.id && m.id.indexOf('manual_') === 0 && e.valid) html += '<button class="btn ghost" data-a="revoke" data-id="' + X(m.id) + '" data-busy="Revoking">Revoke manual access</button>';
+    if (!e.valid) html += '<a class="btn ghost" href="#access" id="d-grant">Grant access manually</a>';
+    var inv2 = D.invited && D.invited[e.email];
+    if (!e.profile && isRelay(e.email)) html += '<p class="small muted">This is an Apple "Hide My Email" address: Apple only forwards mail from senders it knows for Whop, so an invitation from the site never arrives. Ask the member to create the account at mrofwallstreet.com/signup with a real e-mail, then open that account here and link <b>' + X(e.email) + '</b> under "Paid on Whop with another email?".</p>';
+    else if (!e.profile) html += '<button class="btn ghost" data-a="invite" data-email="' + X(e.email) + '" data-busy="Inviting">Invite to the site (email)</button>';
+    else if (inv2 && !inv2.accepted) html += '<p class="small muted">Invited ' + X(M.fmtDate(inv2.invited_at)) + ', has not opened the link yet.</p><button class="btn ghost" data-a="reinvite" data-email="' + X(e.email) + '" data-busy="Sending">Send the link again</button>';
+    else if (D.unconf[e.email]) html += '<p class="small muted">The 6-digit code was never entered (sent ' + X(D.unconf[e.email].confirmation_sent_at ? M.fmtDate(D.unconf[e.email].confirmation_sent_at) : '–') + '). Once they prove the address is theirs (a message from it, or from the Whop account that paid), confirm it here: they log in with their password, no code.</p><button class="btn ghost" data-a="confirm_account" data-u="' + X(e.profile.id) + '" data-busy="Confirming">Confirm account (no code)</button>';
+    if (e.profile && e.profile.role === 'member') html += '<button class="btn ghost" data-a="login_link" data-u="' + e.profile.id + '" data-busy="Making the link">Get a one-time login link (mail blocked?)</button><div id="d-link" hidden></div>';
+    html += '<button class="btn ghost" data-p="' + presetFor(e) + '" id="d-preview">Preview what they see</button>';
+    if (!e.test) html += '<button class="btn ghost" data-a="test" data-email="' + X(e.email) + '" data-busy="Removing">Not a member: test e-mail, remove from the site</button>';
+    html += '</div>';
+    if (!e.profile && m.id) html += '<form class="linkw" id="f-setmail" data-id="' + X(m.id) + '" novalidate><p class="eyebrow" style="margin-top:22px">Member uses another e-mail?</p><div class="row"><input type="email" id="set-email" placeholder="their real e-mail" autocomplete="off"><button class="btn sm ghost" type="submit" data-busy="Saving">Use this e-mail</button></div><p class="small muted">The site keeps this e-mail for the member from now on (invitation, account, receipts); Whop keeps charging under <b>' + X(e.email) + '</b>. Then press Invite.</p></form>';
+    if (e.profile) html += '<form class="linkw" id="f-link" data-u="' + e.profile.id + '" novalidate><p class="eyebrow" style="margin-top:22px">Paid on Whop with another email?</p><div class="row"><input type="email" id="link-email" placeholder="email used on Whop" autocomplete="off"><button class="btn sm ghost" type="submit" data-busy="Linking">Link to this account</button></div><p class="small muted">Binds every Whop membership under that email to this account; access follows immediately.</p></form>';
+    $('#dbody').innerHTML = html; showDrawer();
+    var g = $('#d-grant'); if (g) g.addEventListener('click', function(){ closeDrawer(); $('#g-email').value = e.email; });
+    $('#d-preview').addEventListener('click', function(){ previewAs(this.dataset.p); });
+  }
+  /* the drawer is a dialog: announced to assistive tech only while open, focus moves in, Escape closes it */
+  function showDrawer(){ var d = $('#drawer'); d.classList.add('on'); $('#scrim').classList.add('on'); d.setAttribute('aria-hidden', 'false'); $('#dx').focus(); }
+  function closeDrawer(){ var d = $('#drawer'); if (!d.classList.contains('on')) return; d.classList.remove('on'); $('#scrim').classList.remove('on'); d.setAttribute('aria-hidden', 'true'); }
+  $('#dx').addEventListener('click', closeDrawer); $('#scrim').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeDrawer(); });
+  $('#rows').addEventListener('click', function(ev){ var tr = ev.target.closest('tr[data-e]'); if (tr) openDrawer(tr.dataset.e); });
+
+  async function act(a, body, btn){
+    if (a === 'kick' && !confirm('Remove this member from every Telegram channel? Automatic invites stay paused until you resend them.')) return;
+    if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
+    if (a === 'confirm_account' && !confirm('Confirm this account without the e-mail code? Only when the member proved the address is theirs (wrote to you from it, or from the Whop account that paid).')) return;
+    if (a === 'login_link') { if (!confirm('Make a one-time login link for this member? Send it to them yourself (Telegram, Whop chat): it opens the site, asks for a new password and logs them in. Works once, for 24 hours. Only for a member who contacted you.')) return; if (btn) M.busy(btn, true); M.msg('#m', ''); try { var lr = await M.fn('admin', { action: 'login_link', user_id: body.user_id }); var box = $('#d-link'); box.hidden = false; box.innerHTML = '<p class="small muted" style="margin-top:10px">Send this to the member (works once, 24 h). It confirms their e-mail and lets them set a password:</p><textarea class="ta" readonly style="min-height:72px;font-family:var(--mono);font-size:12px">' + X(lr.link) + '</textarea><div class="row" style="margin-top:8px"><button class="btn sm ghost" type="button" id="d-copy">Copy link</button><span class="small muted">for ' + X(lr.email) + '</span></div>'; $('#d-copy').addEventListener('click', function(){ try { navigator.clipboard.writeText(lr.link); M.msg('#m', 'Link copied.', 'ok'); } catch (e) { box.querySelector('textarea').select(); } }); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { if (btn) M.busy(btn, false); } return; }
+    if (btn) M.busy(btn, true); M.msg('#m', '');
+    try { var r = await M.fn('admin', Object.assign({ action: a }, body)); if (a === 'sync') M.msg('#m', 'Synced ' + r.memberships + ' memberships from Whop.', 'ok'); if (a === 'test_accounts') M.msg('#m', 'Saved: ' + (r.emails || []).length + ' test e-mails ignored by the site.', 'ok'); if (a === 'resend') M.msg('#m', 'Invites sent for ' + r.sent + ' channel(s).', 'ok'); if (a === 'confirm_account') M.msg('#m', r.already ? 'That account was already confirmed.' : 'Account confirmed. They can log in with their e-mail and password now.', 'ok'); if (a === 'set_email') M.msg('#m', 'E-mail changed to ' + r.email + (r.bound ? ' and tied to their existing account.' : '. Now open the member again and press "Invite to the site".'), 'ok'); if (a === 'link_email') M.msg('#m', r.linked ? 'Linked ' + r.linked + ' membership(s).' : 'No Whop membership under that email.', r.linked ? 'ok' : 'bad'); if (a === 'invite') { var fk = Object.keys(r.failed || {}); M.msg('#m', 'Invitation sent to ' + r.sent.length + (r.skipped.length ? ' · ' + r.skipped.length + ' already had an account' : '') + (fk.length ? ' · failed: ' + fk.join(', ') : '') + '.', fk.length ? 'bad' : 'ok'); } closeDrawer(); await load(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    finally { if (btn) M.busy(btn, false); }
+  }
+  document.addEventListener('submit', function(ev){ var f = ev.target.closest('#f-setmail'); if (!f) return; ev.preventDefault(); var em = $('#set-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter the member\'s real e-mail.', 'bad'); if (!confirm('Use ' + em + ' for this member on the site? The invitation, the account and the receipts go there; the membership stays the same on Whop.')) return; act('set_email', { id: f.dataset.id, email: em }, f.querySelector('.btn')); });
+  document.addEventListener('submit', function(ev){ var f = ev.target.closest('#f-link'); if (!f) return; ev.preventDefault(); var em = $('#link-email').value.trim(); if (!M.validEmail(em)) return M.msg('#m', 'Enter the email used on Whop.', 'bad'); if (!confirm('Bind every Whop membership under ' + em + ' to this account? Access follows immediately.')) return; act('link_email', { user_id: f.dataset.u, email: em }, f.querySelector('.btn')); });
+  document.addEventListener('click', function(ev){ var b = ev.target.closest('button[data-a]'); if (!b) return; if (b.dataset.a === 'invite') return act('invite', { emails: [b.dataset.email] }, b); if (b.dataset.a === 'reinvite') return reinvite(b.dataset.email, b); if (b.dataset.a === 'test') return act('test_accounts', { add: [b.dataset.email] }, b); if (b.dataset.a === 'untest') return act('test_accounts', { remove: [b.dataset.email] }, b); act(b.dataset.a, b.dataset.u ? { user_id: b.dataset.u } : { id: b.dataset.id }, b); });
+  async function reinvite(email, btn){ M.busy(btn, true); try { var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/app?invited=1' }); if (r.error) throw r.error; M.msg('#m', 'A fresh link is on its way to ' + email + '.', 'ok'); closeDrawer(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } }
+  $('#invite-all').addEventListener('click', function(){ var list = people().filter(function(e){ return e.valid && !e.profile && !e.test && !isRelay(e.email); }).map(function(e){ return e.email; }); if (!list.length) return; if (!confirm('Send the invitation email to ' + list.length + ' member(s) with access and no account yet?')) return; act('invite', { emails: list }, $('#invite-all')); });
+  $('#sync').addEventListener('click', function(){ act('sync', {}, $('#sync')); });
+  M.$$('#pseg button').forEach(function(b){ b.addEventListener('click', function(){ pFilter = b.dataset.f; M.$$('#pseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); render(); }); });
+  $('#q').addEventListener('input', function(){ q = $('#q').value.trim().toLowerCase(); render(); });
+  M.$$('#seg button').forEach(function(b){ b.addEventListener('click', function(){ setFilter(b.dataset.f); }); });
+  function setFilter(f){ filter = f; M.$$('#seg button').forEach(function(x){ x.classList.toggle('on', x.dataset.f === f); }); render(); }
+  /* ---- emails (sent_emails: everything the site sends, as sent) ---- */
+  var eFilter = 'all', eq = '';
+  var EKIND = { welcome: 'billing', payment_received: 'billing', payment_failed: 'billing', renewal: 'billing', access_ended: 'billing', invite: 'account', confirm: 'account', magic: 'account', reset: 'account', change_email: 'account', reauth: 'account', support_reply: 'support', announcement: 'account' };
+  function renderEmails(){
+    if (D.emails === null) { $('#erows').innerHTML = '<tr><td colspan="5" class="muted">The email log could not be read. Run <b>supabase/night_2026-10-04.sql</b> once in the SQL editor (it grants the admin page read access to sent_emails).</td></tr>'; $('#ecount').textContent = ''; return; }
+    var list = D.emails.filter(function(x){
+      if (D.tests[String(x.to_email || '').toLowerCase()]) return false; /* test e-mails are not members */
+      if (eq && (x.to_email + ' ' + x.subject).toLowerCase().indexOf(eq) < 0) return false;
+      if (eFilter === 'failed') return x.status !== 'sent';
+      if (eFilter === 'preview') return /^preview/.test(x.sent_by || '');
+      if (eFilter === 'all') return true;
+      return EKIND[x.type] === eFilter && !/^preview/.test(x.sent_by || '');
+    });
+    $('#erows').innerHTML = list.map(function(x){ var w = new Date(x.created_at); return '<tr data-mail="' + X(x.id) + '" class="row-link"><td>' + M.fmtDate(x.created_at) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</td><td class="em">' + X(x.to_email) + '</td><td>' + X(x.subject) + '</td><td><span class="small muted">' + X(x.type) + (/^preview/.test(x.sent_by || '') ? ' · preview' : '') + '</span></td><td>' + (x.status === 'sent' ? tag('ok', 'sent') : tag('bad', 'failed')) + '</td></tr>'; }).join('') || '<tr><td colspan="5" class="muted">No emails yet.</td></tr>';
+    $('#ecount').textContent = list.length + ' of ' + D.emails.length;
+  }
+  async function openEmail(id){
+    var x = (D.emails || []).filter(function(e){ return e.id === id; })[0]; if (!x) return;
+    var w = new Date(x.created_at), html = '<p class="eyebrow">Email</p><h2>' + X(x.subject) + '</h2>';
+    html += '<dl class="kv"><dt>To</dt><dd><a class="link" href="#members" data-open-member="' + X(x.to_email) + '">' + X(x.to_email) + '</a></dd><dt>Sent</dt><dd>' + X(M.fmtDate(x.created_at)) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</dd><dt>Type</dt><dd>' + X(x.type) + '</dd><dt>Status</dt><dd>' + (x.status === 'sent' ? 'Sent' : 'Failed · ' + X(x.error || '')) + '</dd><dt>By</dt><dd>' + X(x.sent_by || 'system') + '</dd>' + (x.provider_id ? '<dt>Resend id</dt><dd class="small muted">' + X(x.provider_id) + '</dd>' : '') + '</dl>';
+    html += '<iframe class="mailframe" sandbox="" referrerpolicy="no-referrer" title="Email as sent"></iframe>';
+    $('#dbody').innerHTML = html; showDrawer();
+    var fr = $('#dbody .mailframe'); try { var r = await sb.from('sent_emails').select('html').eq('id', id).maybeSingle(); fr.srcdoc = (r.data && r.data.html) || '<p style="font-family:sans-serif;color:#888;padding:20px">Could not load this email.</p>'; } catch (e) { fr.srcdoc = '<p style="font-family:sans-serif;color:#888;padding:20px">Could not load this email.</p>'; }
+  }
+  $('#eq').addEventListener('input', function(){ eq = $('#eq').value.trim().toLowerCase(); renderEmails(); });
+  M.$$('#eseg button').forEach(function(b){ b.addEventListener('click', function(){ eFilter = b.dataset.f; M.$$('#eseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); renderEmails(); }); });
+  document.addEventListener('click', function(ev){ var t = ev.target.closest('[data-mail]'); if (!t || ev.target.closest('a')) return; openEmail(t.dataset.mail); });
+
+  /* ---- support inbox ---- */
+  var sFilter = 'open', sOpen = null;
+  function emailOfUser(uid){ var p = D.profiles.filter(function(x){ return x.id === uid; })[0]; return p ? p.email : uid; }
+  function renderSupport(){
+    var nb = $('#nav-sup'); if (D.sup === null) { $('#slist').innerHTML = '<li class="muted">Run <b>supabase/support.sql</b> once to enable the Inbox.</li>'; nb.hidden = true; return; }
+    var open = D.sup.filter(function(t){ return t.status === 'open'; }).length; nb.hidden = !open; nb.textContent = String(open);
+    var list = D.sup.filter(function(t){ return sFilter === 'all' || t.status === sFilter; });
+    $('#sup-n').textContent = open ? '· ' + open + ' waiting' : '';
+    $('#slist').innerHTML = list.map(function(t){ var w = new Date(t.last_at); return '<li data-t="' + X(t.id) + '"' + (t.id === sOpen ? ' class="on"' : '') + '><span><b>' + X(t.subject) + '</b><span class="small muted">' + X(emailOfUser(t.user_id)) + ' · ' + X(M.fmtDate(t.last_at)) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</span></span>' + tag(t.status === 'open' ? 'warn' : t.status === 'answered' ? 'ok' : '', t.status === 'open' ? 'waiting' : t.status) + '</li>'; }).join('') || '<li class="muted">Nothing here.</li>';
+    var t = D.sup.filter(function(x){ return x.id === sOpen; })[0], v = $('#sview');
+    if (!t) { v.innerHTML = '<p class="muted">Pick a conversation on the left.</p>'; return; }
+    var msgs = D.supMsgs[t.id] || [];
+    v.innerHTML = '<h3>' + X(t.subject) + ' <span class="small muted">' + X(emailOfUser(t.user_id)) + '</span></h3><div class="thread">' + msgs.map(function(m){ var w = new Date(m.created_at); return '<div class="tm' + (m.from_staff ? ' staff' : '') + '"><span class="who">' + (m.from_staff ? 'You' : X(emailOfUser(t.user_id))) + ' · ' + X(M.fmtDate(m.created_at)) + ' ' + w.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '</span><p>' + X(m.body).replace(/\n/g, '<br>') + '</p></div>'; }).join('') + '</div>'
+      + '<form id="f-sreply" novalidate><textarea class="ta" id="s-body" rows="4" maxlength="4000" placeholder="Your answer…"></textarea><div class="row" style="margin-top:10px"><span class="small muted">' + (t.status === 'closed' ? 'Closed. Answering reopens it.' : 'They see it instantly and get a Telegram note if connected.') + '</span><span><button class="link" type="button" id="s-toggle">' + (t.status === 'closed' ? 'Reopen' : 'Close') + '</button> &nbsp; <button class="btn sm acc" type="submit" data-busy="Sending">Answer</button></span></div></form>'
+      + '<p class="small muted" style="margin-top:14px"><a class="link" href="#members" data-open-member="' + X(emailOfUser(t.user_id)) + '">Open this member</a></p>';
+  }
+  M.$$('#sseg button').forEach(function(b){ b.addEventListener('click', function(){ sFilter = b.dataset.s; M.$$('#sseg button').forEach(function(x){ x.classList.toggle('on', x === b); }); renderSupport(); }); });
+  $('#slist').addEventListener('click', function(ev){ var li = ev.target.closest('li[data-t]'); if (!li) return; sOpen = li.dataset.t; renderSupport(); });
+  document.addEventListener('submit', async function(ev){ if (ev.target.id !== 'f-sreply') return; ev.preventDefault(); var body = $('#s-body').value.trim(); if (!body) return M.msg('#m', 'Write the answer first.', 'bad'); var btn = ev.target.querySelector('.btn'); M.busy(btn, true); try { await M.fn('support', { action: 'reply', thread_id: sOpen, body: body }); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); M.busy(btn, false); } });
+  document.addEventListener('click', async function(ev){ var b = ev.target.closest('#s-toggle'); if (!b) return; var t = D.sup.filter(function(x){ return x.id === sOpen; })[0]; if (!t) return; try { await M.fn('support', { action: t.status === 'closed' ? 'reopen' : 'close', thread_id: sOpen }); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } });
+  document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-open-member]'); if (!a) return; ev.preventDefault(); location.hash = '#members'; setTimeout(function(){ openDrawer(a.dataset.openMember); }, 50); });
+  $('#f-grant').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var email = $('#g-email').value.trim().toLowerCase(), plan = $('#g-plan').value, months = $('#g-months').value ? Number($('#g-months').value) : null, note = $('#g-note').value.trim(), paid = $('#g-paid').value || null;
+    if (!M.validEmail(email)) return M.msg('#m', 'Enter a valid email.', 'bad');
+    var btn = $('#f-grant .btn'); M.busy(btn, true); M.msg('#m', '');
+    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note, paid_on: paid });
+      var invited = false; if (!r.user_exists && $('#g-invite').checked) { try { var iv = await M.fn('admin', { action: 'invite', emails: [email] }); invited = (iv.sent || []).indexOf(email) >= 0; } catch (e2) { invited = false; } }
+      M.msg('#m', 'Access granted to ' + email + (r.user_exists ? ' — live now.' : invited ? ' — invitation emailed; access is live the moment they choose a password.' : ' — activates when they create their account with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; $('#g-months').value = ''; $('#g-paid').value = ''; await load(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); }
+    finally { M.busy(btn, false); }
+  });
+  $('#s-save').addEventListener('click', async function(){ var btn = $('#s-save'); M.busy(btn, true); try { await M.fn('admin', { action: 'set_setting', key: 'grace_days', value: String(Math.max(0, parseInt($('#s-grace').value, 10) || 0)) }); await M.fn('admin', { action: 'set_setting', key: 'invite_ttl_hours', value: String(Math.max(1, parseInt($('#s-ttl').value, 10) || 24)) }); M.msg('#m', 'Rules saved.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); } });
+  $('#s-tests-save').addEventListener('click', function(){ var lines = $('#s-tests').value.split(/[\s,;]+/).map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean); var bad = lines.filter(function(x){ return !M.validEmail(x); }); if (bad.length) return M.msg('#m', 'Not an e-mail: ' + bad.slice(0, 3).join(', '), 'bad'); act('test_accounts', { set: lines }, $('#s-tests-save')); });
+  $('#f-role').addEventListener('submit', async function(ev){ ev.preventDefault(); var em = $('#r-email').value.trim().toLowerCase(); if (!M.validEmail(em)) return M.msg('#m', 'Enter a valid email.', 'bad'); var role = $('#r-role').value; if (!confirm('Make ' + em + ' ' + role + '?' + (role === 'owner' || role === 'admin' ? ' Staff see every member and every setting.' : ''))) return; var rb = $('#f-role .btn'); M.busy(rb, true); try { await M.fn('admin', { action: 'set_role', email: em, role: role }); M.msg('#m', 'Role updated.', 'ok'); $('#r-email').value = ''; await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(rb, false); } });
+
+  // channels on/off (channels added by a non-staff Telegram start off) + which plans grant access
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-ch]'); if (!b) return; ev.stopPropagation();
+    var on = b.dataset.on === '1'; if (!on && !confirm('Switch this channel off? Members lose their links to it and new invites stop. Existing members are not removed.')) return;
+    try { await M.fn('admin', { action: 'channel_toggle', chat_id: Number(b.dataset.ch), enabled: on }); M.msg('#m', on ? 'Channel switched on. Members get their links on the next sync or when they open the Telegram page.' : 'Channel switched off.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-desk]'); if (!b) return; var on = b.dataset.on === '1', name = b.dataset.desk;
+    if (!confirm(on ? 'Make the ' + name + ' live for every member with access? They see it the moment you confirm.' : 'Take the ' + name + ' back to "only you"? Members go back to "In development".')) return;
+    try { await M.fn('admin', { action: 'desk_live', section: name, on: on }); M.msg('#m', on ? name + ' is live for members.' : name + ' is only you again.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-chh]'); if (!b) return; var hide = b.dataset.hide === '1';
+    try { await M.fn('admin', { action: 'channel_hide', chat_id: Number(b.dataset.chh), hidden: hide }); M.msg('#m', hide ? 'Channel hidden from this list (nothing deleted; members unaffected).' : 'Channel shown again.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-plan]'); if (!b) return; ev.stopPropagation();
+    var on = b.dataset.on === '1'; if (!on && !confirm('Stop this plan from granting access? Members on it lose access on the next sync.')) return;
+    try { await M.fn('admin', { action: 'plan_access', plan_id: b.dataset.plan, grants_access: on }); M.msg('#m', 'Plan updated.', 'ok'); await load(); } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  function renderNotices(){
+    var el = $('#notices'); if (!el) return;
+    if (D.notices === null) { el.innerHTML = '<p class="small muted">Run <b>supabase/security.sql</b> once to enable notices.</p>'; $('#f-notice .btn').disabled = true; return; }
+    el.innerHTML = D.notices.length ? '<ul class="attn">' + D.notices.map(function(n){ return '<li><span>' + X(String(n.body || '').slice(0, 140)) + (String(n.body || '').length > 140 ? '…' : '') + ' <span class="small muted">' + X(M.fmtDate(n.created_at)) + '</span></span><span>' + (n.active ? tag('ok', 'live') : tag('', 'off')) + ' <button class="link" data-nt="' + X(n.id) + '" data-on="' + (n.active ? '0' : '1') + '">' + (n.active ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-ndel="' + X(n.id) + '">Delete</button></span></li>'; }).join('') + '</ul>' : '<p class="small muted">No notices yet.</p>';
+  }
+  $('#f-notice').addEventListener('submit', async function(ev){
+    ev.preventDefault(); var body = $('#n-body').value.trim(); if (!body) return M.msg('#m', 'Write the message first.', 'bad');
+    var link = $('#n-link').value.trim(); if (link && !/^https:\/\//i.test(link)) return M.msg('#m', 'Links must start with https://', 'bad');
+    var btn = $('#f-notice .btn'); M.busy(btn, true);
+    try { var r = await sb.from('notices').insert({ body: body.slice(0, 500), kind: $('#n-kind').value, link: link || null, link_label: $('#n-label').value.trim().slice(0, 40) || null, active: true }); if (r.error) throw r.error; M.msg('#m', 'Notice posted. Members see it now.', 'ok'); $('#n-body').value = ''; $('#n-link').value = ''; $('#n-label').value = ''; await load(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); }
+  });
+  document.addEventListener('click', async function(ev){
+    var t = ev.target.closest('button[data-nt]'), d = ev.target.closest('button[data-ndel]'); if (!t && !d) return; ev.stopPropagation();
+    try {
+      if (t) { var r1 = await sb.from('notices').update({ active: t.dataset.on === '1' }).eq('id', t.dataset.nt); if (r1.error) throw r1.error; }
+      if (d) { if (!confirm('Delete this notice?')) return; var r2 = await sb.from('notices').delete().eq('id', d.dataset.ndel); if (r2.error) throw r2.error; }
+      await load();
+    } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+  function renderPlans(){
+    var el = $('#plans'); if (!el) return;
+    if (!D.plans.length) { el.innerHTML = '<p class="small muted">No plans mirrored yet (the sync fills this).</p>'; return; }
+    var gated = D.plans.some(function(p){ return typeof p.grants_access === 'boolean'; });
+    var byPlan = {}; D.memberships.forEach(function(m){ if (valid(m)) byPlan[m.plan_id] = (byPlan[m.plan_id] || 0) + 1; });
+    el.innerHTML = (gated ? '' : '<div class="msg on bad" style="margin-bottom:12px">Run <b>supabase/security.sql</b> once: until then every Whop plan grants access (including the $1 test plan).</div>') + '<ul class="attn">' + D.plans.map(function(p){ var on = gated ? !!p.grants_access : true; return '<li><span>' + X(p.title) + ' <span class="small muted">' + X(p.price_label) + ' · ' + X(p.plan_key) + '</span></span><span>' + (byPlan[p.plan_id] || 0) + ' valid ' + (on ? tag('ok', 'grants access') : tag('bad', 'no access')) + (gated ? ' <button class="link" data-plan="' + X(p.plan_id) + '" data-on="' + (on ? '0' : '1') + '">' + (on ? 'Turn off' : 'Turn on') + '</button>' : '') + '</span></li>'; }).join('') + '</ul><p class="small muted" style="margin-top:12px">New plans from Whop start on when they cost more than $5, off otherwise. Manual grants ignore this list.</p>';
+  }
+
+  // portfolio (The Desk): staff writes public.positions directly (RLS: owner/admin only), members read it in /app#portfolio.
+  // Prices: public.quotes (the quotes function, Twelve Data). The numbers here come from M.book, the same model the member page uses.
+  var POS = [], QUOTES = {}, HAS_Q = true, QSTAT = null, pfT = null, showHidden = false;
+  function num(v){ v = String(v == null ? '' : v).trim(); if (!v) return null; var n = Number(v); return isNaN(n) ? null : n; }
+  function fmtN(n){ if (n == null) return '—'; n = Number(n); return n >= 1000 ? n.toLocaleString('en-US', { maximumFractionDigits: n >= 10000 ? 0 : 1 }) : n.toLocaleString('en-US', { maximumFractionDigits: n < 1 ? 4 : 2 }); }
+  function pctS(v, dp){ if (v == null || !isFinite(v)) return '—'; return '<span class="' + (v > 0 ? 'pos' : v < 0 ? 'neg' : '') + '">' + (v > 0 ? '+' : '') + Number(v).toFixed(dp == null ? 2 : dp) + '%</span>'; }
+  var TYPE_CLASS = { 'Digital Currency': 'crypto', 'Common Stock': 'equity', 'REIT': 'equity', 'Depositary Receipt': 'equity', 'Preferred Stock': 'equity', 'ETF': 'etf', 'Fund': 'etf', 'Physical Currency': 'fx', 'Commodity': 'commodity', 'Index': 'other' };
+  async function loadQuotes(){ try { var q = await sb.from('quotes').select('*'); if (q.error) { HAS_Q = !/quotes/.test(String(q.error.message || '')); return; } QUOTES = {}; (q.data || []).forEach(function(r){ QUOTES[String(r.symbol).toUpperCase()] = r; }); } catch (e) {} }
+  function qstat(){
+    var syms = Object.keys(QUOTES), latest = syms.map(function(k){ return QUOTES[k].updated_at; }).filter(Boolean).sort().pop(), bad = syms.filter(function(k){ return QUOTES[k].error; });
+    var parts = []; if (syms.length) parts.push(syms.length + ' instrument' + (syms.length === 1 ? '' : 's') + ' priced'); if (latest) parts.push('last fetch ' + new Date(latest).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })); if (bad.length) parts.push('<span class="neg">no quote for ' + X(bad.join(', ')) + '</span>');
+    if (QSTAT && QSTAT.budget) parts.push('credits today ' + QSTAT.budget.used + ' / ' + QSTAT.budget.limit + (QSTAT.market_open === false ? ' · US market closed' : QSTAT.market_open ? ' · US market open' : ''));
+    if (!HAS_Q) parts.push('<span class="neg">Run portfolio_quotes_2026-10-07.sql first: the quotes table does not exist yet.</span>');
+    var wsum = POS.filter(function(p){ return p.status === 'open' && p.kind !== 'order'; }).reduce(function(a, p){ return a + (Number(p.weight_entry != null ? p.weight_entry : p.size_pct) || 0); }, 0); if (wsum > 100.005) parts.push('<span class="neg">weights at entry add up to ' + wsum.toFixed(2) + '%: the book is over-allocated (cash below zero)</span>');
+    var noW = POS.filter(function(p){ return p.status === 'open' && p.kind !== 'order' && p.weight_entry == null && p.size_pct == null; }).map(function(p){ return p.symbol; }); if (noW.length) parts.push('<span class="muted">no weight yet: ' + X(noW.join(', ')) + ' (not counted in the book)</span>');
+    $('#pf-qstat').innerHTML = parts.length ? parts.join(' · ') : 'No prices yet: add a position with a price feed (Find) and press Refresh prices.';
+  }
+  async function loadPositions(){
+    var r = await sb.from('positions').select('*').order('status', { ascending: true }).order('sort', { ascending: true }).order('opened_at', { ascending: false });
+    if (r.error) { M.msg('#m', 'Positions: ' + M.human(r.error), 'bad'); return; }
+    POS = r.data || []; if (POS.length) HAS_Q = Object.prototype.hasOwnProperty.call(POS[0], 'quote_symbol');
+    await loadQuotes(); qstat();
+    var book = M.book(POS, QUOTES, {}, {}), R = {}; book.rows.forEach(function(x){ R[x.p.id] = x; });
+    var KIND_N = { spot: 0, leveraged: 1, order: 2 }, CLASS_N = { crypto: 0, equity: 1, etf: 1, commodity: 2, fx: 3, other: 4 }, CLASS_T = { crypto: 'Crypto', equity: 'Stocks', etf: 'Stocks · ETF', commodity: 'Commodities', fx: 'FX', other: 'Other' };
+    var kindOf = function(p){ return KIND_N[p.kind] != null ? p.kind : 'spot'; };
+    var open = POS.filter(function(p){ return p.status === 'open'; }).sort(function(a, b){ return (KIND_N[kindOf(a)] - KIND_N[kindOf(b)]) || ((CLASS_N[a.asset_class] || 0) - (CLASS_N[b.asset_class] || 0)) || ((a.sort || 100) - (b.sort || 100)) || String(b.opened_at || '').localeCompare(String(a.opened_at || '')); }), closed = POS.filter(function(p){ return p.status === 'closed'; });
+    var links = function(p){ var l = Array.isArray(p.links) ? p.links : []; return l.length ? l.map(function(u, i){ return '<a class="link" href="' + X(u) + '" target="_blank" rel="noopener">' + (l.length > 1 ? (i + 1) : 'post') + '</a>'; }).join(' ') : '—'; };
+    var sideTag = function(p){ return tag(p.side === 'short' || p.side === 'sell' ? 'warn' : 'ok', p.side + (kindOf(p) === 'leveraged' && p.leverage ? ' ' + p.leverage : '')); };
+    var feed = function(p){ if (!p.quote_symbol) return '<span class="small muted">none · mark</span>'; var q = QUOTES[String(p.quote_symbol).toUpperCase()]; return '<span class="small">' + X(p.quote_symbol) + (p.quote_exchange ? ' <span class="muted">' + X(p.quote_exchange) + '</span>' : '') + (q && q.error ? ' <span class="neg" title="' + X(q.error) + '">!</span>' : '') + '</span>'; };
+    var lastCell = function(p){ var x = R[p.id]; if (kindOf(p) === 'order') { var q = p.quote_symbol ? QUOTES[String(p.quote_symbol).toUpperCase()] : null; return q && q.price != null ? fmtN(q.price) + (p.entry_price ? ' <span class="small muted">' + Math.abs((Number(p.entry_price) / Number(q.price) - 1) * 100).toFixed(1) + '% ' + (Number(p.entry_price) < Number(q.price) ? 'below' : 'above') + '</span>' : '') : '—'; }
+      if (!x || x.last == null) return '—'; return fmtN(x.last) + ' <span class="small muted">' + (x.source === 'live' ? (x.q && x.q.change_pct != null ? pctS(x.q.change_pct) + ' today' : 'live') : 'mark' + (p.mark_at ? ' ' + M.fmtDate(p.mark_at) : '')) + '</span>'; };
+    var pnlCell = function(p){ var x = R[p.id]; return x && x.ret != null ? pctS(x.ret * 100, 1) : '—'; };
+    var wCell = function(p){ var x = R[p.id]; var w0 = p.weight_entry != null ? Number(p.weight_entry) : (p.size_pct != null ? Number(p.size_pct) : null); if (x && x.weightNow != null) return x.weightNow.toFixed(2) + '%' + (w0 != null ? ' <span class="small muted">' + w0.toFixed(2) + ' at entry</span>' : ''); return w0 != null ? w0.toFixed(2) + '%' : '—'; };
+    $('#pf-open-n').textContent = open.length ? '· ' + open.length : ''; $('#pf-closed-n').textContent = closed.length ? '· ' + closed.length : '';
+    var live = function(p){ return p.published !== false; }; /* before portfolio_drafts.sql there is no column: everything counts as live */
+    var drafts = open.filter(function(p){ return !live(p); }); $('#pf-publish-all').hidden = !drafts.length; $('#pf-publish-all').textContent = 'Publish all drafts (' + drafts.length + ')';
+    $('#pf-open').innerHTML = open.length ? open.map(function(p){ return '<tr data-id="' + X(p.id) + '"><td>' + (live(p) ? tag('ok', 'live') : tag('warn', 'draft')) + '</td><td>' + tag(kindOf(p) === 'order' ? '' : 'ok', kindOf(p)) + '</td><td class="em">' + X(p.symbol) + (p.name ? ' <span class="small muted">' + X(p.name) + '</span>' : '') + '<br><span class="small muted">' + X(CLASS_T[p.asset_class] || p.asset_class) + '</span></td><td>' + feed(p) + '</td><td>' + sideTag(p) + '</td><td>' + (p.entry_price != null ? fmtN(p.entry_price) : '') + (p.entry ? ' <span class="small muted">' + X(p.entry) + '</span>' : (p.entry_price == null ? '—' : '')) + '</td><td>' + lastCell(p) + '</td><td>' + pnlCell(p) + '</td><td>' + wCell(p) + '</td><td>' + X(p.target || '—') + '</td><td>' + X(p.opened_at ? M.fmtDate(p.opened_at) : '—') + '</td><td>' + links(p) + '</td><td class="wrap">' + X(p.thesis || '') + '</td><td class="acts"><button class="link" data-pa="' + (live(p) ? 'unpublish' : 'publish') + '">' + (live(p) ? 'Unpublish' : 'Publish') + '</button> · <button class="link" data-pa="edit">Edit</button>' + (kindOf(p) === 'order' ? ' · <button class="link" data-pa="filled">Filled → position</button>' : (p.quote_symbol ? '' : ' · <button class="link" data-pa="mark">Mark</button>')) + ' · <button class="link" data-pa="close">' + (kindOf(p) === 'order' ? 'Cancel order' : 'Close') + '</button> · <button class="link" data-pa="del">Delete</button></td></tr>'; }).join('') : '<tr><td colspan="14" class="muted">Nothing yet. Save the first position or order above (it starts as a draft).</td></tr>';
+    $('#pf-closed').innerHTML = closed.length ? closed.map(function(p){ return '<tr data-id="' + X(p.id) + '"><td class="em">' + X(p.symbol) + (p.name ? ' <span class="small muted">' + X(p.name) + '</span>' : '') + (kindOf(p) !== 'spot' ? ' <span class="small muted">' + X(kindOf(p)) + '</span>' : '') + '</td><td>' + sideTag(p) + '</td><td>' + X(p.entry || fmtN(p.entry_price)) + '</td><td>' + X(p.exit || '—') + '</td><td class="em">' + X(p.result || '—') + '</td><td>' + X(p.opened_at ? M.fmtDate(p.opened_at) : '—') + '</td><td>' + X(p.closed_at ? M.fmtDate(p.closed_at) : '—') + '</td><td class="wrap">' + X(p.thesis || '') + '</td><td class="acts"><button class="link" data-pa="edit">Edit</button> · <button class="link" data-pa="reopen">Reopen</button> · <button class="link" data-pa="del">Delete</button></td></tr>'; }).join('') : '<tr><td colspan="9" class="muted">Nothing closed yet.</td></tr>';
+  }
+  async function loadCalStatus(){
+    var el = $('#cal-status'); if (!el) return;
+    try { var r = await M.fn('calendar', { action: 'status' }); var st = r.state || {}; var t = function(x){ return x ? new Date(x).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'never'; };
+      var S0 = r.settings || {}; Object.keys(S0).forEach(function(k){ var f = $('#k-' + k); if (f && document.activeElement !== f) f.value = S0[k]; });
+      el.innerHTML = '<div><b>Macro calendar</b> · provider <b>' + X(r.provider) + '</b>' + (r.provider !== 'preview' && !r.has_calendar_key ? ' <span class="neg">· CALENDAR_KEY missing in Edge Functions → Secrets</span>' : '') + (r.provider === 'preview' ? ' <span class="muted">· preview feed (this week only, no actuals) until CALENDAR_KEY exists in Secrets — then EODHD takes over by itself</span>' : '') + ' · countries ' + X(r.countries || '—') + ' · ' + r.events + ' events loaded · last window ' + t(st.macro_full_at) + (st.macro_quick_at ? ' · last release check ' + t(st.macro_quick_at) : '') + (st.macro_error ? ' · <span class="neg">' + X(st.macro_error) + '</span>' : '') + (r.next_high ? '<br><span class="muted">Next high impact: ' + X(r.next_high.country + ' ' + r.next_high.title) + ' · ' + t(r.next_high.at) + '</span>' : '') + '</div>'
+        + '<div style="margin-top:8px"><b>Telegram posts</b> · ' + (S0.tg_brief_chat_id ? 'channel ' + X(S0.tg_brief_chat_id) + ' · brief at ' + X(S0.tg_brief_hour || '08:00') + ' Lisbon · alerts ' + X(S0.tg_alerts || 'on') : '<span class="muted">off (no channel set)</span>') + '</div>'
+        + '<div style="margin-top:8px"><b>Earnings</b> · Twelve Data' + (!r.has_td_key ? ' <span class="neg">· TWELVE_DATA_KEY missing</span>' : '') + ' · markets ' + X(r.earnings_countries || '—') + ' · ' + r.earnings + ' reports from today on · last window ' + t(st.earnings_full_at) + (st.earnings_today_at ? ' · last intraday check ' + t(st.earnings_today_at) : '') + (st.earnings_error ? ' · <span class="neg">' + X(st.earnings_error) + (/credits/i.test(st.earnings_error) ? ' (needs the Grow plan: 40 credits a request)' : '') + '</span>' : '') + '</div>';
+    } catch (e) { el.innerHTML = '<span class="neg">' + X(M.human(e)) + '</span> <span class="muted">· is the calendar function deployed?</span>'; }
+  }
+  $('#f-mkt').addEventListener('submit', async function(ev){ ev.preventDefault(); var btn = $('#mkt-save'); M.busy(btn, true); var keys = ['calendar_provider', 'calendar_countries', 'calendar_tz', 'earnings_countries', 'earnings_days_ahead', 'earnings_days_back', 'quotes_benchmarks', 'quotes_interval_min', 'quotes_per_minute', 'quotes_daily_budget', 'tg_brief_chat_id', 'tg_brief_hour', 'tg_alerts', 'portfolio_notional']; var done = 0; try { for (var i = 0; i < keys.length; i++) { var v = $('#k-' + keys[i]).value.trim(); if (v === '' && keys[i] !== 'calendar_countries' && keys[i] !== 'tg_brief_chat_id') continue; await M.fn('calendar', { action: 'configure', key: keys[i], value: v }); done++; } M.msg('#m', 'Market data settings saved (' + done + ').', 'ok'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); loadCalStatus(); } });
+  $('#tg-brief-now').addEventListener('click', async function(){ if (!confirm('Post today\'s brief to the Telegram channel now? Members see it the moment you confirm.')) return; M.busy(this, true); try { var r = await M.fn('calendar', { action: 'brief_now' }); M.msg('#m', r.ok ? 'Brief posted to the channel.' : 'Nothing posted (check the channel id).', r.ok ? 'ok' : 'bad'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); } });
+  $('#cal-refresh').addEventListener('click', async function(){ M.busy(this, true); try { var r = await M.fn('calendar', { action: 'refresh_macro' }); M.msg('#m', 'Calendar: ' + r.written + ' events from ' + r.provider + ' (' + r.from + ' → ' + r.to + ').', 'ok'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); loadCalStatus(); } });
+  $('#er-refresh').addEventListener('click', async function(){ M.busy(this, true); try { var r = await M.fn('calendar', { action: 'refresh_earnings' }); M.msg('#m', 'Earnings: ' + r.written + ' reports (' + r.from + ' → ' + r.to + ')' + (r.failed && r.failed.length ? ', failed: ' + r.failed.join(', ') : '') + '.', r.failed && r.failed.length ? 'bad' : 'ok'); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); loadCalStatus(); } });
+  function feedLine(){
+    var qs = $('#p-qsym').value; var box = $('#p-feed');
+    if (!qs) { box.innerHTML = 'No price feed yet: press <b>Find</b> next to the symbol. Without a feed the P&amp;L uses the Mark you type.'; return; }
+    var q = QUOTES[qs.toUpperCase()];
+    box.innerHTML = 'Price feed: <b>' + X(qs) + '</b>' + ($('#p-qname').value ? ' · ' + X($('#p-qname').value) : '') + ($('#p-qexch').value ? ' · ' + X($('#p-qexch').value) : '') + ($('#p-qtype').value ? ' · ' + X($('#p-qtype').value) : '') + (q && q.price != null ? ' · last <b>' + fmtN(q.price) + '</b> ' + (q.currency ? X(q.currency) + ' ' : '') + (q.change_pct != null ? pctS(q.change_pct) + ' today' : '') + ' <button class="link" type="button" id="p-useprice">use as entry price</button>' : '') + ' · <button class="link" type="button" id="p-clearfeed">remove feed</button>';
+    var up = $('#p-useprice'); if (up) up.addEventListener('click', function(){ $('#p-entryp').value = q.price; });
+    $('#p-clearfeed').addEventListener('click', function(){ ['p-qsym', 'p-qname', 'p-qexch', 'p-qtype', 'p-qcur'].forEach(function(id){ $('#' + id).value = ''; }); feedLine(); });
+  }
+  function setFeed(c){ $('#p-qsym').value = c.symbol || ''; $('#p-qname').value = c.name || ''; $('#p-qexch').value = c.exchange || ''; $('#p-qtype').value = c.type || ''; $('#p-qcur').value = c.currency || ''; if (!$('#p-name').value.trim() && c.name) $('#p-name').value = c.name; if (!$('#p-symbol').value.trim()) $('#p-symbol').value = String(c.symbol || '').replace(/\/(USD|USDT|EUR)$/i, ''); var cls = TYPE_CLASS[c.type]; if (cls && !$('#p-id').value) $('#p-class').value = cls; feedLine(); }
+  $('#p-find').addEventListener('click', async function(){
+    var q = ($('#p-symbol').value || $('#p-name').value).trim(); if (!q) return M.msg('#m', 'Type a ticker or a name first.', 'bad');
+    var btn = this, box = $('#p-findbox'); M.busy(btn, true); box.hidden = false; box.innerHTML = '<span class="small muted">Searching the price feed…</span>';
+    try { var r = await M.fn('quotes', { action: 'search', q: q }); var list = r.results || [];
+      box.innerHTML = list.length ? '<div class="small muted" style="margin-bottom:6px">Pick the exact instrument (US venues first):</div>' + list.map(function(c, i){ return '<button class="btn sm ghost" type="button" data-pick="' + i + '" style="margin:0 6px 6px 0"><b>' + X(c.symbol) + '</b>&nbsp;' + X(c.name || '') + ' <span class="muted">· ' + X(c.exchange || '') + ' · ' + X(c.type || '') + (c.currency ? ' · ' + X(c.currency) : '') + '</span></button>'; }).join('') : '<span class="small muted">Nothing found for "' + X(q) + '". Try the full ticker (MSTR, BTC/USD, USO).</span>';
+      M.$$('button[data-pick]', box).forEach(function(b){ b.addEventListener('click', async function(){ var c = list[Number(b.dataset.pick)]; M.busy(b, true); try { var l = await M.fn('quotes', { action: 'lookup', symbol: c.symbol }); QUOTES[String(l.quote.symbol).toUpperCase()] = l.quote; setFeed({ symbol: l.quote.symbol, name: l.quote.name || c.name, exchange: l.quote.exchange || c.exchange, type: c.type, currency: l.quote.currency || c.currency }); box.hidden = true; box.innerHTML = ''; qstat(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(b, false); } }); });
+    } catch (e) { box.innerHTML = '<span class="neg small">' + X(M.human(e)) + '</span>'; } finally { M.busy(btn, false); }
+  });
+  $('#p-symbol').addEventListener('keydown', function(ev){ if (ev.key === 'Enter') { ev.preventDefault(); $('#p-find').click(); } });
+  $('#pf-refresh').addEventListener('click', async function(){ M.busy(this, true); try { var r = await M.fn('quotes', { action: 'refresh', force: true }); QSTAT = r; M.msg('#m', 'Prices: ' + (r.fetched || 0) + ' fetched' + (r.failed && r.failed.length ? ', no quote for ' + r.failed.join(', ') : '') + (r.left ? ', ' + r.left + ' wait for the next minute (8 a minute on this plan)' : '') + '.', r.failed && r.failed.length ? 'bad' : 'ok'); await loadPositions(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); } });
+  $('#pf-backfill').addEventListener('click', async function(){ M.busy(this, true); try { var r = await M.fn('quotes', { action: 'backfill' }); QSTAT = r; M.msg('#m', 'History: ' + r.done + ' instrument' + (r.done === 1 ? '' : 's') + ' filled since ' + M.fmtDate(r.since) + (r.remaining ? ', ' + r.remaining + ' more next time' : '') + (r.failed && r.failed.length ? ', failed: ' + r.failed.join(', ') : '') + '.', 'ok'); qstat(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); } });
+  function pfFill(p){
+    $('#p-id').value = p ? p.id : ''; $('#p-kind').value = p && p.kind ? p.kind : 'spot'; sideOptions(); $('#p-symbol').value = p ? p.symbol : ''; $('#p-name').value = p ? (p.name || '') : ''; $('#p-side').value = p ? p.side : 'long'; $('#p-class').value = p ? p.asset_class : 'crypto'; $('#p-lev').value = p ? (p.leverage || '') : ''; $('#p-links').value = p && Array.isArray(p.links) ? p.links.join('\n') : '';
+    $('#p-size').value = p && (p.weight_entry != null || p.size_pct != null) ? Number(p.weight_entry != null ? p.weight_entry : p.size_pct).toFixed(2) : ''; $('#p-entry').value = p ? (p.entry || '') : ''; $('#p-entryp').value = p && p.entry_price != null ? p.entry_price : ''; $('#p-mark').value = p && p.mark != null ? p.mark : '';
+    $('#p-qsym').value = p ? (p.quote_symbol || '') : ''; $('#p-qname').value = p ? (p.quote_name || '') : ''; $('#p-qexch').value = p ? (p.quote_exchange || '') : ''; $('#p-qtype').value = p ? (p.quote_type || '') : ''; $('#p-qcur').value = p ? (p.currency || '') : ''; $('#p-findbox').hidden = true; $('#p-findbox').innerHTML = ''; feedLine();
+    $('#p-target').value = p ? (p.target || '') : ''; $('#p-opened').value = p && p.opened_at ? String(p.opened_at).slice(0, 10) : ''; $('#p-sort').value = p ? p.sort : ''; $('#p-thesis').value = p ? (p.thesis || '') : '';
+    $('#pf-title').childNodes[0].textContent = p ? 'Edit ' + p.symbol + ' ' : 'Add a position '; $('#pf-cancel').hidden = !p; $('#pf-save').firstChild.textContent = p ? 'Save ' : 'Publish ';
+    if (p) window.scrollTo(0, 0);
+  }
+  /* a position is long or short; an order is buy / sell (spot) or long / short (leveraged) */
+  function sideOptions(){ var k = $('#p-kind').value, cur = $('#p-side').value, opts = k === 'order' ? [['buy', 'Buy'], ['sell', 'Sell'], ['long', 'Long (leveraged)'], ['short', 'Short (leveraged)']] : [['long', 'Long'], ['short', 'Short']]; $('#p-side').innerHTML = opts.map(function(o){ return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join(''); $('#p-side').value = opts.some(function(o){ return o[0] === cur; }) ? cur : opts[0][0]; $('#p-lev').disabled = k !== 'leveraged'; $('#p-lev').placeholder = k === 'leveraged' ? '10x' : '—'; }
+  $('#p-kind').addEventListener('change', sideOptions);
+  $('#pf-cancel').addEventListener('click', function(){ pfFill(null); });
+  $('#pf-publish-all').addEventListener('click', async function(){ var ids = POS.filter(function(p){ return p.status === 'open' && p.published === false; }).map(function(p){ return p.id; }); if (!ids.length) return; if (!confirm('Publish ' + ids.length + ' draft(s)? Members see them the moment you confirm.')) return; M.busy(this, true); try { var r = await sb.from('positions').update({ published: true }).in('id', ids); if (r.error) throw r.error; M.msg('#m', ids.length + ' position(s) published.', 'ok'); await loadPositions(); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(this, false); } });
+  $('#f-pos').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var symbol = $('#p-symbol').value.trim().toUpperCase(); if (!symbol) return M.msg('#m', 'Symbol is required.', 'bad');
+    var id = $('#p-id').value, old = POS.filter(function(p){ return p.id === id; })[0];
+    var mark = num($('#p-mark').value);
+    var kind = $('#p-kind').value, linkList = $('#p-links').value.split(/\s+/).map(function(u){ return u.trim(); }).filter(Boolean);
+    var badLink = linkList.filter(function(u){ return !/^https:\/\/t\.me\/[A-Za-z0-9_+\/-]+$/.test(u); })[0]; if (badLink) return M.msg('#m', 'Telegram links only (https://t.me/…): ' + badLink, 'bad');
+    var w = num($('#p-size').value); if (w != null && (w < 0 || w > 100)) return M.msg('#m', 'Weight at entry must be between 0 and 100.', 'bad');
+    var row = { kind: kind, leverage: kind === 'leveraged' ? ($('#p-lev').value.trim() || null) : null, links: linkList, symbol: symbol, name: $('#p-name').value.trim() || null, side: $('#p-side').value, asset_class: $('#p-class').value, size_pct: w, entry: $('#p-entry').value.trim() || null, entry_price: num($('#p-entryp').value), mark: mark, mark_at: mark == null ? null : (old && old.mark != null && Number(old.mark) === mark ? old.mark_at : new Date().toISOString()), target: $('#p-target').value.trim() || null, opened_at: $('#p-opened').value || (old ? old.opened_at : new Date().toISOString().slice(0, 10)), sort: parseInt($('#p-sort').value, 10) || 100, thesis: $('#p-thesis').value.trim() || null };
+    var btn = $('#pf-save'); M.busy(btn, true);
+    if (!id && POS.some(function(p){ return p.published === false || p.published === true; })) row.published = false; /* a new row is a draft (only once the column exists) */
+    if (HAS_Q) { row.weight_entry = w; row.quote_symbol = $('#p-qsym').value.trim().toUpperCase() || null; row.quote_name = $('#p-qname').value.trim() || null; row.quote_exchange = $('#p-qexch').value.trim() || null; row.quote_type = $('#p-qtype').value.trim() || null; row.currency = $('#p-qcur').value.trim() || null; } /* price-feed columns exist once portfolio_quotes.sql ran */
+    try { var r = id ? await sb.from('positions').update(row).eq('id', id) : await sb.from('positions').insert(row); if (r.error) throw r.error; M.msg('#m', id ? symbol + ' updated' + (old && old.published === false ? ' (still a draft).' : '.') : symbol + ' saved as a draft. Publish it when it is right.', 'ok'); M.busy(btn, false); pfFill(null); await loadPositions(); } /* busy off before the form resets, or the old "Save" label comes back over the reset one */
+    catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { M.busy(btn, false); }
+  });
+  document.addEventListener('click', async function(ev){
+    var b = ev.target.closest('button[data-pa]'); if (!b) return; ev.stopPropagation();
+    var tr = b.closest('tr'), p = POS.filter(function(x){ return x.id === tr.dataset.id; })[0]; if (!p) return;
+    var a = b.dataset.pa;
+    try {
+      if (a === 'edit') { pfFill(p); return; }
+      if (a === 'publish') { var rp = await sb.from('positions').update({ published: true }).eq('id', p.id); if (rp.error) throw rp.error; M.msg('#m', p.symbol + ' is live for members.', 'ok'); }
+      if (a === 'unpublish') { var ru = await sb.from('positions').update({ published: false }).eq('id', p.id); if (ru.error) throw ru.error; M.msg('#m', p.symbol + ' is a draft again (hidden from members).', 'ok'); }
+      if (a === 'mark') { var v = prompt('Last mark for ' + p.symbol + ' (number):', p.mark != null ? p.mark : ''); if (v == null) return; var n = num(v); if (n == null) return M.msg('#m', 'Enter a number.', 'bad'); var r1 = await sb.from('positions').update({ mark: n, mark_at: new Date().toISOString() }).eq('id', p.id); if (r1.error) throw r1.error; }
+      if (a === 'close' && p.kind === 'order') { if (!confirm('Cancel this ' + p.side + ' order on ' + p.symbol + '? It disappears from the members\' book (kept in the admin history as closed).')) return; var r5 = await sb.from('positions').update({ status: 'closed', result: 'cancelled', closed_at: new Date().toISOString().slice(0, 10) }).eq('id', p.id); if (r5.error) throw r5.error; }
+      else if (a === 'close') { var ex = prompt('Exit for ' + p.symbol + ' (text, e.g. "100-126K"):', ''); if (ex == null) return; var res = prompt('Result (text, e.g. "x7" or "+70%"):', ''); if (res == null) return; var r2 = await sb.from('positions').update({ status: 'closed', exit: ex.trim() || null, result: res.trim() || null, closed_at: new Date().toISOString().slice(0, 10) }).eq('id', p.id); if (r2.error) throw r2.error; }
+      if (a === 'filled' && p.side === 'sell') { if (!confirm('Mark this sell order on ' + p.symbol + ' as filled? It leaves the book (a sell reduces a position; update that position\'s size if needed).')) return; var r7 = await sb.from('positions').update({ status: 'closed', result: 'filled', closed_at: new Date().toISOString().slice(0, 10) }).eq('id', p.id); if (r7.error) throw r7.error; }
+      else if (a === 'filled') { var lev = p.side === 'long' || p.side === 'short'; var fill = prompt('Filled at (text, e.g. "$80, $70"):', p.entry || ''); if (fill == null) return; var fp = prompt('Average entry price (number, for the live P&L):', p.entry_price != null ? p.entry_price : ''); if (fp == null) return; var fw = prompt('Weight of the book at entry (%, two decimals):', p.weight_entry != null ? p.weight_entry : (p.size_pct != null ? p.size_pct : '')); if (fw == null) return; var upd = { kind: lev ? 'leveraged' : 'spot', side: p.side === 'buy' ? 'long' : p.side, entry: fill.trim() || p.entry, entry_price: num(fp), opened_at: new Date().toISOString().slice(0, 10), size_pct: num(fw) }; if (HAS_Q) upd.weight_entry = num(fw); var r6 = await sb.from('positions').update(upd).eq('id', p.id); if (r6.error) throw r6.error; } /* a resting buy / long / short order that got hit becomes the position it was waiting to be */
+      if (a === 'reopen') { var r3 = await sb.from('positions').update({ status: 'open', closed_at: null }).eq('id', p.id); if (r3.error) throw r3.error; }
+      if (a === 'del') { if (!confirm('Delete ' + p.symbol + ' for good? Closing keeps it in the track record; deleting removes it everywhere.')) return; var r4 = await sb.from('positions').delete().eq('id', p.id); if (r4.error) throw r4.error; }
+      await loadPositions();
+    } catch (e) { M.msg('#m', M.human(e), 'bad'); }
+  });
+
+  // routing
+  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], portfolio: ['Portfolio', 'The book members see in The Desk. Publish, mark, close.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
+  function route(){ var v = currentView(); if (!Object.prototype.hasOwnProperty.call(TITLES, v)) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
+    if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
+  window.addEventListener('hashchange', route);
+  document.addEventListener('click', function(ev){ var a = ev.target.closest('a[data-f]'); if (a) setFilter(a.dataset.f); });
+  route(); await load(); loadPositions(); loadCalStatus(); if (currentView() === 'activity') { hlSince = seenAt(); renderActivity(); }
+  /* live: tables in the realtime publication push; audit_log and telegram_access only if housekeeping.sql was run, so a quiet poll covers them */
+  var loadT = null; function loadSoon(){ clearTimeout(loadT); loadT = setTimeout(function(){ load(); }, 700); }
+  try { sb.channel('adm').on('postgres_changes', { event: '*', schema: 'public', table: 'memberships' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_links' }, loadSoon).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'audit_log' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'telegram_access' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, loadSoon).on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ loadPositions(); }).on('postgres_changes', { event: '*', schema: 'public', table: 'quotes' }, function(){ clearTimeout(pfT); pfT = setTimeout(loadPositions, 500); }).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sent_emails' }, loadSoon).subscribe(); } catch (e) {}
+  var lastLoad = Date.now(); setInterval(function(){ if (!document.hidden) { lastLoad = Date.now(); load(); } }, 90000);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden && Date.now() - lastLoad > 60000) { lastLoad = Date.now(); load(); } });
+})();
+</script>
+</body></html>

@@ -654,3 +654,21 @@ body.app .pt tr.clk:hover a.more{color:var(--fg)}
 @media (min-width:761px){body.app #pf-table td.em{min-width:120px;width:auto}}
 .chart .tk.tb{fill:var(--fg-2)}
 body.app .pt tr.cash td{color:var(--fg-3)}body.app .pt tr.cash td.em .sym{color:var(--fg-2)}body.app .pt tr.cash td.num{color:var(--fg-2)}
+/* performance header: title, the names (or the day's numbers while hovering) under it, the timeframes on the right as plain text */
+body.app .pf-cell .sh{align-items:flex-start}
+body.app #pf-tip{font-size:13px;color:var(--fg-3);font-variant-numeric:tabular-nums;margin:6px 0 0;min-height:18px}
+body.app #pf-tip .day{color:var(--fg);font-weight:500}
+body.app #pf-tip .sep{margin:0 8px;color:var(--line-2)}
+body.app #pf-tip b{color:var(--fg-2);font-weight:500}body.app #pf-tip b.pos{color:var(--good)}body.app #pf-tip b.neg{color:var(--bad)}
+body.app #pf-tip .ln{color:var(--fg-2)}body.app #pf-tip .ln.lb{color:var(--fg)}body.app #pf-tip .ln.ls{color:#3B82F6}body.app #pf-tip .ln.lq{color:#F59E0B}
+body.app #pf-tip button.lgb{background:none;border:0;padding:0;font:inherit;cursor:pointer}
+body.app #pf-tip button.lgb:hover{text-decoration:underline;text-underline-offset:3px}
+body.app #pf-tip button.lgb.off{opacity:.4;text-decoration:line-through}
+body.app .chart{padding-top:14px}
+/* choices as words, not boxes */
+body.app .chips{border:0;gap:4px 18px;flex-wrap:wrap}
+body.app .chips button{border:0;padding:4px 0;background:none;color:var(--fg-3);letter-spacing:.08em}
+body.app .chips button:hover{background:none;color:var(--fg-2)}
+body.app .chips button.on{background:none;color:var(--fg);font-weight:600}
+body.app .chips.sm button{padding:4px 0;font-size:10.5px}
+body.app #pf-rng{margin-top:6px}

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=91535b58">
+<link rel="stylesheet" href="/mws.css?v=c1f8a6cb">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=91535b58"></script>
+<script src="/mws.js?v=c1f8a6cb"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -133,8 +133,8 @@
         <div id="pf-live" hidden>
           <div class="pf-grid rv d1">
             <div class="pf-cell">
-              <div class="sh"><h2>Performance <span class="muted" id="pf-chart-sub"></span></h2><span class="lg" id="pf-legend"></span></div>
-              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div><div class="tip" id="pf-tip"></div><div class="ctl"><span class="chips sm" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span></div></div>
+              <div class="sh"><div><h2>Performance <span class="muted" id="pf-chart-sub"></span></h2><div class="tip" id="pf-tip"></div></div><span class="chips sm" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span></div>
+              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div></div>
               <div class="banner" id="pf-perf-empty" hidden><div><b>The curve starts with the first daily closes.</b><p>The book is priced live from today; the line against the S&amp;P 500 and the Nasdaq 100 appears as the days close.</p></div></div>
             </div>
             <div class="pf-cell">
@@ -786,7 +786,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* the book against the market, daily: in % (rebased to the start of the range) or in $ (what $1,000,000 became — the same for the S&P 500 and the Nasdaq 100) */
   function renderChart(book, Q, N, hasHist){
     var sec = $('#pf-chart-sec'); var S = book.series || [];
-    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-legend').innerHTML = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
+    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-tip').innerHTML = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
     sec.hidden = false; /* visible before measuring: the chart takes the width it will be drawn at */
     var seg = rangeSeg(S, pfRange), n = seg.length, usdMode = pfUnit === 'usd';
     var raw = pfRange === 'all' || seg[0].day === S[0].day; /* from the start of the book: against the $1,000,000, not rebased */
@@ -823,20 +823,20 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var area = '';
     var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" class="cv">' + grid + zero + area + lines.map(function(x){ return '<path class="l ' + x.c + '" d="' + path(x.d) + '"/>'; }).join('') + xl + '<line class="hv" x1="0" x2="0" y1="' + T + '" y2="' + (Hh - Bt) + '" hidden/>' + lines.map(function(x){ return '<circle class="dot ' + x.c + '" r="4" hidden/>'; }).join('') + '</svg>';
     var endTxt = function(x){ var r = x.v[x.v.length - 1]; return r == null ? '—' : usdMode ? usd(disp(r)) + ' <small class="' + sgn(r).trim() + '">' + pct(r * 100) + '</small>' : pct(r * 100); };
-    $('#pf-legend').innerHTML = allLines.map(function(x){ var off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span><i class="' + x.c + '"></i>' + x.l + '</span>' : '<button type="button" class="lgb' + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '"><i class="' + x.c + '"></i>' + x.l + '</button>'; }).join('');
+    var legendHtml = allLines.map(function(x){ var off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span class="ln lb">' + x.l + '</span>' : '<button type="button" class="ln lgb ' + x.c + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '">' + x.l + '</button>'; }).join('<span class="sep">·</span>');
     $('#pf-chart').innerHTML = svg;
     /* hover: nearest day */
     var sv = $('#pf-chart svg'), hv = sv.querySelector('.hv'), dots = M.$$('.dot', sv), tip = $('#pf-tip');
     var show = function(ev){ var rc = sv.getBoundingClientRect(); var px = (ev.clientX - rc.left) / rc.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.removeAttribute('hidden');
       lines.forEach(function(x, j){ var v = x.d[i]; if (v == null) { dots[j].setAttribute('hidden', ''); return; } dots[j].removeAttribute('hidden'); dots[j].setAttribute('cx', X(i)); dots[j].setAttribute('cy', Y(v)); });
       tip.innerHTML = statsAt(i); };
-    var statsAt = function(i){ return '<b>' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var r = x.v[i]; return ' · ' + x.l + ' <b class="' + sgn(r).trim() + '">' + (r == null ? '—' : fmtV(disp(r))) + '</b>'; }).join(''); };
-    var hide = function(){ hv.setAttribute('hidden', ''); dots.forEach(function(d){ d.setAttribute('hidden', ''); }); tip.innerHTML = statsAt(n - 1); }; /* at rest: the latest point */
+    var statsAt = function(i){ return '<b class="day">' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var r = x.v[i]; return '<span class="sep">·</span><span class="ln ' + x.c + '">' + x.l + '</span> <b class="' + sgn(r).trim() + '">' + (r == null ? '—' : fmtV(disp(r))) + '</b>'; }).join(''); };
+    var hide = function(){ hv.setAttribute('hidden', ''); dots.forEach(function(d){ d.setAttribute('hidden', ''); }); tip.innerHTML = legendHtml; }; /* at rest: just the names (click a benchmark to take it off) */
     hide();
     sv.addEventListener('mousemove', show); sv.addEventListener('touchmove', function(ev){ if (ev.touches[0]) show(ev.touches[0]); }, { passive: true }); sv.addEventListener('mouseleave', hide);
   }
   var pfRz = null; window.addEventListener('resize', function(){ clearTimeout(pfRz); pfRz = setTimeout(function(){ if (current === 'portfolio' && !$('#pf-live').hidden) renderPortfolio(); }, 200); });
-  document.addEventListener('click', function(ev){ var lb = ev.target.closest('#pf-legend button.lgb'); if (lb) { pfBench[lb.dataset.b] = pfBench[lb.dataset.b] === false; M.store.set('mws_bench', pfBench); renderPortfolio(); return; } var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
+  document.addEventListener('click', function(ev){ var lb = ev.target.closest('#pf-tip button.lgb'); if (lb) { pfBench[lb.dataset.b] = pfBench[lb.dataset.b] === false; M.store.set('mws_bench', pfBench); renderPortfolio(); return; } var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
   function sortBy(h){ var st = h.closest('#pf-table') ? pfSort : trSort; if (st.k === h.dataset.k) st.d = -st.d; else { st.k = h.dataset.k; st.d = h.dataset.k === 'sym' || h.dataset.k === 'since' || h.dataset.k === 'side' ? 1 : -1; } renderPortfolio(); var again = $('#' + (st === pfSort ? 'pf-table' : 'tr-table') + ' th[data-k="' + st.k + '"]'); if (again) again.focus(); }
   document.addEventListener('click', function(ev){ var h = ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) sortBy(h); });
   document.addEventListener('keydown', function(ev){ if (ev.key !== 'Enter' && ev.key !== ' ') return; var h = ev.target.closest && ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) { ev.preventDefault(); sortBy(h); } });

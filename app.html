@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=7f7b5f9e">
+<link rel="stylesheet" href="/mws.css?v=ef959878">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=7f7b5f9e"></script>
+<script src="/mws.js?v=ef959878"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -769,18 +769,18 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* a donut of weights: monochrome slices, labels outside, the biggest first */
   function donut(segs){
     var tot = segs.reduce(function(a, s){ return a + Math.max(0, s.w); }, 0); if (!(tot > 0)) return '<p class="small muted">Nothing to show yet.</p>';
-    var W = 560, cx = W / 2, cy = 230, R0 = 150, R1 = 94, a0 = -Math.PI / 2, out = '', labels = '', lab = [];
+    var W = 640, cx = W / 2, cy = 268, R0 = 176, R1 = 110, a0 = -Math.PI / 2, out = '', labels = '', lab = [];
     segs.forEach(function(s, i){ var f = Math.min(0.9999, Math.max(0, s.w) / tot); if (f <= 0) return; var a1 = a0 + f * Math.PI * 2, big = f > 0.5 ? 1 : 0;
       var p = function(r, a){ return (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1); };
       var d = 'M' + p(R0, a0) + 'A' + R0 + ',' + R0 + ' 0 ' + big + ',1 ' + p(R0, a1) + 'L' + p(R1, a1) + 'A' + R1 + ',' + R1 + ' 0 ' + big + ',0 ' + p(R1, a0) + 'Z';
       out += '<path class="sl c' + Math.min(i, 7) + (s.cash ? ' cash' : '') + '" d="' + d + '"><title>' + esc(s.k) + ' · ' + s.w.toFixed(2) + '%' + (s.v != null ? ' · ' + usdFull(s.v) : '') + '</title></path>';
-      if (f >= 0.015) { var am = (a0 + a1) / 2; lab.push({ k: s.k, w: s.w, am: am, right: Math.cos(am) >= 0, y: cy + (R0 + 34) * Math.sin(am) }); }
+      if (f >= 0.015) { var am = (a0 + a1) / 2; lab.push({ k: s.k, w: s.w, am: am, right: Math.cos(am) >= 0, y: cy + (R0 + 48) * Math.sin(am) }); }
       a0 = a1; });
     [true, false].forEach(function(side){ var L = lab.filter(function(l){ return l.right === side; }).sort(function(a, b){ return a.y - b.y; }); for (var i = 1; i < L.length; i++) if (L[i].y - L[i - 1].y < 18) L[i].y = L[i - 1].y + 18; for (var j = L.length - 2; j >= 0; j--) if (L[j + 1].y - L[j].y < 18) L[j].y = L[j + 1].y - 18; });
-    lab.forEach(function(l){ var x1 = cx + (R0 + 4) * Math.cos(l.am), y1 = cy + (R0 + 4) * Math.sin(l.am), x2 = cx + (R0 + 28) * Math.cos(l.am), lx = cx + (R0 + 34) * Math.cos(l.am);
+    lab.forEach(function(l){ var x1 = cx + (R0 + 4) * Math.cos(l.am), y1 = cy + (R0 + 4) * Math.sin(l.am), x2 = cx + (R0 + 40) * Math.cos(l.am), lx = cx + (R0 + 48) * Math.cos(l.am);
       labels += '<line class="ll" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + l.y.toFixed(1) + '"/><text class="lt" x="' + lx.toFixed(1) + '" y="' + (l.y + 4).toFixed(1) + '" text-anchor="' + (l.right ? 'start' : 'end') + '">' + esc(l.k) + ' <tspan class="lp">' + l.w.toFixed(1) + '%</tspan></text>'; });
     var n = segs.filter(function(s){ return !s.cash; }).length;
-    return '<svg viewBox="0 0 ' + W + ' 470" class="dn">' + out + labels + '<text class="dc" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + n + '</text><text class="dl" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">' + (pfGrp === 'class' ? (n === 1 ? 'class' : 'classes') : (n === 1 ? 'holding' : 'holdings')) + '</text></svg>';
+    return '<svg viewBox="0 0 ' + W + ' 540" class="dn">' + out + labels + '<text class="dc" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + n + '</text><text class="dl" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">' + (pfGrp === 'class' ? (n === 1 ? 'class' : 'classes') : (n === 1 ? 'holding' : 'holdings')) + '</text></svg>';
   }
   /* the book against the market, daily: in % (rebased to the start of the range) or in $ (what $1,000,000 became — the same for the S&P 500 and the Nasdaq 100) */
   function renderChart(book, Q, N, hasHist){
@@ -792,21 +792,31 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var reb = function(k){ if (raw) return seg.map(function(p){ return p[k] == null ? null : p[k]; }); var b = seg[0][k]; return seg.map(function(p){ return p[k] == null || b == null ? null : (1 + p[k]) / (1 + b) - 1; }); };
     var disp = usdMode ? function(r){ return N * (1 + r); } : function(r){ return r * 100; };
     var fmtV = usdMode ? function(v){ return usd(v); } : function(v){ return pct(v); };
-    var fmtTick = usdMode ? function(v){ return usd(v, Math.abs(hi - lo) < N * 0.1 ? 3 : 2); } : function(v){ return (v > 0 ? '+' : '') + v.toFixed(Math.abs(hi - lo) < 10 ? 1 : 0) + '%'; };
+    var fmtTick = usdMode ? function(v){ return usd(v, Math.abs(hi - lo) < N * 0.1 ? 3 : 2); } : function(v){ var dp = step < 1 ? (step < 0.25 ? 2 : 1) : 0; return (v > 0 ? '+' : '') + v.toFixed(dp) + '%'; };
     var allLines = [{ k: 'book', l: 'Portfolio', v: reb('book'), c: 'lb' }, { k: 'SPY', l: 'S&P 500', v: reb('SPY'), c: 'ls' }, { k: 'QQQ', l: 'Nasdaq 100', v: reb('QQQ'), c: 'lq' }].filter(function(x){ return x.v.some(function(v){ return v != null; }); });
     var lines = allLines.filter(function(x){ return x.k === 'book' || pfBench[x.k] !== false; });
     lines.forEach(function(x){ x.d = x.v.map(function(r){ return r == null ? null : disp(r); }); });
     var all = []; lines.forEach(function(x){ x.d.forEach(function(v){ if (v != null) all.push(v); }); });
     var zeroV = disp(0), lo = Math.min(zeroV, Math.min.apply(null, all)), hi = Math.max(zeroV, Math.max.apply(null, all)); if (hi - lo < (usdMode ? N * 0.02 : 2)) { hi += usdMode ? N * 0.01 : 1; lo -= usdMode ? N * 0.01 : 1; } var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
-    var cw = $('#pf-chart').clientWidth || 800, W = Math.max(300, cw - 36), Hh = W < 560 ? 240 : 300, L = 8, Rr = W < 560 ? 54 : (usdMode ? 70 : 58), T = 14, Bt = 30;
+    var cw = $('#pf-chart').clientWidth || 800, W = Math.max(300, cw - 36), Hh = Math.round(Math.max(260, Math.min(470, W * 0.5))), L = 8, Rr = W < 560 ? 54 : (usdMode ? 70 : 58), T = 14, Bt = 30;
     var X = function(i){ return L + (W - L - Rr) * i / (n - 1); }, Y = function(v){ return T + (Hh - T - Bt) * (1 - (v - lo) / (hi - lo)); };
-    var step = (hi - lo) / 4, ticks = []; for (var t = 0; t <= 4; t++) ticks.push(lo + step * t);
+    var nice = [0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000], wantN = Hh >= 400 ? 6 : 5, step = nice[nice.length - 1];
+    for (var si = 0; si < nice.length; si++) if ((hi - lo) / nice[si] <= wantN) { step = nice[si]; break; }
+    var ticks = []; for (var tv = Math.ceil(lo / step) * step; tv <= hi + 1e-9; tv += step) ticks.push(Math.round(tv / step) * step); /* multiples of a round number inside the range */
     var grid = ticks.map(function(v){ return '<text x="' + (W - Rr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="tk">' + fmtTick(v) + '</text>'; }).join(''); /* the scale on the right, nothing drawn across the chart */
     var zero = '';
-    var months = []; seg.forEach(function(p, i){ var m = p.day.slice(0, 7); if (!months.length || months[months.length - 1].m !== m) months.push({ m: m, i: i }); });
-    var xl;
-    if (months.length >= 3) { var every = Math.max(1, Math.ceil(months.length / (W < 560 ? 4 : 8))); xl = months.filter(function(_, j){ return j % every === 0; }).map(function(o){ var d = new Date(o.m + '-01T00:00:00Z'); return '<text x="' + X(o.i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk">' + d.toLocaleDateString('en-GB', { month: 'short', year: months.length > 12 ? '2-digit' : undefined, timeZone: 'UTC' }) + '</text>'; }).join(''); }
-    else { var k = Math.max(1, Math.ceil(n / (W < 560 ? 4 : 7))); xl = seg.map(function(p, i){ return i % k === 0 || i === n - 1 ? '<text x="' + X(i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk" text-anchor="' + (i === n - 1 ? 'end' : i === 0 ? 'start' : 'middle') + '">' + new Date(p.day + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }) + '</text>' : ''; }).join(''); }
+    /* the time scale the way a trading chart draws it: day numbers, the month name where the month changes; on long ranges months, the year where it changes */
+    var maxLab = W < 560 ? 5 : Math.floor((W - L - Rr) / 64), xt = [];
+    var mo = function(d){ return new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }); };
+    if (n <= maxLab * 7) { /* up to ~2 months: days */
+      var kd = [1, 2, 3, 5, 7, 10, 14].filter(function(k){ return Math.ceil(n / k) <= maxLab; })[0] || 14;
+      seg.forEach(function(p, i){ var dd = Number(p.day.slice(8, 10)), first = i === 0 || p.day.slice(0, 7) !== seg[i - 1].day.slice(0, 7); if (first) { xt.push({ i: i, t: i === 0 && dd !== 1 ? dd + ' ' + mo(p.day) : mo(p.day), b: true }); return; } if ((dd - 1) % kd === 0 && dd !== 1) xt.push({ i: i, t: String(dd) }); });
+      if (kd >= 5) xt = xt.filter(function(x, j){ return x.b || j === 0 || x.i - xt[j - 1].i >= kd - 1; });
+    } else {
+      var km = [1, 2, 3, 6, 12].filter(function(k){ var cnt = 0; seg.forEach(function(p, i){ if (i === 0 || p.day.slice(0, 7) !== seg[i - 1].day.slice(0, 7)) cnt++; }); return Math.ceil(cnt / k) <= maxLab; })[0] || 12;
+      seg.forEach(function(p, i){ if (i !== 0 && p.day.slice(0, 7) === seg[i - 1].day.slice(0, 7)) return; var mm = Number(p.day.slice(5, 7)); if (mm === 1 || (i === 0 && km > 1)) { xt.push({ i: i, t: mm === 1 ? p.day.slice(0, 4) : mo(p.day), b: true }); return; } if ((mm - 1) % km === 0) xt.push({ i: i, t: mo(p.day) }); });
+    }
+    var xl = xt.map(function(x){ return '<text x="' + X(x.i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk' + (x.b ? ' tb' : '') + '" text-anchor="' + (x.i === 0 ? 'start' : x.i === n - 1 ? 'end' : 'middle') + '">' + x.t + '</text>'; }).join('');
     var path = function(v){ var d = '', on = false; v.forEach(function(y, i){ if (y == null) { on = false; return; } d += (on ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(y).toFixed(1); on = true; }); return d; };
     var bookD = lines[0] && lines[0].k === 'book' ? lines[0].d : null, bookR = bookD ? lines[0].v : null;
     var area = '';

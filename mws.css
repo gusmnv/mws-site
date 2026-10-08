@@ -569,7 +569,7 @@ body.app .months{border:0;border-top:1px solid var(--line);background:none;gap:0
 body.app .months .k{padding:12px 0 4px}
 body.app .months .mo{background:none;padding:6px 18px 10px 0}
 body.app .donut{border:0;background:none;padding:0}
-body.app .pf-cell .donut svg{max-height:none;max-width:560px;margin:0 auto}
+body.app .pf-cell .donut svg{max-height:none;max-width:640px;margin:0 auto}
 body.app .donut .lt{font-size:12px}
 body.app .ptw{border:0;background:none}
 body.app .pt th{background:none;border-bottom:1px solid var(--line-2)}
@@ -651,3 +651,4 @@ body.app .pt a.more:hover{color:var(--fg)}
 body.app .pt tr.clk:hover a.more{color:var(--fg)}
 @media (max-width:760px){body.app .pt.cards td.act{display:block;text-align:right}body.app .pt.cards td.act::before{display:none}body.app .acct{gap:0}}
 @media (min-width:761px){body.app #pf-table td.em{min-width:120px;width:auto}}
+.chart .tk.tb{fill:var(--fg-2)}

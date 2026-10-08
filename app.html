@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=c1f8a6cb">
+<link rel="stylesheet" href="/mws.css?v=41c0dccb">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=c1f8a6cb"></script>
+<script src="/mws.js?v=41c0dccb"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -43,10 +43,9 @@
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
-      <a href="#telegram" data-p="telegram">Private Telegram<span class="cnt" id="n-tg"></span></a>
+      <a href="#telegram" data-p="telegram">Core<span class="cnt" id="n-tg"></span></a>
       <p class="grp">Portfolio <span class="soon" id="desk-grp-tag">In development</span></p>
-      <a href="#portfolio" data-p="portfolio">Spot Positions<span class="cnt" id="n-pf"></span></a>
-      <a href="#trades" data-p="trades">Leveraged Positions<span class="cnt" id="n-tr"></span></a>
+      <a href="#portfolio" data-p="portfolio">Active Positions<span class="cnt" id="n-pf"></span></a>
       <a href="#track" data-p="track">Track Record<span class="cnt" id="n-tk"></span></a>
       <p class="grp">The Desk</p>
       <a href="#earnings" data-p="earnings">Stock Earnings<span class="cnt" id="n-er"></span></a>
@@ -67,7 +66,7 @@
   <div class="mainc">
     <header class="bar">
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><span></span></button>
-      <div class="crumbs"><span id="crumb">Private Telegram</span><span class="soon" id="bar-tag" hidden></span></div>
+      <div class="crumbs"><span id="crumb">Core</span><span class="soon" id="bar-tag" hidden></span></div>
       <span class="tag" id="bar-st">—</span>
     </header>
 
@@ -98,9 +97,9 @@
         </div>
       </section>
 
-      <!-- 01 telegram -->
+      <!-- 01 core: the Telegram channels (the heart of the membership; building your own portfolio joins this page later) -->
       <section class="page" data-page="telegram">
-        <div class="head rv"><h1>Your channels.</h1><p id="tg-sub" hidden></p></div>
+        <div class="head rv"><h1>Core.</h1><p id="tg-sub" hidden></p></div>
         <div id="ov-notices"></div>
         <div id="ov-banner"></div>
         <div class="acct">
@@ -127,27 +126,16 @@
         </div>
       </section>
 
-      <!-- 03–05 the desk -->
+      <!-- 03–05 portfolio: Active Positions (one list: spot, leveraged, orders — a row opens the story of the call) and the Track Record -->
       <section class="page" data-page="portfolio">
-        <div class="head rv"><h1>Spot positions. <span class="soon" id="pf-tag">In development</span></h1><p id="pf-sub" hidden></p></div>
+        <div class="head rv"><h1>Active positions. <span class="soon" id="pf-tag">In development</span></h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
-          <div class="pf-grid rv d1">
-            <div class="pf-cell">
-              <div class="sh"><div><h2>Performance <span class="muted" id="pf-chart-sub"></span></h2><div class="tip" id="pf-tip"></div></div><span class="chips sm" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span></div>
-              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div></div>
-              <div class="banner" id="pf-perf-empty" hidden><div><b>The curve starts with the first daily closes.</b><p>The book is priced live from today; the line against the S&amp;P 500 and the Nasdaq 100 appears as the days close.</p></div></div>
-            </div>
-            <div class="pf-cell">
-              <div class="sh"><h2>Exposure</h2><span class="chips sm" id="pf-grp"><button type="button" data-v="security" class="on">By asset</button><button type="button" data-v="class">By class</button></span></div>
-              <div class="donut" id="pf-donut"></div>
-            </div>
-          </div>
-          <div class="sh rv d2" style="margin-top:22px"><h2>Holdings <span class="muted" id="pf-hold-n"></span></h2></div>
-          <div class="ptw rv d2"><table class="pt cards" id="pf-table"></table></div>
-          <div id="pf-orders" hidden><div class="sh" style="margin-top:22px"><h2>Resting orders</h2></div><div class="ptw"><table class="pt cards" id="pf-ord"></table></div></div>
+          <p class="dateline rv d1" id="pf-line"></p>
+          <div class="ptw rv d1"><table class="pt cards ruled" id="pf-table"></table></div>
           <p class="small muted" style="margin-top:18px" id="pf-foot"></p>
         </div>
-        <div id="pf-locked" hidden class="banner"><div><b>Members only.</b><p>The portfolio opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
+        <div id="pf-locked" hidden class="banner"><div><b>Members only.</b><p>The positions open with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
+        <div id="pf-none" hidden class="banner"><div><b>Nothing open right now.</b><p>The next call lands here the moment it is made, and in the Exclusive channel.</p></div></div>
         <div id="pf-empty">
         <div class="skel rv d1">
           <div class="r h"><span style="width:38%"></span><span style="width:50%"></span><span style="width:40%"></span><span style="width:60%"></span><span style="width:55%"></span></div>
@@ -157,22 +145,12 @@
           <div class="r"><span style="width:55%"></span><span style="width:48%"></span><span style="width:44%"></span><span style="width:66%"></span><span style="width:36%"></span></div>
           <div class="veil"><span>In development</span></div>
         </div>
-        <p class="small muted rv d2" style="margin-top:18px">Until it opens, positions and updates are posted in the Exclusive channel. Members are told in the channels the day the Desk goes live.</p>
+        <p class="small muted rv d2" style="margin-top:18px">Until it opens, positions and updates are posted in the Exclusive channel. Members are told in the channels the day the Portfolio goes live.</p>
         </div>
-      </section>
-      <section class="page" data-page="trades">
-        <div class="head rv"><h1>Leveraged positions. <span class="soon" id="tr-tag">In development</span></h1></div>
-        <div id="tr-live" hidden>
-          <div class="ptw"><table class="pt cards" id="tr-table"></table></div>
-          <div id="tr-orders" hidden><div class="sh" style="margin-top:22px"><h2>Resting orders</h2></div><div class="ptw"><table class="pt cards" id="tr-ord"></table></div></div>
-          <p class="small muted" style="margin-top:18px" id="tr-foot"></p>
-        </div>
-        <div id="tr-locked" hidden class="banner"><div><b>Members only.</b><p>The trades open with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
-        <div id="tr-empty" hidden class="banner"><div><b>No trade open right now.</b><p>Leveraged trades appear here the moment one is opened; the portfolio is the spot book.</p></div></div>
       </section>
       <section class="page" data-page="track">
         <div class="head rv"><h1>Track record. <span class="soon" id="tk-tag">In development</span></h1></div>
-        <div id="tk-live" hidden><div class="ptw"><table class="pt cards" id="tk-table"></table></div><p class="small muted" style="margin-top:18px" id="tk-foot"></p></div>
+        <div id="tk-live" hidden><div class="paper" id="tk-paper"></div><div class="sh" style="margin-top:44px"><h2>The ledger <span class="muted" id="tk-ledger-n"></span></h2></div><div class="ptw"><table class="pt cards ruled" id="tk-table"></table></div><p class="small muted" style="margin-top:18px" id="tk-foot"></p></div>
         <div id="tk-locked" hidden class="banner"><div><b>Members only.</b><p>The track record opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
         <div id="tk-empty" hidden class="banner"><div><b>Nothing closed yet.</b><p>Closed calls land here with entry, exit and result.</p></div></div>
       </section>
@@ -310,7 +288,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { telegram:'Private Telegram', portfolio:'Spot Positions', trades:'Leveraged Positions', track:'Track Record', position:'Spot Positions', calendar:'Economic Calendar', earnings:'Stock Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
+  var PAGES = { telegram:'Core', portfolio:'Active Positions', track:'Track Record', position:'Active Positions', calendar:'Economic Calendar', earnings:'Stock Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
   var posId = null, posHome = 'portfolio'; /* #position/<id>: one position, its numbers and the Telegram posts; posHome = the section it belongs to */
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
@@ -375,14 +353,14 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* the Live / Only you / In development tag of the page on screen, shown next to the crumb (the pages have no titles) */
   function syncBarTag(){ var t = document.querySelector('.page.on .head .soon'), b = $('#bar-tag'); if (!b) return; if (!t) { b.hidden = true; return; } b.textContent = t.textContent; b.className = t.className; b.hidden = false; }
   function route(){
-    var k = (location.hash || '#telegram').slice(1); var pm = k.match(/^position\/([\w-]+)$/); if (pm) { k = 'position'; posId = pm[1]; } if (k === 'economic') k = 'calendar'; if (k === 'settings') k = 'account'; if (k === 'support' || k === 'chat') k = 'feedback'; if (k === 'overview') k = 'telegram'; if (!Object.prototype.hasOwnProperty.call(PAGES, k) || /=/.test(k)) k = 'telegram';
+    var k = (location.hash || '#telegram').slice(1); var pm = k.match(/^position\/([\w-]+)$/); if (pm) { k = 'position'; posId = pm[1]; } if (k === 'economic') k = 'calendar'; if (k === 'settings') k = 'account'; if (k === 'support' || k === 'chat') k = 'feedback'; if (k === 'overview') k = 'telegram'; if (k === 'trades' || k === 'spot' || k === 'leveraged' || k === 'positions') k = 'portfolio'; /* old links: one list now */ if (!Object.prototype.hasOwnProperty.call(PAGES, k) || /=/.test(k)) k = 'telegram';
     if (k === 'devices' && typeof loadDevices === 'function') loadDevices();
     current = k;
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
     $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === (k === 'position' ? posHome : k)); });
     $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — Mr. Wall Street'; syncBarTag();
     if (k === 'position' && typeof renderPosition === 'function') renderPosition();
-    if ((k === 'portfolio' || k === 'trades' || k === 'track') && typeof renderPortfolio === 'function' && positions) renderPortfolio(); /* the page measures its chart at the width it is shown at */
+    if ((k === 'portfolio' || k === 'track') && typeof renderPortfolio === 'function' && positions) renderPortfolio();
     drawer(false); window.scrollTo(0, 0);
     if (k === 'telegram' && access && access.valid && !invites) { fetchInvites(false).then(paintInvites); }
   }
@@ -390,7 +368,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   route();
 
   /* ---- data ---- */
-  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, qhist = {}, histFor = '', deskLive = { portfolio: true, calendar: true, earnings: true }, NOTIONAL = 1000000, tgUser = null, notices = [], lastLoad = 0;
+  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, deskLive = { portfolio: false, calendar: false, earnings: false }, tgUser = null, notices = [], lastLoad = 0; /* deskLive: which parts of the Portfolio and the Desk members see (Settings → What goes live); off until the RPC says otherwise */
   var signup = M.signupState();
   /* the handoff belongs to the e-mail typed at checkout: another account on the same browser must not inherit its receipt or its "paid" state */
   if (signup.email && user.email && String(signup.email).toLowerCase() !== String(user.email).toLowerCase()) { signup = {}; M.store.del('mws_signup'); M.sess.del('mws_signup'); }
@@ -424,7 +402,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!simOn) M.store.set('mws_access', { valid: !!acc.valid, at: Date.now() });
     try { var ps = await sb.from('positions').select('*').order('sort').order('opened_at', { ascending: false }); positions = ps.error ? null : (ps.data || []); } catch (e) { positions = null; } /* RLS: empty for non-members */
     await loadQuotes(); await loadCalendar();
-    try { var ds = await sb.rpc('desk_state'); if (!ds.error && ds.data) { deskLive = ds.data; if (Number(ds.data.notional) > 0) NOTIONAL = Number(ds.data.notional); } } catch (e) {} /* which sections are live for members (before desk_visibility.sql: everything counts as live) */
+    try { var ds = await sb.rpc('desk_state'); if (!ds.error && ds.data) deskLive = ds.data; } catch (e) {} /* which sections members see: Settings → What goes live (the admin). Off while unknown. */
     try { var ns = await sb.from('notices').select('id,body,kind,link,link_label,created_at').eq('active', true).order('created_at', { ascending: false }).limit(3); notices = ns.error ? [] : (ns.data || []); } catch (e) { notices = []; }
     /* owner preview: a preset replaces the data (never touches the database) */
     sim = simOn ? M.sim(channels) : null;
@@ -553,16 +531,15 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible' && access && Date.now() - lastLoad > 60000) load(false); });
   setInterval(function(){ if (!document.hidden && access && Date.now() - lastLoad > 5 * 60000) load(false); }, 60000);
 
-  /* The Desk · Portfolio: what staff publish in /admin#portfolio (RLS hides it from non-members), priced live (public.quotes,
-     written by the quotes function) and modelled by M.book — the same numbers the admin sees. */
+  /* Portfolio: what staff publish in /admin#positions (RLS hides it from non-members, and from everyone until it is live), priced live from
+     public.quotes (written by the quotes function). Open calls = Active Positions; closed calls = the Track Record; each one has its story page. */
   function fmtN(n){ if (n == null) return '—'; n = Number(n); return n >= 1000 ? n.toLocaleString('en-US', { maximumFractionDigits: n >= 10000 ? 0 : 1 }) : n.toLocaleString('en-US', { maximumFractionDigits: n < 1 ? 4 : 2 }); }
   function pct(v, dp, plus){ if (v == null || !isFinite(v)) return '—'; var t = (dp == null ? 2 : dp); return (v > 0 && plus !== false ? '+' : '') + Number(v).toFixed(t) + '%'; }
   function sgn(v){ return v == null || !isFinite(v) ? '' : v > 0 ? ' pos' : v < 0 ? ' neg' : ''; }
   function cell(l, html, cls){ return '<td data-l="' + l + '"' + (cls ? ' class="' + cls + '"' : '') + '>' + html + '</td>'; }
   function hhmm(iso){ if (!iso) return ''; var d = new Date(iso); return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
-  /* the book, in sections: spot → leveraged → orders, each grouped Crypto / Stocks / Commodities, closed calls last */
+  /* asset classes as members read them */
   var PF_CLASS = { crypto: 'Crypto', equity: 'Stocks', etf: 'Stocks', commodity: 'Commodities', fx: 'FX', other: 'Other' }, PF_ORDER = ['Crypto', 'Stocks', 'Commodities', 'FX', 'Other'];
-  var BENCH = { SPY: 'S&P 500', QQQ: 'Nasdaq', 'BTC/USD': 'Bitcoin' };
   function pfKind(p){ return p.kind === 'leveraged' || p.kind === 'order' ? p.kind : 'spot'; }
   function pfDraft(p){ return p.published === false ? '<span class="tag warn" style="margin-left:8px">Draft</span>' : ''; } /* only staff ever receive drafts (RLS); the tag shows what members do not see yet */
   function pfLinks(p){ var l = Array.isArray(p.links) ? p.links.filter(function(u){ return /^https:\/\/t\.me\//.test(String(u)); }) : []; return l.length ? '<span class="posts">' + l.map(function(u, i){ return '<a href="' + esc(u) + '" target="_blank" rel="noopener" title="Open the call in Telegram">' + (l.length > 1 ? 'post ' + (i + 1) : 'post') + '</a>'; }).join('') + '</span>' : ''; }
@@ -573,273 +550,177 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* the calls behind a position: a screenshot of each Telegram post (posts/<id>.png, listed in posts/index.json with the time it was posted) */
   var POSTS = null, postsReq = null;
   function loadPosts(){ if (POSTS || postsReq) return postsReq; postsReq = fetch('/posts/index.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; }).then(function(j){ POSTS = j || {}; return POSTS; }); return postsReq; }
+  /* the story of each call (stories.json, keyed by positions.story_key): the lede, then chapter by chapter with the post that was made that day */
+  var STORIES = null, storiesReq = null;
+  function loadStories(){ if (STORIES || storiesReq) return storiesReq; storiesReq = Promise.all([loadPosts(), fetch('/stories.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; })]).then(function(a){ STORIES = a[1] || {}; return STORIES; }); return storiesReq; }
+  function storyOf(p){ if (!STORIES || !p) return null; if (p.story_key && STORIES[p.story_key]) return STORIES[p.story_key]; var k = Object.keys(STORIES).filter(function(k){ var s = STORIES[k]; return s.symbol === p.symbol && s.side === (p.side || 'long') && s.kind === pfKind(p) && s.status === p.status; }); return k.length === 1 ? STORIES[k[0]] : null; } /* a row without a key still finds its story when it is the only one of its kind */
+  function postImg(id){ var x = POSTS && POSTS[id]; return x && x.img ? (/^(https?:)?\//.test(x.img) ? x.img : '/' + x.img) : null; }
+  function postWhen(id){ var x = POSTS && POSTS[id]; if (!(x && x.t)) return ''; var d = new Date(x.t); try { return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Dubai' }) + ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Dubai' }) + ' Dubai'; } catch (e) { return fmtWhen(x.t); } } /* the time the post was made, in the channel's own time */
+  function daysBetween(a, b){ if (!a || !b) return null; var n = Math.round((Date.parse(String(b).slice(0, 10)) - Date.parse(String(a).slice(0, 10))) / 86400000); return n >= 0 ? n : null; }
+  function heldTxt(p){ if (p.status === 'closed' && !p.closed_at) return ''; var n = daysBetween(p.opened_at, p.closed_at || new Date().toISOString().slice(0, 10)); return n == null ? '' : n === 0 ? 'same day' : n === 1 ? '1 day' : n < 60 ? n + ' days' : Math.round(n / 30.4) + ' months'; }
+  function resultHtml(p){ var s = resultSign(p); return '<span class="' + (s > 0 ? 'pos' : s < 0 ? 'neg' : 'muted') + '">' + esc(p.result || '—') + '</span>'; }
+  /* the headline of a call: "Short Bitcoin from $95,350" */
+  function usdHl(v){ v = Number(v); var dp = v >= 1000 || Math.abs(v - Math.round(v)) < 1e-9 ? 0 : v < 1 ? 4 : 2; return '$' + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }); } /* a price in a headline: no cents unless there are cents */
+  function storyTitle(p){ var side = String(p.side || 'long'), k = pfKind(p); var verb = k === 'order' ? side.charAt(0).toUpperCase() + side.slice(1) : k === 'spot' ? (side === 'sell' ? 'Sold' : 'Bought') : (side === 'short' || side === 'sell' ? 'Short' : 'Long'); return verb + ' ' + esc(p.name || p.symbol) + (p.entry_price != null ? (k === 'leveraged' ? ' from ' : ' at ') + usdHl(p.entry_price) : ''); } /* "Short Bitcoin from $95,350" · "Bought Strategy at $95.26" · an order: "Buy Bitcoin at $57,000" (the dateline says it is resting) */
   function fmtWhen(iso){ if (!iso) return ''; var d = new Date(iso); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   /* prices and money on the page: a price always carries its dollar sign */
   function usdPx(v){ if (v == null || !isFinite(v)) return '—'; v = Number(v); var dp = v >= 10000 ? 0 : v < 1 ? 4 : 2; return (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
-  /* the numbers behind the pages, shared by the tables and the position page (the same model the admin uses).
-     The portfolio is the spot book on its own capital ($1,000,000 model book); leveraged trades run on their own capital and only ever show ROI. */
+  /* the numbers behind the pages: every open call, priced live from public.quotes. No weights, no book: a position is a price and a
+     return (the weighted model book, the curve and the exposure moved to the future "build your portfolio" under Core — site/parked/). */
   function pfData(){
     var list = sim ? (sim.key === 'none' || sim.key === 'canceled' ? [] : SIM_POS) : (positions || []);
-    var Q = sim ? SIM_QUOTES : quotes, H = sim ? SIM_HIST : qhist;
-    var book = M.book(list.filter(function(p){ return pfKind(p) !== 'leveraged'; }), Q, H, { bench: ['SPY', 'QQQ'] }); var R = {}; book.rows.forEach(function(r){ R[r.p.id] = r; });
-    return { list: list, Q: Q, H: H, book: book, R: R, N: NOTIONAL };
+    return { list: list, Q: sim ? SIM_QUOTES : quotes };
   }
   function pfQuote(p, Q){ var q = p.quote_symbol ? Q[String(p.quote_symbol).toUpperCase()] : null; return q && q.price != null && !q.error ? q : null; }
   /* leverage as written ("3x", "x3", "3"); 1 when absent */
   function levOf(p){ var n = parseFloat(String(p && p.leverage || '').replace(/[^0-9.]/g, '')); return n > 0 ? n : 1; }
   /* a trade is anything leveraged, or an order that will open one (it carries a leverage or is a short) */
-  function isTrade(p){ var k = pfKind(p); return k === 'leveraged' || (k === 'order' && (levOf(p) > 1 || p.side === 'short' || p.side === 'sell')); }
-  function pfHome(p){ return p.status === 'closed' ? '#track' : isTrade(p) ? '#trades' : '#portfolio'; }
+  function isTrade(p){ var k = pfKind(p); return k === 'leveraged' || (k === 'order' && (levOf(p) > 1 || p.side === 'short' || p.side === 'sell' || p.side === 'long')); }
+  function pfHome(p){ return p.status === 'closed' ? '#track' : '#portfolio'; }
   function pfSplit(list){
     var open = list.filter(function(p){ return p.status === 'open'; }), closed = list.filter(function(p){ return p.status === 'closed'; });
-    return { open: open, closed: closed, spot: open.filter(function(p){ return pfKind(p) === 'spot'; }), lev: open.filter(function(p){ return pfKind(p) === 'leveraged'; }),
-      ordS: open.filter(function(p){ return pfKind(p) === 'order' && !isTrade(p); }), ordT: open.filter(function(p){ return pfKind(p) === 'order' && isTrade(p); }) };
+    return { open: open, closed: closed, spot: open.filter(function(p){ return pfKind(p) === 'spot'; }), lev: open.filter(function(p){ return pfKind(p) === 'leveraged'; }), ord: open.filter(function(p){ return pfKind(p) === 'order'; }) };
   }
-  /* a trade's numbers straight from the quote: ROI on the margin at the stated leverage, no size */
+  /* Returns of a leveraged trade: 'price' = the move in the price (what the channel posts: "+32%"; the Track Record reads the same way),
+     'margin' = that move × the leverage. One word to flip. */
+  var LEV_ROI = 'price';
+  /* a position's numbers straight from the quote: entry, last, the return since entry and since the previous close (shorts the other way round) */
   function tradeNums(p, Q){
-    var q = pfQuote(p, Q), last = q ? Number(q.price) : (p.mark != null ? Number(p.mark) : null), entry = Number(p.entry_price) > 0 ? Number(p.entry_price) : null, L = levOf(p), s = p.side === 'short' || p.side === 'sell' ? -1 : 1;
-    return { q: q, last: last, entry: entry, L: L, s: s, ret: entry != null && last != null ? s * L * (last / entry - 1) * 100 : null, roi1: q && q.change_pct != null ? (String(p.opened_at || '').slice(0, 10) >= new Date().toISOString().slice(0, 10) && entry != null && last != null ? s * L * (last / entry - 1) * 100 : s * L * Number(q.change_pct)) : null, mark: q ? null : (p.mark != null ? p.mark_at : null) };
+    var q = pfQuote(p, Q), last = q ? Number(q.price) : (p.mark != null ? Number(p.mark) : null), entry = Number(p.entry_price) > 0 ? Number(p.entry_price) : null, L = levOf(p), s = p.side === 'short' || p.side === 'sell' ? -1 : 1, Lr = LEV_ROI === 'margin' ? L : 1;
+    return { q: q, last: last, entry: entry, L: L, s: s, ret: entry != null && last != null ? s * Lr * (last / entry - 1) * 100 : null, roi1: q && q.change_pct != null ? (String(p.opened_at || '').slice(0, 10) >= new Date().toISOString().slice(0, 10) && entry != null && last != null ? s * Lr * (last / entry - 1) * 100 : s * Lr * Number(q.change_pct)) : null, mark: q ? null : (p.mark != null ? p.mark_at : null), dist: pfKind(p) === 'order' && entry != null && last ? (entry / last - 1) * 100 : null };
   }
-  function resultSign(p){ var t = String(p.result || ''); return /^\s*(\+|x)/i.test(t) ? 1 : /^\s*(-|−)/.test(t) ? -1 : 0; }
+  /* the type of a row: Spot · Stocks / [short 5x] · Crypto / [buy] order · Crypto (the side as a tag, like everywhere else) */
+  function pfType(p){ var k = pfKind(p), L = levOf(p), cls = ' <span class="muted">· ' + esc(PF_CLASS[p.asset_class] || 'Other') + '</span>';
+    if (k === 'spot') return 'Spot' + cls; if (k === 'leveraged') return pfSide(p) + cls;
+    return pfSideOnly(p) + ' order' + (L > 1 ? ' ' + L + '×' : '') + cls; }
+  function resultSign(p){ var t = String(p.result || ''); return /^\s*(\+|x)/i.test(t) || /^(profit|take profit)/i.test(t) ? 1 : /^\s*(-|−)/.test(t) || /loss/i.test(t) ? -1 : 0; }
   /* one position, as a page: #position/<id> */
   function renderPosition(){
     var box = $('#pos-page'); if (!box) return;
     if (!(access && access.valid)) { box.innerHTML = '<p class="small muted">Members only.</p>'; return; }
+    if (devFor('position')) { box.innerHTML = '<p class="back"><a href="#portfolio">← Active Positions</a></p><div class="banner"><div><b>In development.</b><p>The positions and their stories are being built. Until they open, every call is posted in the Exclusive channel.</p></div></div>'; return; }
     var D = pfData(); var p = D.list.filter(function(x){ return String(x.id) === String(posId); })[0];
-    if (!p) { box.innerHTML = '<p class="back"><a href="#portfolio">← Portfolio</a></p><p class="muted">' + (positions ? 'This position is no longer in the book.' : 'Loading…') + '</p>'; return; }
-    var r = D.R[p.id], N = D.N, trade = isTrade(p), closed = p.status === 'closed', order = pfKind(p) === 'order', T = tradeNums(p, D.Q);
-    var val = r && r.capital != null ? r.value / 100 * N : null, cost = r && r.capital != null ? r.capital / 100 * N : null, pl = val != null && r.entry != null && r.last != null ? val - cost : null;
-    var d1 = r && r.prev != null && r.q && r.q.prev_close != null ? (r.value - r.prev) / 100 * N : null, roi1 = d1 != null && r.prev > 0 ? (r.value - r.prev) / r.prev * 100 : (T.roi1 != null && !trade ? T.roi1 : null);
-    var ret = r && r.ret != null ? r.ret * 100 : (trade ? T.ret : (T.entry && T.last ? (T.last / T.entry - 1) * 100 : null));
+    if (!p) { box.innerHTML = '<p class="back"><a href="#portfolio">← Active Positions</a></p><p class="muted">' + (positions ? 'This position is no longer in the list.' : 'Loading…') + '</p>'; return; }
+    var trade = isTrade(p), closed = p.status === 'closed', order = pfKind(p) === 'order', T = tradeNums(p, D.Q);
     var fact = function(k, v){ return v == null || v === '' ? '' : '<div><span>' + k + '</span><b>' + v + '</b></div>'; };
     var sg = function(v, txt){ return v == null ? '—' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
     var lastTxt = T.last != null ? usdPx(T.last) + (T.mark ? ' <small>mark · ' + esc(M.fmtDate(T.mark)) + '</small>' : '') : '—';
+    var levFact = T.L > 1 ? fact('Leverage', T.L + '×') : '';
     var facts = closed
       ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (resultSign(p) > 0 ? 'pos' : resultSign(p) < 0 ? 'neg' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (pfKind(p) === 'leveraged' ? fact('Leverage', esc(p.leverage || '—')) : '')
       : order
-      ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.entry != null && T.last ? Math.abs((T.entry / T.last - 1) * 100).toFixed(1) + '% ' + (T.entry < T.last ? 'below' : 'above') + ' market' : '—') + (trade ? fact('Leverage', T.L + '×') : fact('Planned weight', p.weight_entry != null ? Number(p.weight_entry).toFixed(2) + '%' : '—')) + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
-      : trade
-      ? fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Leverage', T.L + '×') + fact('1D ROI', sg(T.roi1, pct(T.roi1))) + fact('All-time ROI', sg(ret, pct(ret)))
-      : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt)
-        + fact('Initial weight', r && r.w0 != null ? r.w0.toFixed(2) + '%' : '—') + fact('Current weight', r && r.weightNow != null ? r.weightNow.toFixed(2) + '%' : '—')
-        + fact('1D ROI', sg(roi1, pct(roi1))) + fact('All-time ROI', sg(ret, pct(ret)));
-    var ids = pfIds(p);
-    var posts = function(){ return ids.length ? ids.map(function(i){ var x = POSTS && POSTS[i]; var when = x && x.t ? fmtWhen(x.t) : 'Telegram post';
-        return x && x.img ? '<figure class="post"><figcaption><span>' + esc(when) + '</span><span>Exclusive channel</span></figcaption><img src="' + esc(/^(https?:)?\//.test(x.img) ? x.img : '/' + x.img) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"></figure>'
-          : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; }).join('') : '<p class="small muted">No posts attached to this position.</p>'; };
-    var home = pfHome(p), homeName = { '#track': 'Track Record', '#trades': 'Leveraged Positions', '#portfolio': 'Spot Positions' }[home]; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
+      ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + ' market' : '—') + levFact + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
+      : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('1D', sg(T.roi1, pct(T.roi1))) + fact('Since entry', sg(T.ret, pct(T.ret)));
+    var ids = pfIds(p), story = storyOf(p);
+    var postFig = function(i, cap){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
+      return src ? '<figure class="post"><img src="' + esc(src) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"><figcaption><span>' + esc(when) + '</span><span>' + (cap || 'Exclusive channel') + '</span></figcaption></figure>'
+        : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; };
+    /* the story: the lede, then every chapter with the post of that day beside it; the posts not in any chapter follow */
+    var body = function(){
+      if (!story) return (ids.length ? '<h2 class="k">The calls <span class="muted">· ' + ids.length + ' post' + (ids.length === 1 ? '' : 's') + ' in the Exclusive channel</span></h2><div class="posts-list">' + ids.map(function(i){ return postFig(i); }).join('') + '</div>' : '<h2 class="k">The calls</h2><p class="small muted">No posts attached to this position.</p>');
+      var seen = {}, n = 0;
+      var chapters = story.chapters.map(function(c){ n++; if (c.post) seen[c.post] = 1;
+        return '<article class="chap' + (c.post ? '' : ' nopic') + '"><div class="txt"><span class="dt">' + esc(M.fmtDate(c.d)) + (c.px ? '<b>' + esc(c.px) + '</b>' : '') + '</span><h3>' + esc(c.h) + '</h3><p>' + esc(c.p) + '</p></div>' + (c.post ? postFig(c.post) : '') + '</article>'; }).join('');
+      var rest = ids.filter(function(i){ return !seen[i]; });
+      return '<div class="story"><p class="lede">' + esc(story.lede) + '</p>' + (story.note ? '<p class="note small muted">' + esc(story.note) + '</p>' : '')
+        + '<h2 class="k">The story <span class="muted">· ' + n + ' chapter' + (n === 1 ? '' : 's') + ' · every post as it was made in the Exclusive channel</span></h2><div class="chapters">' + chapters + '</div>'
+        + (rest.length ? '<h2 class="k">More posts</h2><div class="posts-list">' + rest.map(function(i){ return postFig(i); }).join('') + '</div>' : '') + '</div>';
+    };
+    var home = pfHome(p), homeName = home === '#track' ? 'Track Record' : 'Active Positions'; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
+    var held = heldTxt(p), dateline = (closed ? 'Closed ' + (p.closed_at ? esc(M.fmtDate(p.closed_at)) : '') : order ? 'Resting since ' + esc(M.fmtDate(p.opened_at)) : 'Open since ' + esc(M.fmtDate(p.opened_at))) + (held && p.opened_at ? ' · ' + (closed ? 'held ' : '') + held : '') + ' · Exclusive channel';
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
-      + '<div class="pos-hd"><h1><span class="sym">' + esc(p.symbol) + '</span>' + (p.name ? '<span class="nm">' + esc(p.name) + '</span>' : '') + '</h1><p class="tags">' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(PF_CLASS[p.asset_class] || 'Other') + '</span>' + pfDraft(p) + '</p></div>'
+      + '<div class="pos-hd"><p class="dateline">' + dateline + '</p><h1>' + storyTitle(p) + (closed && p.result ? ' <span class="res">' + resultHtml(p) + '</span>' : '') + '</h1><p class="tags"><span class="tag">' + esc(p.symbol) + '</span>' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(PF_CLASS[p.asset_class] || 'Other') + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
-      + '<h2 class="k">The calls' + (ids.length ? ' <span class="muted">· ' + ids.length + ' post' + (ids.length === 1 ? '' : 's') + ' in the Exclusive channel</span>' : '') + '</h2><div class="posts-list" id="pf-posts">' + (POSTS ? posts() : '<p class="small muted">Loading…</p>') + '</div>';
-    if (!POSTS) loadPosts().then(function(){ var el = $('#pf-posts'); if (el && current === 'position') el.innerHTML = posts(); });
+      + '<div id="pf-story">' + (STORIES ? body() : '<p class="small muted">Loading…</p>') + '</div>';
+    if (!STORIES) loadStories().then(function(){ if (current === 'position') renderPosition(); });
   }
-  document.addEventListener('click', function(ev){ var tr = ev.target.closest('#pf-table tr.clk, #pf-ord tr.clk, #tr-table tr.clk, #tr-ord tr.clk, #tk-table tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
+  document.addEventListener('click', function(ev){ var tr = ev.target.closest('#pf-table tr.clk, #tk-table tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
   function pfGrouped(rows, cols, rowFn){ /* one heading row per asset class, in a fixed order */
     var by = {}; rows.forEach(function(p){ var g = PF_CLASS[p.asset_class] || 'Other'; (by[g] = by[g] || []).push(p); });
     return PF_ORDER.filter(function(g){ return by[g]; }).map(function(g){ return '<tr class="grp"><td colspan="' + cols + '">' + g + '</td></tr>' + by[g].map(rowFn).join(''); }).join('');
   }
   async function loadQuotes(){
-    if (!positions || !positions.length) { quotes = {}; qhist = {}; return; }
+    if (!positions || !positions.length) { quotes = {}; return; }
     try { var q = await sb.from('quotes').select('*'); quotes = {}; (q.data || []).forEach(function(r){ quotes[String(r.symbol).toUpperCase()] = r; }); } catch (e) { quotes = {}; }
-    /* daily closes since the first entry (one compact RPC): the chart and the book path. Re-read only when the set of symbols changes or once an hour. */
-    var held = positions.filter(function(p){ return p.status === 'open' && p.kind !== 'order' && p.quote_symbol; });
-    var first = held.map(function(p){ return String(p.opened_at || '').slice(0, 10); }).filter(Boolean).sort()[0];
-    var key = held.map(function(p){ return p.quote_symbol; }).sort().join(',') + '|' + first + '|' + Math.floor(Date.now() / 3600000);
-    if (!first || key === histFor) return;
-    try { var since = new Date(Math.max(Date.parse(first), Date.now() - 400 * 86400000)).toISOString().slice(0, 10); var h = await sb.rpc('quote_history_compact', { since: since }); qhist = {};
-      (h.data || []).forEach(function(r){ var days = r.days || [], closes = r.closes || []; qhist[String(r.symbol).toUpperCase()] = days.map(function(d, i){ return { day: String(d).slice(0, 10), close: Number(closes[i]) }; }); }); histFor = key; } catch (e) { qhist = {}; }
   }
-  var pfRange = 'all', pfGrp = 'security', pfUnit = 'pct' /* percentages only, for now */, pfSort = { k: 'wNow', d: -1 }, trSort = { k: 'ret', d: -1 };
-  var pfBench = (function(){ var v = M.store.get('mws_bench'); return v && typeof v === 'object' ? v : { SPY: true, QQQ: true }; })(); /* which benchmark lines are drawn; the member's choice is remembered on this device */
-  var RANGES = { '1': 'Today', '7': '1 week', 'mtd': 'This month', '30': '1 month', '90': '3 months', 'ytd': 'This year', '365': '1 year', '1825': '5 years', 'all': 'All time' };
-  function usd(v, dp){ if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v); var s = a >= 1e6 ? (a / 1e6).toFixed(dp == null ? 2 : dp) + 'M' : a >= 1e4 ? (a / 1e3).toFixed(dp == null ? 1 : dp) + 'K' : a.toLocaleString('en-US', { maximumFractionDigits: dp == null ? (a < 100 ? 2 : 0) : dp }); return (v < 0 ? '−$' : '$') + s; }
-  function usdFull(v){ if (v == null || !isFinite(v)) return '—'; return (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
-  function usdSigned(v){ if (v == null || !isFinite(v)) return '—'; return (v > 0 ? '+' : '') + usdFull(v); }
-  function qtyFmt(q){ if (q == null || !isFinite(q)) return '—'; return q >= 1000 ? q.toLocaleString('en-US', { maximumFractionDigits: 0 }) : q.toLocaleString('en-US', { maximumFractionDigits: q < 1 ? 4 : 2 }); }
-  /* the first day of the selected range, in the daily series */
-  function rangeFrom(S, rng){ var last = S[S.length - 1].day; if (rng === 'all') return S[0].day; if (rng === 'ytd') return last.slice(0, 4) + '-01-01'; if (rng === 'mtd') return last.slice(0, 7) + '-01'; return new Date(Date.parse(last) - Number(rng) * 86400000).toISOString().slice(0, 10); }
-  function rangeSeg(S, rng){ if (rng === '1') return S.slice(-2); var from = rangeFrom(S, rng); var i0 = Math.max(0, S.findIndex(function(p){ return p.day >= from; })); if (i0 > 0 && rng !== 'all') i0 -= 1; /* one point before the range so the lines start at the edge */ var seg = S.slice(i0); if (seg.length < 2) seg = S.slice(-2); return seg; }
+  var pfSort = { k: 'ret', d: -1 }; /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
   /* the section tag: Live for members, a warning for the owner while members do not see it yet */
   function deskTag(id, unlocked, has){ var onlyMe = staffRole && !sim && !deskLive.portfolio; var t = $('#' + id); t.textContent = unlocked && has ? (onlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); t.className = 'soon' + (onlyMe && has ? ' warn' : ''); return onlyMe; }
   /* sortable tables: every row carries its values; a header click sorts by that column, again to flip */
   function sortRows(rows, st){ rows.sort(function(a, b){ var x = a.v[st.k], y = b.v[st.k]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return typeof x === 'string' ? st.d * x.localeCompare(y) : st.d * (x - y); }); return rows; }
   function th(label, k, st, cls, title){ return '<th class="' + (cls || '') + (st.k === k ? ' on' : '') + '" data-k="' + k + '" tabindex="0" role="button" aria-sort="' + (st.k === k ? (st.d < 0 ? 'descending' : 'ascending') : 'none') + '"' + (title ? ' title="' + title + '"' : '') + '>' + label + (st.k === k ? ' <i aria-hidden="true">' + (st.d < 0 ? '↓' : '↑') + '</i>' : '') + '</th>'; }
   function renderPortfolio(){
-    var D = pfData(), list = D.list, unlocked = !!(access && access.valid), P = pfSplit(list);
-    $('#n-pf').textContent = P.spot.length ? String(P.spot.length) : ''; $('#n-tr').textContent = P.lev.length + P.ordT.length ? String(P.lev.length + P.ordT.length) : ''; $('#n-tk').textContent = '';
-    var onlyMe = deskTag('pf-tag', unlocked, list.length > 0); deskTag('tr-tag', unlocked, list.length > 0); deskTag('tk-tag', unlocked, list.length > 0);
+    var D = pfData(), list = D.list, unlocked = !!(access && access.valid), P = pfSplit(list), nOpen = P.spot.length + P.lev.length;
+    $('#n-pf').textContent = !devFor('portfolio') && nOpen ? String(nOpen) : ''; $('#n-tk').textContent = '';
+    var onlyMe = deskTag('pf-tag', unlocked, list.length > 0); deskTag('tk-tag', unlocked, list.length > 0);
     $('#desk-grp-tag').textContent = devFor('portfolio') ? 'In development' : (unlocked && list.length ? (onlyMe ? 'Owner preview' : 'Live') : 'In development');
-    renderBook(D, P, unlocked); renderTrades(D, P, unlocked); renderTrack(D, P, unlocked); pressChips(); syncBarTag();
+    renderBook(D, P, unlocked); renderTrack(D, P, unlocked); pressChips(); syncBarTag();
   }
-  /* /02 Portfolio: the spot book. Range chips → KPIs + chart; exposure donut; the holdings grid (a row opens its page). */
+  /* Active Positions: every open call in one list — spot positions, leveraged trades, resting orders — each a price, a move and a Details link to its story. */
   function renderBook(D, P, unlocked){
-    var list = D.list, Q = D.Q, N = D.N, book = D.book, R = D.R;
-    if (devFor('portfolio')) { $('#pf-locked').hidden = true; $('#pf-live').hidden = true; $('#pf-empty').hidden = false; var pt = $('#pf-tag'); pt.textContent = 'In development'; pt.className = 'soon'; $('#n-pf').textContent = ''; return; }
-    $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && list.length); $('#pf-empty').hidden = !(unlocked && !list.length); $('#pf-sub').hidden = true;
-    if (!(unlocked && list.length)) return;
-    M.$$('#pf-rng button').forEach(function(b){ b.classList.toggle('on', b.dataset.r === pfRange); });
-    M.$$('#pf-grp button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === pfGrp); });
-    $('#pf-chart-sub').textContent = '· ' + RANGES[pfRange];
-    var rows = book.rows.filter(function(r){ return r.capital != null; }), live = rows.filter(function(r){ return r.source === 'live'; }).length;
-    var val$ = function(r){ return r.value / 100 * N; }, cost$ = function(r){ return r.capital / 100 * N; }, pl$ = function(r){ return (r.value - r.capital) / 100 * N; }, pl1d$ = function(r){ return r.prev != null && r.q && r.q.prev_close != null ? (r.value - r.prev) / 100 * N : null; };
-    var S = book.series || [], hasHist = Object.keys(D.H).some(function(k){ return D.H[k] && D.H[k].length >= 2; });
-    /* KPIs: the value of the book against the $1,000,000 it started with; the selected range; the last 24 h */
-    var bookVal = book.B / 100 * N, bookPL = bookVal - N, pl1 = book.todayBook != null && live ? bookVal - bookVal / (1 + book.todayBook) : null, roi1 = book.todayBook != null && live ? book.todayBook * 100 : null;
-    var rk = pfRange === '1' ? 'all' : pfRange, rPL = null, rPct = null, rSince = null;
-    if (rk === 'all' || (S.length >= 2 && rangeFrom(S, rk) <= S[0].day)) { rPL = bookPL; rPct = book.retTotal * 100; rSince = book.first; }
-    else if (hasHist && S.length >= 2) { var seg0 = rangeSeg(S, rk)[0], base = N * (1 + seg0.book); rPL = bookVal - base; rPct = base > 0 ? (bookVal / base - 1) * 100 : null; rSince = seg0.day; }
-    var kp = function(k, v, d, big){ return '<div class="kp' + (big ? ' big' : '') + '"><span>' + k + '</span><b>' + v + '</b>' + (d ? '<em>' + d + '</em>' : '') + '</div>'; };
-    var sg = function(v, txt){ return v == null ? '<span class="muted">—</span>' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
-    var asOfTxt = book.asOf ? 'prices as of ' + hhmm(book.asOf) + ' (your time)' : (live ? 'live prices' : 'prices: none yet');
-    /* percentages only for now: no value block (a "what $1M would have become" line may come later) */
-    /* exposure: current weights by asset or by class, cash included */
-    var groups = {}, keyOf = function(r){ return pfGrp === 'class' ? (PF_CLASS[r.p.asset_class] || 'Other') : String(r.p.symbol); };
-    rows.forEach(function(r){ var k = keyOf(r); var g = groups[k] = groups[k] || { k: k, w: 0, v: 0, n: 0 }; g.w += r.weightNow || 0; g.v += val$(r); g.n++; });
-    var segs = Object.keys(groups).map(function(k){ return groups[k]; }).sort(function(a, b){ return b.w - a.w; });
-    if (book.cashNow > 0) segs.push({ k: 'Cash', w: book.cashNow, v: Math.max(0, book.cash) / 100 * N, n: 0, cash: true });
-    $('#pf-donut').innerHTML = donut(segs);
-    /* performance */
-    renderChart(book, Q, N, hasHist);
-    $('#pf-perf-empty').hidden = !$('#pf-chart-sec').hidden;
-    /* holdings */
-    var hrows = rows.map(function(r){ var p = r.p, v1 = pl1d$(r), ro1 = v1 != null && r.prev > 0 ? (r.value - r.prev) / r.prev * 100 : null;
-      return { p: p, r: r, v: { sym: String(p.symbol), since: String(p.opened_at || ''), entry: r.entry, last: r.last, roi1: ro1, pl1: v1, w0: r.w0, cost: cost$(r), wNow: r.weightNow, val: val$(r), ret: r.ret != null ? r.ret * 100 : null, pl: r.entry != null && r.last != null ? pl$(r) : null } }; });
-    sortRows(hrows, pfSort);
-    var unweighted = P.spot.filter(function(p){ return !R[p.id] || R[p.id].capital == null; });
-    var head = '<thead><tr>' + th('Position', 'sym', pfSort) + th('Since', 'since', pfSort) + th('Entry', 'entry', pfSort, 'num') + th('Last', 'last', pfSort, 'num') + th('1D ROI', 'roi1', pfSort, 'num', 'Since the previous close')
-      + th('Weight', 'wNow', pfSort, 'num', 'Share of the book now') + th('All-time ROI', 'ret', pfSort, 'num') + '<th></th></tr></thead>';
-    var lastCell = function(r){ if (r.last == null) return cell('Last', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last', usdPx(r.last) + (r.source === 'mark' ? '<span class="sub muted">mark' + (r.p.mark_at ? ' · ' + M.fmtDate(r.p.mark_at) : '') + '</span>' : ''), 'num'); };
-    var row = function(h){ var p = h.p, r = h.r, v = h.v;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
-        + cell('Entry', r.entry != null ? usdPx(r.entry) : '—', 'num') + lastCell(r)
-        + cell('1D ROI', v.roi1 == null ? '—' : pct(v.roi1), 'num' + sgn(v.roi1))
-        + cell('Weight', v.wNow != null ? v.wNow.toFixed(2) + '%' : '—', 'num')
-        + cell('All-time ROI', v.ret == null ? '—' : pct(v.ret), 'num' + sgn(v.ret)) + detailsCell(p) + '</tr>'; };
-    var unwRow = function(p){ var T = tradeNums(p, Q), ret = T.entry && T.last ? (T.last / T.entry - 1) * 100 : null;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry', T.entry != null ? usdPx(T.entry) : '—', 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num')
-        + cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('Weight', '<span class="muted">—</span>', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + detailsCell(p) + '</tr>'; };
-    var cashRow = '<tr class="cash"><td class="em" data-l="Position"><span class="sym">Cash</span><span class="nm">unallocated</span></td>' + cell('Since', '—', 'muted') + cell('Entry', '—', 'num muted') + cell('Last', '—', 'num muted') + cell('1D ROI', '0.00%', 'num muted') + cell('Weight', book.cashNow != null ? book.cashNow.toFixed(2) + '%' + (book.cash < -0.005 ? '<span class="sub neg">over-allocated</span>' : '') : '—', 'num') + cell('All-time ROI', '0.00%', 'num muted') + '<td></td></tr>';
-    $('#pf-table').innerHTML = head + '<tbody>' + hrows.map(row).join('') + unweighted.map(unwRow).join('') + cashRow + '</tbody>';
-    $('#pf-hold-n').textContent = '· ' + P.spot.length + ' position' + (P.spot.length === 1 ? '' : 's') + ' + cash';
-    /* resting spot orders */
-    var ordRow = function(p){ var T = tradeNums(p, Q), dist = T.entry != null && T.last ? (T.entry / T.last - 1) * 100 : null;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, true), 'em') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) + (T.q && T.q.change_pct != null ? '<span class="sub' + sgn(T.q.change_pct) + '">' + pct(T.q.change_pct) + ' today</span>' : '') : '—', 'num')
-        + cell('Distance', dist != null ? Math.abs(dist).toFixed(1) + '% ' + (dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num') + cell('Planned weight', p.weight_entry != null ? Number(p.weight_entry).toFixed(2) + '%' : '—', 'num') + '</tr>'; };
-    $('#pf-orders').hidden = !P.ordS.length;
-    if (P.ordS.length) $('#pf-ord').innerHTML = '<thead><tr><th>Asset</th><th class="num">Level</th><th class="num">Last</th><th class="num">Distance</th><th class="num">Planned weight</th></tr></thead><tbody>' + pfGrouped(P.ordS, 5, ordRow) + '</tbody>';
+    var list = D.list, Q = D.Q, open = P.open;
+    if (devFor('portfolio')) { $('#pf-locked').hidden = true; $('#pf-live').hidden = true; $('#pf-none').hidden = true; $('#pf-empty').hidden = false; var pt = $('#pf-tag'); pt.textContent = 'In development'; pt.className = 'soon'; $('#n-pf').textContent = ''; return; }
+    $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && open.length); $('#pf-empty').hidden = true; $('#pf-none').hidden = !(unlocked && !open.length); $('#pf-sub').hidden = true;
+    if (!(unlocked && open.length)) return;
+    var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), type: pfKind(p) + ' ' + String(p.side || ''), since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist) } }; };
+    var sortGroup = function(rows, orders){ var st = pfSort; if (orders && (st.k === 'ret' || st.k === 'roi1')) st = { k: 'dist', d: 1 }; /* orders: the nearest level first */ return sortRows(rows, st); };
+    var head = '<thead><tr>' + th('Position', 'sym', pfSort) + th('Type', 'type', pfSort) + th('Since', 'since', pfSort, '', 'The day of the call; the day an order was placed') + th('Entry', 'entry', pfSort, 'num', 'Average entry · the level of an order') + th('Last', 'last', pfSort, 'num') + th('1D', 'roi1', pfSort, 'num', 'Since the previous close · shorts the other way round') + th('Since entry', 'ret', pfSort, 'num', LEV_ROI === 'margin' ? 'The move in the price, times the leverage' : 'The move in the price since the call; shorts the other way round') + '<th></th></tr></thead>';
+    var lastCell = function(T){ if (T.last == null) return cell('Last', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last', usdPx(T.last) + (T.mark ? '<span class="sub muted">mark' + (T.mark ? ' · ' + esc(M.fmtDate(T.mark)) : '') + '</span>' : ''), 'num'); };
+    var row = function(h){ var p = h.p, T = h.T, order = pfKind(p) === 'order';
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, false, false), 'em') + cell('Type', '<span>' + pfType(p) + '</span>', 'muted') + cell(order ? 'Placed' : 'Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
+        + cell(order ? 'Level' : 'Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T)
+        + (order ? cell('1D', T.q && T.q.change_pct != null ? '<span class="muted">' + pct(Number(T.q.change_pct)) + '</span>' : '—', 'num') : cell('1D', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)))
+        + (order ? cell('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num muted') : cell('Since entry', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret)))
+        + detailsCell(p) + '</tr>'; };
+    var grp = function(rows, title, sub){ return rows.length ? '<tr class="grp"><td colspan="8">' + title + ' <span class="muted">· ' + rows.length + (sub ? ' ' + sub : '') + '</span></td></tr>' + rows.map(row).join('') : ''; };
+    var spot = sortGroup(P.spot.map(mk)), lev = sortGroup(P.lev.map(mk)), ord = sortGroup(P.ord.map(mk), true);
+    $('#pf-table').innerHTML = head + '<tbody>' + grp(spot, 'Spot', spot.length === 1 ? 'position' : 'positions') + grp(lev, 'Leveraged', lev.length === 1 ? 'trade' : 'trades') + grp(ord, 'Orders', 'waiting to fill') + '</tbody>';
+    var up = open.filter(function(p){ return pfKind(p) !== 'order'; }).map(function(p){ return tradeNums(p, Q).ret; }).filter(function(v){ return v != null; }), wins = up.filter(function(v){ return v > 0; }).length;
+    var asOf = open.map(function(p){ var q = pfQuote(p, Q); return q && (q.updated_at || q.quoted_at); }).filter(Boolean).sort().pop();
     var nDraft = list.filter(function(p){ return p.published === false; }).length;
-    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'A model portfolio that tracks our calls' + (book.first ? ' since ' + M.fmtDate(book.first) : '') + ': every position enters on the day of the call, at the weight we gave, and the curve is the return of that book — what a member who followed every call would have made. Cash earns nothing · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · ' + asOfTxt + ' · Details opens the position with its weights and the original Telegram posts · not financial advice: this is what we hold.';
+    $('#pf-line').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + (P.spot.length + P.lev.length) + ' open position' + (P.spot.length + P.lev.length === 1 ? '' : 's') + (P.ord.length ? ' · ' + P.ord.length + ' order' + (P.ord.length === 1 ? '' : 's') + ' resting' : '') + (up.length ? ' · ' + wins + ' of ' + up.length + ' above entry' : '') + (asOf ? ' · prices as of ' + hhmm(asOf) + ' (your time)' : '');
+    $('#pf-foot').innerHTML = 'Every open call from the Exclusive channel, priced live: entry as posted, last price, the move since entry (shorts gain when the price falls' + (LEV_ROI === 'margin' ? '; leveraged trades at their leverage' : '; leveraged trades show the move in the price, the leverage beside the side') + ') · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · orders show the level and how far the market is from it · Details opens the story of the call with every post as it was made · not financial advice: this is what we hold.';
   }
-  /* /03 Trades: leveraged, on their own capital. ROI only — never a size. */
-  var DEV_PAGES = { trades: true, track: true }; /* sections still being built: everyone sees "In development" whatever the data says */
-  function devFor(page){ return !!DEV_PAGES[page] || !staffRole || !!sim; } /* members (and the owner's "View as") see the whole Portfolio and Desk as In development until it is opened; staff see the real state */
-  function renderTrades(D, P, unlocked){
-    var Q = D.Q, n = P.lev.length + P.ordT.length;
-    if (DEV_PAGES.trades) { $('#tr-locked').hidden = true; $('#tr-live').hidden = true; $('#tr-empty').hidden = false; $('#tr-empty').innerHTML = '<div><b>In development.</b><p>Leveraged positions are being built. Until they open, the trades are posted in the Exclusive channel.</p></div>'; var tt = $('#tr-tag'); tt.textContent = 'In development'; tt.className = 'soon'; $('#n-tr').textContent = ''; return; }
-    $('#tr-locked').hidden = unlocked; $('#tr-live').hidden = !(unlocked && n); $('#tr-empty').hidden = !(unlocked && !n);
-    if (!(unlocked && n)) return;
-    var rows = P.lev.map(function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), side: String(p.side || 'long'), L: T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret } }; });
-    sortRows(rows, trSort);
-    var head = '<thead><tr>' + th('Trade', 'sym', trSort) + th('Side', 'side', trSort) + th('Leverage', 'L', trSort, 'num') + th('Since', 'since', trSort) + th('Entry', 'entry', trSort, 'num') + th('Last', 'last', trSort, 'num') + th('1D ROI', 'roi1', trSort, 'num', 'Since the previous close, at the stated leverage') + th('All-time ROI', 'ret', trSort, 'num', 'On the margin, at the stated leverage') + '</tr></thead>';
-    var row = function(h){ var p = h.p, T = h.T, v = h.v;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Trade', pfName(p, false), 'em') + cell('Side', pfSideOnly(p)) + cell('Leverage', T.L + '×', 'num') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
-        + cell('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : '') : '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num')
-        + cell('1D ROI', v.roi1 == null ? '—' : pct(v.roi1), 'num' + sgn(v.roi1)) + cell('All-time ROI', v.ret == null ? '—' : pct(v.ret), 'num' + sgn(v.ret)) + '</tr>'; };
-    $('#tr-table').innerHTML = head + '<tbody>' + (rows.length ? rows.map(row).join('') : '<tr><td colspan="8" class="muted">No leveraged trade open right now.</td></tr>') + '</tbody>';
-    var ordRow = function(p){ var T = tradeNums(p, Q), dist = T.entry != null && T.last ? (T.entry / T.last - 1) * 100 : null;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, false), 'em') + cell('Side', pfSideOnly(p)) + cell('Leverage', T.L + '×', 'num') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num') + cell('Distance', dist != null ? Math.abs(dist).toFixed(1) + '% ' + (dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num') + '</tr>'; };
-    $('#tr-orders').hidden = !P.ordT.length;
-    if (P.ordT.length) $('#tr-ord').innerHTML = '<thead><tr><th>Asset</th><th>Side</th><th class="num">Leverage</th><th class="num">Level</th><th class="num">Last</th><th class="num">Distance</th></tr></thead><tbody>' + pfGrouped(P.ordT, 6, ordRow) + '</tbody>';
-    var asOf = rows.map(function(h){ return h.T.q && (h.T.q.updated_at || h.T.q.quoted_at); }).filter(Boolean).sort().pop();
-    $('#tr-foot').innerHTML = 'Trades run on their own capital, apart from the portfolio · ROI is on the margin at the stated leverage (a 3× short gains 3% when the price drops 1%) · 1D = since the previous close' + (asOf ? ' · prices as of ' + hhmm(asOf) + ' (your time)' : '') + ' · click a trade for the original Telegram posts · not financial advice.';
-  }
-  /* /04 Track record: every closed call, the latest first */
+  var DEV_PAGES = {}; /* sections still being built: everyone sees "In development" whatever the data says */
+  var LIVE_KEY = { portfolio: 'portfolio', track: 'portfolio', position: 'portfolio', calendar: 'calendar', earnings: 'earnings' };
+  /* members (and the owner's "View as") see a section once it is live (admin → Settings → What goes live); staff see the real state at all times, the tag saying "Only you" until then */
+  function devFor(page){ return !!DEV_PAGES[page] || ((!staffRole || !!sim) && !deskLive[LIVE_KEY[page] || page]); }
+  /* Track Record: the paper. The lead story, then every closed call as an article (the cover post, the headline, the result,
+     the lede), the open ones, the calls whose exit was never posted; the ledger (one line per call) at the end. */
   function renderTrack(D, P, unlocked){
-    var closed = P.closed.slice().sort(function(a, b){ return String(b.closed_at || '').localeCompare(String(a.closed_at || '')); });
-    if (DEV_PAGES.track) { $('#tk-locked').hidden = true; $('#tk-live').hidden = true; $('#tk-empty').hidden = false; $('#tk-empty').innerHTML = '<div><b>In development.</b><p>The track record is being built: every closed call with entry, exit and result, automatically.</p></div>'; var kt = $('#tk-tag'); kt.textContent = 'In development'; kt.className = 'soon'; return; }
+    var closed = P.closed.slice().sort(function(a, b){ return String(b.closed_at || '').localeCompare(String(a.closed_at || '')) || String(b.opened_at || '').localeCompare(String(a.opened_at || '')); });
+    if (devFor('track')) { $('#tk-locked').hidden = true; $('#tk-live').hidden = true; $('#tk-empty').hidden = false; $('#tk-empty').innerHTML = '<div><b>In development.</b><p>The track record is being built: every call with entry, exit and result, and the posts behind it.</p></div>'; var kt = $('#tk-tag'); kt.textContent = 'In development'; kt.className = 'soon'; return; }
     $('#tk-locked').hidden = unlocked; $('#tk-live').hidden = !(unlocked && closed.length); $('#tk-empty').hidden = !(unlocked && !closed.length);
     if (!(unlocked && closed.length)) return;
-    var wins = closed.filter(function(p){ return resultSign(p) > 0; }).length;
-    $('#tk-table').innerHTML = '<thead><tr><th>Position</th><th>Type</th><th>Side</th><th class="num">Entry</th><th class="num">Exit</th><th class="num">Result</th><th>Opened</th><th>Closed</th></tr></thead><tbody>'
+    if (!STORIES) { $('#tk-paper').innerHTML = '<p class="small muted">Loading…</p>'; loadStories().then(function(){ if (current === 'track') renderPortfolio(); }); }
+    var S = function(p){ return storyOf(p) || null; };
+    var posted = closed.filter(function(p){ var s = S(p); return !s || s.tier !== 'noexit'; }), unposted = closed.filter(function(p){ var s = S(p); return s && s.tier === 'noexit'; });
+    var wins = posted.filter(function(p){ return resultSign(p) > 0; }).length, losses = posted.filter(function(p){ return resultSign(p) < 0; }).length, flat = posted.length - wins - losses;
+    var first = closed.concat(P.open).map(function(p){ return p.opened_at; }).filter(Boolean).sort()[0];
+    var lead = posted.filter(function(p){ var s = S(p); return s && s.lead; })[0] || posted[0];
+    var cover = function(p){ var s = S(p); var id = s && s.cover; var src = id && postImg(id); return src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : '<span class="nopic"></span>'; };
+    var when = function(p){ return p.status === 'closed' ? (p.closed_at ? esc(M.fmtDate(p.opened_at)) + ' → ' + esc(M.fmtDate(p.closed_at)) : 'from ' + esc(M.fmtDate(p.opened_at))) : 'since ' + esc(M.fmtDate(p.opened_at)); };
+    var kindTxt = function(p){ return (pfKind(p) === 'leveraged' ? 'Trade' : 'Spot') + ' · ' + esc(PF_CLASS[p.asset_class] || 'Other'); };
+    var art = function(p, cls){ var s = S(p), main = !s || s.tier !== 'noexit'; return '<a class="art ' + (cls || '') + '" href="#position/' + esc(String(p.id)) + '"><span class="pic">' + cover(p) + '</span><span class="dt">' + when(p) + ' · ' + kindTxt(p) + '</span><span class="hl">' + storyTitle(p) + '</span>' + (p.status === 'closed' ? '<span class="res">' + resultHtml(p) + (p.exit && main ? ' <span class="muted">· out ' + esc(p.exit) + '</span>' : '') + '</span>' : '') + (s ? '<span class="ld">' + esc(s.lede) + '</span>' : '') + '</a>'; };
+    var html = '<p class="dateline">Since ' + (first ? esc(M.fmtDate(first)) : 'the first call') + ' · ' + posted.length + ' closed calls: ' + wins + ' positive · ' + losses + ' negative · ' + flat + ' flat' + (unposted.length ? ' · ' + unposted.length + ' without a posted exit' : '') + ' · ' + (P.spot.length + P.lev.length) + ' open</p>';
+    if (lead) { var ls = S(lead); html += '<a class="lead" href="#position/' + esc(String(lead.id)) + '"><span class="txt"><span class="dt">' + when(lead) + ' · ' + kindTxt(lead) + ' · ' + esc(heldTxt(lead)) + '</span><span class="hl">' + storyTitle(lead) + '</span><span class="res">' + resultHtml(lead) + (lead.exit ? ' <span class="muted">· out ' + esc(lead.exit) + '</span>' : '') + '</span>' + (ls ? '<span class="ld">' + esc(ls.lede) + '</span>' : '') + '<span class="more">Read the story →</span></span><span class="pic">' + cover(lead) + '</span></a>'; }
+    var others = posted.filter(function(p){ return p !== lead; });
+    if (others.length) html += '<div class="sh"><h2>Closed calls <span class="muted">· newest first</span></h2></div><div class="arts">' + others.map(function(p){ return art(p); }).join('') + '</div>';
+    var open = P.open.filter(function(p){ return pfKind(p) !== 'order'; }).slice().sort(function(a, b){ return (a.sort || 100) - (b.sort || 100) || String(b.opened_at || '').localeCompare(String(a.opened_at || '')); });
+    if (open.length) html += '<div class="sh"><h2>Open now <span class="muted">· ' + open.length + ' position' + (open.length === 1 ? '' : 's') + ' · the story so far</span></h2></div><div class="arts">' + open.map(function(p){ return art(p, 'open'); }).join('') + '</div>';
+    if (unposted.length) html += '<div class="sh"><h2>Called, exit not posted <span class="muted">· ' + unposted.length + ' · the entry was posted, the close was not — no result is claimed</span></h2></div><div class="arts sm">' + unposted.map(function(p){ return art(p, 'sm'); }).join('') + '</div>';
+    $('#tk-paper').innerHTML = html;
+    $('#tk-ledger-n').textContent = '· ' + closed.length + ' closed call' + (closed.length === 1 ? '' : 's');
+    $('#tk-table').innerHTML = '<thead><tr><th>Position</th><th>Type</th><th>Side</th><th class="num">Entry</th><th class="num">Exit</th><th class="num">Result</th><th>Opened</th><th>Closed</th><th>Held</th><th></th></tr></thead><tbody>'
       + closed.map(function(p){ var s = resultSign(p); return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + (p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + pfDraft(p), 'em') + cell('Type', pfKind(p) === 'leveraged' ? 'Trade' + (p.leverage ? ' · ' + esc(p.leverage) : '') : 'Spot', 'muted') + cell('Side', pfSideOnly(p))
-        + cell('Entry', esc(p.entry || usdPx(p.entry_price)), 'num') + cell('Exit', esc(p.exit || '—'), 'num') + cell('Result', '<b>' + esc(p.result || '—') + '</b>', 'num' + (s > 0 ? ' pos' : s < 0 ? ' neg' : '')) + cell('Opened', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Closed', esc(p.closed_at ? M.fmtDate(p.closed_at) : '—'), 'muted') + '</tr>'; }).join('') + '</tbody>';
-    $('#tk-foot').innerHTML = wins + ' of ' + closed.length + ' closed calls positive · results as called in the Exclusive channel, without leverage unless stated · click a call for the original posts · the audited track record (entry, exit and result at the prices of the day) is being built.';
+        + cell('Entry', esc(p.entry || usdPx(p.entry_price)), 'num') + cell('Exit', esc(p.exit || '—'), 'num') + cell('Result', '<b>' + esc(p.result || '—') + '</b>', 'num' + (s > 0 ? ' pos' : s < 0 ? ' neg' : '')) + cell('Opened', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Closed', esc(p.closed_at ? M.fmtDate(p.closed_at) : '—'), 'muted') + cell('Held', esc(heldTxt(p) || '—'), 'muted') + detailsCell(p) + '</tr>'; }).join('') + '</tbody>';
+    $('#tk-foot').innerHTML = wins + ' of ' + posted.length + ' closed calls with a posted exit were positive · prices and dates exactly as posted in the Exclusive channel, nothing added later · results on the price (leveraged trades: the move in the price, not the return on the margin) · "small loss" and "breakeven" as written at the time · every story opens the posts of the day, in the order they were made · not financial advice: this is what was done.';
   }
   function pfSideOnly(p){ var s = String(p.side || 'long'); var warn = s === 'short' || s === 'sell'; return '<span class="tag ' + (warn ? 'warn' : 'ok') + '">' + esc(s) + '</span>'; }
   /* a donut of weights: monochrome slices, labels outside, the biggest first */
-  function donut(segs){
-    var tot = segs.reduce(function(a, s){ return a + Math.max(0, s.w); }, 0); if (!(tot > 0)) return '<p class="small muted">Nothing to show yet.</p>';
-    var W = 640, cx = W / 2, cy = 268, R0 = 176, R1 = 110, a0 = -Math.PI / 2, out = '', labels = '', lab = [];
-    segs.forEach(function(s, i){ var f = Math.min(0.9999, Math.max(0, s.w) / tot); if (f <= 0) return; var a1 = a0 + f * Math.PI * 2, big = f > 0.5 ? 1 : 0;
-      var p = function(r, a){ return (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1); };
-      var d = 'M' + p(R0, a0) + 'A' + R0 + ',' + R0 + ' 0 ' + big + ',1 ' + p(R0, a1) + 'L' + p(R1, a1) + 'A' + R1 + ',' + R1 + ' 0 ' + big + ',0 ' + p(R1, a0) + 'Z';
-      out += '<path class="sl c' + Math.min(i, 7) + (s.cash ? ' cash' : '') + '" d="' + d + '"><title>' + esc(s.k) + ' · ' + s.w.toFixed(2) + '%' + (s.v != null ? ' · ' + usdFull(s.v) : '') + '</title></path>';
-      if (f >= 0.015) { var am = (a0 + a1) / 2; lab.push({ k: s.k, w: s.w, am: am, right: Math.cos(am) >= 0, y: cy + (R0 + 48) * Math.sin(am) }); }
-      a0 = a1; });
-    [true, false].forEach(function(side){ var L = lab.filter(function(l){ return l.right === side; }).sort(function(a, b){ return a.y - b.y; }); for (var i = 1; i < L.length; i++) if (L[i].y - L[i - 1].y < 18) L[i].y = L[i - 1].y + 18; for (var j = L.length - 2; j >= 0; j--) if (L[j + 1].y - L[j].y < 18) L[j].y = L[j + 1].y - 18; });
-    lab.forEach(function(l){ var x1 = cx + (R0 + 4) * Math.cos(l.am), y1 = cy + (R0 + 4) * Math.sin(l.am), x2 = cx + (R0 + 40) * Math.cos(l.am), lx = cx + (R0 + 48) * Math.cos(l.am);
-      labels += '<line class="ll" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + l.y.toFixed(1) + '"/><text class="lt" x="' + lx.toFixed(1) + '" y="' + (l.y + 4).toFixed(1) + '" text-anchor="' + (l.right ? 'start' : 'end') + '">' + esc(l.k) + ' <tspan class="lp">' + l.w.toFixed(1) + '%</tspan></text>'; });
-    var n = segs.filter(function(s){ return !s.cash; }).length;
-    return '<svg viewBox="0 0 ' + W + ' 540" class="dn">' + out + labels + '<text class="dc" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + n + '</text><text class="dl" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">' + (pfGrp === 'class' ? (n === 1 ? 'class' : 'classes') : (n === 1 ? 'holding' : 'holdings')) + '</text></svg>';
-  }
-  /* the book against the market, daily: in % (rebased to the start of the range) or in $ (what $1,000,000 became — the same for the S&P 500 and the Nasdaq 100) */
-  function renderChart(book, Q, N, hasHist){
-    var sec = $('#pf-chart-sec'); var S = book.series || [];
-    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-tip').innerHTML = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
-    sec.hidden = false; /* visible before measuring: the chart takes the width it will be drawn at */
-    var seg = rangeSeg(S, pfRange), n = seg.length, usdMode = pfUnit === 'usd';
-    var raw = pfRange === 'all' || seg[0].day === S[0].day; /* from the start of the book: against the $1,000,000, not rebased */
-    var reb = function(k){ if (raw) return seg.map(function(p){ return p[k] == null ? null : p[k]; }); var b = seg[0][k]; return seg.map(function(p){ return p[k] == null || b == null ? null : (1 + p[k]) / (1 + b) - 1; }); };
-    var disp = usdMode ? function(r){ return N * (1 + r); } : function(r){ return r * 100; };
-    var fmtV = usdMode ? function(v){ return usd(v); } : function(v){ return pct(v); };
-    var fmtTick = usdMode ? function(v){ return usd(v, Math.abs(hi - lo) < N * 0.1 ? 3 : 2); } : function(v){ var dp = step < 1 ? (step < 0.25 ? 2 : 1) : 0; return (v > 0 ? '+' : '') + v.toFixed(dp) + '%'; };
-    var allLines = [{ k: 'book', l: 'Portfolio', v: reb('book'), c: 'lb' }, { k: 'SPY', l: 'S&P 500', v: reb('SPY'), c: 'ls' }, { k: 'QQQ', l: 'Nasdaq 100', v: reb('QQQ'), c: 'lq' }].filter(function(x){ return x.v.some(function(v){ return v != null; }); });
-    var lines = allLines.filter(function(x){ return x.k === 'book' || pfBench[x.k] !== false; });
-    lines.forEach(function(x){ x.d = x.v.map(function(r){ return r == null ? null : disp(r); }); });
-    var all = []; lines.forEach(function(x){ x.d.forEach(function(v){ if (v != null) all.push(v); }); });
-    var zeroV = disp(0), lo = Math.min(zeroV, Math.min.apply(null, all)), hi = Math.max(zeroV, Math.max.apply(null, all)); if (hi - lo < (usdMode ? N * 0.02 : 2)) { hi += usdMode ? N * 0.01 : 1; lo -= usdMode ? N * 0.01 : 1; } var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
-    var cw = $('#pf-chart').clientWidth || 800, W = Math.max(300, cw - 36), Hh = Math.round(Math.max(260, Math.min(470, W * 0.5))), L = 8, Rr = W < 560 ? 54 : (usdMode ? 70 : 58), T = 14, Bt = 30;
-    var X = function(i){ return L + (W - L - Rr) * i / (n - 1); }, Y = function(v){ return T + (Hh - T - Bt) * (1 - (v - lo) / (hi - lo)); };
-    var nice = [0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000], wantN = Hh >= 400 ? 6 : 5, step = nice[nice.length - 1];
-    for (var si = 0; si < nice.length; si++) if ((hi - lo) / nice[si] <= wantN) { step = nice[si]; break; }
-    var ticks = []; for (var tv = Math.ceil(lo / step) * step; tv <= hi + 1e-9; tv += step) ticks.push(Math.round(tv / step) * step); /* multiples of a round number inside the range */
-    var grid = ticks.map(function(v){ return '<text x="' + (W - Rr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="tk">' + fmtTick(v) + '</text>'; }).join(''); /* the scale on the right, nothing drawn across the chart */
-    var zero = '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(zeroV).toFixed(1) + '" y2="' + Y(zeroV).toFixed(1) + '" class="z"/>'; /* the only line across the chart: 0% */
-    /* the time scale the way a trading chart draws it: day numbers, the month name where the month changes; on long ranges months, the year where it changes */
-    var maxLab = W < 560 ? 5 : Math.floor((W - L - Rr) / 64), xt = [];
-    var mo = function(d){ return new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }); };
-    if (n <= maxLab * 7) { /* up to ~2 months: days */
-      var kd = [1, 2, 3, 5, 7, 10, 14].filter(function(k){ return Math.ceil(n / k) <= maxLab; })[0] || 14;
-      seg.forEach(function(p, i){ var dd = Number(p.day.slice(8, 10)), first = i === 0 || p.day.slice(0, 7) !== seg[i - 1].day.slice(0, 7); if (first) { xt.push({ i: i, t: i === 0 && dd !== 1 ? dd + ' ' + mo(p.day) : mo(p.day), b: true }); return; } if ((dd - 1) % kd === 0 && dd !== 1) xt.push({ i: i, t: String(dd) }); });
-      if (kd >= 5) xt = xt.filter(function(x, j){ return x.b || j === 0 || x.i - xt[j - 1].i >= kd - 1; });
-    } else {
-      var km = [1, 2, 3, 6, 12].filter(function(k){ var cnt = 0; seg.forEach(function(p, i){ if (i === 0 || p.day.slice(0, 7) !== seg[i - 1].day.slice(0, 7)) cnt++; }); return Math.ceil(cnt / k) <= maxLab; })[0] || 12;
-      seg.forEach(function(p, i){ if (i !== 0 && p.day.slice(0, 7) === seg[i - 1].day.slice(0, 7)) return; var mm = Number(p.day.slice(5, 7)); if (mm === 1 || (i === 0 && km > 1)) { xt.push({ i: i, t: mm === 1 ? p.day.slice(0, 4) : mo(p.day), b: true }); return; } if ((mm - 1) % km === 0) xt.push({ i: i, t: mo(p.day) }); });
-    }
-    var xl = xt.map(function(x){ return '<text x="' + X(x.i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk' + (x.b ? ' tb' : '') + '" text-anchor="' + (x.i === 0 ? 'start' : x.i === n - 1 ? 'end' : 'middle') + '">' + x.t + '</text>'; }).join('');
-    var path = function(v){ var d = '', on = false; v.forEach(function(y, i){ if (y == null) { on = false; return; } d += (on ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(y).toFixed(1); on = true; }); return d; };
-    var bookD = lines[0] && lines[0].k === 'book' ? lines[0].d : null, bookR = bookD ? lines[0].v : null;
-    var area = '';
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" class="cv">' + grid + zero + area + lines.map(function(x){ return '<path class="l ' + x.c + '" d="' + path(x.d) + '"/>'; }).join('') + xl + '<line class="hv" x1="0" x2="0" y1="' + T + '" y2="' + (Hh - Bt) + '" hidden/>' + lines.map(function(x){ return '<circle class="dot ' + x.c + '" r="4" hidden/>'; }).join('') + '</svg>';
-    var endTxt = function(x){ var r = x.v[x.v.length - 1]; return r == null ? '—' : usdMode ? usd(disp(r)) + ' <small class="' + sgn(r).trim() + '">' + pct(r * 100) + '</small>' : pct(r * 100); };
-    var legendHtml = allLines.map(function(x){ var off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span class="ln lb">' + x.l + '</span>' : '<button type="button" class="ln lgb ' + x.c + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '">' + x.l + '</button>'; }).join('<span class="sep">·</span>');
-    $('#pf-chart').innerHTML = svg;
-    /* hover: nearest day */
-    var sv = $('#pf-chart svg'), hv = sv.querySelector('.hv'), dots = M.$$('.dot', sv), tip = $('#pf-tip');
-    var show = function(ev){ var rc = sv.getBoundingClientRect(); var px = (ev.clientX - rc.left) / rc.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.removeAttribute('hidden');
-      lines.forEach(function(x, j){ var v = x.d[i]; if (v == null) { dots[j].setAttribute('hidden', ''); return; } dots[j].removeAttribute('hidden'); dots[j].setAttribute('cx', X(i)); dots[j].setAttribute('cy', Y(v)); });
-      tip.innerHTML = statsAt(i); };
-    var statsAt = function(i){ return '<b class="day">' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var r = x.v[i]; return '<span class="sep">·</span><span class="ln ' + x.c + '">' + x.l + '</span> <b class="' + sgn(r).trim() + '">' + (r == null ? '—' : fmtV(disp(r))) + '</b>'; }).join(''); };
-    var hide = function(){ hv.setAttribute('hidden', ''); dots.forEach(function(d){ d.setAttribute('hidden', ''); }); tip.innerHTML = legendHtml; }; /* at rest: just the names (click a benchmark to take it off) */
-    hide();
-    sv.addEventListener('mousemove', show); sv.addEventListener('touchmove', function(ev){ if (ev.touches[0]) show(ev.touches[0]); }, { passive: true }); sv.addEventListener('mouseleave', hide);
-  }
-  var pfRz = null; window.addEventListener('resize', function(){ clearTimeout(pfRz); pfRz = setTimeout(function(){ if (current === 'portfolio' && !$('#pf-live').hidden) renderPortfolio(); }, 200); });
-  document.addEventListener('click', function(ev){ var lb = ev.target.closest('#pf-tip button.lgb'); if (lb) { pfBench[lb.dataset.b] = pfBench[lb.dataset.b] === false; M.store.set('mws_bench', pfBench); renderPortfolio(); return; } var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
-  function sortBy(h){ var st = h.closest('#pf-table') ? pfSort : trSort; if (st.k === h.dataset.k) st.d = -st.d; else { st.k = h.dataset.k; st.d = h.dataset.k === 'sym' || h.dataset.k === 'since' || h.dataset.k === 'side' ? 1 : -1; } renderPortfolio(); var again = $('#' + (st === pfSort ? 'pf-table' : 'tr-table') + ' th[data-k="' + st.k + '"]'); if (again) again.focus(); }
-  document.addEventListener('click', function(ev){ var h = ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) sortBy(h); });
-  document.addEventListener('keydown', function(ev){ if (ev.key !== 'Enter' && ev.key !== ' ') return; var h = ev.target.closest && ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) { ev.preventDefault(); sortBy(h); } });
+  function sortBy(h){ var st = pfSort; if (st.k === h.dataset.k) st.d = -st.d; else { st.k = h.dataset.k; st.d = /^(sym|since|type)$/.test(h.dataset.k) ? 1 : -1; } renderPortfolio(); var again = $('#pf-table th[data-k="' + st.k + '"]'); if (again) again.focus(); }
+  document.addEventListener('click', function(ev){ var h = ev.target.closest('#pf-table th[data-k]'); if (h) sortBy(h); });
+  document.addEventListener('keydown', function(ev){ if (ev.key !== 'Enter' && ev.key !== ' ') return; var h = ev.target.closest && ev.target.closest('#pf-table th[data-k]'); if (h) { ev.preventDefault(); sortBy(h); } });
   /* every chip row tells assistive tech which one is pressed */
   function pressChips(){ $$('.chips button').forEach(function(b){ b.setAttribute('aria-pressed', b.classList.contains('on') ? 'true' : 'false'); }); }
   /* owner preview data: a plausible book with live-looking prices, so "View as" shows the page members get */
@@ -852,11 +733,6 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     { id: 's6', symbol:'MSTR', name:'Strategy', kind:'order', side:'buy', asset_class:'equity', entry:'$80, $70, $60, $50', entry_price:80, quote_symbol:'MSTR', status:'open', opened_at:'2026-09-20', links:['https://t.me/c/2077854583/4450'] },
     { id: 's7', symbol:'BTC', name:'Bitcoin · 2022 cycle', kind:'spot', side:'long', asset_class:'crypto', entry:'16-18K', exit:'100-126K', result:'x7', status:'closed', opened_at:'2022-11-20', closed_at:'2025-11-16', thesis:'Bought when the market called for 10-12K.' } ];
   var SIM_QUOTES = { MSTR: { symbol:'MSTR', price:162.4, prev_close:158, change_pct:2.78, quoted_at:new Date().toISOString() }, PLTR: { symbol:'PLTR', price:171, prev_close:172.5, change_pct:-0.87, quoted_at:new Date().toISOString() }, 'BTC/USD': { symbol:'BTC/USD', price:72150, prev_close:71000, change_pct:1.62, quoted_at:new Date().toISOString() }, SPY: { symbol:'SPY', price:580.2, prev_close:578, change_pct:0.38 }, QQQ: { symbol:'QQQ', price:500.1, prev_close:501.2, change_pct:-0.22 } };
-  var SIM_HIST = (function(){ /* smooth made-up paths from each entry to today's price, daily */
-    var out = {}, end = Date.now(), seed = 7; var rnd = function(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280 - 0.5; };
-    var mk = function(sym, from, p0, p1){ var a = [], t0 = Date.parse(from), n = Math.round((end - t0) / 86400000); for (var i = 0; i <= n; i++) { var f = i / n; a.push({ day: new Date(t0 + i * 86400000).toISOString().slice(0, 10), close: +(p0 + (p1 - p0) * f + (i === n ? 0 : (p1 - p0) * 0.35 * Math.sin(f * 9) + rnd() * p0 * 0.012)).toFixed(2) }); } out[sym] = a; };
-    mk('MSTR', '2026-07-23', 95, 162.4); mk('PLTR', '2026-08-04', 125, 171); mk('BTC/USD', '2026-08-11', 84000, 72150); mk('SPY', '2026-07-23', 545, 580.2); mk('QQQ', '2026-07-23', 468, 500.1); return out; })();
-
   /* The Desk · Calendar (public.calendar_events) and Earnings (public.earnings), filled by the calendar function. RLS hides both from non-members. */
   var events = null, earnings = null, calF = { imp: 3, reg: 'all', wk: 0 }, erF = { scope: 'book', reg: 'all', when: 'ahead' }, calT = null;
   var REGION = { US: 'US', CA: 'US', EU: 'EU', DE: 'EU', FR: 'EU', IT: 'EU', ES: 'EU', GB: 'EU', CH: 'EU', JP: 'AS', CN: 'AS', HK: 'AS', AU: 'AS', NZ: 'AS', KR: 'AS', IN: 'AS', SG: 'AS', CRYPTO: 'CRYPTO' };

@@ -528,8 +528,8 @@ a.tile:hover{background:var(--bg-2)}
 #pos-page h2.k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;margin:28px 0 10px}
 #pos-page .why{color:var(--fg-2);line-height:1.6;max-width:70ch;margin:0;font-size:16px}
 #pos-page .posts-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
-#pos-page .post{margin:0;border:1px solid var(--line);background:var(--bg-2)}
-#pos-page .post figcaption{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);padding:8px 10px;border-bottom:1px solid var(--line)}
+#pos-page .post{margin:0;border:0;background:none}
+#pos-page .post figcaption{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);padding:8px 0 0;border-top:1px solid var(--line)}
 #pos-page .post img{display:block;width:100%;height:auto}
 #pos-page .post.none{padding:12px;color:var(--fg-3);font-size:13px}#pos-page .post.none a{color:var(--fg-2)}
 @media (max-width:760px){.pos-hd h1 .nm{display:block;margin:6px 0 0}}
@@ -581,6 +581,54 @@ body.app .pf-cell .sh{padding-bottom:10px;border-bottom:1px solid var(--line);ma
 body.app #pos-page .facts{gap:0 32px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:22px}
 body.app #pos-page .facts div{background:none;box-shadow:none;padding:14px 0}
 body.app #pos-page .post{background:none}
+/* ===== the track record as a paper: a lead story, then the articles; each position page is the story, chapter by chapter ===== */
+body.app .dateline,.paper .dateline,#pos-page .dateline{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin:0 0 26px;line-height:1.7}
+#pos-page .dateline{margin:0 0 10px}
+.paper .lead{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:0 56px;align-items:start;text-decoration:none;color:inherit;padding:0 0 36px;border-bottom:1px solid var(--line)}
+.paper .lead .txt{display:flex;flex-direction:column;gap:12px;min-width:0}
+.paper .lead .pic,.paper .art .pic{display:block;background:var(--bg-2);overflow:hidden}
+.paper .lead .pic img{display:block;width:100%;height:auto;max-height:640px;object-fit:cover;object-position:top}
+.paper .dt,.paper .art .dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
+.paper .lead .hl{font-size:clamp(30px,3vw,46px);line-height:1.08;letter-spacing:-.02em;font-weight:500;color:var(--fg)}
+.paper .lead .res{font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.paper .res .pos{color:var(--good)}.paper .res .neg{color:var(--bad)}.paper .res .muted{color:var(--fg-2)}
+.paper .lead .ld{font-size:18px;line-height:1.55;color:var(--fg-2);max-width:62ch}
+.paper .lead .more{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg);margin-top:6px}
+.paper .lead:hover .hl,.paper .art:hover .hl{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;text-decoration-color:var(--fg-3)}
+.paper .sh{margin:40px 0 18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.paper .arts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 40px}
+.paper .arts.sm{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 32px}
+.paper .art{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;min-width:0}
+.paper .art .pic{margin-bottom:6px}
+.paper .art .pic img{width:100%;height:auto;max-height:340px;object-fit:cover;object-position:top;display:block}
+.paper .arts.sm .art .pic img{max-height:220px}
+.paper .art .pic .nopic{display:block;width:100%;height:120px}
+.paper .art .hl{font-size:21px;line-height:1.2;letter-spacing:-.015em;font-weight:500;color:var(--fg)}
+.paper .arts.sm .art .hl{font-size:16px}
+.paper .art .res{font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.paper .art .ld{font-size:14px;line-height:1.5;color:var(--fg-2);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.paper .arts.sm .art .ld{-webkit-line-clamp:3;font-size:13px}
+@media (max-width:1200px){.paper .arts{grid-template-columns:repeat(2,minmax(0,1fr))}.paper .arts.sm{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.paper .lead{grid-template-columns:1fr;gap:22px}.paper .lead .pic{order:-1}.paper .arts,.paper .arts.sm{grid-template-columns:1fr}}
+/* the story of one call */
+#pos-page .pos-hd h1 .res{margin-left:14px;font-size:.62em;font-weight:500;vertical-align:baseline;white-space:nowrap}
+#pos-page .pos-hd h1 .res .pos{color:var(--good)}#pos-page .pos-hd h1 .res .neg{color:var(--bad)}#pos-page .pos-hd h1 .res .muted{color:var(--fg-3)}
+#pos-page .story .lede{font-size:clamp(18px,1.4vw,22px);line-height:1.5;color:var(--fg-2);max-width:78ch;margin:26px 0 0}
+#pos-page .story .note{margin:12px 0 0;max-width:78ch}
+#pos-page .chapters{display:flex;flex-direction:column}
+#pos-page .chap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 56px;align-items:start;padding:28px 0;border-top:1px solid var(--line)}
+#pos-page .chap:first-child{border-top:0;padding-top:4px}
+#pos-page .chap.nopic{grid-template-columns:minmax(0,1fr)}
+#pos-page .chap .txt{min-width:0;max-width:62ch}
+#pos-page .chap .dt{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
+#pos-page .chap .dt b{font-weight:500;color:var(--fg);letter-spacing:0;text-transform:none;font-size:13px;font-variant-numeric:tabular-nums}
+#pos-page .chap h3{font-size:22px;line-height:1.25;letter-spacing:-.015em;font-weight:500;margin:10px 0 10px;text-transform:none}
+#pos-page .pos-hd h1,.paper .hl,.paper .lead .hl{text-transform:none} /* headlines are sentences, not menu entries */
+#pos-page .chap p{margin:0;font-size:15.5px;line-height:1.6;color:var(--fg-2)}
+#pos-page .chap .post{margin:0;border:0;max-width:540px;justify-self:end;width:100%}
+#pos-page .chap .post img{display:block;width:100%;height:auto}
+#pos-page .chap .post figcaption{border:0;border-top:1px solid var(--line);padding:8px 0 0}
+@media (max-width:900px){#pos-page .chap{grid-template-columns:1fr;gap:16px}#pos-page .chap .post{justify-self:stretch}}
 /* calendar + earnings: day sections as ruled blocks */
 body.app .sec.cal{margin-top:30px}
 body.app .sec .sh{padding-bottom:10px;border-bottom:1px solid var(--line)}
@@ -672,3 +720,27 @@ body.app .chips button:hover{background:none;color:var(--fg-2)}
 body.app .chips button.on{background:none;color:var(--fg);font-weight:600}
 body.app .chips.sm button{padding:4px 0;font-size:10.5px}
 body.app #pf-rng{margin-top:6px}
+
+/* Active Positions: one list, three groups */
+#pf-live .dateline{margin-bottom:18px}
+#pf-table tr.grp td .muted{text-transform:none;letter-spacing:0;font-family:var(--sans,inherit);font-size:12px;color:var(--fg-3)}
+#pf-table td .tag{padding:2px 6px;font-size:10px;vertical-align:1px}
+#pf-table td.muted .muted{color:var(--fg-3)}
+@media (max-width:760px){
+  /* the positions and the ledger on the phone: a ruled list, each row = the name, a grid of its facts (label above value), Details */
+  body.app .pt.cards.ruled tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 12px;border:0;border-top:1px solid var(--line);margin:0;padding:12px 0 12px;background:none}
+  body.app .pt.cards.ruled tr.grp{display:block;border:0;margin:22px 0 0;padding:0 0 4px}
+  body.app .pt.cards.ruled td{display:block;text-align:left;border:0;padding:0;min-width:0}
+  body.app .pt.cards.ruled td::before{display:block;flex:none;margin-bottom:1px;padding:0;font-size:10px}
+  body.app .pt.cards.ruled td.em{grid-column:1/-1;padding:0 0 2px;font-size:16px}
+  body.app .pt.cards.ruled td.em::before{display:none}
+  body.app .pt.cards.ruled td.num{text-align:left}
+  body.app .pt.cards.ruled td .sub{text-align:left}
+  body.app .pt.cards.ruled td.act{grid-column:1/-1;display:block;text-align:right;padding:2px 0 0}
+  body.app .pt.cards.ruled td.act::before{display:none}
+  body.app .pt.cards.ruled td[colspan]{grid-column:1/-1}
+  body.app #pf-live .dateline{margin-bottom:6px}
+}
+/* the story page on the phone: facts two by two */
+@media (max-width:760px){#pos-page .facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}body.app #pos-page .facts div{padding:10px 0}#pos-page .facts b{font-size:16px}}
+.paper .sh h2 .muted{text-transform:none}

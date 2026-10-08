@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=ef959878">
+<link rel="stylesheet" href="/mws.css?v=91535b58">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=ef959878"></script>
+<script src="/mws.js?v=91535b58"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -719,8 +719,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var unwRow = function(p){ var T = tradeNums(p, Q), ret = T.entry && T.last ? (T.last / T.entry - 1) * 100 : null;
       return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry', T.entry != null ? usdPx(T.entry) : '—', 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num')
         + cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('Weight', '<span class="muted">—</span>', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + detailsCell(p) + '</tr>'; };
-    $('#pf-table').innerHTML = head + '<tbody>' + (hrows.length || unweighted.length ? hrows.map(row).join('') + unweighted.map(unwRow).join('') : '<tr><td colspan="8" class="muted">No spot positions open right now. Cash is a position too.</td></tr>') + '</tbody>';
-    $('#pf-hold-n').textContent = '· ' + P.spot.length + ' position' + (P.spot.length === 1 ? '' : 's');
+    var cashRow = '<tr class="cash"><td class="em" data-l="Position"><span class="sym">Cash</span><span class="nm">unallocated</span></td>' + cell('Since', '—', 'muted') + cell('Entry', '—', 'num muted') + cell('Last', '—', 'num muted') + cell('1D ROI', '0.00%', 'num muted') + cell('Weight', book.cashNow != null ? book.cashNow.toFixed(2) + '%' + (book.cash < -0.005 ? '<span class="sub neg">over-allocated</span>' : '') : '—', 'num') + cell('All-time ROI', '0.00%', 'num muted') + '<td></td></tr>';
+    $('#pf-table').innerHTML = head + '<tbody>' + hrows.map(row).join('') + unweighted.map(unwRow).join('') + cashRow + '</tbody>';
+    $('#pf-hold-n').textContent = '· ' + P.spot.length + ' position' + (P.spot.length === 1 ? '' : 's') + ' + cash';
     /* resting spot orders */
     var ordRow = function(p){ var T = tradeNums(p, Q), dist = T.entry != null && T.last ? (T.entry / T.last - 1) * 100 : null;
       return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, true), 'em') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) + (T.q && T.q.change_pct != null ? '<span class="sub' + sgn(T.q.change_pct) + '">' + pct(T.q.change_pct) + ' today</span>' : '') : '—', 'num')
@@ -804,7 +805,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     for (var si = 0; si < nice.length; si++) if ((hi - lo) / nice[si] <= wantN) { step = nice[si]; break; }
     var ticks = []; for (var tv = Math.ceil(lo / step) * step; tv <= hi + 1e-9; tv += step) ticks.push(Math.round(tv / step) * step); /* multiples of a round number inside the range */
     var grid = ticks.map(function(v){ return '<text x="' + (W - Rr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="tk">' + fmtTick(v) + '</text>'; }).join(''); /* the scale on the right, nothing drawn across the chart */
-    var zero = '';
+    var zero = '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(zeroV).toFixed(1) + '" y2="' + Y(zeroV).toFixed(1) + '" class="z"/>'; /* the only line across the chart: 0% */
     /* the time scale the way a trading chart draws it: day numbers, the month name where the month changes; on long ranges months, the year where it changes */
     var maxLab = W < 560 ? 5 : Math.floor((W - L - Rr) / 64), xt = [];
     var mo = function(d){ return new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }); };

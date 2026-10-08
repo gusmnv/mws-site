@@ -643,7 +643,8 @@ body.app #pf-chart-sec .tip{font-size:13px;color:var(--fg-3);font-variant-numeri
 body.app #pf-chart-sec .tip b{color:var(--fg-2);font-weight:500}body.app #pf-chart-sec .tip b.pos{color:var(--good)}body.app #pf-chart-sec .tip b.neg{color:var(--bad)}
 body.app #pf-chart-sec .ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 body.app .chart{padding:4px 0 0}
-body.app .chart .g,body.app .chart .z{display:none}
+body.app .chart .g{display:none}
+body.app .chart .z{stroke:var(--fg-2);stroke-width:1;stroke-dasharray:4 4;opacity:.55}
 /* holdings: the Details link at the end of each row */
 body.app .pt td.act{white-space:nowrap}
 body.app .pt a.more{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);text-decoration:none}
@@ -652,3 +653,4 @@ body.app .pt tr.clk:hover a.more{color:var(--fg)}
 @media (max-width:760px){body.app .pt.cards td.act{display:block;text-align:right}body.app .pt.cards td.act::before{display:none}body.app .acct{gap:0}}
 @media (min-width:761px){body.app #pf-table td.em{min-width:120px;width:auto}}
 .chart .tk.tb{fill:var(--fg-2)}
+body.app .pt tr.cash td{color:var(--fg-3)}body.app .pt tr.cash td.em .sym{color:var(--fg-2)}body.app .pt tr.cash td.num{color:var(--fg-2)}

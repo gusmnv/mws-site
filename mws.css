@@ -613,3 +613,41 @@ body.app .kpis{margin-top:4px}
 body.app .pf-intro{max-width:92ch;color:var(--fg-2);font-size:14px;line-height:1.6;margin:0 0 22px}
 body.app .pf-intro b{color:var(--fg);font-weight:500}
 body.app .pf-intro b.pos{color:var(--good)}body.app .pf-intro b.neg{color:var(--bad)}
+/* ===== no lines: whitespace organises the sheet ===== */
+body.app .page .head{border-bottom:0}
+body.app .panel+.panel{border-top:0;padding-top:0;margin-top:34px}
+body.app .acct>div+div{border-left:0;padding-left:0}
+body.app .acct{gap:0 72px}
+body.app .kpis{border-bottom:0;padding:0 0 30px;margin:0}
+body.app .kpis .kp.big{border-right:0;padding-right:0}
+body.app .kpis .kp.big>em{font-size:15px;margin-top:8px}
+body.app .kpis .kp.big>em .muted{color:var(--fg-3)}
+body.app .pf-cell+.pf-cell{border-left:0;padding-left:0}
+body.app .pf-grid{gap:0 72px}
+body.app .pf-cell .sh,body.app #pf-live>.sh,body.app #tr-live>.sh,body.app #tk-live>.sh,body.app #pf-orders .sh,body.app #tr-orders .sh,body.app .sec .sh{border-bottom:0;padding-bottom:0}
+body.app #pf-live>.sh{margin-top:40px;margin-bottom:14px}
+body.app .pt th{border-bottom:1px solid var(--line)}
+body.app .pt td{border-bottom:1px solid var(--line)}
+body.app #pos-page .facts{border:0}
+body.app .snav a{padding-left:14px;font-size:14.5px}
+body.app .snav .grp{padding-top:22px}
+/* performance: legend beside the title, stats and timeframes under the chart */
+body.app .pf-cell .sh .lg{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;color:var(--fg-3);align-items:center;margin:0}
+body.app .pf-cell .sh .lg span,body.app .pf-cell .sh .lg button{display:inline-flex;align-items:center;gap:8px}
+body.app .pf-cell .sh .lg i{width:14px;height:2px;display:inline-block;background:var(--fg)}
+body.app .pf-cell .sh .lg i.ls{background:#3B82F6}body.app .pf-cell .sh .lg i.lq{background:#F59E0B}
+body.app .pf-cell .sh .lg button.lgb{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
+body.app .pf-cell .sh .lg button.lgb:hover{color:var(--fg)}
+body.app .pf-cell .sh .lg button.lgb.off{opacity:.42;text-decoration:line-through;text-decoration-color:var(--fg-3)}
+body.app #pf-chart-sec .tip{font-size:13px;color:var(--fg-3);font-variant-numeric:tabular-nums;margin:6px 0 14px;min-height:18px}
+body.app #pf-chart-sec .tip b{color:var(--fg-2);font-weight:500}body.app #pf-chart-sec .tip b.pos{color:var(--good)}body.app #pf-chart-sec .tip b.neg{color:var(--bad)}
+body.app #pf-chart-sec .ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+body.app .chart{padding:4px 0 0}
+body.app .chart .g,body.app .chart .z{display:none}
+/* holdings: the Details link at the end of each row */
+body.app .pt td.act{white-space:nowrap}
+body.app .pt a.more{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);text-decoration:none}
+body.app .pt a.more:hover{color:var(--fg)}
+body.app .pt tr.clk:hover a.more{color:var(--fg)}
+@media (max-width:760px){body.app .pt.cards td.act{display:block;text-align:right}body.app .pt.cards td.act::before{display:none}body.app .acct{gap:0}}
+@media (min-width:761px){body.app #pf-table td.em{min-width:120px;width:auto}}

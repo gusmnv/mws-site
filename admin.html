@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=e52dc2a0">
+<link rel="stylesheet" href="/mws.css?v=7f7b5f9e">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=e52dc2a0"></script>
+<script src="/mws.js?v=7f7b5f9e"></script>
 <style>
 body{display:block}
 header.top{display:none}
@@ -171,7 +171,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <div class="grp">Manage</div>
       <a href="#access" data-v="access"><i>08</i>Grant access</a>
       <a href="#spot" data-v="spot"><i>09</i>Spot positions</a>
-      <a href="#leveraged" data-v="leveraged"><i>10</i>Leveraged trades</a>
+      <a href="#leveraged" data-v="leveraged"><i>10</i>Leveraged positions</a>
       <a href="#settings" data-v="settings"><i>11</i>Settings</a>
       <a href="/app" class="mob-ma"><i>→</i>Member area</a>
     </nav>
@@ -977,7 +977,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
 
   // routing
-  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], spot: ['Spot positions', 'The portfolio members see: each position takes its weight of the book. Buy and sell orders rest here too.'], leveraged: ['Leveraged trades', 'Long or short at a leverage, on their own capital: ROI only, no size. Long and short orders rest here too.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
+  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], spot: ['Spot positions', 'The portfolio members see: each position takes its weight of the book. Buy and sell orders rest here too.'], leveraged: ['Leveraged positions', 'Long or short at a leverage, on their own capital: ROI only, no size. Long and short orders rest here too.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
   function route(){ var v = currentView(); if (!Object.prototype.hasOwnProperty.call(TITLES, v)) v = 'overview'; var sv = v === 'leveraged' ? 'spot' : v; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === sv); }); if ((v === 'spot' || v === 'leveraged') && pfMode !== v) { pfMode = v; pfFilter = 'all'; if (typeof kindUI === 'function') { pfFill(null); } if (POS.length) renderPositions(); } M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);

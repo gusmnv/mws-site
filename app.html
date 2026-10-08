@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=e52dc2a0">
+<link rel="stylesheet" href="/mws.css?v=7f7b5f9e">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=e52dc2a0"></script>
+<script src="/mws.js?v=7f7b5f9e"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -43,19 +43,19 @@
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
-      <a href="#telegram" data-p="telegram"><i>01</i>Private Telegram<span class="cnt" id="n-tg"></span></a>
+      <a href="#telegram" data-p="telegram">Private Telegram<span class="cnt" id="n-tg"></span></a>
       <p class="grp">Portfolio <span class="soon" id="desk-grp-tag">In development</span></p>
-      <a href="#portfolio" data-p="portfolio"><i>02</i>Spot positions<span class="cnt" id="n-pf"></span></a>
-      <a href="#trades" data-p="trades"><i>03</i>Leveraged trading<span class="cnt" id="n-tr"></span></a>
-      <a href="#track" data-p="track"><i>04</i>Track record<span class="cnt" id="n-tk"></span></a>
+      <a href="#portfolio" data-p="portfolio">Spot Positions<span class="cnt" id="n-pf"></span></a>
+      <a href="#trades" data-p="trades">Leveraged Positions<span class="cnt" id="n-tr"></span></a>
+      <a href="#track" data-p="track">Track Record<span class="cnt" id="n-tk"></span></a>
       <p class="grp">The Desk</p>
-      <a href="#earnings" data-p="earnings"><i>05</i>Stock earnings<span class="cnt" id="n-er"></span></a>
-      <a href="#calendar" data-p="calendar"><i>06</i>Economic calendar<span class="cnt" id="n-cal"></span></a>
+      <a href="#earnings" data-p="earnings">Stock Earnings<span class="cnt" id="n-er"></span></a>
+      <a href="#calendar" data-p="calendar">Economic Calendar<span class="cnt" id="n-cal"></span></a>
       <p class="grp">Settings</p>
-      <a href="#account" data-p="account"><i>07</i>Account</a>
-      <a href="#membership" data-p="membership"><i>08</i>Membership<span class="cnt" id="n-mem"></span></a>
-      <a href="#devices" data-p="devices"><i>09</i>Devices</a>
-      <a href="#feedback" data-p="feedback"><i>10</i>Feedback<span class="cnt" id="n-fb"></span></a>
+      <a href="#account" data-p="account">Account</a>
+      <a href="#membership" data-p="membership">Membership<span class="cnt" id="n-mem"></span></a>
+      <a href="#devices" data-p="devices">Devices</a>
+      <a href="#feedback" data-p="feedback">Feedback<span class="cnt" id="n-fb"></span></a>
     </nav>
     <div class="side-foot">
       <a class="adm" href="/admin" id="side-admin" hidden>Admin <span>→</span></a>
@@ -131,12 +131,11 @@
       <section class="page" data-page="portfolio">
         <div class="head rv"><h1>Spot positions. <span class="soon" id="pf-tag">In development</span></h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
-          <p class="pf-intro rv" id="pf-intro"></p>
           <div class="kpis rv" id="pf-kpis"></div>
           <div class="pf-grid rv d1">
             <div class="pf-cell">
-              <div class="sh"><h2>Performance <span class="muted" id="pf-chart-sub"></span></h2><span class="ctl"><span class="chips sm" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span><span class="chips sm" id="pf-unit"><button type="button" data-v="pct" class="on">%</button><button type="button" data-v="usd">$</button></span></span></div>
-              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div></div>
+              <div class="sh"><h2>Performance <span class="muted" id="pf-chart-sub" hidden></span></h2><span class="lg" id="pf-legend"></span></div>
+              <div id="pf-chart-sec"><div class="chart" id="pf-chart"></div><div class="tip" id="pf-tip"></div><div class="ctl"><span class="chips sm" id="pf-rng"><button type="button" data-r="1">1D</button><button type="button" data-r="7">1W</button><button type="button" data-r="mtd">MTD</button><button type="button" data-r="30">1M</button><button type="button" data-r="90">3M</button><button type="button" data-r="ytd">YTD</button><button type="button" data-r="365">1Y</button><button type="button" data-r="1825">5Y</button><button type="button" data-r="all" class="on">All</button></span><span class="chips sm" id="pf-unit"><button type="button" data-v="pct" class="on">%</button><button type="button" data-v="usd">$</button></span></div></div>
               <div class="banner" id="pf-perf-empty" hidden><div><b>The curve starts with the first daily closes.</b><p>The book is priced live from today; the line against the S&amp;P 500 and the Nasdaq 100 appears as the days close.</p></div></div>
             </div>
             <div class="pf-cell">
@@ -163,7 +162,7 @@
         </div>
       </section>
       <section class="page" data-page="trades">
-        <div class="head rv"><h1>Leveraged trading. <span class="soon" id="tr-tag">In development</span></h1></div>
+        <div class="head rv"><h1>Leveraged positions. <span class="soon" id="tr-tag">In development</span></h1></div>
         <div id="tr-live" hidden>
           <div class="ptw"><table class="pt cards" id="tr-table"></table></div>
           <div id="tr-orders" hidden><div class="sh" style="margin-top:22px"><h2>Resting orders</h2></div><div class="ptw"><table class="pt cards" id="tr-ord"></table></div></div>
@@ -312,7 +311,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { telegram:'Private Telegram', portfolio:'Spot positions', trades:'Leveraged trading', track:'Track record', position:'Spot positions', calendar:'Economic calendar', earnings:'Stock earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
+  var PAGES = { telegram:'Private Telegram', portfolio:'Spot Positions', trades:'Leveraged Positions', track:'Track Record', position:'Spot Positions', calendar:'Economic Calendar', earnings:'Stock Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
   var posId = null, posHome = 'portfolio'; /* #position/<id>: one position, its numbers and the Telegram posts; posHome = the section it belongs to */
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
@@ -569,7 +568,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function pfDraft(p){ return p.published === false ? '<span class="tag warn" style="margin-left:8px">Draft</span>' : ''; } /* only staff ever receive drafts (RLS); the tag shows what members do not see yet */
   function pfLinks(p){ var l = Array.isArray(p.links) ? p.links.filter(function(u){ return /^https:\/\/t\.me\//.test(String(u)); }) : []; return l.length ? '<span class="posts">' + l.map(function(u, i){ return '<a href="' + esc(u) + '" target="_blank" rel="noopener" title="Open the call in Telegram">' + (l.length > 1 ? 'post ' + (i + 1) : 'post') + '</a>'; }).join('') + '</span>' : ''; }
   function pfSide(p){ var s = String(p.side || 'long'); var warn = s === 'short' || s === 'sell'; return '<span class="tag ' + (warn ? 'warn' : 'ok') + '">' + esc(s) + (p.kind === 'leveraged' && p.leverage ? ' ' + esc(p.leverage) : '') + '</span>'; }
-  function pfName(p, side){ var s = String(p.side || 'long'); var says = side && (s === 'short' || s === 'sell' || pfKind(p) !== 'spot'); return '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + (p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + (says ? ' ' + pfSide(p) : '') + pfDraft(p); } /* the row stays clean: everything else lives on the position page (the symbol is the link, the whole row a shortcut) */
+  function pfName(p, side, bare){ var s = String(p.side || 'long'); var says = side && (s === 'short' || s === 'sell' || pfKind(p) !== 'spot'); return '<a class="sym" href="#position/' + esc(String(p.id)) + '"' + (bare && p.name ? ' title="' + esc(p.name) + '"' : '') + '>' + esc(p.symbol) + '</a>' + (!bare && p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + (says ? ' ' + pfSide(p) : '') + pfDraft(p); }
+  function detailsCell(p){ return '<td class="num act"><a class="more" href="#position/' + esc(String(p.id)) + '">Details <span aria-hidden="true">→</span></a></td>'; } /* the row stays clean: everything else lives on the position page (the symbol is the link, the whole row a shortcut) */
   function pfIds(p){ return (Array.isArray(p.links) ? p.links : []).map(function(u){ var m = String(u).match(/t\.me\/c\/2077854583\/(\d+)/); return m ? m[1] : null; }).filter(Boolean); }
   /* the calls behind a position: a screenshot of each Telegram post (posts/<id>.png, listed in posts/index.json with the time it was posted) */
   var POSTS = null, postsReq = null;
@@ -628,7 +628,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var posts = function(){ return ids.length ? ids.map(function(i){ var x = POSTS && POSTS[i]; var when = x && x.t ? fmtWhen(x.t) : 'Telegram post';
         return x && x.img ? '<figure class="post"><figcaption><span>' + esc(when) + '</span><span>Exclusive channel</span></figcaption><img src="' + esc(/^(https?:)?\//.test(x.img) ? x.img : '/' + x.img) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"></figure>'
           : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; }).join('') : '<p class="small muted">No posts attached to this position.</p>'; };
-    var home = pfHome(p), homeName = { '#track': 'Track record', '#trades': 'Leveraged trading', '#portfolio': 'Spot positions' }[home]; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
+    var home = pfHome(p), homeName = { '#track': 'Track Record', '#trades': 'Leveraged Positions', '#portfolio': 'Spot Positions' }[home]; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
       + '<div class="pos-hd"><h1><span class="sym">' + esc(p.symbol) + '</span>' + (p.name ? '<span class="nm">' + esc(p.name) + '</span>' : '') + '</h1><p class="tags">' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(PF_CLASS[p.asset_class] || 'Other') + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
@@ -670,12 +670,13 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var D = pfData(), list = D.list, unlocked = !!(access && access.valid), P = pfSplit(list);
     $('#n-pf').textContent = P.spot.length ? String(P.spot.length) : ''; $('#n-tr').textContent = P.lev.length + P.ordT.length ? String(P.lev.length + P.ordT.length) : ''; $('#n-tk').textContent = '';
     var onlyMe = deskTag('pf-tag', unlocked, list.length > 0); deskTag('tr-tag', unlocked, list.length > 0); deskTag('tk-tag', unlocked, list.length > 0);
-    $('#desk-grp-tag').textContent = unlocked && list.length ? (onlyMe ? 'Owner preview' : 'Live') : 'In development';
+    $('#desk-grp-tag').textContent = devFor('portfolio') ? 'In development' : (unlocked && list.length ? (onlyMe ? 'Owner preview' : 'Live') : 'In development');
     renderBook(D, P, unlocked); renderTrades(D, P, unlocked); renderTrack(D, P, unlocked); pressChips(); syncBarTag();
   }
   /* /02 Portfolio: the spot book. Range chips → KPIs + chart; exposure donut; the holdings grid (a row opens its page). */
   function renderBook(D, P, unlocked){
     var list = D.list, Q = D.Q, N = D.N, book = D.book, R = D.R;
+    if (devFor('portfolio')) { $('#pf-locked').hidden = true; $('#pf-live').hidden = true; $('#pf-empty').hidden = false; var pt = $('#pf-tag'); pt.textContent = 'In development'; pt.className = 'soon'; $('#n-pf').textContent = ''; return; }
     $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && list.length); $('#pf-empty').hidden = !(unlocked && !list.length); $('#pf-sub').hidden = true;
     if (!(unlocked && list.length)) return;
     M.$$('#pf-rng button').forEach(function(b){ b.classList.toggle('on', b.dataset.r === pfRange); });
@@ -692,11 +693,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var kp = function(k, v, d, big){ return '<div class="kp' + (big ? ' big' : '') + '"><span>' + k + '</span><b>' + v + '</b>' + (d ? '<em>' + d + '</em>' : '') + '</div>'; };
     var sg = function(v, txt){ return v == null ? '<span class="muted">—</span>' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
     var asOfTxt = book.asOf ? 'prices as of ' + hhmm(book.asOf) + ' (your time)' : (live ? 'live prices' : 'prices: none yet');
-    $('#pf-intro').innerHTML = 'A model portfolio that tracks our calls: it started with <b>' + usdFull(N) + '</b>' + (book.first ? ' on ' + M.fmtDate(book.first) : '') + ' and shows what a member who followed every call, at the size we gave, would hold today — and the return: <b class="' + sgn(bookPL).trim() + '">' + pct(book.retTotal * 100) + '</b> all time. Prices and weights move with the market; ' + asOfTxt + '.';
-    $('#pf-kpis').innerHTML = kp('Portfolio value', usdFull(bookVal) + ' <small>USD</small>', '', true)
-      + (pfRange === '1'
-        ? kp('1 day', sg(pl1, usdSigned(pl1)), pl1 == null ? 'waiting for prices' : sg(roi1, pct(roi1)) + ' · since the previous close')
-        : kp(RANGES[rk], sg(rPL, usdSigned(rPL)), rPL == null ? (hasHist ? 'the book is younger than the range' : 'waiting for daily closes') : sg(rPct, pct(rPct)) + (rSince ? ' · since ' + M.fmtDate(rSince) : '')));
+    var ret1 = pfRange === '1' ? (pl1 == null ? '<span class="muted">waiting for prices</span>' : sg(pl1, usdSigned(pl1)) + ' · ' + sg(roi1, pct(roi1)) + ' <span class="muted">· 1 day, since the previous close</span>')
+      : (rPL == null ? '<span class="muted">' + (hasHist ? 'the book is younger than the range' : 'waiting for daily closes') + '</span>' : sg(rPL, usdSigned(rPL)) + ' · ' + sg(rPct, pct(rPct)) + ' <span class="muted">· ' + RANGES[rk].toLowerCase() + (rSince ? ', since ' + M.fmtDate(rSince) : '') + '</span>');
+    $('#pf-kpis').innerHTML = kp('Portfolio value', usdFull(bookVal) + ' <small>USD</small>', ret1, true);
     /* exposure: current weights by asset or by class, cash included */
     var groups = {}, keyOf = function(r){ return pfGrp === 'class' ? (PF_CLASS[r.p.asset_class] || 'Other') : String(r.p.symbol); };
     rows.forEach(function(r){ var k = keyOf(r); var g = groups[k] = groups[k] || { k: k, w: 0, v: 0, n: 0 }; g.w += r.weightNow || 0; g.v += val$(r); g.n++; });
@@ -712,19 +711,19 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     sortRows(hrows, pfSort);
     var unweighted = P.spot.filter(function(p){ return !R[p.id] || R[p.id].capital == null; });
     var head = '<thead><tr>' + th('Position', 'sym', pfSort) + th('Since', 'since', pfSort) + th('Entry', 'entry', pfSort, 'num') + th('Last', 'last', pfSort, 'num') + th('1D ROI', 'roi1', pfSort, 'num', 'Since the previous close') + th('1D P&amp;L', 'pl1', pfSort, 'num', 'Since the previous close')
-      + th('Initial weight', 'w0', pfSort, 'num', 'Share of the book on the day of the call') + th('Invested', 'cost', pfSort, 'num', 'That share in dollars, on the day of the call') + th('Current weight', 'wNow', pfSort, 'num', 'Share of the book now') + th('Market value', 'val', pfSort, 'num') + th('All-time ROI', 'ret', pfSort, 'num') + th('All-time P&amp;L', 'pl', pfSort, 'num') + '</tr></thead>';
+      + th('Weight', 'wNow', pfSort, 'num', 'Share of the book now') + th('Market value', 'val', pfSort, 'num') + th('All-time ROI', 'ret', pfSort, 'num') + th('All-time P&amp;L', 'pl', pfSort, 'num') + '<th></th></tr></thead>';
     var lastCell = function(r){ if (r.last == null) return cell('Last', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last', usdPx(r.last) + (r.source === 'mark' ? '<span class="sub muted">mark' + (r.p.mark_at ? ' · ' + M.fmtDate(r.p.mark_at) : '') + '</span>' : ''), 'num'); };
     var row = function(h){ var p = h.p, r = h.r, v = h.v;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted')
         + cell('Entry', r.entry != null ? usdPx(r.entry) : '—', 'num') + lastCell(r)
         + cell('1D ROI', v.roi1 == null ? '—' : pct(v.roi1), 'num' + sgn(v.roi1)) + cell('1D P&L', v.pl1 == null ? '—' : usdSigned(v.pl1), 'num' + sgn(v.pl1))
-        + cell('Initial weight', v.w0 != null ? v.w0.toFixed(2) + '%' : '—', 'num muted') + cell('Invested', usdFull(v.cost), 'num muted') + cell('Current weight', v.wNow != null ? v.wNow.toFixed(2) + '%' : '—', 'num') + cell('Market value', usdFull(v.val), 'num')
-        + cell('All-time ROI', v.ret == null ? '—' : pct(v.ret), 'num' + sgn(v.ret)) + cell('All-time P&L', v.pl == null ? '—' : usdSigned(v.pl), 'num' + sgn(v.pl)) + '</tr>'; };
+        + cell('Weight', v.wNow != null ? v.wNow.toFixed(2) + '%' : '—', 'num') + cell('Market value', usdFull(v.val), 'num')
+        + cell('All-time ROI', v.ret == null ? '—' : pct(v.ret), 'num' + sgn(v.ret)) + cell('All-time P&L', v.pl == null ? '—' : usdSigned(v.pl), 'num' + sgn(v.pl)) + detailsCell(p) + '</tr>'; };
     var unwRow = function(p){ var T = tradeNums(p, Q), ret = T.entry && T.last ? (T.last / T.entry - 1) * 100 : null;
-      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry', T.entry != null ? usdPx(T.entry) : '—', 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num')
-        + cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('1D P&L', '—', 'num') + cell('Initial weight', '<span class="muted">—</span>', 'num') + cell('Invested', '—', 'num') + cell('Current weight', '<span class="muted">—</span>', 'num') + cell('Market value', '—', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + cell('All-time P&L', '—', 'num') + '</tr>'; };
-    $('#pf-table').innerHTML = head + '<tbody>' + (hrows.length || unweighted.length ? hrows.map(row).join('') + unweighted.map(unwRow).join('') : '<tr><td colspan="12" class="muted">No spot positions open right now. Cash is a position too.</td></tr>') + '</tbody>';
-    $('#pf-hold-n').textContent = '· ' + P.spot.length + ' position' + (P.spot.length === 1 ? '' : 's') + (book.cashNow != null ? ' · ' + book.cashNow.toFixed(2) + '% cash' : '');
+      return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', pfName(p, true, true), 'em') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry', T.entry != null ? usdPx(T.entry) : '—', 'num') + cell('Last', T.last != null ? usdPx(T.last) : '—', 'num')
+        + cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('1D P&L', '—', 'num') + cell('Weight', '<span class="muted">—</span>', 'num') + cell('Market value', '—', 'num') + cell('All-time ROI', ret == null ? '—' : pct(ret), 'num' + sgn(ret)) + cell('All-time P&L', '—', 'num') + detailsCell(p) + '</tr>'; };
+    $('#pf-table').innerHTML = head + '<tbody>' + (hrows.length || unweighted.length ? hrows.map(row).join('') + unweighted.map(unwRow).join('') : '<tr><td colspan="11" class="muted">No spot positions open right now. Cash is a position too.</td></tr>') + '</tbody>';
+    $('#pf-hold-n').textContent = '· ' + P.spot.length + ' position' + (P.spot.length === 1 ? '' : 's');
     /* resting spot orders */
     var ordRow = function(p){ var T = tradeNums(p, Q), dist = T.entry != null && T.last ? (T.entry / T.last - 1) * 100 : null;
       return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Asset', pfName(p, true), 'em') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + cell('Last', T.last != null ? usdPx(T.last) + (T.q && T.q.change_pct != null ? '<span class="sub' + sgn(T.q.change_pct) + '">' + pct(T.q.change_pct) + ' today</span>' : '') : '—', 'num')
@@ -732,13 +731,14 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#pf-orders').hidden = !P.ordS.length;
     if (P.ordS.length) $('#pf-ord').innerHTML = '<thead><tr><th>Asset</th><th class="num">Level</th><th class="num">Last</th><th class="num">Distance</th><th class="num">Planned weight</th></tr></thead><tbody>' + pfGrouped(P.ordS, 5, ordRow) + '</tbody>';
     var nDraft = list.filter(function(p){ return p.published === false; }).length;
-    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'A model book that started with ' + usdFull(N) + '; every position takes its weight of the book on the day it is called (Initial weight = that share then, Invested = the same in dollars that day), cash earns nothing · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · stocks refresh through the US session and at the close, crypto around the clock · click a position for the original Telegram posts · not financial advice: this is what we hold.';
+    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'A model portfolio that tracks our calls: it started with ' + usdFull(N) + (book.first ? ' on ' + M.fmtDate(book.first) : '') + ' and shows what a member who followed every call, at the size we gave, would hold today — and the return. Every position takes its weight of the book on the day it is called; cash earns nothing · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · ' + asOfTxt + ' · Details opens the position with its weights, the dollars invested and the original Telegram posts · not financial advice: this is what we hold.';
   }
   /* /03 Trades: leveraged, on their own capital. ROI only — never a size. */
-  var DEV_PAGES = { trades: true, track: true }; /* sections still being built: members (and the owner) see "In development" whatever the data says */
+  var DEV_PAGES = { trades: true, track: true }; /* sections still being built: everyone sees "In development" whatever the data says */
+  function devFor(page){ return !!DEV_PAGES[page] || !staffRole || !!sim; } /* members (and the owner's "View as") see the whole Portfolio and Desk as In development until it is opened; staff see the real state */
   function renderTrades(D, P, unlocked){
     var Q = D.Q, n = P.lev.length + P.ordT.length;
-    if (DEV_PAGES.trades) { $('#tr-locked').hidden = true; $('#tr-live').hidden = true; $('#tr-empty').hidden = false; $('#tr-empty').innerHTML = '<div><b>In development.</b><p>Leveraged trading is being built. Until it opens, the trades are posted in the Exclusive channel.</p></div>'; var tt = $('#tr-tag'); tt.textContent = 'In development'; tt.className = 'soon'; $('#n-tr').textContent = ''; return; }
+    if (DEV_PAGES.trades) { $('#tr-locked').hidden = true; $('#tr-live').hidden = true; $('#tr-empty').hidden = false; $('#tr-empty').innerHTML = '<div><b>In development.</b><p>Leveraged positions are being built. Until they open, the trades are posted in the Exclusive channel.</p></div>'; var tt = $('#tr-tag'); tt.textContent = 'In development'; tt.className = 'soon'; $('#n-tr').textContent = ''; return; }
     $('#tr-locked').hidden = unlocked; $('#tr-live').hidden = !(unlocked && n); $('#tr-empty').hidden = !(unlocked && !n);
     if (!(unlocked && n)) return;
     var rows = P.lev.map(function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), side: String(p.side || 'long'), L: T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret } }; });
@@ -788,7 +788,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* the book against the market, daily: in % (rebased to the start of the range) or in $ (what $1,000,000 became — the same for the S&P 500 and the Nasdaq 100) */
   function renderChart(book, Q, N, hasHist){
     var sec = $('#pf-chart-sec'); var S = book.series || [];
-    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-chart-sub').textContent = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
+    if (S.length < 2 || !hasHist) { sec.hidden = true; $('#pf-legend').innerHTML = ''; return; } /* no daily closes yet: a flat line with a jump would mislead */
     sec.hidden = false; /* visible before measuring: the chart takes the width it will be drawn at */
     var seg = rangeSeg(S, pfRange), n = seg.length, usdMode = pfUnit === 'usd';
     var raw = pfRange === 'all' || seg[0].day === S[0].day; /* from the start of the book: against the $1,000,000, not rebased */
@@ -804,8 +804,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var cw = $('#pf-chart').clientWidth || 800, W = Math.max(300, cw - 36), Hh = W < 560 ? 240 : 300, L = 8, Rr = W < 560 ? 54 : (usdMode ? 70 : 58), T = 14, Bt = 30;
     var X = function(i){ return L + (W - L - Rr) * i / (n - 1); }, Y = function(v){ return T + (Hh - T - Bt) * (1 - (v - lo) / (hi - lo)); };
     var step = (hi - lo) / 4, ticks = []; for (var t = 0; t <= 4; t++) ticks.push(lo + step * t);
-    var grid = ticks.map(function(v){ return '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" class="g"/><text x="' + (W - Rr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="tk">' + fmtTick(v) + '</text>'; }).join('');
-    var zero = '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(zeroV).toFixed(1) + '" y2="' + Y(zeroV).toFixed(1) + '" class="z"/>';
+    var grid = ticks.map(function(v){ return '<text x="' + (W - Rr + 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="tk">' + fmtTick(v) + '</text>'; }).join(''); /* the scale on the right, nothing drawn across the chart */
+    var zero = '';
     var months = []; seg.forEach(function(p, i){ var m = p.day.slice(0, 7); if (!months.length || months[months.length - 1].m !== m) months.push({ m: m, i: i }); });
     var xl;
     if (months.length >= 3) { var every = Math.max(1, Math.ceil(months.length / (W < 560 ? 4 : 8))); xl = months.filter(function(_, j){ return j % every === 0; }).map(function(o){ var d = new Date(o.m + '-01T00:00:00Z'); return '<text x="' + X(o.i).toFixed(1) + '" y="' + (Hh - 8) + '" class="tk">' + d.toLocaleDateString('en-GB', { month: 'short', year: months.length > 12 ? '2-digit' : undefined, timeZone: 'UTC' }) + '</text>'; }).join(''); }
@@ -815,19 +815,21 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var area = '';
     var svg = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" class="cv">' + grid + zero + area + lines.map(function(x){ return '<path class="l ' + x.c + '" d="' + path(x.d) + '"/>'; }).join('') + xl + '<line class="hv" x1="0" x2="0" y1="' + T + '" y2="' + (Hh - Bt) + '" hidden/>' + lines.map(function(x){ return '<circle class="dot ' + x.c + '" r="4" hidden/>'; }).join('') + '</svg>';
     var endTxt = function(x){ var r = x.v[x.v.length - 1]; return r == null ? '—' : usdMode ? usd(disp(r)) + ' <small class="' + sgn(r).trim() + '">' + pct(r * 100) + '</small>' : pct(r * 100); };
-    var legend = '<div class="lg">' + allLines.map(function(x){ var off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span><i class="' + x.c + '"></i>' + x.l + '</span>' : '<button type="button" class="lgb' + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '"><i class="' + x.c + '"></i>' + x.l + '</button>'; }).join('') + '<span class="tip" id="pf-tip"></span></div>';
-    $('#pf-chart').innerHTML = legend + svg;
+    $('#pf-legend').innerHTML = allLines.map(function(x){ var off = x.k !== 'book' && pfBench[x.k] === false; return x.k === 'book' ? '<span><i class="' + x.c + '"></i>' + x.l + '</span>' : '<button type="button" class="lgb' + (off ? ' off' : '') + '" data-b="' + x.k + '" aria-pressed="' + (off ? 'false' : 'true') + '" title="' + (off ? 'Show ' : 'Hide ') + x.l + '"><i class="' + x.c + '"></i>' + x.l + '</button>'; }).join('');
+    $('#pf-chart').innerHTML = svg;
     $('#pf-chart-sub').textContent = '';
     /* hover: nearest day */
     var sv = $('#pf-chart svg'), hv = sv.querySelector('.hv'), dots = M.$$('.dot', sv), tip = $('#pf-tip');
     var show = function(ev){ var rc = sv.getBoundingClientRect(); var px = (ev.clientX - rc.left) / rc.width * W; var i = Math.round((px - L) / (W - L - Rr) * (n - 1)); i = Math.max(0, Math.min(n - 1, i)); hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.removeAttribute('hidden');
       lines.forEach(function(x, j){ var v = x.d[i]; if (v == null) { dots[j].setAttribute('hidden', ''); return; } dots[j].removeAttribute('hidden'); dots[j].setAttribute('cx', X(i)); dots[j].setAttribute('cy', Y(v)); });
-      tip.innerHTML = '<b>' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var r = x.v[i]; return ' · ' + x.l + ' <b class="' + sgn(r).trim() + '">' + (r == null ? '—' : fmtV(disp(r))) + '</b>'; }).join(''); };
-    var hide = function(){ hv.setAttribute('hidden', ''); dots.forEach(function(d){ d.setAttribute('hidden', ''); }); tip.innerHTML = ''; };
+      tip.innerHTML = statsAt(i); };
+    var statsAt = function(i){ return '<b>' + M.fmtDate(seg[i].day) + '</b>' + lines.map(function(x){ var r = x.v[i]; return ' · ' + x.l + ' <b class="' + sgn(r).trim() + '">' + (r == null ? '—' : fmtV(disp(r))) + '</b>'; }).join(''); };
+    var hide = function(){ hv.setAttribute('hidden', ''); dots.forEach(function(d){ d.setAttribute('hidden', ''); }); tip.innerHTML = statsAt(n - 1); }; /* at rest: the latest point */
+    hide();
     sv.addEventListener('mousemove', show); sv.addEventListener('touchmove', function(ev){ if (ev.touches[0]) show(ev.touches[0]); }, { passive: true }); sv.addEventListener('mouseleave', hide);
   }
   var pfRz = null; window.addEventListener('resize', function(){ clearTimeout(pfRz); pfRz = setTimeout(function(){ if (current === 'portfolio' && !$('#pf-live').hidden) renderPortfolio(); }, 200); });
-  document.addEventListener('click', function(ev){ var lb = ev.target.closest('#pf-chart button.lgb'); if (lb) { pfBench[lb.dataset.b] = pfBench[lb.dataset.b] === false; M.store.set('mws_bench', pfBench); renderPortfolio(); return; } var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
+  document.addEventListener('click', function(ev){ var lb = ev.target.closest('#pf-legend button.lgb'); if (lb) { pfBench[lb.dataset.b] = pfBench[lb.dataset.b] === false; M.store.set('mws_bench', pfBench); renderPortfolio(); return; } var b = ev.target.closest('#pf-rng button, #pf-grp button, #pf-unit button'); if (!b) return; var g = b.parentNode.id; if (g === 'pf-rng') pfRange = b.dataset.r; if (g === 'pf-grp') pfGrp = b.dataset.v; if (g === 'pf-unit') pfUnit = b.dataset.v; renderPortfolio(); });
   function sortBy(h){ var st = h.closest('#pf-table') ? pfSort : trSort; if (st.k === h.dataset.k) st.d = -st.d; else { st.k = h.dataset.k; st.d = h.dataset.k === 'sym' || h.dataset.k === 'since' || h.dataset.k === 'side' ? 1 : -1; } renderPortfolio(); var again = $('#' + (st === pfSort ? 'pf-table' : 'tr-table') + ' th[data-k="' + st.k + '"]'); if (again) again.focus(); }
   document.addEventListener('click', function(ev){ var h = ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) sortBy(h); });
   document.addEventListener('keydown', function(ev){ if (ev.key !== 'Enter' && ev.key !== ' ') return; var h = ev.target.closest && ev.target.closest('#pf-table th[data-k], #tr-table th[data-k]'); if (h) { ev.preventDefault(); sortBy(h); } });
@@ -867,6 +869,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
   function renderCalendar(){
     var unlocked = !!(access && access.valid), list = sim ? SIM_EVENTS : (events || []);
+    if (devFor('calendar')) { $('#cal-locked').hidden = true; $('#cal-live').hidden = true; $('#cal-empty').hidden = false; $('#cal-tag').textContent = 'In development'; $('#cal-tag').className = 'soon'; $('#n-cal').textContent = ''; return; }
     $('#cal-locked').hidden = unlocked; $('#cal-live').hidden = !(unlocked && list.length); $('#cal-empty').hidden = !(unlocked && !list.length);
     var calOnlyMe = staffRole && !sim && !deskLive.calendar;
     $('#cal-tag').textContent = unlocked && list.length ? (calOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#cal-tag').className = 'soon' + (calOnlyMe && list.length ? ' warn' : '');
@@ -894,6 +897,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
   function renderEarnings(){
     var unlocked = !!(access && access.valid), list = sim ? SIM_EARNINGS : (earnings || []);
+    if (devFor('earnings')) { $('#er-locked').hidden = true; $('#er-live').hidden = true; $('#er-empty').hidden = false; $('#er-tag').textContent = 'In development'; $('#er-tag').className = 'soon'; $('#n-er').textContent = ''; return; }
     $('#er-locked').hidden = unlocked; $('#er-live').hidden = !(unlocked && list.length); $('#er-empty').hidden = !(unlocked && !list.length);
     var erOnlyMe = staffRole && !sim && !deskLive.earnings;
     $('#er-tag').textContent = unlocked && list.length ? (erOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#er-tag').className = 'soon' + (erOnlyMe && list.length ? ' warn' : '');

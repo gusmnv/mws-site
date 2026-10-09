@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Member area — Mr. Wall Street</title>
+<title>Member area · Mr. Wall Street</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0A0A0B">
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=394d51cc">
+<link rel="stylesheet" href="/mws.css?v=f95c552d">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=394d51cc"></script>
+<script src="/mws.js?v=f95c552d"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -362,8 +362,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     current = k; if (k !== 'earnings' && typeof erClose === 'function' && erOpen) erClose();
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
     $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === (k === 'position' ? posHome : k)); });
-    $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — Mr. Wall Street'; syncBarTag();
-    if (k === 'track' && trackAlbum) { var an = { crypto: 'Crypto', stocks: 'Stocks', commodities: 'Commodities', indices: 'Indices', fx: 'FX', other: 'Other' }[trackAlbum]; if (an) { $('#crumb').textContent = an; document.title = an + ' — Track Record — Mr. Wall Street'; } }
+    $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' · Mr. Wall Street'; syncBarTag();
+    if (k === 'track' && trackAlbum) { var an = { crypto: 'Crypto', stocks: 'Stocks', commodities: 'Commodities', indices: 'Indices', fx: 'FX', other: 'Other' }[trackAlbum]; if (an) { $('#crumb').textContent = an; document.title = an + ' · Track Record · Mr. Wall Street'; } }
     if (k === 'position' && typeof renderPosition === 'function') renderPosition();
     if ((k === 'portfolio' || k === 'track') && typeof renderPortfolio === 'function' && positions) renderPortfolio();
     drawer(false); window.scrollTo(0, 0);
@@ -617,17 +617,14 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (resultSign(p) > 0 ? 'pos' : resultSign(p) < 0 ? 'neg' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (pfKind(p) === 'leveraged' ? fact('Leverage', esc(p.leverage || '—')) : '')
       : order
       ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + ' market' : '—') + levFact + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
-      : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('1D', sg(T.roi1, pct(T.roi1))) + fact('Since entry', sg(T.ret, pct(T.ret)));
+      : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('1D', sg(T.roi1, pct(T.roi1))) + fact('Since entry', sg(T.ret, pct(T.ret)))
     var hidden = (STORIES && STORIES._hidden) || [], ids = pfIds(p).filter(function(i){ return hidden.indexOf(i) < 0; }), story = storyOf(p), co = COMPANIES[String(p.symbol).toUpperCase()]; /* posts about several positions at once are never shown on one position's page */
-    /* what the asset is: name, site, a paragraph, and the live figures (market cap = price × shares or supply, approximate) */
     var bigUsd = function(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); };
+    /* the asset's live market cap (price × shares or supply, approximate) and its site join the facts; the rest of the company text stays in companies.json for the earnings panel */
     var about = function(){ if (!co) return ''; var q = pfQuote(p, D.Q) || D.Q[String(p.symbol).toUpperCase() + '/USD'] || D.Q[String(p.symbol).toUpperCase()] || null; if (q && (q.price == null || q.error)) q = null; var px = q ? Number(q.price) : null; var cap = px != null && (co.shares || co.supply) ? bigUsd(px * (co.shares ? co.shares * 1e9 : co.supply * 1e6)) : null;
-      var f = function(k, v){ return v ? '<div><span>' + k + '</span><b>' + v + '</b></div>' : ''; };
       var site = co.site ? '<a class="site" href="' + esc(co.site) + '" target="_blank" rel="noopener">' + esc(String(co.site).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')) + ' ↗</a>' : '';
-      return '<section class="about"><h2 class="k">About ' + esc(co.name) + '</h2><div class="about-g"><div class="txt"><p>' + esc(co.desc) + '</p>' + site + '</div><div class="facts">'
-        + f('Last price', px != null ? usdPx(px) + (q.change_pct != null ? ' <small class="' + sgn(Number(q.change_pct)).trim() + '">' + pct(Number(q.change_pct)) + ' today</small>' : '') : null) + f('Market cap', cap ? cap + ' <small>approx.</small>' : null)
-        + f(co.kind === 'crypto' ? 'Network' : 'Sector', co.sector) + f('Exchange', co.exchange) + f('Headquarters', co.hq) + f(co.kind === 'crypto' ? 'Launched' : co.kind === 'company' ? 'Founded' : 'Since', co.founded ? String(co.founded) : null)
-        + f(co.supply ? 'Circulating supply' : null, co.supply ? (co.supply >= 1000 ? (co.supply / 1000).toFixed(1) + 'B' : co.supply.toFixed(co.supply < 100 ? 1 : 0) + 'M') + ' ' + esc(co.unit || '') : null) + '</div></div></section>'; };
+      return (cap ? fact('Market cap', cap + ' <small>approx.</small>') : '') + (site ? fact('Website', site) : ''); };
+    facts += about();
     var postFig = function(i, cap){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
       return src ? '<figure class="post"><img src="' + esc(src) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"><figcaption><span>' + esc(when) + '</span><span>' + (cap || 'Exclusive channel') + '</span></figcaption></figure>'
         : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; };
@@ -639,7 +636,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
         return '<article class="chap' + (c.post ? '' : ' nopic') + '"><div class="txt"><span class="dt">' + esc(M.fmtDate((c.post && postDay(c.post)) || c.d)) + (c.px ? '<b>' + esc(c.px) + '</b>' : '') + '</span><h3>' + esc(c.h) + '</h3><p>' + esc(c.p) + '</p></div>' + (c.post ? postFig(c.post) : '') + '</article>'; }).join('');
       var rest = ids.filter(function(i){ return !seen[i]; });
       return '<div class="story"><p class="lede">' + esc(story.lede) + '</p>' + (story.note ? '<p class="note small muted">' + esc(story.note) + '</p>' : '')
-        + '<h2 class="k">The story <span class="muted">· ' + n + ' chapter' + (n === 1 ? '' : 's') + ' · every post as it was made in the Exclusive channel</span></h2><div class="chapters">' + chapters + '</div>'
+        + (n ? '<h2 class="k">The story <span class="muted">· ' + n + ' chapter' + (n === 1 ? '' : 's') + ' · every post as it was made in the Exclusive channel</span></h2><div class="chapters">' + chapters + '</div>' : '<p class="small muted">The posts on this call covered several positions at once, so they are not shown here.</p>')
         + (rest.length ? '<h2 class="k">More posts</h2><div class="posts-list">' + rest.map(function(i){ return postFig(i); }).join('') + '</div>' : '') + '</div>';
     };
     var home = pfHome(p), homeName = home === '#track' ? 'Track Record' : 'Active Positions'; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
@@ -647,7 +644,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
       + '<div class="pos-hd"><p class="dateline">' + dateline + '</p><h1>' + storyTitle(p) + (closed && p.result ? ' <span class="res">' + resultHtml(p) + '</span>' : '') + '</h1><p class="tags"><span class="tag">' + esc(p.symbol) + '</span>' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(classOf(p)) + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
-      + (STORIES ? about() : '') + '<div id="pf-story">' + (STORIES ? body() : '<p class="small muted">Loading…</p>') + '</div>';
+      + '<div id="pf-story">' + (STORIES ? body() : '<p class="small muted">Loading…</p>') + '</div>';
     if (!STORIES) loadStories().then(function(){ if (current === 'position') renderPosition(); });
   }
   document.addEventListener('click', function(ev){ var tr = ev.target.closest('#pf-groups tr.clk, #tk-table tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
@@ -742,7 +739,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       return syms.map(function(sym){ return '<tr class="grp"><td colspan="10">' + esc(names[sym] || sym) + ' <span class="muted">· ' + esc(sym) + ' · ' + by[sym].length + ' call' + (by[sym].length === 1 ? '' : 's') + '</span></td></tr>' + by[sym].map(row).join(''); }).join(''); };
     var main = posted.filter(inAlb), rest = unposted.filter(inAlb);
     $('#tk-table').innerHTML = head + '<tbody>' + (main.length ? grouped(main) : '<tr><td colspan="10" class="muted">Nothing closed in this market yet.</td></tr>') + '</tbody>';
-    $('#tk-noexit').hidden = !rest.length; $('#tk-noexit-n').textContent = '· ' + rest.length + ' · the entry was posted, the close was not — no result is claimed';
+    $('#tk-noexit').hidden = !rest.length; $('#tk-noexit-n').textContent = '· ' + rest.length + ' · the entry was posted, the close was not: no result is claimed';
     if (rest.length) $('#tk-table2').innerHTML = head + '<tbody>' + grouped(rest) + '</tbody>';
     $('#tk-foot').innerHTML = wins + ' of ' + posted.length + ' closed calls were positive · prices and dates exactly as posted in the Exclusive channel, nothing added later · a position built in several entries counts once, at the average entry · results on the price (leveraged trades: the move in the price, not the return on the margin) · "small loss" and "breakeven" as written at the time · a row opens the story of the call with every post as it was made · not financial advice: this is what was done.';
   }

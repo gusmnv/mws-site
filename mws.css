@@ -489,7 +489,7 @@ a.tile:hover{background:var(--bg-2)}
 .pf-cell{min-width:0}
 #pf-live .sh,#tr-live .sh,#tk-live .sh{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:10px;flex-wrap:wrap}
 #pf-live .sh h2,#tr-live .sh h2,#tk-live .sh h2{font-size:17px;font-weight:500;letter-spacing:-.01em}
-#pf-live .sh h2 .muted{font-weight:400;font-size:13px;margin-left:6px;text-transform:none}
+#pf-live .sh h2 .muted{font-weight:400;font-size:inherit;margin-left:4px;text-transform:none;color:var(--fg-3)}
 .donut .xl{border-top:1px solid var(--line);margin:4px 4px 0;padding:6px 0 2px}
 .donut .xl div{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:baseline;padding:5px 6px;font-size:13px;color:var(--fg-2);font-variant-numeric:tabular-nums}
 .donut .xl div+div{border-top:1px solid var(--line)}
@@ -525,6 +525,7 @@ a.tile:hover{background:var(--bg-2)}
 #pos-page .facts b{display:block;font-weight:500;font-size:17px;margin-top:5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 #pos-page .facts b span,#pos-page .facts b small{font:inherit;letter-spacing:0;text-transform:none}#pos-page .facts b small{color:var(--fg-3);font-size:12px}
 #pos-page .facts b .pos{color:var(--good)}#pos-page .facts b .neg{color:var(--bad)}
+#pos-page .facts b a.site{font:inherit;color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line-2)}#pos-page .facts b a.site:hover{border-color:var(--fg)}
 #pos-page h2.k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:500;margin:28px 0 10px}
 #pos-page .why{color:var(--fg-2);line-height:1.6;max-width:70ch;margin:0;font-size:16px}
 #pos-page .posts-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
@@ -554,7 +555,7 @@ body.app .panel .ttl h3{font-size:16px;letter-spacing:-.01em}
 body.app .acct{gap:0 64px;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr)}
 body.app .acct>div+div{border-left:1px solid var(--line);padding-left:48px}
 body.app .acct>div>.panel:first-child{padding-top:0}
-@media (max-width:900px){body.app .acct{gap:0}body.app .acct>div+div{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:24px}}
+@media (max-width:900px){body.app .acct{gap:0;grid-template-columns:1fr}body.app .acct>div+div{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:24px;margin-top:8px}}
 /* portfolio: KPIs as a line of numbers, chart and donut without frames, tables with hairlines only */
 body.app .pf-top{margin:0 0 18px}
 body.app .kpis{display:flex;gap:0 64px;background:none;border:0;border-bottom:1px solid var(--line);margin:0 0 26px;padding:0 0 22px}
@@ -768,7 +769,7 @@ body.app #pf-rng{margin-top:6px}
 /* Active Positions: one table per group (Spot, Leveraged, Orders) */
 .pf-sec{margin-top:6px}.pf-sec+.pf-sec{margin-top:34px}
 .pf-sec .sh{margin:0 0 10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.pf-sec .sh h2 .muted{font-weight:400;font-size:13px;margin-left:6px;text-transform:none}
+.pf-sec .sh h2 .muted{font-weight:400;font-size:inherit;margin-left:4px;text-transform:none;color:var(--fg-3)}
 .pf-tbl td.nm2{color:var(--fg-2);white-space:nowrap}
 @media (min-width:761px){.pf-tbl td.nm2{max-width:200px;overflow:hidden;text-overflow:ellipsis}}
 @media (max-width:760px){
@@ -850,7 +851,7 @@ body.app #pf-rng{margin-top:6px}
 /* Stock earnings: the book's cards, the week day by day, the reported table, the company panel */
 #er-book .sh,#er-week .sh,#er-reported .sh{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 #er-book .sh h2,#er-week .sh h2,#er-reported .sh h2{font-size:20px;font-weight:500;letter-spacing:-.015em;text-transform:none}
-#er-book .sh h2 .muted,#er-week .sh h2 .muted,#er-reported .sh h2 .muted{font-weight:400;font-size:13px;margin-left:6px;color:var(--fg-3)}
+#er-book .sh h2 .muted,#er-week .sh h2 .muted,#er-reported .sh h2 .muted{font-weight:400;font-size:inherit;margin-left:4px;color:var(--fg-3)}
 #er-week,#er-reported{margin-top:34px}
 #er-bar{margin:26px 0 0}
 .er-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--bg);border:1px solid var(--line)}

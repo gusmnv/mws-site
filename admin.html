@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=41c0dccb">
+<link rel="stylesheet" href="/mws.css?v=a5bf6ea4">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=41c0dccb"></script>
+<script src="/mws.js?v=a5bf6ea4"></script>
 <style>
 body{display:block}
 header.top{display:none}
@@ -262,7 +262,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
         <form class="pf" id="f-pos" novalidate>
           <input type="hidden" id="p-id"><input type="hidden" id="p-qsym"><input type="hidden" id="p-qname"><input type="hidden" id="p-qexch"><input type="hidden" id="p-qtype"><input type="hidden" id="p-qcur">
           <div class="field"><label for="p-kind">Type</label><select id="p-kind"><option value="spot">Spot position</option><option value="leveraged">Leveraged trade</option><option value="order">Order</option></select></div>
-          <div class="field"><label for="p-class">Category</label><select id="p-class"><option value="crypto">Crypto</option><option value="equity">Stocks</option><option value="etf">ETF</option><option value="commodity">Commodities</option><option value="fx">FX</option><option value="other">Other</option></select></div>
+          <div class="field"><label for="p-class">Category</label><select id="p-class"><option value="crypto">Crypto</option><option value="equity">Stocks</option><option value="etf">ETF</option><option value="commodity">Commodities</option><option value="index">Indices</option><option value="fx">FX</option><option value="other">Other</option></select></div>
           <div class="field"><label for="p-symbol">Symbol</label><input id="p-symbol" type="text" placeholder="MSTR" autocapitalize="characters"></div>
           <div class="field" id="f-side"><label for="p-side">Side</label><select id="p-side"><option value="long">Long</option><option value="short">Short</option></select></div>
           <div class="field" id="f-lev"><label for="p-lev" id="l-lev">Leverage</label><input id="p-lev" type="text" placeholder="3x"></div>
@@ -833,7 +833,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function usdS(v){ if (v == null || !isFinite(v)) return '—'; return '<span class="' + (v > 0 ? 'pos' : v < 0 ? 'neg' : '') + '">' + (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 }) + '</span>'; }
   function pctS(v, dp){ if (v == null || !isFinite(v)) return '—'; return '<span class="' + (v > 0 ? 'pos' : v < 0 ? 'neg' : '') + '">' + (v > 0 ? '+' : '') + Number(v).toFixed(dp == null ? 2 : dp) + '%</span>'; }
   var TYPE_CLASS = { 'Digital Currency': 'crypto', 'Common Stock': 'equity', 'REIT': 'equity', 'Depositary Receipt': 'equity', 'Preferred Stock': 'equity', 'ETF': 'etf', 'Fund': 'etf', 'Physical Currency': 'fx', 'Commodity': 'commodity', 'Index': 'other' };
-  var CLASS_T = { crypto: 'Crypto', equity: 'Stocks', etf: 'ETF', commodity: 'Commodities', fx: 'FX', other: 'Other' }, KIND_N = { spot: 0, leveraged: 1, order: 2 }, KIND_T = { spot: 'Spot', leveraged: 'Trade', order: 'Order' };
+  var CLASS_T = { crypto: 'Crypto', equity: 'Stocks', etf: 'ETF', commodity: 'Commodities', index: 'Indices', fx: 'FX', other: 'Other' }, KIND_N = { spot: 0, leveraged: 1, order: 2 }, KIND_T = { spot: 'Spot', leveraged: 'Trade', order: 'Order' };
   function kindOf(p){ return KIND_N[p.kind] != null ? p.kind : 'spot'; }
   function levOf(p){ var n = parseFloat(String(p && p.leverage || '').replace(/[^0-9.]/g, '')); return n > 0 ? n : 1; }
   function notional(){ return Number(D.settings && D.settings.portfolio_notional) > 0 ? Number(D.settings.portfolio_notional) : 1000000; }

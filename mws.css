@@ -381,10 +381,10 @@ a.tile:hover{background:var(--bg-2)}
 .pt td .sub{display:block;font-size:12px;color:var(--fg-3);font-weight:400;margin-top:3px;font-variant-numeric:tabular-nums}
 .pt td .sub.pos{color:var(--good)}.pt td .sub.neg{color:var(--bad)}
 .pt td.num{text-align:right}
-@media (min-width:761px){#pf-table td.em{min-width:180px}}
+@media (min-width:761px){.pf-tbl td.em{min-width:180px}}
 #pf-expo-table{min-width:0}
-@media (max-width:1400px){#pf-table .opt{display:none}}
-@media (max-width:760px){#pf-table .opt{display:flex}}
+@media (max-width:1400px){.pf-tbl .opt{display:none}}
+@media (max-width:760px){.pf-tbl .opt{display:flex}}
 @media (max-width:1100px){.tiles.pf4{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:760px){
   .tiles.pf4{grid-template-columns:1fr}
@@ -500,17 +500,17 @@ a.tile:hover{background:var(--bg-2)}
 .pf-cell .donut svg{max-height:330px;margin:0 auto}
 .pf-cell .chart{padding:14px 14px 8px}
 .pt th[data-k]{cursor:pointer;user-select:none}.pt th[data-k]:hover{color:var(--fg)}.pt th.on{color:var(--fg)}.pt th i{font-style:normal;color:var(--fg-3)}
-#pf-table,#pf-ord,#tr-table,#tr-ord,#tk-table{font-size:13px;width:100%}
+.pf-tbl,#pf-ord,#tr-table,#tr-ord,#tk-table{font-size:13px;width:100%}
 .pt th.num,.pt td.num{text-align:right}
 .pt td a.sym{color:inherit;text-decoration:none;font-weight:500}.pt td a.sym:hover{text-decoration:underline;text-underline-offset:3px}.pt td a.sym:focus-visible,.pt th[data-k]:focus-visible{outline:2px solid var(--fg-2);outline-offset:2px}
 #tk-table td.num b{color:var(--fg);font-weight:500}#tk-table td.num.pos b{color:var(--good)}#tk-table td.num.neg b{color:var(--bad)}
 #tr-table,#tk-table{min-width:0}
 @media (min-width:761px){
-#pf-table th,#pf-ord th,#tr-table th,#tr-ord th,#tk-table th{padding:9px 8px;white-space:normal;line-height:1.25;vertical-align:bottom}
-#pf-table td,#pf-ord td,#tr-table td,#tr-ord td,#tk-table td{padding:10px 8px;vertical-align:middle}
-#pf-table td.em,#pf-ord td.em,#tr-table td.em,#tr-ord td.em,#tk-table td.em{white-space:nowrap;min-width:0;width:1%}
-#pf-table td.em .nm,#pf-ord td.em .nm,#tr-table td.em .nm,#tr-ord td.em .nm,#tk-table td.em .nm{display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;margin-left:6px}
-#pf-table td.em .tag,#pf-ord td.em .tag,#tr-table td.em .tag,#tr-ord td.em .tag,#tk-table td.em .tag{margin-left:8px;vertical-align:2px;padding:2px 6px;font-size:10px}
+.pf-tbl th,#pf-ord th,#tr-table th,#tr-ord th,#tk-table th{padding:9px 8px;white-space:normal;line-height:1.25;vertical-align:bottom}
+.pf-tbl td,#pf-ord td,#tr-table td,#tr-ord td,#tk-table td{padding:10px 8px;vertical-align:middle}
+.pf-tbl td.em,#pf-ord td.em,#tr-table td.em,#tr-ord td.em,#tk-table td.em{white-space:nowrap;min-width:0;width:1%}
+.pf-tbl td.em .nm,#pf-ord td.em .nm,#tr-table td.em .nm,#tr-ord td.em .nm,#tk-table td.em .nm{display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;margin-left:6px}
+.pf-tbl td.em .tag,#pf-ord td.em .tag,#tr-table td.em .tag,#tr-ord td.em .tag,#tk-table td.em .tag{margin-left:8px;vertical-align:2px;padding:2px 6px;font-size:10px}
 .pt td:first-child,.pt th:first-child{padding-left:14px}.pt td:last-child,.pt th:last-child{padding-right:14px}
 }
 @media (max-width:1000px){.pf-grid{grid-template-columns:1fr}}
@@ -588,26 +588,46 @@ body.app .dateline,.paper .dateline,#pos-page .dateline{font-family:var(--mono);
 .paper .lead .txt{display:flex;flex-direction:column;gap:12px;min-width:0}
 .paper .lead .pic,.paper .art .pic{display:block;background:var(--bg-2);overflow:hidden}
 .paper .lead .pic img{display:block;width:100%;height:auto;max-height:640px;object-fit:cover;object-position:top}
+.paper .lead .pic img.fit{height:auto}
 .paper .dt,.paper .art .dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
 .paper .lead .hl{font-size:clamp(30px,3vw,46px);line-height:1.08;letter-spacing:-.02em;font-weight:500;color:var(--fg)}
 .paper .lead .res{font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
 .paper .res .pos{color:var(--good)}.paper .res .neg{color:var(--bad)}.paper .res .muted{color:var(--fg-2)}
 .paper .lead .ld{font-size:18px;line-height:1.55;color:var(--fg-2);max-width:62ch}
 .paper .lead .more{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg);margin-top:6px}
-.paper .lead:hover .hl,.paper .art:hover .hl{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;text-decoration-color:var(--fg-3)}
+.paper .lead:hover .hl{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;text-decoration-color:var(--fg-3)}
 .paper .sh{margin:40px 0 18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.paper .arts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 40px}
-.paper .arts.sm{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 32px}
-.paper .art{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;min-width:0}
-.paper .art .pic{margin-bottom:6px}
-.paper .art .pic img{width:100%;height:auto;max-height:340px;object-fit:cover;object-position:top;display:block}
-.paper .arts.sm .art .pic img{max-height:220px}
-.paper .art .pic .nopic{display:block;width:100%;height:120px}
-.paper .art .hl{font-size:21px;line-height:1.2;letter-spacing:-.015em;font-weight:500;color:var(--fg)}
-.paper .arts.sm .art .hl{font-size:16px}
-.paper .art .res{font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
-.paper .art .ld{font-size:14px;line-height:1.5;color:var(--fg-2);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-.paper .arts.sm .art .ld{-webkit-line-clamp:3;font-size:13px}
+.paper .arts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 24px}
+.paper .arts.sm{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 20px}
+/* each call is a framed card: the post on top in a fixed frame, the result as the big figure, then the headline and the lede */
+.paper .art{display:flex;flex-direction:column;text-decoration:none;color:inherit;min-width:0;border:1px solid var(--line);background:var(--bg-2);transition:border-color .3s var(--ease),transform .3s var(--ease)}
+.paper .art:hover{border-color:var(--fg-3);transform:translateY(-2px)}
+.paper .art .pic{margin:0;aspect-ratio:3/2;border-bottom:1px solid var(--line);background:var(--bg);padding:0}
+.paper .art .pic img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.paper .art .pic img.fit,.paper .album .pic img.fit{object-fit:contain;object-position:center}
+.paper .art .pic .nopic{display:block;width:100%;height:100%}
+.paper .art .bd{display:flex;flex-direction:column;gap:8px;padding:16px 18px 18px;min-width:0}
+.paper .art .fig{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px}
+.paper .art .res{font-size:28px;line-height:1;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.paper .art .res .muted{font-size:18px;color:var(--fg-3)}
+.paper .art .out{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
+.paper .art .hl{font-size:19px;line-height:1.2;letter-spacing:-.015em;font-weight:500;color:var(--fg);margin-top:2px}
+.paper .art .ld{font-size:13.5px;line-height:1.5;color:var(--fg-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.paper .art .ft{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);margin-top:auto;padding-top:10px}
+.paper .arts.sm .art .pic{aspect-ratio:3/2}
+.paper .arts.sm .art .bd{padding:12px 14px 14px;gap:6px}
+.paper .arts.sm .art .res{font-size:20px}.paper .arts.sm .art .res .muted{font-size:14px}
+.paper .arts.sm .art .hl{font-size:15px}
+.paper .arts.sm .art .ld{-webkit-line-clamp:2;font-size:12.5px}
+/* the scoreboard: the record at a glance */
+.paper .score{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;border:1px solid var(--line);margin:0 0 18px}
+.paper .score .sc{padding:16px 18px;border-left:1px solid var(--line);min-width:0}
+.paper .score .sc:first-child{border-left:0}
+.paper .score .sc b{display:block;font-size:30px;line-height:1;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--fg)}
+.paper .score .sc b.pos{color:var(--good)}.paper .score .sc b.neg{color:var(--bad)}
+.paper .score .sc span{display:block;margin-top:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+@media (max-width:1100px){.paper .score{grid-template-columns:repeat(3,minmax(0,1fr))}.paper .score .sc:nth-child(4){border-left:0}.paper .score .sc:nth-child(n+4){border-top:1px solid var(--line)}}
+@media (max-width:520px){.paper .score{grid-template-columns:repeat(2,minmax(0,1fr))}.paper .score .sc:nth-child(odd){border-left:0}.paper .score .sc:nth-child(even){border-left:1px solid var(--line)}.paper .score .sc:nth-child(n+3){border-top:1px solid var(--line)}.paper .score .sc:nth-child(4){border-left:1px solid var(--line)}.paper .score .sc b{font-size:26px}}
 @media (max-width:1200px){.paper .arts{grid-template-columns:repeat(2,minmax(0,1fr))}.paper .arts.sm{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:900px){.paper .lead{grid-template-columns:1fr;gap:22px}.paper .lead .pic{order:-1}.paper .arts,.paper .arts.sm{grid-template-columns:1fr}}
 /* the story of one call */
@@ -633,8 +653,8 @@ body.app .dateline,.paper .dateline,#pos-page .dateline{font-family:var(--mono);
 body.app .sec.cal{margin-top:30px}
 body.app .sec .sh{padding-bottom:10px;border-bottom:1px solid var(--line)}
 /* the tables take the whole width at 1800 */
-body.app #pf-table{font-size:13.5px}
-@media (min-width:1500px){body.app #pf-table td,body.app #tr-table td,body.app #tk-table td,body.app #pf-ord td,body.app #tr-ord td{padding:12px 10px}body.app .pt td.em .nm{max-width:170px}}
+body.app .pf-tbl{font-size:13.5px}
+@media (min-width:1500px){body.app .pf-tbl td,body.app #tr-table td,body.app #tk-table td,body.app #pf-ord td,body.app #tr-ord td{padding:12px 10px}body.app .pt td.em .nm{max-width:170px}}
 @media (max-width:1000px){body.app .pf-cell+.pf-cell{border-left:0;padding-left:0;margin-top:30px}}
 @media (max-width:760px){body.app .kpis{flex-direction:column;gap:18px}body.app .kpis .kp.big{padding-right:0;border-right:0;padding-bottom:18px;border-bottom:1px solid var(--line)}body.app .kpis .kp.big>b{font-size:32px}body.app .content{padding-top:18px}}
 body.app .page .head .eyebrow{white-space:nowrap}
@@ -699,7 +719,7 @@ body.app .pt a.more{font-family:var(--mono);font-size:11px;letter-spacing:.06em;
 body.app .pt a.more:hover{color:var(--fg)}
 body.app .pt tr.clk:hover a.more{color:var(--fg)}
 @media (max-width:760px){body.app .pt.cards td.act{display:block;text-align:right}body.app .pt.cards td.act::before{display:none}body.app .acct{gap:0}}
-@media (min-width:761px){body.app #pf-table td.em{min-width:120px;width:auto}}
+@media (min-width:761px){body.app .pf-tbl td.em{min-width:120px;width:auto}}
 .chart .tk.tb{fill:var(--fg-2)}
 body.app .pt tr.cash td{color:var(--fg-3)}body.app .pt tr.cash td.em .sym{color:var(--fg-2)}body.app .pt tr.cash td.num{color:var(--fg-2)}
 /* performance header: title, the names (or the day's numbers while hovering) under it, the timeframes on the right as plain text */
@@ -723,9 +743,9 @@ body.app #pf-rng{margin-top:6px}
 
 /* Active Positions: one list, three groups */
 #pf-live .dateline{margin-bottom:18px}
-#pf-table tr.grp td .muted{text-transform:none;letter-spacing:0;font-family:var(--sans,inherit);font-size:12px;color:var(--fg-3)}
-#pf-table td .tag{padding:2px 6px;font-size:10px;vertical-align:1px}
-#pf-table td.muted .muted{color:var(--fg-3)}
+.pf-tbl tr.grp td .muted{text-transform:none;letter-spacing:0;font-family:var(--sans,inherit);font-size:12px;color:var(--fg-3)}
+.pf-tbl td .tag{padding:2px 6px;font-size:10px;vertical-align:1px}
+.pf-tbl td.muted .muted{color:var(--fg-3)}
 @media (max-width:760px){
   /* the positions and the ledger on the phone: a ruled list, each row = the name, a grid of its facts (label above value), Details */
   body.app .pt.cards.ruled tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 12px;border:0;border-top:1px solid var(--line);margin:0;padding:12px 0 12px;background:none}
@@ -744,3 +764,35 @@ body.app #pf-rng{margin-top:6px}
 /* the story page on the phone: facts two by two */
 @media (max-width:760px){#pos-page .facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}body.app #pos-page .facts div{padding:10px 0}#pos-page .facts b{font-size:16px}}
 .paper .sh h2 .muted{text-transform:none}
+
+/* Active Positions: one table per group (Spot, Leveraged, Orders) */
+.pf-sec{margin-top:6px}.pf-sec+.pf-sec{margin-top:34px}
+.pf-sec .sh{margin:0 0 10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.pf-sec .sh h2 .muted{font-weight:400;font-size:13px;margin-left:6px;text-transform:none}
+.pf-tbl td.nm2{color:var(--fg-2);white-space:nowrap}
+@media (min-width:761px){.pf-tbl td.nm2{max-width:200px;overflow:hidden;text-overflow:ellipsis}}
+@media (max-width:760px){
+  body.app .pt.cards.ruled td.nm2{grid-column:1/-1;margin-top:-10px;padding:0 0 6px;font-size:14px;color:var(--fg-3);white-space:normal}
+  body.app .pt.cards.ruled td.nm2::before{display:none}
+  .pf-sec+.pf-sec{margin-top:26px}
+}
+/* Track Record · albums (one per market) and the album page */
+.paper .back{margin:0 0 18px}.paper .back a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);text-decoration:none}.paper .back a:hover{color:var(--fg)}
+.paper .albums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px 28px}
+.paper .album{display:flex;flex-direction:column;gap:5px;text-decoration:none;color:inherit;min-width:0;border:1px solid var(--line);background:var(--bg-2);padding:0 0 16px;transition:border-color .3s var(--ease),transform .3s var(--ease)}
+.paper .album:hover{border-color:var(--fg-3);transform:translateY(-2px)}
+.paper .album .nm,.paper .album .ct,.paper .album .syms{padding:0 16px}
+.paper .album .pic{display:block;aspect-ratio:3/2;background:var(--bg);overflow:hidden;border:0;border-bottom:1px solid var(--line);margin-bottom:10px}
+.paper .album .pic img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;transition:transform .5s var(--ease)}
+.paper .album:hover .pic img{transform:scale(1.03)}
+.paper .album .nm{font-size:22px;line-height:1.15;letter-spacing:-.015em;font-weight:500;color:var(--fg)}
+.paper .album .ct{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
+.paper .album .syms{font-size:13px;color:var(--fg-2)}
+.paper .alb-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+.paper .alb-tabs .chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);text-decoration:none;border:1px solid var(--line-2);padding:8px 12px}
+.paper .alb-tabs .chip i{font-style:normal;color:var(--fg-3);margin-left:4px}
+.paper .alb-tabs .chip.on,.paper .alb-tabs .chip:hover{color:var(--fg);background:var(--bg-2)}
+@media (max-width:1200px){.paper .albums{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.paper .albums{grid-template-columns:1fr}.paper .album .pic{aspect-ratio:16/9}}
+/* the ledger fits a 1440 screen: entry/exit texts may wrap */
+@media (min-width:761px){#tk-table td.num{white-space:normal;max-width:220px}}

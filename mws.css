@@ -826,3 +826,23 @@ body.app #pf-rng{margin-top:6px}
 #pos-page .about .facts b small.pos{color:var(--good)}#pos-page .about .facts b small.neg{color:var(--bad)}
 @media (max-width:900px){#pos-page .about-g{grid-template-columns:1fr;gap:18px}}
 #tk-table td.act,#tk-table2 td.act{white-space:nowrap}
+
+/* Active Positions · column rhythm: Type · Ticker · Name · (Direction) · date · numbers — fixed widths for the text columns so the three tables line up */
+@media (min-width:761px){
+  .pf-tbl{table-layout:auto}
+  .pf-tbl th.c-type,.pf-tbl td.c-type{width:120px;min-width:120px;white-space:nowrap}
+  .pf-tbl th.c-tick,.pf-tbl td.c-tick{width:90px;min-width:90px}
+  .pf-tbl td.em.c-tick{min-width:90px;width:90px;padding-right:0}
+  .pf-tbl th.c-name,.pf-tbl td.c-name{width:220px;min-width:160px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pf-tbl th.c-dir,.pf-tbl td.c-dir{width:120px;min-width:110px;white-space:nowrap}
+  .pf-tbl th.c-date,.pf-tbl td.c-date{width:130px;min-width:120px;white-space:nowrap}
+  .pf-tbl th.c-act,.pf-tbl td.act{width:96px}
+  .pf-tbl th.num,.pf-tbl td.num{min-width:110px}
+  .pf-tbl td{vertical-align:middle}
+}
+@media (max-width:760px){
+  /* on the phone the card still opens with the ticker, then the name, then the facts in reading order */
+  body.app .pt.cards.ruled td.em.c-tick{order:-3}
+  body.app .pt.cards.ruled td.nm2{order:-2}
+  body.app .pt.cards.ruled td.c-type{order:-1}
+}

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=f95c552d">
+<link rel="stylesheet" href="/mws.css?v=c64b762a">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=f95c552d"></script>
+<script src="/mws.js?v=c64b762a"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -131,6 +131,7 @@
       <section class="page" data-page="portfolio">
         <div class="head rv"><h1>Active positions. <span class="soon" id="pf-tag">In development</span></h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
+          <p class="mkt rv" id="pf-mkt"></p>
           <div id="pf-groups" class="rv d1"></div>
           <p class="small muted" style="margin-top:18px" id="pf-foot"></p>
         </div>
@@ -654,41 +655,66 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var by = {}; rows.forEach(function(p){ var g = PF_CLASS[p.asset_class] || 'Other'; (by[g] = by[g] || []).push(p); });
     return PF_ORDER.filter(function(g){ return by[g]; }).map(function(g){ return '<tr class="grp"><td colspan="' + cols + '">' + g + '</td></tr>' + by[g].map(rowFn).join(''); }).join('');
   }
-  M.refreshQuotes = function(){ return loadQuotes().then(function(){ if (current === 'portfolio' || current === 'track') renderPortfolio(); if (current === 'position') renderPosition(); if (current === 'earnings') renderEarnings(); }); };
+  M.refreshQuotes = function(){ return loadQuotes().then(function(){ if (current === 'portfolio') renderPortfolio(); if (current === 'position') posRefresh(); if (current === 'earnings') renderEarnings(); }); };
   async function loadQuotes(){
     if (!positions || !positions.length) { quotes = {}; return; }
     try { var q = await sb.from('quotes').select('*'); var prev = quotes; quotes = {}; (q.data || []).forEach(function(r){ var k = String(r.symbol).toUpperCase(), cur = prev[k]; if (cur && cur.live_at && Date.now() - cur.live_at < 120000) { r = Object.assign({}, r, { price: cur.price, live_at: cur.live_at }); if (r.prev_close != null && Number(r.prev_close) > 0) r.change_pct = Math.round((Number(r.price) / Number(r.prev_close) - 1) * 10000) / 100; } quotes[k] = r; }); } catch (e) { quotes = {}; }
-    liveStart();
+    liveStart(); tickStart();
   }
   /* Live crypto: Binance's public market stream (no key, no account), one miniTicker a second per pair. BTC/USD on the site
      is the BTC/USDT pair there (USDT trades at a dollar). The stream only patches the last price; the previous close and the
      1D base stay as the quotes function sets them, so the 1D column keeps its meaning. */
   var liveWs = null, liveSyms = {}, liveT = null, liveTries = 0, liveLast = 0, posFacts = null;
+  var liveSet = {}; /* quote symbols that tick live (Binance for crypto, the ticks service for stocks) */
+  function liveTick(sym, px){ if (!isFinite(px) || px <= 0) return; var q = quotes[sym] || (quotes[sym] = { symbol: sym }); if (q.price === px && q.live_at) return; q.price = px; q.live_at = Date.now(); liveSet[sym] = 1; if (q.prev_close != null && Number(q.prev_close) > 0) q.change_pct = Math.round((px / Number(q.prev_close) - 1) * 10000) / 100;
+    if (!liveT) liveT = setTimeout(function(){ liveT = null; liveLast = Date.now(); livePatch(); }, 900); }
   /* a tick redraws only what moved: the price cells of the rows concerned (with the flash), the facts of an open story */
   function livePatch(){
-    if (current === 'portfolio') { var D = pfData(); D.list.forEach(function(p){ if (p.status !== 'open' || !liveSyms[liveKey(p.quote_symbol)]) return; var tr = document.querySelector('#pf-groups tr[data-pid="' + String(p.id).replace(/"/g, '') + '"]'); if (!tr) return; var T = tradeNums(p, D.Q), k = String(p.id), dir = T.last != null && lastPx[k] != null && T.last !== lastPx[k] ? (T.last > lastPx[k] ? 'flash-up' : 'flash-dn') : ''; if (T.last != null) lastPx[k] = T.last;
-      var set = function(label, html){ var td = tr.querySelector('td[data-l="' + label + '"]'); if (!td) return; td.innerHTML = html; td.classList.remove('flash-up', 'flash-dn', 'pos', 'neg'); if (dir) { void td.offsetWidth; td.classList.add(dir); } return td; };
-      set('Last price', T.last != null ? usdPx(T.last) : '—'); var a = set('1D ROI', T.roi1 == null ? '—' : pct(T.roi1)); if (a && sgn(T.roi1)) a.classList.add(sgn(T.roi1).trim()); var b = set('All-time ROI', T.ret == null ? '—' : pct(T.ret)); if (b && sgn(T.ret)) b.classList.add(sgn(T.ret).trim()); set('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—'); }); }
-    else if (current === 'position' && posFacts) { var f = document.querySelector('#pos-page .facts'); if (f) f.innerHTML = posFacts(); }
-    else if (current === 'track') renderPortfolio(); else if (current === 'earnings') renderEarnings();
+    if (current === 'portfolio') { var D = pfData(); D.list.forEach(function(p){ if (p.status !== 'open' || !liveSet[String(p.quote_symbol || '').toUpperCase()]) return; var tr = document.querySelector('#pf-groups tr[data-pid="' + String(p.id).replace(/"/g, '') + '"]'); if (!tr) return; var T = tradeNums(p, D.Q), k = String(p.id); if (T.last != null && lastPx[k] != null && T.last !== lastPx[k]) lastDir[k] = T.last > lastPx[k] ? ' px-up' : ' px-dn'; if (T.last != null) lastPx[k] = T.last;
+      var set = function(label, html, cls){ var td = tr.querySelector('td[data-l="' + label + '"]'); if (!td) return; td.innerHTML = html; td.classList.remove('px-up', 'px-dn', 'pos', 'neg'); (cls || '').trim().split(/\s+/).forEach(function(c){ if (c) td.classList.add(c); }); return td; };
+      set('Last price', T.last != null ? usdPx(T.last) : '—', lastDir[k]); if (tr._mkt !== tickOn) { tr._mkt = tickOn; mktLine(); } set('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), sgn(T.roi1)); set('All-time ROI', T.ret == null ? '—' : pct(T.ret), sgn(T.ret)); set('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—'); }); }
+    else if (current === 'position') posRefresh();
+    else if (current === 'earnings') renderEarnings();
   }
+  function posRefresh(){ if (posFacts) { var f = document.querySelector('#pos-page .facts'); if (f) f.innerHTML = posFacts(); } else renderPosition(); } /* prices moved: the facts row only, never the posts */
   function liveKey(qs){ var x = /^([A-Z0-9]{2,10})\/(USD|USDT)$/.exec(String(qs || '').toUpperCase()); return x ? x[1].toLowerCase() + 'usdt' : ''; }
   function liveMap(){ var m = {}; (positions || []).forEach(function(p){ if (p.status !== 'open') return; var k = liveKey(p.quote_symbol); if (k) m[k] = String(p.quote_symbol).toUpperCase(); }); return m; }
   function liveStart(){
     if (sim || typeof WebSocket === 'undefined') return; var m = liveMap(), pairs = Object.keys(m); var key = pairs.join('/');
     if (liveWs && liveWs._key === key) return; liveStop(); if (!pairs.length) return; liveSyms = m;
-    try { var ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + pairs.map(function(p){ return p + '@miniTicker'; }).join('/')); } catch (e) { return; }
+    var host = liveTries % 2 === 0 ? 'wss://data-stream.binance.vision' : 'wss://stream.binance.com:9443';
+    try { var ws = new WebSocket(host + '/stream?streams=' + pairs.map(function(p){ return p + '@miniTicker'; }).join('/')); } catch (e) { return; }
     ws._key = key; liveWs = ws;
     ws.onopen = function(){ liveTries = 0; };
     ws.onmessage = function(ev){ var d; try { d = JSON.parse(ev.data).data; } catch (e) { return; } if (!d || !d.s || d.c == null) return; var sym = liveSyms[String(d.s).toLowerCase()]; if (!sym) return;
-      var q = quotes[sym] || (quotes[sym] = { symbol: sym }); var px = Number(d.c); if (!isFinite(px) || px <= 0) return; q.price = px; q.live_at = Date.now(); if (q.prev_close != null && Number(q.prev_close) > 0) q.change_pct = Math.round((px / Number(q.prev_close) - 1) * 10000) / 100;
-      if (!liveT) liveT = setTimeout(function(){ liveT = null; liveLast = Date.now(); livePatch(); }, 900); };
+      liveTick(sym, Number(d.c)); };
     ws.onclose = function(){ if (liveWs !== ws) return; liveWs = null; liveTries++; setTimeout(function(){ if (!liveWs && !document.hidden) liveStart(); }, Math.min(30000, 2000 * liveTries)); };
     ws.onerror = function(){ try { ws.close(); } catch (e) {} };
   }
   function liveStop(){ if (liveWs) { var w = liveWs; liveWs = null; try { w.onclose = null; w.close(); } catch (e) {} } }
-  document.addEventListener('visibilitychange', function(){ if (document.hidden) liveStop(); else if (positions) liveStart(); }); /* no stream while the tab sleeps; back on return */
-  var pfSort = { k: 'ret', d: -1 }, lastPx = {}; /* the last price each row was drawn with: a move flashes the cell green or red */ /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
+  /* Live stocks: the ticks service (ticks/ on Fly.io) holds the Twelve Data stream and fans it out to members, a tick a second.
+     The browser presents its own session token; the service checks the membership. Five failed attempts and it stays quiet. */
+  var tickWs = null, tickTries = 0, tickOn = false;
+  function tickStart(){
+    if (sim || !C.TICKS_URL || tickWs || typeof WebSocket === 'undefined' || !(access && access.valid) || tickTries >= 5) return;
+    sb.auth.getSession().then(function(r){ var tok = r && r.data && r.data.session && r.data.session.access_token; if (!tok || tickWs) return;
+      var ws; try { ws = new WebSocket(C.TICKS_URL.replace(/\/$/, '') + '/?token=' + encodeURIComponent(tok)); } catch (e) { tickTries++; return; }
+      tickWs = ws; var got = false;
+      ws.onmessage = function(ev){ var m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (!m || !m.q) return; if (!got) { got = true; tickTries = 0; tickOn = true; if (current === 'portfolio') renderPortfolio(); } Object.keys(m.q).forEach(function(k){ liveTick(String(k).toUpperCase(), Number(m.q[k])); }); };
+      ws.onclose = function(){ if (tickWs !== ws) return; tickWs = null; tickOn = false; if (!got) tickTries++; if (!document.hidden) setTimeout(tickStart, Math.min(60000, 3000 * (tickTries + 1))); };
+      ws.onerror = function(){ try { ws.close(); } catch (e) {} }; }).catch(function(){});
+  }
+  function tickStop(){ if (tickWs) { var w = tickWs; tickWs = null; tickOn = false; try { w.onclose = null; w.close(); } catch (e) {} } }
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) { liveStop(); tickStop(); } else if (positions) { liveStart(); tickStart(); } }); /* no stream while the tab sleeps; back on return */
+  /* the US session: New York time, Monday to Friday, 09:30 to 16:00 (exchange holidays are not known here) */
+  var NYF = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  function usSession(now){ var p = {}; NYF.formatToParts(now || new Date()).forEach(function(x){ p[x.type] = x.value; }); var dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday), mins = (Number(p.hour) % 24) * 60 + Number(p.minute), wk = dow >= 1 && dow <= 5, open = wk && mins >= 570 && mins < 960;
+    var until; if (open) until = 960 - mins; else { var d = 0, m = mins; if (wk && mins < 570) until = 570 - mins; else { d = dow === 5 ? 3 : dow === 6 ? 2 : 1; until = (1440 - m) + 570 + (d - 1) * 1440; } }
+    return { open: open, until: until, dow: dow }; }
+  function untilTxt(mins){ var h = Math.floor(mins / 60), m = mins % 60; return h >= 48 ? Math.round(h / 24) + ' days' : h ? h + ' h ' + (m ? String(m).padStart(2, '0') + ' min' : '') : m + ' min'; }
+  function mktLine(){ var el = $('#pf-mkt'); if (!el) return; var st = usSession(); el.innerHTML = '<span class="dot' + (st.open ? ' on' : '') + '"></span>' + (st.open ? 'US market open <span class="muted">· closes in ' + untilTxt(st.until) + (tickOn ? ' · stocks tick live' : '') + '</span>' : 'US market closed <span class="muted">· stocks at the last close · opens in ' + untilTxt(st.until) + '</span>') + '<span class="muted"> · crypto trades 24/7' + (Object.keys(liveSyms).length ? ', live from Binance' : '') + '</span>'; }
+  setInterval(function(){ if (current === 'portfolio') mktLine(); }, 60000);
+  var pfSort = { k: 'ret', d: -1 }, lastPx = {}, lastDir = {}; /* the last price each row was drawn with: a move flashes the cell green or red */ /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
   /* the section tag: Live for members, a warning for the owner while members do not see it yet */
   function deskTag(id, unlocked, has){ var onlyMe = staffRole && !sim && !deskLive.portfolio; var t = $('#' + id); t.textContent = unlocked && has ? (onlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); t.className = 'soon' + (onlyMe && has ? ' warn' : ''); return onlyMe; }
   /* sortable tables: every row carries its values; a header click sorts by that column, again to flip */
@@ -710,9 +736,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: String(p.side || 'long') + ' ' + T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist) } }; };
     var sortGroup = function(rows, orders){ var st = pfSort; if (orders && (st.k === 'ret' || st.k === 'roi1')) st = { k: 'dist', d: 1 }; /* orders: the nearest level first */ return sortRows(rows, st); };
     var tick = function(p){ return cell('Type', esc(classOf(p)), 'muted c-type') + cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em c-tick') + cell('Name', esc(p.name || '—'), 'nm2 c-name'); };
-    var flash = {}; open.forEach(function(p){ var T = tradeNums(p, Q), k = String(p.id); if (T.last != null && lastPx[k] != null && T.last !== lastPx[k]) flash[k] = T.last > lastPx[k] ? ' flash-up' : ' flash-dn'; if (T.last != null) lastPx[k] = T.last; });
-    var lastCell = function(T, p){ var fl = flash[String(p.id)] || ''; if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', usdPx(T.last) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : ''), 'num' + fl); };
-    var roiCells = function(T, p){ var fl = flash[String(p.id)] || ''; return cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1) + fl) + cell('All-time ROI', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret) + fl); };
+    var flash = {}; open.forEach(function(p){ var T = tradeNums(p, Q), k = String(p.id); if (T.last != null && lastPx[k] != null && T.last !== lastPx[k]) lastDir[k] = T.last > lastPx[k] ? ' px-up' : ' px-dn'; if (T.last != null) lastPx[k] = T.last; flash[k] = lastDir[k] || ''; }); /* the last price keeps the colour of its last move */
+    var shut = !usSession().open;
+    var lastCell = function(T, p){ var fl = flash[String(p.id)] || ''; if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', usdPx(T.last) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : (shut && !liveKey(p.quote_symbol) && (p.asset_class === 'equity' || p.asset_class === 'etf' || p.asset_class === 'index') ? '<span class="sub muted">at close</span>' : '')), 'num' + fl); };
+    var roiCells = function(T, p){ return cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('All-time ROI', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret)); };
     var head = function(cols){ return '<thead><tr>' + cols.map(function(c){ return th(c[0], c[1], pfSort, c[2] || '', c[3] || ''); }).join('') + '<th class="c-act"></th></tr></thead>'; };
     var spotHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Bought', 'since', 'c-date', 'The day of the call'], ['Entry price', 'entry', 'num', 'Average entry as posted'], ['Last price', 'last', 'num'], ['1D ROI', 'roi1', 'num', 'Since the previous close'], ['All-time ROI', 'ret', 'num', 'Since the call']]);
     var levHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Direction', 'side', 'c-dir', 'Long or short, and the leverage'], ['Opened', 'since', 'c-date'], ['Entry price', 'entry', 'num'], ['Last price', 'last', 'num'], ['1D ROI', 'roi1', 'num', 'Since the previous close · shorts the other way round'], ['All-time ROI', 'ret', 'num', LEV_ROI === 'margin' ? 'The move in the price, times the leverage' : 'The move in the price since the call; shorts the other way round']]);
@@ -722,10 +749,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var ordRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Side', pfSide(p), 'c-dir') + cell('Placed', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted c-date') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + cell('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num muted') + detailsCell(p) + '</tr>'; };
     var block = function(title, sub, headHtml, rows, rowFn){ return rows.length ? '<section class="pf-sec"><div class="sh"><h2>' + title + ' <span class="muted">· ' + rows.length + ' ' + sub + '</span></h2></div><div class="ptw"><table class="pt cards ruled pf-tbl">' + headHtml + '<tbody>' + rows.map(rowFn).join('') + '</tbody></table></div></section>' : ''; };
     var spot = sortGroup(P.spot.map(mk)), lev = sortGroup(P.lev.map(mk)), ord = sortGroup(P.ord.map(mk), true);
+    mktLine();
     $('#pf-groups').innerHTML = block('Spot', spot.length === 1 ? 'position' : 'positions', spotHead, spot, spotRow) + block('Leveraged', lev.length === 1 ? 'trade' : 'trades', levHead, lev, levRow) + block('Orders', 'waiting to fill', ordHead, ord, ordRow);
     var asOf = open.map(function(p){ var q = pfQuote(p, Q); return q && (q.updated_at || q.quoted_at); }).filter(Boolean).sort().pop();
     var nDraft = list.filter(function(p){ return p.published === false; }).length;
-    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'Every open call from the Exclusive channel, priced live: entry as posted, last price, the move since the call (shorts gain when the price falls' + (LEV_ROI === 'margin' ? '; leveraged trades at their leverage' : '; leveraged trades show the move in the price, the leverage beside the direction') + ') · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · orders show the level and how far the market is from it' + (asOf ? ' · stocks as of ' + hhmm(asOf) + ' (your time)' : '') + (Object.keys(liveSyms).length ? ' · crypto ticks live from Binance' : '') + ' · Details opens the story of the call with every post as it was made · not financial advice: this is what we hold.';
+    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'Every open call from the Exclusive channel, priced live: entry as posted, last price, the move since the call (shorts gain when the price falls' + (LEV_ROI === 'margin' ? '; leveraged trades at their leverage' : '; leveraged trades show the move in the price, the leverage beside the direction') + ') · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · orders show the level and how far the market is from it' + (asOf && !tickOn ? ' · stocks as of ' + hhmm(asOf) + ' (your time)' : '') + ' · Details opens the story of the call with every post as it was made · not financial advice: this is what we hold.';
   }
   var DEV_PAGES = {}; /* sections still being built: everyone sees "In development" whatever the data says */
   var LIVE_KEY = { portfolio: 'portfolio', track: 'portfolio', position: 'portfolio', calendar: 'calendar', earnings: 'earnings' };
@@ -1203,7 +1231,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       .on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_events' }, function(pl){ var e = pl && pl.new; if (!e || !e.id || !events) return; var i = events.findIndex(function(x){ return x.id === e.id; }); if (i >= 0) events[i] = e; else events.push(e); if (current === 'calendar') renderCalendar(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'earnings' }, function(pl){ var e = pl && pl.new; if (!e || !e.symbol || !earnings) return; var i = earnings.findIndex(function(x){ return x.symbol === e.symbol && x.mic_code === e.mic_code && x.day === e.day; }); if (i >= 0) earnings[i] = e; else earnings.push(e); if (current === 'earnings') renderEarnings(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'quotes' }, function(pl){ var q = pl && pl.new; if (q && q.symbol) { var k = String(q.symbol).toUpperCase(), cur = quotes[k]; if (cur && cur.live_at && Date.now() - cur.live_at < 120000) { q = Object.assign({}, q, { price: cur.price, change_pct: cur.change_pct, live_at: cur.live_at }); if (q.prev_close != null && Number(q.prev_close) > 0) q.change_pct = Math.round((Number(q.price) / Number(q.prev_close) - 1) * 10000) / 100; } quotes[k] = q; if (current === 'portfolio' || current === 'track') renderPortfolio(); if (current === 'position') renderPosition(); if (current === 'earnings') renderEarnings(); } })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quotes' }, function(pl){ var q = pl && pl.new; if (q && q.symbol) { var k = String(q.symbol).toUpperCase(), cur = quotes[k]; if (cur && cur.live_at && Date.now() - cur.live_at < 120000) { q = Object.assign({}, q, { price: cur.price, change_pct: cur.change_pct, live_at: cur.live_at }); if (q.prev_close != null && Number(q.prev_close) > 0) q.change_pct = Math.round((Number(q.price) / Number(q.prev_close) - 1) * 10000) / 100; } quotes[k] = q; if (current === 'portfolio') renderPortfolio(); if (current === 'position') posRefresh(); if (current === 'earnings') renderEarnings(); } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, function(){ loadSupport(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, function(){ loadSupport(); }).subscribe();

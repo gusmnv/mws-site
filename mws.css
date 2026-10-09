@@ -808,12 +808,8 @@ body.app #pf-rng{margin-top:6px}
 @media (max-width:760px){#tk-table td.em,#tk-table2 td.em{display:flex;align-items:center;gap:0}#tk-table .ttl,#tk-table2 .ttl{max-width:none;font-size:15px}}
 .paper .score .sc span i{font-style:normal;color:var(--fg-2);letter-spacing:0;text-transform:none;margin-left:4px}
 .paper .alb-tabs{margin:0 0 18px}
-/* Active Positions · a price that moved flashes like an exchange ticker: green up, red down */
-@keyframes flashUp{0%{background:rgba(127,191,138,.32)}100%{background:transparent}}
-@keyframes flashDn{0%{background:rgba(217,122,122,.32)}100%{background:transparent}}
-.pf-tbl td.flash-up{animation:flashUp 1.4s var(--ease) 1}
-.pf-tbl td.flash-dn{animation:flashDn 1.4s var(--ease) 1}
-@media (prefers-reduced-motion:reduce){.pf-tbl td.flash-up,.pf-tbl td.flash-dn{animation:none}}
+/* the last price carries the colour of its last move (green up, red down), like an exchange; nothing flashes */
+.pf-tbl td.px-up{color:var(--good)}.pf-tbl td.px-dn{color:var(--bad)}
 /* the position page · About the asset */
 #pos-page .about{margin:30px 0 0;padding:22px 0 0;border-top:1px solid var(--line)}
 #pos-page .about h2.k{margin:0 0 14px}
@@ -971,3 +967,8 @@ body.app #pf-rng{margin-top:6px}
   body.app .pt.cards.ruled.er td.act{display:none}
   .er-chart text{font-size:12.5px}
 }
+/* Active Positions: the market line (session open or shut, when it turns) */
+#pf-mkt{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--fg);margin:0 0 16px;flex-wrap:wrap}
+#pf-mkt .dot{width:8px;height:8px;background:var(--fg-3);flex:none;display:inline-block}
+#pf-mkt .dot.on{background:var(--good);box-shadow:0 0 0 3px rgba(127,191,138,.18)}
+#pf-mkt .muted{color:var(--fg-3)}

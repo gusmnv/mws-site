@@ -611,20 +611,21 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var trade = isTrade(p), closed = p.status === 'closed' || p.status === 'archived', order = pfKind(p) === 'order', T = tradeNums(p, D.Q);
     var fact = function(k, v){ return v == null || v === '' ? '' : '<div><span>' + k + '</span><b>' + v + '</b></div>'; };
     var sg = function(v, txt){ return v == null ? '—' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
-    var lastTxt = T.last != null ? usdPx(T.last) + (T.mark ? ' <small>mark · ' + esc(M.fmtDate(T.mark)) + '</small>' : '') : '—';
-    var levFact = T.L > 1 ? fact('Leverage', T.L + '×') : '';
-    var facts = closed
-      ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (resultSign(p) > 0 ? 'pos' : resultSign(p) < 0 ? 'neg' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (pfKind(p) === 'leveraged' ? fact('Leverage', esc(p.leverage || '—')) : '')
-      : order
-      ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + ' market' : '—') + levFact + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
-      : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('1D', sg(T.roi1, pct(T.roi1))) + fact('Since entry', sg(T.ret, pct(T.ret)))
+    var buildFacts = function(){ T = tradeNums(p, D.Q);
+      var lastTxt = T.last != null ? usdPx(T.last) + (T.mark ? ' <small>mark · ' + esc(M.fmtDate(T.mark)) + '</small>' : '') : '—';
+      var levFact = T.L > 1 ? fact('Leverage', T.L + '×') : '';
+      return (closed
+        ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (resultSign(p) > 0 ? 'pos' : resultSign(p) < 0 ? 'neg' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (pfKind(p) === 'leveraged' ? fact('Leverage', esc(p.leverage || '—')) : '')
+        : order
+        ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + ' market' : '—') + levFact + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
+        : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('1D', sg(T.roi1, pct(T.roi1))) + fact('Since entry', sg(T.ret, pct(T.ret)))) + (typeof about === 'function' ? about() : ''); };
     var hidden = (STORIES && STORIES._hidden) || [], ids = pfIds(p).filter(function(i){ return hidden.indexOf(i) < 0; }), story = storyOf(p), co = COMPANIES[String(p.symbol).toUpperCase()]; /* posts about several positions at once are never shown on one position's page */
     var bigUsd = function(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); };
     /* the asset's live market cap (price × shares or supply, approximate) and its site join the facts; the rest of the company text stays in companies.json for the earnings panel */
     var about = function(){ if (!co) return ''; var q = pfQuote(p, D.Q) || D.Q[String(p.symbol).toUpperCase() + '/USD'] || D.Q[String(p.symbol).toUpperCase()] || null; if (q && (q.price == null || q.error)) q = null; var px = q ? Number(q.price) : null; var cap = px != null && (co.shares || co.supply) ? bigUsd(px * (co.shares ? co.shares * 1e9 : co.supply * 1e6)) : null;
       var site = co.site ? '<a class="site" href="' + esc(co.site) + '" target="_blank" rel="noopener">' + esc(String(co.site).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')) + ' ↗</a>' : '';
       return (cap ? fact('Market cap', cap + ' <small>approx.</small>') : '') + (site ? fact('Website', site) : ''); };
-    facts += about();
+    var facts = buildFacts(); posFacts = buildFacts; /* a live tick redraws the facts only */
     var postFig = function(i, cap){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
       return src ? '<figure class="post"><img src="' + esc(src) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"><figcaption><span>' + esc(when) + '</span><span>' + (cap || 'Exclusive channel') + '</span></figcaption></figure>'
         : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; };
@@ -632,15 +633,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var body = function(){
       if (!story) return (ids.length ? '<h2 class="k">The calls <span class="muted">· ' + ids.length + ' post' + (ids.length === 1 ? '' : 's') + ' in the Exclusive channel</span></h2><div class="posts-list">' + ids.map(function(i){ return postFig(i); }).join('') + '</div>' : '<h2 class="k">The calls</h2><p class="small muted">No posts attached to this position.</p>');
       var seen = {}, n = 0;
-      var chapters = story.chapters.map(function(c){ n++; if (c.post) seen[c.post] = 1;
-        return '<article class="chap' + (c.post ? '' : ' nopic') + '"><div class="txt"><span class="dt">' + esc(M.fmtDate((c.post && postDay(c.post)) || c.d)) + (c.px ? '<b>' + esc(c.px) + '</b>' : '') + '</span><h3>' + esc(c.h) + '</h3><p>' + esc(c.p) + '</p></div>' + (c.post ? postFig(c.post) : '') + '</article>'; }).join('');
+      var chapters = story.chapters.filter(function(c){ return c.post && postImg(c.post); }).map(function(c){ n++; seen[c.post] = 1;
+        return '<article class="chap"><div class="txt"><span class="dt">' + esc(M.fmtDate(postDay(c.post) || c.d)) + (c.px ? '<b>' + esc(c.px) + '</b>' : '') + '</span><h3>' + esc(c.h) + '</h3></div>' + postFig(c.post) + '</article>'; }).join('');
       var rest = ids.filter(function(i){ return !seen[i]; });
-      return '<div class="story"><p class="lede">' + esc(story.lede) + '</p>' + (story.note ? '<p class="note small muted">' + esc(story.note) + '</p>' : '')
-        + (n ? '<h2 class="k">The story <span class="muted">· ' + n + ' chapter' + (n === 1 ? '' : 's') + ' · every post as it was made in the Exclusive channel</span></h2><div class="chapters">' + chapters + '</div>' : '<p class="small muted">The posts on this call covered several positions at once, so they are not shown here.</p>')
+      return '<div class="story">' + (story.note ? '<p class="note small muted">' + esc(story.note) + '</p>' : '')
+        + (n ? '<h2 class="k">The calls <span class="muted">· ' + n + ' post' + (n === 1 ? '' : 's') + ' · as they were made in the Exclusive channel</span></h2><div class="chapters">' + chapters + '</div>' : '<p class="small muted">The posts on this call covered several positions at once, so they are not shown here.</p>')
         + (rest.length ? '<h2 class="k">More posts</h2><div class="posts-list">' + rest.map(function(i){ return postFig(i); }).join('') + '</div>' : '') + '</div>';
     };
     var home = pfHome(p), homeName = home === '#track' ? 'Track Record' : 'Active Positions'; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
-    var held = heldTxt(p), dateline = (closed ? 'Closed ' + (p.closed_at ? esc(M.fmtDate(p.closed_at)) : '') : order ? 'Resting since ' + esc(M.fmtDate(p.opened_at)) : 'Open since ' + esc(M.fmtDate(p.opened_at))) + (held && p.opened_at ? ' · ' + (closed ? 'held ' : '') + held : '') + ' · Exclusive channel';
+    var held = heldTxt(p), dateline = order ? 'Placed ' + esc(M.fmtDate(p.opened_at)) + (held ? ' · waiting ' + held : '')
+      : 'Opened ' + (p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + (closed ? ' · closed ' + (p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (held ? ' · held ' + held : '') : (held ? ' · held ' + held + ' so far' : ''));
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
       + '<div class="pos-hd"><p class="dateline">' + dateline + '</p><h1>' + storyTitle(p) + (closed && p.result ? ' <span class="res">' + resultHtml(p) + '</span>' : '') + '</h1><p class="tags"><span class="tag">' + esc(p.symbol) + '</span>' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(classOf(p)) + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
@@ -655,8 +657,37 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   M.refreshQuotes = function(){ return loadQuotes().then(function(){ if (current === 'portfolio' || current === 'track') renderPortfolio(); if (current === 'position') renderPosition(); if (current === 'earnings') renderEarnings(); }); };
   async function loadQuotes(){
     if (!positions || !positions.length) { quotes = {}; return; }
-    try { var q = await sb.from('quotes').select('*'); quotes = {}; (q.data || []).forEach(function(r){ quotes[String(r.symbol).toUpperCase()] = r; }); } catch (e) { quotes = {}; }
+    try { var q = await sb.from('quotes').select('*'); var prev = quotes; quotes = {}; (q.data || []).forEach(function(r){ var k = String(r.symbol).toUpperCase(), cur = prev[k]; if (cur && cur.live_at && Date.now() - cur.live_at < 120000) { r = Object.assign({}, r, { price: cur.price, live_at: cur.live_at }); if (r.prev_close != null && Number(r.prev_close) > 0) r.change_pct = Math.round((Number(r.price) / Number(r.prev_close) - 1) * 10000) / 100; } quotes[k] = r; }); } catch (e) { quotes = {}; }
+    liveStart();
   }
+  /* Live crypto: Binance's public market stream (no key, no account), one miniTicker a second per pair. BTC/USD on the site
+     is the BTC/USDT pair there (USDT trades at a dollar). The stream only patches the last price; the previous close and the
+     1D base stay as the quotes function sets them, so the 1D column keeps its meaning. */
+  var liveWs = null, liveSyms = {}, liveT = null, liveTries = 0, liveLast = 0, posFacts = null;
+  /* a tick redraws only what moved: the price cells of the rows concerned (with the flash), the facts of an open story */
+  function livePatch(){
+    if (current === 'portfolio') { var D = pfData(); D.list.forEach(function(p){ if (p.status !== 'open' || !liveSyms[liveKey(p.quote_symbol)]) return; var tr = document.querySelector('#pf-groups tr[data-pid="' + String(p.id).replace(/"/g, '') + '"]'); if (!tr) return; var T = tradeNums(p, D.Q), k = String(p.id), dir = T.last != null && lastPx[k] != null && T.last !== lastPx[k] ? (T.last > lastPx[k] ? 'flash-up' : 'flash-dn') : ''; if (T.last != null) lastPx[k] = T.last;
+      var set = function(label, html){ var td = tr.querySelector('td[data-l="' + label + '"]'); if (!td) return; td.innerHTML = html; td.classList.remove('flash-up', 'flash-dn', 'pos', 'neg'); if (dir) { void td.offsetWidth; td.classList.add(dir); } return td; };
+      set('Last price', T.last != null ? usdPx(T.last) : '—'); var a = set('1D ROI', T.roi1 == null ? '—' : pct(T.roi1)); if (a && sgn(T.roi1)) a.classList.add(sgn(T.roi1).trim()); var b = set('All-time ROI', T.ret == null ? '—' : pct(T.ret)); if (b && sgn(T.ret)) b.classList.add(sgn(T.ret).trim()); set('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—'); }); }
+    else if (current === 'position' && posFacts) { var f = document.querySelector('#pos-page .facts'); if (f) f.innerHTML = posFacts(); }
+    else if (current === 'track') renderPortfolio(); else if (current === 'earnings') renderEarnings();
+  }
+  function liveKey(qs){ var x = /^([A-Z0-9]{2,10})\/(USD|USDT)$/.exec(String(qs || '').toUpperCase()); return x ? x[1].toLowerCase() + 'usdt' : ''; }
+  function liveMap(){ var m = {}; (positions || []).forEach(function(p){ if (p.status !== 'open') return; var k = liveKey(p.quote_symbol); if (k) m[k] = String(p.quote_symbol).toUpperCase(); }); return m; }
+  function liveStart(){
+    if (sim || typeof WebSocket === 'undefined') return; var m = liveMap(), pairs = Object.keys(m); var key = pairs.join('/');
+    if (liveWs && liveWs._key === key) return; liveStop(); if (!pairs.length) return; liveSyms = m;
+    try { var ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + pairs.map(function(p){ return p + '@miniTicker'; }).join('/')); } catch (e) { return; }
+    ws._key = key; liveWs = ws;
+    ws.onopen = function(){ liveTries = 0; };
+    ws.onmessage = function(ev){ var d; try { d = JSON.parse(ev.data).data; } catch (e) { return; } if (!d || !d.s || d.c == null) return; var sym = liveSyms[String(d.s).toLowerCase()]; if (!sym) return;
+      var q = quotes[sym] || (quotes[sym] = { symbol: sym }); var px = Number(d.c); if (!isFinite(px) || px <= 0) return; q.price = px; q.live_at = Date.now(); if (q.prev_close != null && Number(q.prev_close) > 0) q.change_pct = Math.round((px / Number(q.prev_close) - 1) * 10000) / 100;
+      if (!liveT) liveT = setTimeout(function(){ liveT = null; liveLast = Date.now(); livePatch(); }, 900); };
+    ws.onclose = function(){ if (liveWs !== ws) return; liveWs = null; liveTries++; setTimeout(function(){ if (!liveWs && !document.hidden) liveStart(); }, Math.min(30000, 2000 * liveTries)); };
+    ws.onerror = function(){ try { ws.close(); } catch (e) {} };
+  }
+  function liveStop(){ if (liveWs) { var w = liveWs; liveWs = null; try { w.onclose = null; w.close(); } catch (e) {} } }
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) liveStop(); else if (positions) liveStart(); }); /* no stream while the tab sleeps; back on return */
   var pfSort = { k: 'ret', d: -1 }, lastPx = {}; /* the last price each row was drawn with: a move flashes the cell green or red */ /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
   /* the section tag: Live for members, a warning for the owner while members do not see it yet */
   function deskTag(id, unlocked, has){ var onlyMe = staffRole && !sim && !deskLive.portfolio; var t = $('#' + id); t.textContent = unlocked && has ? (onlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); t.className = 'soon' + (onlyMe && has ? ' warn' : ''); return onlyMe; }
@@ -694,7 +725,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#pf-groups').innerHTML = block('Spot', spot.length === 1 ? 'position' : 'positions', spotHead, spot, spotRow) + block('Leveraged', lev.length === 1 ? 'trade' : 'trades', levHead, lev, levRow) + block('Orders', 'waiting to fill', ordHead, ord, ordRow);
     var asOf = open.map(function(p){ var q = pfQuote(p, Q); return q && (q.updated_at || q.quoted_at); }).filter(Boolean).sort().pop();
     var nDraft = list.filter(function(p){ return p.published === false; }).length;
-    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'Every open call from the Exclusive channel, priced live: entry as posted, last price, the move since the call (shorts gain when the price falls' + (LEV_ROI === 'margin' ? '; leveraged trades at their leverage' : '; leveraged trades show the move in the price, the leverage beside the direction') + ') · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · orders show the level and how far the market is from it' + (asOf ? ' · prices as of ' + hhmm(asOf) + ' (your time)' : '') + ' · Details opens the story of the call with every post as it was made · not financial advice: this is what we hold.';
+    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'Every open call from the Exclusive channel, priced live: entry as posted, last price, the move since the call (shorts gain when the price falls' + (LEV_ROI === 'margin' ? '; leveraged trades at their leverage' : '; leveraged trades show the move in the price, the leverage beside the direction') + ') · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · orders show the level and how far the market is from it' + (asOf ? ' · stocks as of ' + hhmm(asOf) + ' (your time)' : '') + (Object.keys(liveSyms).length ? ' · crypto ticks live from Binance' : '') + ' · Details opens the story of the call with every post as it was made · not financial advice: this is what we hold.';
   }
   var DEV_PAGES = {}; /* sections still being built: everyone sees "In development" whatever the data says */
   var LIVE_KEY = { portfolio: 'portfolio', track: 'portfolio', position: 'portfolio', calendar: 'calendar', earnings: 'earnings' };
@@ -1172,7 +1203,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       .on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_events' }, function(pl){ var e = pl && pl.new; if (!e || !e.id || !events) return; var i = events.findIndex(function(x){ return x.id === e.id; }); if (i >= 0) events[i] = e; else events.push(e); if (current === 'calendar') renderCalendar(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'earnings' }, function(pl){ var e = pl && pl.new; if (!e || !e.symbol || !earnings) return; var i = earnings.findIndex(function(x){ return x.symbol === e.symbol && x.mic_code === e.mic_code && x.day === e.day; }); if (i >= 0) earnings[i] = e; else earnings.push(e); if (current === 'earnings') renderEarnings(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'quotes' }, function(pl){ var q = pl && pl.new; if (q && q.symbol) { quotes[String(q.symbol).toUpperCase()] = q; if (current === 'portfolio' || current === 'trades') renderPortfolio(); if (current === 'position') renderPosition(); } })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quotes' }, function(pl){ var q = pl && pl.new; if (q && q.symbol) { var k = String(q.symbol).toUpperCase(), cur = quotes[k]; if (cur && cur.live_at && Date.now() - cur.live_at < 120000) { q = Object.assign({}, q, { price: cur.price, change_pct: cur.change_pct, live_at: cur.live_at }); if (q.prev_close != null && Number(q.prev_close) > 0) q.change_pct = Math.round((Number(q.price) / Number(q.prev_close) - 1) * 10000) / 100; } quotes[k] = q; if (current === 'portfolio' || current === 'track') renderPortfolio(); if (current === 'position') renderPosition(); if (current === 'earnings') renderEarnings(); } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notices' }, function(){ load(false); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, function(){ loadSupport(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'support_threads' }, function(){ loadSupport(); }).subscribe();

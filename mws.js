@@ -12,7 +12,7 @@ window.MWS = window.MWS || {};
       test:    { id: "plan_YLIcoMLF4LFih", title: "Test", price: "$1", per: "one-time", tag: "Internal", sub: "Internal test plan. Not for members.", hidden: true }
     },
     WHOP_LOADER: "https://js.whop.com/static/checkout/loader.js",
-    TICKS_URL: "wss://mws-ticks.fly.dev" /* live stock prices for members (ticks/ on Fly.io); empty = off */
+    TICKS_URL: "wss://mws-ticks-production-c41a.up.railway.app" /* live stock prices for members (ticks/ on Railway); empty = off */
   };
   C.FUNCTIONS = C.SUPABASE_URL.replace(".supabase.co", ".supabase.co/functions/v1");
 

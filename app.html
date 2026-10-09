@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=992d870a">
+<link rel="stylesheet" href="/mws.css?v=394d51cc">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=992d870a"></script>
+<script src="/mws.js?v=394d51cc"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -183,13 +183,15 @@
       <section class="page" data-page="earnings">
         <div class="head rv"><h1>Stock earnings. <span class="soon" id="er-tag">In development</span></h1></div>
         <div id="er-live" hidden>
-          <div class="banner next rv" id="er-strip" hidden></div>
-          <div class="fbar rv">
-            <span class="chips" id="er-scope"><button type="button" data-v="book" class="on">Our book</button><button type="button" data-v="all">Everyone</button></span>
+          <div id="er-book" class="rv"></div>
+          <div class="fbar rv d1" id="er-bar">
+            <span class="chips" id="er-scope"><button type="button" data-v="all" class="on">All companies</button><button type="button" data-v="book">Our book only</button></span>
             <span class="chips" id="er-reg"><button type="button" data-v="all" class="on">All markets</button><button type="button" data-v="US">US</button><button type="button" data-v="EU">Europe</button><button type="button" data-v="AS">Asia</button></span>
-            <span class="chips" id="er-when"><button type="button" data-v="ahead" class="on">Coming up</button><button type="button" data-v="past">Reported</button></span>
+            <span class="chips" id="er-wk"><button type="button" data-v="-1" title="Previous week">‹</button><button type="button" data-v="0" class="on">This week</button><button type="button" data-v="1" title="Next week">›</button></span>
+            <label class="er-find"><input id="er-q" type="search" placeholder="Find a company reporting in the next two weeks" autocomplete="off" aria-label="Find a company"></label>
           </div>
-          <div id="er-days"></div>
+          <div id="er-week" class="rv d1"></div>
+          <div id="er-reported" class="rv d2"></div>
           <p class="small muted" style="margin-top:18px" id="er-foot"></p>
         </div>
         <div id="er-locked" hidden class="banner"><div><b>Members only.</b><p>Earnings open with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
@@ -280,6 +282,8 @@
 
     </main>
   </div>
+  <div class="er-scrim" id="er-scrim" hidden></div>
+  <aside class="er-panel" id="er-panel" hidden aria-label="Company"><div class="er-panel-in" id="er-panel-in"></div></aside>
 </div>
 
 <script>
@@ -355,7 +359,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function route(){
     var k = (location.hash || '#telegram').slice(1); var pm = k.match(/^position\/([\w-]+)$/); if (pm) { k = 'position'; posId = pm[1]; } var tm = k.match(/^track\/([a-z]+)$/); trackAlbum = tm ? tm[1] : null; if (tm) k = 'track'; if (k === 'economic') k = 'calendar'; if (k === 'settings') k = 'account'; if (k === 'support' || k === 'chat') k = 'feedback'; if (k === 'overview') k = 'telegram'; if (k === 'trades' || k === 'spot' || k === 'leveraged' || k === 'positions') k = 'portfolio'; /* old links: one list now */ if (!Object.prototype.hasOwnProperty.call(PAGES, k) || /=/.test(k)) k = 'telegram';
     if (k === 'devices' && typeof loadDevices === 'function') loadDevices();
-    current = k;
+    current = k; if (k !== 'earnings' && typeof erClose === 'function' && erOpen) erClose();
     $$('.page').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-page') === k); });
     $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === (k === 'position' ? posHome : k)); });
     $('#crumb').textContent = PAGES[k]; document.title = PAGES[k] + ' — Mr. Wall Street'; syncBarTag();
@@ -651,7 +655,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var by = {}; rows.forEach(function(p){ var g = PF_CLASS[p.asset_class] || 'Other'; (by[g] = by[g] || []).push(p); });
     return PF_ORDER.filter(function(g){ return by[g]; }).map(function(g){ return '<tr class="grp"><td colspan="' + cols + '">' + g + '</td></tr>' + by[g].map(rowFn).join(''); }).join('');
   }
-  M.refreshQuotes = function(){ return loadQuotes().then(function(){ if (current === 'portfolio' || current === 'track') renderPortfolio(); if (current === 'position') renderPosition(); }); };
+  M.refreshQuotes = function(){ return loadQuotes().then(function(){ if (current === 'portfolio' || current === 'track') renderPortfolio(); if (current === 'position') renderPosition(); if (current === 'earnings') renderEarnings(); }); };
   async function loadQuotes(){
     if (!positions || !positions.length) { quotes = {}; return; }
     try { var q = await sb.from('quotes').select('*'); quotes = {}; (q.data || []).forEach(function(r){ quotes[String(r.symbol).toUpperCase()] = r; }); } catch (e) { quotes = {}; }
@@ -760,7 +764,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     { id: 's7', symbol:'BTC', name:'Bitcoin · 2022 cycle', kind:'spot', side:'long', asset_class:'crypto', entry:'16-18K', exit:'100-126K', result:'x7', status:'closed', opened_at:'2022-11-20', closed_at:'2025-11-16', thesis:'Bought when the market called for 10-12K.' } ];
   var SIM_QUOTES = { MSTR: { symbol:'MSTR', price:162.4, prev_close:158, change_pct:2.78, quoted_at:new Date().toISOString() }, PLTR: { symbol:'PLTR', price:171, prev_close:172.5, change_pct:-0.87, quoted_at:new Date().toISOString() }, 'BTC/USD': { symbol:'BTC/USD', price:72150, prev_close:71000, change_pct:1.62, quoted_at:new Date().toISOString() }, SPY: { symbol:'SPY', price:580.2, prev_close:578, change_pct:0.38 }, QQQ: { symbol:'QQQ', price:500.1, prev_close:501.2, change_pct:-0.22 } };
   /* The Desk · Calendar (public.calendar_events) and Earnings (public.earnings), filled by the calendar function. RLS hides both from non-members. */
-  var events = null, earnings = null, calF = { imp: 3, reg: 'all', wk: 0 }, erF = { scope: 'book', reg: 'all', when: 'ahead' }, calT = null;
+  var events = null, earnings = null, erHist = {}, calF = { imp: 3, reg: 'all', wk: 0 }, erF = { scope: 'all', reg: 'all', wk: 0, q: '' }, calT = null, erOpen = null;
   var REGION = { US: 'US', CA: 'US', EU: 'EU', DE: 'EU', FR: 'EU', IT: 'EU', ES: 'EU', GB: 'EU', CH: 'EU', JP: 'AS', CN: 'AS', HK: 'AS', AU: 'AS', NZ: 'AS', KR: 'AS', IN: 'AS', SG: 'AS', CRYPTO: 'CRYPTO' };
   var CNAME = { US: 'United States', EU: 'Euro area', GB: 'United Kingdom', JP: 'Japan', CN: 'China', DE: 'Germany', CA: 'Canada', AU: 'Australia', CH: 'Switzerland', NZ: 'New Zealand', FR: 'France', IT: 'Italy', ES: 'Spain', HK: 'Hong Kong', KR: 'South Korea', IN: 'India', CRYPTO: 'Crypto' };
   var ER_REGION = { 'United States': 'US', 'Canada': 'US', 'United Kingdom': 'EU', 'Germany': 'EU', 'France': 'EU', 'Netherlands': 'EU', 'Switzerland': 'EU', 'Italy': 'EU', 'Spain': 'EU', 'Sweden': 'EU', 'Denmark': 'EU', 'Norway': 'EU', 'Finland': 'EU', 'Belgium': 'EU', 'Ireland': 'EU', 'Japan': 'AS', 'China': 'AS', 'Hong Kong': 'AS', 'Australia': 'AS', 'South Korea': 'AS', 'India': 'AS', 'Singapore': 'AS', 'Taiwan': 'AS' };
@@ -775,6 +779,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     /* the window members browse, plus the last prints of the important series (for the "last 3" line) */
     try { var ev = await sb.from('calendar_events').select('*').gte('at', hist0).lte('at', to).or('importance.gte.3,at.gte.' + from).order('at').limit(1000); events = ev.error ? [] : (ev.data || []); } catch (e) { events = []; }
     try { var d0 = dayKey(Date.now() - 8 * 864e5), d1 = dayKey(Date.now() + 15 * 864e5); var er = await sb.from('earnings').select('*').gte('day', d0).lte('day', d1).order('day'); earnings = er.error ? [] : (er.data || []); } catch (e) { earnings = []; }
+    try { var eh = await sb.from('earnings_history').select('*'); erHist = {}; (eh.data || []).forEach(function(r){ erHist[String(r.symbol).toUpperCase()] = r.data || {}; }); } catch (e) { erHist = {}; } /* the book's companies: last quarters, next report, highlights (EODHD, once a day) */
   }
   function renderCalendar(){
     var unlocked = !!(access && access.valid), list = sim ? SIM_EVENTS : (events || []);
@@ -804,34 +809,122 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#cal-foot').textContent = 'Times in your time zone (' + tzName() + ')' + (latest ? ' · updated ' + new Date(latest).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '') + (prov === 'preview' ? ' · preview feed: this week only, no actual values yet' : ' · actuals land within minutes of release') + ' · not financial advice.';
     clearTimeout(calT); calT = setTimeout(function(){ if (current === 'calendar') renderCalendar(); }, 30000); /* countdowns tick */
   }
+  /* Stock earnings. First the book: every held company with its next report (or the one just out). Then the week, day by day,
+     our companies first; a search box for anyone else. Then what was reported, newest first. A company opens a panel: the report,
+     the last eight quarters against the estimate, revenue, the highlights, the position. Data: public.earnings (Twelve Data,
+     refreshed through the day) and public.earnings_history (EODHD fundamentals, once a day). */
+  var ER_TOD = function(t){ return /pre/i.test(t || '') ? 'pre' : /after/i.test(t || '') ? 'after' : /\d{1,2}:\d{2}/.test(t || '') ? 'time' : ''; };
+  function erTime(t){ var k = ER_TOD(t); return k === 'pre' ? 'Before the open' : k === 'after' ? 'After the close' : k === 'time' ? esc(t) : 'Time not set'; }
+  function erTag(t){ var k = ER_TOD(t); return k === 'pre' ? '<span class="tod pre" title="Before the open">pre</span>' : k === 'after' ? '<span class="tod after" title="After the close">after</span>' : k === 'time' ? '<span class="tod">' + esc(t) + '</span>' : ''; }
+  function erKey(e){ return e.symbol + '|' + (e.mic_code || '') + '|' + e.day; }
+  function erWhen(key){ var t = new Date(key + 'T12:00:00'); if (isNaN(t)) return esc(String(key || '')); return t.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).replace(',', '') + (t.getFullYear() !== new Date().getFullYear() ? ' ' + t.getFullYear() : ''); }
+  function agoTxt(iso){ var m = Math.round((Date.now() - new Date(iso).getTime()) / 60000); if (!isFinite(m) || m < 0) return ''; if (m < 1) return 'just now'; if (m < 60) return m + ' min ago'; var h = Math.floor(m / 60); if (h < 24) return h + ' h ago'; var d = Math.floor(h / 24); return d + ' day' + (d === 1 ? '' : 's') + ' ago'; }
+  function erDayLbl(key){ var t = new Date(key + 'T12:00:00'); return { wd: t.toLocaleDateString('en-GB', { weekday: 'short' }), d: t.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) }; }
+  function surprise(e){ if (e.eps_actual == null) return null; var sp = e.surprise_pct != null ? Number(e.surprise_pct) : (e.eps_estimate != null && Number(e.eps_estimate) !== 0 ? (Number(e.eps_actual) - Number(e.eps_estimate)) / Math.abs(Number(e.eps_estimate)) * 100 : null); return sp; }
+  function beatHtml(e, long){ var sp = surprise(e); if (sp == null) return e.eps_actual != null ? '<span class="beat eq">Reported</span>' : ''; var w = sp > 0.5 ? 'up' : sp < -0.5 ? 'dn' : 'eq'; return '<span class="beat ' + w + '">' + (w === 'up' ? 'Beat' : w === 'dn' ? 'Miss' : 'In line') + (long && Math.abs(sp) >= 0.5 && Math.abs(sp) < 1000 ? ' ' + (sp > 0 ? '+' : '') + sp.toFixed(1) + '%' : '') + '</span>'; }
+  function epsTxt(v, ccy){ if (v == null) return '—'; v = Number(v); return (v < 0 ? '−' : '') + (ccy && ccy !== 'USD' ? '' : '$') + Math.abs(v).toFixed(2); }
+  function big$(v){ if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v); return (v < 0 ? '−$' : '$') + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); }
+  function inDays(key){ var n = Math.round((Date.parse(key + 'T12:00:00') - Date.parse(dayKey(Date.now()) + 'T12:00:00')) / 864e5); return n === 0 ? 'today' : n === 1 ? 'tomorrow' : n > 1 ? 'in ' + n + ' days' : n === -1 ? 'yesterday' : Math.abs(n) + ' days ago'; }
+  function erBookMap(){ var book = {}; (sim ? SIM_POS : (positions || [])).forEach(function(p){ if (p.status !== 'open' || pfKind(p) === 'order') return; book[String(p.symbol).toUpperCase()] = p; if (p.quote_symbol) book[String(p.quote_symbol).toUpperCase().replace(/\/.*$/, '')] = p; }); return book; }
   function renderEarnings(){
-    var unlocked = !!(access && access.valid), list = sim ? SIM_EARNINGS : (earnings || []);
+    var unlocked = !!(access && access.valid), list = sim ? SIM_EARNINGS : (earnings || []), H = sim ? SIM_ERHIST : erHist, Q = sim ? SIM_QUOTES : quotes;
     if (devFor('earnings')) { $('#er-locked').hidden = true; $('#er-live').hidden = true; $('#er-empty').hidden = false; $('#er-tag').textContent = 'In development'; $('#er-tag').className = 'soon'; $('#n-er').textContent = ''; return; }
     $('#er-locked').hidden = unlocked; $('#er-live').hidden = !(unlocked && list.length); $('#er-empty').hidden = !(unlocked && !list.length);
     var erOnlyMe = staffRole && !sim && !deskLive.earnings;
     $('#er-tag').textContent = unlocked && list.length ? (erOnlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); $('#er-tag').className = 'soon' + (erOnlyMe && list.length ? ' warn' : '');
     if (!(unlocked && list.length)) return;
-    var now = Date.now(), today = dayKey(now);
-    var book = {}; (sim ? SIM_POS : (positions || [])).forEach(function(p){ if (p.status !== 'open') return; book[String(p.symbol).toUpperCase()] = p; if (p.quote_symbol) book[String(p.quote_symbol).toUpperCase().replace(/\/.*$/, '')] = p; });
-    var rows = list.filter(function(e){ if (erF.scope === 'book' && !book[String(e.symbol).toUpperCase()]) return false; if (erF.reg !== 'all' && (ER_REGION[e.country] || 'other') !== erF.reg) return false; var isPast = e.day < today || (e.day === today && e.eps_actual != null); return erF.when === 'past' ? isPast : !isPast || e.day === today; return true; });
-    var nBook = list.filter(function(e){ return book[String(e.symbol).toUpperCase()] && e.day >= today; }).length; $('#n-er').textContent = String(nBook || '');
-    var tdy = list.filter(function(e){ return e.day === today; }), pre = tdy.filter(function(e){ return /pre/i.test(e.time || ''); }).length, aft = tdy.filter(function(e){ return /after/i.test(e.time || ''); }).length, tdyBook = tdy.filter(function(e){ return book[String(e.symbol).toUpperCase()]; }).length, done = tdy.filter(function(e){ return e.eps_actual != null; }).length;
-    var strip = $('#er-strip'); strip.hidden = !tdy.length; if (tdy.length) strip.innerHTML = '<div><b>Today: ' + tdy.length + ' report' + (tdy.length === 1 ? '' : 's') + '</b><p>' + (pre ? pre + ' before the open' : '') + (pre && aft ? ' · ' : '') + (aft ? aft + ' after the close' : '') + (tdyBook ? ' · <b>' + tdyBook + ' from the book</b>' : '') + (done ? ' · ' + done + ' already out' : '') + '</p></div>';
-    var by = {}; rows.forEach(function(e){ (by[e.day] = by[e.day] || []).push(e); });
-    var keys = Object.keys(by).sort(); if (erF.when === 'past') keys.reverse();
-    var timeTxt = function(t){ return /pre/i.test(t || '') ? 'Before the open' : /after/i.test(t || '') ? 'After the close' : /\d{1,2}:\d{2}/.test(t || '') ? esc(t) : 'Time not set'; };
-    $('#er-days').innerHTML = keys.length ? keys.map(function(k){ var l = by[k].sort(function(a, b){ return (book[String(b.symbol).toUpperCase()] ? 1 : 0) - (book[String(a.symbol).toUpperCase()] ? 1 : 0) || String(a.time).localeCompare(String(b.time)) || a.symbol.localeCompare(b.symbol); }); return '<div class="sec cal"><div class="sh"><h2>' + dayTitle(k) + '</h2><span class="small muted">' + l.length + ' report' + (l.length === 1 ? '' : 's') + '</span></div><div class="ptw"><table class="pt cards er"><thead><tr><th>Company</th><th>When</th><th>EPS estimate</th><th>EPS actual</th><th>Surprise</th></tr></thead><tbody>' + l.map(function(e){
-      var inBook = book[String(e.symbol).toUpperCase()], out = e.eps_actual != null, fresh = out && e.reported_at && now - new Date(e.reported_at).getTime() < 60 * 60000;
-      var q = inBook && inBook.quote_symbol ? (sim ? SIM_QUOTES : quotes)[String(inBook.quote_symbol).toUpperCase()] : null, px = q && q.price != null ? '<span class="sub' + sgn(q.change_pct) + '">' + fmtN(q.price) + (q.change_pct != null ? ' · ' + pct(q.change_pct) + ' today' : '') + '</span>' : '';
-      return '<tr class="' + (inBook ? 'mine' : '') + (fresh ? ' fresh' : '') + '">' + cell('Company', '<span class="sym">' + esc(e.symbol) + '</span>' + (e.name ? '<span class="nm">' + esc(e.name) + '</span>' : '') + (inBook ? '<a class="tag ok" style="margin-left:8px" href="#portfolio" title="Open the position">in the book</a>' : '') + (fresh ? '<span class="tag ok" style="margin-left:8px">just reported</span>' : '') + '<span class="sub muted">' + esc(e.exchange || '') + (e.country ? ' · ' + esc(e.country) : '') + '</span>' + px, 'em') + cell('When', timeTxt(e.time)) + cell('EPS estimate', e.eps_estimate != null ? Number(e.eps_estimate).toFixed(2) : '—', 'num') + cell('EPS actual', out ? '<b>' + Number(e.eps_actual).toFixed(2) + '</b>' : '<span class="muted">—</span>', 'num') + cell('Surprise', (e.surprise_pct != null ? pct(e.surprise_pct, 1) : (out && e.eps_estimate != null && e.difference != null ? pct(e.difference / Math.abs(e.eps_estimate) * 100, 1) : '—')) + (out && e.eps_estimate != null ? '<span class="sub">' + (e.eps_actual > e.eps_estimate ? 'beat' : e.eps_actual < e.eps_estimate ? '<span class="neg">miss</span>' : 'in line') + '</span>' : ''), 'num' + sgn(e.surprise_pct)) + '</tr>'; }).join('') + '</tbody></table></div></div>'; }).join('') : '<div class="banner"><div><b>' + (erF.scope === 'book' ? 'No reports from the book in this window.' : 'Nothing in this view.') + '</b><p>' + (erF.scope === 'book' ? 'Switch to "Everyone" to see the whole tape.' : 'Try another market or the other tab.') + '</p></div></div>';
+    var now = Date.now(), today = dayKey(now), book = erBookMap(), byKey = {}; list.forEach(function(e){ byKey[erKey(e)] = e; });
+    var isBook = function(e){ return !!book[String(e.symbol).toUpperCase()]; };
+    var qOf = function(p){ return p && p.quote_symbol ? Q[String(p.quote_symbol).toUpperCase()] : (p ? Q[String(p.symbol).toUpperCase()] : null); };
+    /* 1 · the book: one card per held company — the next report, or the one just out */
+    var held = Object.keys(book).map(function(k){ return book[k]; }).filter(function(p, i, arr){ return arr.indexOf(p) === i && (p.asset_class === 'equity' || p.asset_class === 'etf'); });
+    var cards = held.map(function(p){ var sym = String(p.symbol).toUpperCase(); var mine = list.filter(function(e){ return String(e.symbol).toUpperCase() === sym; }).sort(function(a, b){ return a.day.localeCompare(b.day); });
+      var up = mine.filter(function(e){ return e.day >= today && e.eps_actual == null; })[0], done = mine.filter(function(e){ return e.eps_actual != null; }).pop(), h = H[sym] || null;
+      var when = up ? up.day : (done ? done.day : (h && h.next && h.next.report ? h.next.report : null)); if (!when) return null;
+      return { p: p, sym: sym, e: up || done || null, up: !!up || (!done && !!when), when: when, h: h }; }).filter(Boolean).sort(function(a, b){ return (a.up ? 0 : 1) - (b.up ? 0 : 1) || (a.up ? a.when.localeCompare(b.when) : b.when.localeCompare(a.when)); });
+    $('#er-book').innerHTML = cards.length ? '<div class="sh"><h2>Our book <span class="muted">· ' + cards.filter(function(c){ return c.up; }).length + ' coming up · ' + cards.filter(function(c){ return !c.up; }).length + ' reported</span></h2></div><div class="er-cards">' + cards.map(function(c){
+      var e = c.e, q = qOf(c.p), T = tradeNums(c.p, Q), tm = e ? erTime(e.time) : (c.h && c.h.next && c.h.next.when ? (/before/i.test(c.h.next.when) ? 'Before the open' : /after/i.test(c.h.next.when) ? 'After the close' : '') : '');
+      var est = e && e.eps_estimate != null ? e.eps_estimate : (c.h && c.h.next ? c.h.next.est : null);
+      var head = c.up ? '<span class="when"><b>' + inDays(c.when).replace(/^./, function(ch){ return ch.toUpperCase(); }) + '</b> · ' + erWhen(c.when) + (tm ? ' · ' + tm.toLowerCase() : '') + '</span>' : '<span class="when"><b>Reported</b> · ' + erWhen(c.when) + (tm ? ' · ' + tm.toLowerCase() : '') + '</span>';
+      var fig = c.up ? (est != null ? '<span class="fig"><b>' + epsTxt(est) + '</b><span>EPS expected</span></span>' : '<span class="fig"><b class="muted">—</b><span>No consensus yet</span></span>') : '<span class="fig"><b>' + epsTxt(e.eps_actual) + '</b><span>EPS · est. ' + epsTxt(e.eps_estimate) + '</span></span>' + beatHtml(e, true);
+      var streak = c.h && c.h.history && c.h.history.length ? (function(){ var n = 0; for (var i = c.h.history.length - 1; i >= 0; i--) { if (c.h.history[i].surprise != null && c.h.history[i].surprise > 0) n++; else break; } return n; })() : 0;
+      return '<button type="button" class="erc' + (c.up ? '' : ' done') + '" data-er="' + esc(e ? erKey(e) : 'sym|' + c.sym) + '"><span class="top"><span class="sym">' + esc(c.sym) + '</span><span class="nm">' + esc(c.p.name || (e && e.name) || c.sym) + '</span></span>' + head + fig
+        + '<span class="ft">' + (q && q.price != null ? usdPx(q.price) + ' <i class="' + sgn(Number(q.change_pct)).trim() + '">' + pct(Number(q.change_pct)) + '</i>' : '') + (T.ret != null ? '<i class="pos-ret ' + sgn(T.ret).trim() + '">' + pct(T.ret) + ' since our entry</i>' : '') + (streak >= 2 ? '<i class="muted">' + streak + ' beats in a row</i>' : '') + '</span></button>'; }).join('') + '</div>'
+      : '<div class="banner"><div><b>No earnings in the window for the book.</b><p>The next reports of our companies appear here as soon as they are scheduled.</p></div></div>';
+    var nBook = cards.filter(function(c){ return c.up && (Date.parse(c.when + 'T12:00:00') - Date.parse(today + 'T12:00:00')) / 864e5 <= 7; }).length; $('#n-er').textContent = String(nBook || ''); /* the badge: our companies reporting within a week */
+    /* 2 · the week, day by day */
+    var q = erF.q.trim().toLowerCase();
+    var pass = function(e){ if (q) return String(e.symbol).toLowerCase().indexOf(q) === 0 || String(e.name || '').toLowerCase().indexOf(q) >= 0; if (erF.scope === 'book' && !isBook(e)) return false; if (erF.reg !== 'all' && (ER_REGION[e.country] || 'other') !== erF.reg) return false; return true; };
+    var regs = {}; list.forEach(function(e){ regs[ER_REGION[e.country] || 'other'] = 1; }); $('#er-reg').hidden = Object.keys(regs).length < 2; if ($('#er-reg').hidden && erF.reg !== 'all') erF.reg = 'all';
+    var mon = new Date(dayKey(now) + 'T12:00:00'); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7) + erF.wk * 7);
+    var days = []; for (var i = 0; i < 5; i++) { var d = new Date(mon.getTime() + i * 864e5); days.push(dayKey(d)); }
+    if (q) { var dq = {}; list.forEach(function(e){ if (pass(e)) dq[e.day] = 1; }); days = Object.keys(dq).sort(); } /* a search looks through the whole window */
+    M.$$('#er-wk button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === '0' && erF.wk === 0); if (b.dataset.v === '0') b.textContent = erF.wk === 0 ? 'This week' : erF.wk === 1 ? 'Next week' : erF.wk === -1 ? 'Last week' : (erF.wk > 0 ? '+' : '') + erF.wk + ' weeks'; });
+    var wkLbl = days.length ? erDayLbl(days[0]).d + ' – ' + erDayLbl(days[days.length - 1]).d : '';
+    var sortDay = function(a, b){ return (isBook(b) ? 1 : 0) - (isBook(a) ? 1 : 0) || (ER_TOD(a.time) === 'pre' ? 0 : 1) - (ER_TOD(b.time) === 'pre' ? 0 : 1) || a.symbol.localeCompare(b.symbol); };
+    var item = function(e, hid){ var mine = isBook(e), out = e.eps_actual != null; return '<button type="button" class="er-it' + (mine ? ' mine' : '') + (out ? ' out' : '') + '"' + (hid ? ' hidden' : '') + ' data-er="' + esc(erKey(e)) + '">' + erTag(e.time) + '<span class="sym">' + esc(e.symbol) + '</span><span class="nm">' + esc(e.name || '') + '</span><span class="v">' + (out ? epsTxt(e.eps_actual) + ' ' + beatHtml(e) : (e.eps_estimate != null ? '<span class="muted">est.</span> ' + epsTxt(e.eps_estimate) : '')) + '</span></button>'; };
+    var LIMIT = erF.scope === 'book' || q ? 60 : 12;
+    $('#er-week').innerHTML = '<div class="sh"><h2>' + (q ? 'Search <span class="muted">· “' + esc(erF.q.trim()) + '”</span>' : 'The week <span class="muted">· ' + wkLbl + '</span>') + '</h2></div>' + (days.length ? '<div class="er-week' + (q ? ' n' + Math.min(days.length, 5) : '') + '">' + days.map(function(k){ var l = erDayLbl(k), rows = list.filter(function(e){ return e.day === k && pass(e); }).sort(sortDay), more = rows.length - LIMIT, isToday = k === today;
+      return '<div class="er-day' + (isToday ? ' today' : '') + (k < today ? ' past' : '') + '"><div class="dh"><b>' + (isToday ? 'Today' : l.wd) + '</b><span>' + l.d + '</span>' + (rows.length ? '<i>' + rows.length + '</i>' : '') + '</div>' + (rows.length ? rows.map(function(e, i){ return item(e, i >= LIMIT); }).join('') + (more > 0 ? '<button type="button" class="er-more" data-day="' + k + '">+ ' + more + ' more</button>' : '') : '<p class="none">' + (erF.scope === 'book' && !q ? 'None of ours' : 'Nothing scheduled') + '</p>') + '</div>'; }).join('') + '</div>' : '<div class="banner"><div><b>No company matches “' + esc(erF.q.trim()) + '”.</b><p>The search covers the companies reporting from last week to two weeks ahead.</p></div></div>');
+    /* 3 · what was reported in the window, newest first */
+    var done = list.filter(function(e){ return e.eps_actual != null && pass(e); }).sort(function(a, b){ return b.day.localeCompare(a.day) || (isBook(b) ? 1 : 0) - (isBook(a) ? 1 : 0) || String(b.reported_at || '').localeCompare(String(a.reported_at || '')); }).slice(0, 40);
+    $('#er-reported').innerHTML = done.length ? '<div class="sh"><h2>Reported <span class="muted">· newest first' + (erF.scope === 'book' && !q ? ' · our book' : '') + '</span></h2></div><div class="ptw"><table class="pt cards ruled er"><thead><tr><th>Company</th><th>When</th><th class="num">EPS expected</th><th class="num">EPS reported</th><th class="num">Surprise</th><th></th></tr></thead><tbody>' + done.map(function(e){ var mine = isBook(e), fresh = e.reported_at && now - new Date(e.reported_at).getTime() < 60 * 60000;
+      return '<tr class="clk-er' + (mine ? ' mine' : '') + (fresh ? ' fresh' : '') + '" data-er="' + esc(erKey(e)) + '">' + cell('Company', '<span class="sym">' + esc(e.symbol) + '</span><span class="nm">' + esc(e.name || '') + '</span>' + (mine ? ' <span class="tag ok">in the book</span>' : ''), 'em') + cell('When', erWhen(e.day) + '<span class="sub muted">' + erTime(e.time) + (fresh && e.reported_at ? ' · ' + agoTxt(e.reported_at) : '') + '</span>', 'muted') + cell('EPS expected', epsTxt(e.eps_estimate, e.currency), 'num') + cell('EPS reported', '<b>' + epsTxt(e.eps_actual, e.currency) + '</b>', 'num') + cell('Surprise', beatHtml(e, true), 'num') + '<td class="num act"><span class="more">Details <span aria-hidden="true">→</span></span></td></tr>'; }).join('') + '</tbody></table></div>' : '';
     var latest = list.map(function(e){ return e.updated_at; }).filter(Boolean).sort().pop();
-    $('#er-foot').textContent = (nBook ? nBook + ' report' + (nBook === 1 ? '' : 's') + ' from the book coming up · ' : '') + 'EPS in the company’s reporting currency · surprise = actual vs consensus' + (latest ? ' · updated ' + new Date(latest).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '') + ' · refreshed every 15 minutes in the reporting windows · not financial advice.';
+    $('#er-foot').textContent = 'Consensus = analysts’ average EPS before the report · surprise = reported vs consensus · pre = before the US open, after = after the close · refreshed through the reporting windows; the company pages once a day' + (latest ? ' · updated ' + new Date(latest).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '') + ' · not financial advice.';
+    if (erOpen) erPanel(erOpen, true);
   }
+  /* the company panel */
+  function erPanel(key, quiet){
+    var list = sim ? SIM_EARNINGS : (earnings || []), H = sim ? SIM_ERHIST : erHist, Q = sim ? SIM_QUOTES : quotes, book = erBookMap();
+    var e = null, sym = null; if (/^sym\|/.test(key)) sym = key.slice(4); else { list.forEach(function(x){ if (erKey(x) === key) e = x; }); if (!e) return; sym = String(e.symbol).toUpperCase(); }
+    var p = book[sym] || null, h = H[sym] || null, co = COMPANIES[sym] || null, q = p && p.quote_symbol ? Q[String(p.quote_symbol).toUpperCase()] : Q[sym], T = p ? tradeNums(p, Q) : null;
+    var name = (e && e.name) || (p && p.name) || (h && h.name) || (co && co.name) || sym;
+    var mine = list.filter(function(x){ return String(x.symbol).toUpperCase() === sym; }).sort(function(a, b){ return a.day.localeCompare(b.day); });
+    var up = mine.filter(function(x){ return x.eps_actual == null && x.day >= dayKey(Date.now()); })[0] || null, last = mine.filter(function(x){ return x.eps_actual != null; }).pop() || null; if (!e) e = up || last;
+    if (!e && h && h.next && h.next.report) e = { symbol: sym, day: h.next.report, time: /before/i.test(h.next.when || '') ? 'Pre Market' : /after/i.test(h.next.when || '') ? 'After Hours' : null, eps_estimate: h.next.est, eps_actual: null, currency: h.currency }; /* beyond the feed's two weeks: from the company data */
+    var f = function(k, v){ return v == null || v === '' ? '' : '<div><span>' + k + '</span><b>' + v + '</b></div>'; };
+    var pctF = function(v, dp, signed){ return v == null ? null : (signed && v > 0 ? '+' : '') + (v * 100).toFixed(dp == null ? 1 : dp) + '%'; };
+    /* the last eight quarters: EPS estimate (hollow) against reported (solid), the surprise above */
+    var chart = function(){ if (!(h && h.history && h.history.length)) return ''; var hs = h.history.slice(-8), W = 480, Hh = 150, L = 8, Bt = 28, T0 = 22, n = hs.length, vals = []; hs.forEach(function(x){ if (x.est != null) vals.push(x.est); if (x.actual != null) vals.push(x.actual); }); if (h.next && h.next.est != null) { vals.push(h.next.est); }
+      /* the scale follows the typical quarter, not the odd one: anything past 3× the 75th percentile is clipped and labelled with its value (fair-value swings like Strategy's) */
+      var mags = vals.map(function(v){ return Math.abs(v); }).sort(function(a, b){ return a - b; }), p75 = mags[Math.min(mags.length - 1, Math.floor(mags.length * 0.75))] || 0, lim = p75 > 0 ? p75 * 3 : Infinity, clipped = 0;
+      var cv = function(v){ if (v == null) return null; if (v > lim) { clipped++; return lim; } if (v < -lim) { clipped++; return -lim; } return v; };
+      var cvals = vals.map(cv); clipped = 0; var lo = Math.min(0, Math.min.apply(null, cvals)), hi = Math.max(0, Math.max.apply(null, cvals)); if (hi === lo) hi = lo + 1; var pad = (hi - lo) * 0.12; hi += pad; if (lo < 0) lo -= pad;
+      var cols = n + (h.next ? 1 : 0), cw = (W - L * 2) / cols, bw = Math.min(22, cw * 0.32), Y = function(v){ return T0 + (Hh - T0 - Bt) * (1 - (v - lo) / (hi - lo)); }, y0 = Y(0), isClip = function(v){ return v != null && Math.abs(v) > lim; };
+      var bar = function(cls, x, v, title){ if (v == null) return ''; var y = Y(cv(v)); if (isClip(v)) clipped++; return '<rect class="' + cls + (isClip(v) ? ' clip' : '') + '" x="' + x.toFixed(1) + '" y="' + Math.min(y, y0).toFixed(1) + '" width="' + bw + '" height="' + Math.max(1, Math.abs(y0 - y)).toFixed(1) + '"><title>' + esc(title) + '</title></rect>'; };
+      var bars = hs.map(function(x, i){ var cx = L + cw * i + cw / 2, w = x.surprise == null ? '' : x.surprise > 0.5 ? 'pos' : x.surprise < -0.5 ? 'neg' : 'flat', ye = x.est == null ? y0 : Y(cv(x.est)), ya = x.actual == null ? y0 : Y(cv(x.actual)), top = Math.min(ye, ya), bot = Math.max(ye, ya);
+        var lbl = isClip(x.actual) ? epsTxt(x.actual) : (x.surprise != null && Math.abs(x.surprise) < 1000 ? (x.surprise > 0 ? '+' : '') + x.surprise.toFixed(0) + '%' : ''), below = (x.actual != null ? x.actual : (x.est || 0)) < 0 && top >= y0 - 1;
+        return bar('est', cx - bw - 2, x.est, qLbl(x.q) + ' consensus ' + epsTxt(x.est)) + bar('act ' + w, cx + 2, x.actual, qLbl(x.q) + ' reported ' + epsTxt(x.actual) + (x.surprise != null ? ' (' + (x.surprise > 0 ? '+' : '') + x.surprise.toFixed(1) + '%)' : ''))
+          + (lbl ? '<text class="sp ' + w + '" x="' + cx.toFixed(1) + '" y="' + (below ? bot + 11 : top - 6).toFixed(1) + '" text-anchor="middle">' + lbl + '</text>' : '')
+          + '<text class="ql" x="' + cx.toFixed(1) + '" y="' + (Hh - 10) + '" text-anchor="middle">' + esc(qLbl(x.q)) + '</text>'; }).join('');
+      var nx = h.next && h.next.est != null ? (function(){ var cx = L + cw * n + cw / 2, ye = Y(cv(h.next.est)); return bar('est next', cx - bw / 2, h.next.est, 'next quarter, consensus ' + epsTxt(h.next.est)) + '<text class="ql" x="' + cx.toFixed(1) + '" y="' + (Hh - 10) + '" text-anchor="middle">next</text><text class="sp" x="' + cx.toFixed(1) + '" y="' + (h.next.est < 0 && ye >= y0 - 1 ? ye + 11 : Math.min(ye, y0) - 6).toFixed(1) + '" text-anchor="middle">est. ' + epsTxt(h.next.est) + '</text>'; })() : '';
+      return '<section class="er-chart"><h3 class="k">EPS, last ' + n + ' quarters <span class="muted">· reported vs consensus</span></h3><svg viewBox="0 0 ' + W + ' ' + Hh + '"><line class="z" x1="' + L + '" x2="' + (W - L) + '" y1="' + y0.toFixed(1) + '" y2="' + y0.toFixed(1) + '"/>' + bars + nx + '</svg><p class="lg"><i class="est"></i> consensus <i class="act"></i> reported · the label is the surprise' + (clipped ? ' · bars cut at ' + epsTxt(lim) + ' carry the figure instead' : '') + '</p></section>'; };
+    var qLbl = function(d){ var m = Number(String(d).slice(5, 7)), y = String(d).slice(2, 4); return 'Q' + Math.ceil(m / 3) + "’" + y; };
+    var revenue = function(){ if (!(h && h.revenue && h.revenue.length)) return ''; var rs = h.revenue.slice(-8), mx = Math.max.apply(null, rs.map(function(r){ return r.revenue || 0; })); if (!(mx > 0)) return ''; var last = rs[rs.length - 1], yago = rs.length >= 5 ? rs[rs.length - 5] : null, g = yago && yago.revenue ? last.revenue / yago.revenue - 1 : null;
+      return '<section class="er-rev"><h3 class="k">Revenue by quarter</h3><div class="bars">' + rs.map(function(r){ var hgt = r.revenue ? Math.max(2, r.revenue / mx * 100) : 0; return '<span title="' + esc(qLbl(r.q)) + ' · ' + big$(r.revenue) + (r.net_income != null ? ' · net ' + big$(r.net_income) : '') + '"><b>' + big$(r.revenue).replace(/^\$/, '').replace(/\.0+([A-Z])$/, '$1') + '</b><i style="height:' + hgt.toFixed(0) + '%"></i><em>' + esc(qLbl(r.q)) + '</em></span>'; }).join('') + '</div><p class="lg">Last quarter ' + big$(last.revenue) + (g != null ? ' · ' + pctF(g, 1, true) + ' vs a year ago' : '') + (last.net_income != null ? ' · net income ' + big$(last.net_income) : '') + '</p></section>'; };
+    var cap = h && h.market_cap != null ? big$(h.market_cap) : (co && (co.shares || co.supply) && q && q.price != null ? big$(Number(q.price) * (co.shares ? co.shares * 1e9 : co.supply * 1e6)) + ' <small>approx.</small>' : null);
+    var html = '<button type="button" class="x" id="er-close" aria-label="Close">×</button>'
+      + '<p class="dateline">' + esc(sym) + (h && h.exchange ? ' · ' + esc(h.exchange) : (e && e.exchange ? ' · ' + esc(e.exchange) : '')) + (h && h.sector ? ' · ' + esc(h.sector) : (co && co.sector ? ' · ' + esc(co.sector) : '')) + '</p><h2>' + esc(name) + '</h2>'
+      + (q && q.price != null ? '<p class="px">' + usdPx(q.price) + ' <span class="' + sgn(Number(q.change_pct)).trim() + '">' + pct(Number(q.change_pct)) + ' today</span>' + (T && T.ret != null ? ' <span class="muted">·</span> <span class="' + sgn(T.ret).trim() + '">' + pct(T.ret) + '</span> <span class="muted">since our entry at ' + usdPx(T.entry) + '</span>' : '') + '</p>' : '')
+      + (e ? '<section class="rep' + (e.eps_actual != null ? ' done' : '') + '"><h3 class="k">' + (e.eps_actual != null ? 'Reported' : 'Next report') + '</h3><div class="facts">' + f('Date', erWhen(e.day) + ' <small>' + inDays(e.day) + '</small>') + f('Time', erTime(e.time) + (e.eps_actual != null && e.reported_at ? ' <small>figures out ' + agoTxt(e.reported_at) + '</small>' : '')) + f('EPS expected', epsTxt(e.eps_estimate, e.currency)) + (e.eps_actual != null ? f('EPS reported', epsTxt(e.eps_actual, e.currency)) + f('Surprise', beatHtml(e, true)) : (h && h.trend && h.trend.rev_est_avg ? f('Revenue expected', big$(h.trend.rev_est_avg) + (h.trend.rev_growth != null ? ' <small>' + pctF(h.trend.rev_growth, 1, true) + ' y/y</small>' : '')) : '')) + (e.eps_actual == null && h && h.trend && h.trend.eps_est_year_ago != null ? f('A year ago', epsTxt(h.trend.eps_est_year_ago)) : '') + '</div></section>' : '')
+      + (p ? '<section class="inbook"><h3 class="k">In the book</h3><p>' + esc(storyTitle(p)) + ' · ' + esc(M.fmtDate(p.opened_at)) + (T && T.ret != null ? ' · <span class="' + sgn(T.ret).trim() + '">' + pct(T.ret) + '</span> since' : '') + '</p><a class="more" href="#position/' + esc(String(p.id)) + '">The story <span aria-hidden="true">→</span></a></section>' : '')
+      + chart() + revenue()
+      + (h ? '<section class="hl"><h3 class="k">Highlights</h3><div class="facts">' + f('Market cap', cap) + f('P/E', h.pe != null ? h.pe.toFixed(1) + (h.forward_pe != null ? ' <small>fwd ' + h.forward_pe.toFixed(1) + '</small>' : '') : null) + f('EPS, last 12 months', h.eps_ttm != null ? epsTxt(h.eps_ttm) : null) + f('Revenue, last 12 months', h.revenue_ttm != null ? big$(h.revenue_ttm) : null) + f('Revenue growth y/y', pctF(h.rev_growth_yoy, 1, true)) + f('Earnings growth y/y', pctF(h.eps_growth_yoy, 1, true)) + f('Profit margin', pctF(h.profit_margin)) + f('Operating margin', pctF(h.operating_margin)) + f('Analyst target', h.target_price != null ? usdPx(h.target_price) + (q && q.price ? ' <small>' + pctF(h.target_price / Number(q.price) - 1, 0, true) + ' from here</small>' : '') : null) + f('Dividend yield', h.dividend_yield != null ? pctF(h.dividend_yield, 2) : null) + f('Short interest', h.short_pct != null ? pctF(h.short_pct) + ' <small>of float</small>' : null) + f('Employees', h.employees != null ? Number(h.employees).toLocaleString('en-US') : null) + '</div></section>' : (cap ? '<section class="hl"><h3 class="k">Highlights</h3><div class="facts">' + f('Market cap', cap) + '</div></section>' : ''))
+      + ((h && h.description) || (co && co.desc) ? '<section class="about"><h3 class="k">About</h3><p>' + esc((co && co.desc) || h.description) + '</p>' + ((co && co.site) || (h && h.web) ? '<a class="site" href="' + esc((co && co.site) || h.web) + '" target="_blank" rel="noopener">' + esc(String((co && co.site) || h.web).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')) + ' ↗</a>' : '') + '</section>' : '')
+      + '<p class="small muted src">' + (h && h.fetched_at ? 'Company data as of ' + esc(M.fmtDate(h.fetched_at)) + ' · ' : '') + 'EPS and revenue in the company’s reporting currency · consensus = analysts’ average before the report.</p>';
+    $('#er-panel-in').innerHTML = html; $('#er-panel').hidden = false; $('#er-scrim').hidden = false; erOpen = key; document.body.classList.add('er-open');
+    if (!quiet) { $('#er-panel').scrollTop = 0; var x = $('#er-close'); if (x) x.focus(); }
+  }
+  function erClose(){ $('#er-panel').hidden = true; $('#er-scrim').hidden = true; erOpen = null; document.body.classList.remove('er-open'); }
+  document.addEventListener('click', function(ev){ var c = ev.target.closest('[data-er]'); if (c) { erPanel(c.getAttribute('data-er')); return; } if (ev.target.closest('#er-close, #er-scrim')) { erClose(); return; } var m = ev.target.closest('.er-more'); if (m) { m.parentNode.querySelectorAll('.er-it').forEach(function(x){ x.hidden = false; }); m.remove(); } });
+  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape' && erOpen) erClose(); });
+  var erQT = null; document.addEventListener('input', function(ev){ if (ev.target && ev.target.id === 'er-q') { clearTimeout(erQT); var v = ev.target.value; erQT = setTimeout(function(){ erF.q = v; renderEarnings(); var i = $('#er-q'); if (i && document.activeElement !== i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 160); } });
   document.addEventListener('click', function(ev){
-    var b = ev.target.closest('#cal-imp button, #cal-reg button, #cal-wk button, #er-scope button, #er-reg button, #er-when button'); if (!b) return;
+    var b = ev.target.closest('#cal-imp button, #cal-reg button, #cal-wk button, #er-scope button, #er-reg button, #er-wk button'); if (!b) return;
     var grp = b.parentNode.id; M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x === b); });
     if (grp === 'cal-imp') calF.imp = Number(b.dataset.v); if (grp === 'cal-reg') calF.reg = b.dataset.v; if (grp === 'cal-wk') { var dv = Number(b.dataset.v); calF.wk = dv === 0 ? 0 : Math.max(-1, Math.min(2, calF.wk + dv)); M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x.dataset.v === '0'); }); }
-    if (grp === 'er-scope') erF.scope = b.dataset.v; if (grp === 'er-reg') erF.reg = b.dataset.v; if (grp === 'er-when') erF.when = b.dataset.v;
+    if (grp === 'er-scope') erF.scope = b.dataset.v; if (grp === 'er-reg') erF.reg = b.dataset.v; if (grp === 'er-wk') { var ev2 = Number(b.dataset.v); erF.wk = ev2 === 0 ? 0 : Math.max(-1, Math.min(2, erF.wk + ev2)); }
     if (/^cal/.test(grp)) renderCalendar(); else renderEarnings(); pressChips(); syncBarTag();
   });
   /* owner preview data */
@@ -845,15 +938,41 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     { id: 'e7', provider: 'eodhd', country: 'GB', title: 'GDP m/m', at: d(7, 0, 2), importance: 2, actual: null, estimate: 0.1, previous: -0.1, unit: '%', period: 'Aug' },
     { id: 'e8', provider: 'eodhd', country: 'JP', title: 'BoJ Interest Rate Decision', at: d(4, 0, 3), importance: 3, actual: null, estimate: 0.5, previous: 0.5, unit: '%' },
     { id: 'e9', provider: 'eodhd', country: 'CN', title: 'Trade Balance', at: d(4, 0, 2), importance: 2, actual: null, estimate: 98e9, previous: 102.3e9 } ]; })();
-  var SIM_EARNINGS = (function(){ var k = function(off){ return dayKey(Date.now() + off * 864e5); }; return [
-    { symbol: 'MSTR', mic_code: 'XNAS', day: k(2), name: 'Strategy Inc', exchange: 'NASDAQ', country: 'United States', currency: 'USD', time: 'After Hours', eps_estimate: -0.12, eps_actual: null },
-    { symbol: 'PLTR', mic_code: 'XNAS', day: k(4), name: 'Palantir Technologies', exchange: 'NASDAQ', country: 'United States', currency: 'USD', time: 'After Hours', eps_estimate: 0.11, eps_actual: null },
-    { symbol: 'PEP', mic_code: 'XNAS', day: k(1), name: 'PepsiCo', exchange: 'NASDAQ', country: 'United States', currency: 'USD', time: 'Pre Market', eps_estimate: 2.26, eps_actual: null },
-    { symbol: 'JPM', mic_code: 'XNYS', day: k(5), name: 'JPMorgan Chase', exchange: 'NYSE', country: 'United States', currency: 'USD', time: 'Pre Market', eps_estimate: 4.71, eps_actual: null },
-    { symbol: 'ASML', mic_code: 'XAMS', day: k(6), name: 'ASML Holding', exchange: 'Euronext', country: 'Netherlands', currency: 'EUR', time: 'Pre Market', eps_estimate: 5.9, eps_actual: null },
-    { symbol: 'TSM', mic_code: 'XTAI', day: k(7), name: 'Taiwan Semiconductor', exchange: 'TWSE', country: 'Taiwan', currency: 'TWD', time: 'Time Not Supplied', eps_estimate: 14.2, eps_actual: null },
-    { symbol: 'MSFT', mic_code: 'XNAS', day: k(-1), name: 'Microsoft', exchange: 'NASDAQ', country: 'United States', currency: 'USD', time: 'After Hours', eps_estimate: 3.65, eps_actual: 3.72, difference: 0.07, surprise_pct: 1.9, reported_at: new Date(Date.now() - 20 * 3600000).toISOString() },
-    { symbol: 'DAL', mic_code: 'XNYS', day: k(0), name: 'Delta Air Lines', exchange: 'NYSE', country: 'United States', currency: 'USD', time: 'Pre Market', eps_estimate: 1.52, eps_actual: 1.71, difference: 0.19, surprise_pct: 12.5, reported_at: new Date(Date.now() - 25 * 60000).toISOString() } ]; })();
+  var SIM_EARNINGS = (function(){ var k = function(off){ var d = new Date(), step = off < 0 ? -1 : 1, n = Math.abs(off); while (n > 0) { d.setDate(d.getDate() + step); if (d.getDay() !== 0 && d.getDay() !== 6) n--; } return dayKey(d); }; /* k(n) = n business days from today */
+    var ago = function(h){ return new Date(Date.now() - h * 3600000).toISOString(); }, US = { exchange: 'NASDAQ', country: 'United States', currency: 'USD' };
+    var r = function(sym, mic, day, name, time, est, act, extra){ var o = Object.assign({ symbol: sym, mic_code: mic, day: day, name: name, time: time, eps_estimate: est, eps_actual: act }, US, extra || {}); if (act != null && est != null) { o.difference = Math.round((act - est) * 100) / 100; o.surprise_pct = Math.round((act - est) / Math.abs(est) * 1000) / 10; } return o; };
+    return [
+    r('MSTR', 'XNAS', k(2), 'Strategy Inc', 'After Hours', -0.12, null),
+    r('PLTR', 'XNAS', k(4), 'Palantir Technologies', 'After Hours', 0.11, null),
+    r('PEP', 'XNAS', k(1), 'PepsiCo', 'Pre Market', 2.26, null),
+    r('JPM', 'XNYS', k(3), 'JPMorgan Chase', 'Pre Market', 4.71, null, { exchange: 'NYSE' }),
+    r('WFC', 'XNYS', k(3), 'Wells Fargo', 'Pre Market', 1.44, null, { exchange: 'NYSE' }),
+    r('C', 'XNYS', k(3), 'Citigroup', 'Pre Market', 1.73, null, { exchange: 'NYSE' }),
+    r('BLK', 'XNYS', k(3), 'BlackRock', 'Pre Market', 11.9, null, { exchange: 'NYSE' }),
+    r('GS', 'XNYS', k(4), 'Goldman Sachs', 'Pre Market', 10.4, null, { exchange: 'NYSE' }),
+    r('UNH', 'XNYS', k(4), 'UnitedHealth Group', 'Pre Market', 2.85, null, { exchange: 'NYSE' }),
+    r('NFLX', 'XNAS', k(5), 'Netflix', 'After Hours', 6.95, null),
+    r('TSLA', 'XNAS', k(7), 'Tesla', 'After Hours', 0.52, null),
+    r('ASML', 'XAMS', k(5), 'ASML Holding', 'Pre Market', 5.9, null, { exchange: 'Euronext', country: 'Netherlands', currency: 'EUR' }),
+    r('TSM', 'XTAI', k(6), 'Taiwan Semiconductor', 'Time Not Supplied', 14.2, null, { exchange: 'TWSE', country: 'Taiwan', currency: 'TWD' }),
+    r('MSFT', 'XNAS', k(-1), 'Microsoft', 'After Hours', 3.65, 3.72, { reported_at: ago(20) }),
+    r('DAL', 'XNYS', k(0), 'Delta Air Lines', 'Pre Market', 1.52, 1.71, { exchange: 'NYSE', reported_at: ago(0.4) }),
+    r('STZ', 'XNYS', k(-2), 'Constellation Brands', 'Pre Market', 3.38, 3.05, { exchange: 'NYSE', reported_at: ago(50) }),
+    r('NKE', 'XNYS', k(-3), 'Nike', 'After Hours', 0.27, 0.49, { exchange: 'NYSE', reported_at: ago(66) }),
+    r('CAG', 'XNYS', k(-3), 'Conagra Brands', 'Pre Market', 0.33, 0.33, { exchange: 'NYSE', reported_at: ago(76) }),
+    r('AZZ', 'XNYS', k(-1), 'AZZ Inc', 'After Hours', 1.55, 1.58, { exchange: 'NYSE', reported_at: ago(18) }) ]; })();
+  var SIM_ERHIST = (function(){ var q = function(n){ var d = new Date(), m = d.getMonth() - 3 * n, y = d.getFullYear() + Math.floor(m / 12); m = ((m % 12) + 12) % 12; var qe = Math.floor(m / 3) * 3 + 2; return y + '-' + String(qe + 1).padStart(2, '0') + '-' + String(new Date(y, qe + 1, 0).getDate()).padStart(2, '0'); }; /* the end of the quarter n quarters back: q(1) = the one being reported now */
+    var H = function(rows){ return rows.map(function(x, i){ var n = rows.length - i + 1; var est = x[0], act = x[1]; return { q: q(n), report: null, when: null, est: est, actual: act, surprise: est ? Math.round((act - est) / Math.abs(est) * 1000) / 10 : null }; }); };
+    var R = function(rows){ return rows.map(function(x, i){ var n = rows.length - i + 1; return { q: q(n), revenue: x[0] * 1e6, net_income: x[1] * 1e6 }; }); };
+    return {
+    MSTR: { name: 'Strategy Inc', sector: 'Technology', industry: 'Software - Application', web: 'https://www.strategy.com', employees: 2190, exchange: 'NASDAQ', currency: 'USD', description: 'Strategy (formerly MicroStrategy) is the largest corporate holder of bitcoin and a provider of AI-powered enterprise analytics software. The company funds bitcoin purchases through equity and convertible debt and reports the holdings at fair value, which makes quarterly earnings swing with the bitcoin price.',
+      market_cap: 42.3e9, pe: null, forward_pe: null, eps_ttm: -12.4, revenue_ttm: 468e6, profit_margin: -7.1, operating_margin: -5.9, rev_growth_yoy: 0.025, eps_growth_yoy: null, target_price: 420, dividend_yield: null, short_pct: 0.11, shares: 275e6,
+      next: { q: q(1), report: null, when: 'AfterMarket', est: -0.12 }, history: H([[-0.05, -0.54], [-1.1, -3.33], [0.14, -1.72], [-0.12, -0.78], [-0.02, -16.5], [0.04, -0.97], [0.08, 32.6], [-0.11, 8.42]]),
+      revenue: R([[115, -53], [111, -341], [116, -123], [121, -671], [120, -4217], [116, 10021], [114, 2771], [113, 2460]]), trend: { rev_est_avg: 118e6, rev_growth: 0.02, eps_est_year_ago: -1.56 }, fetched_at: new Date().toISOString() },
+    PLTR: { name: 'Palantir Technologies', sector: 'Technology', industry: 'Software - Infrastructure', web: 'https://www.palantir.com', employees: 4100, exchange: 'NASDAQ', currency: 'USD', description: 'Palantir builds software platforms for data integration and decision-making: Gotham for governments and defence, Foundry for companies, and AIP, which puts large language models to work on an organisation’s own data. Revenue growth has accelerated with US commercial and government AI contracts.',
+      market_cap: 455e9, pe: 480, forward_pe: 170, eps_ttm: 0.41, revenue_ttm: 3.9e9, profit_margin: 0.26, operating_margin: 0.31, rev_growth_yoy: 0.48, eps_growth_yoy: 1.01, target_price: 165, dividend_yield: null, short_pct: 0.028, shares: 2.37e9,
+      next: { q: q(1), report: null, when: 'AfterMarket', est: 0.11 }, history: H([[0.08, 0.08], [0.08, 0.09], [0.09, 0.10], [0.11, 0.14], [0.13, 0.13], [0.14, 0.16], [0.16, 0.18], [0.17, 0.21]]),
+      revenue: R([[634, 106], [678, 134], [726, 144], [828, 79], [884, 214], [1004, 327], [1181, 476], [1290, 540]]), trend: { rev_est_avg: 1.36e9, rev_growth: 0.52, eps_est_year_ago: 0.10 }, fetched_at: new Date().toISOString() } }; })();
 
   /* Telegram: personal join links, one per channel. Tap → Telegram opens the channel → Join → approved in a second. */
   var invitesInFlight = null;

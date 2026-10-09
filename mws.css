@@ -503,8 +503,8 @@ a.tile:hover{background:var(--bg-2)}
 .pf-tbl,#pf-ord,#tr-table,#tr-ord,#tk-table{font-size:13px;width:100%}
 .pt th.num,.pt td.num{text-align:right}
 .pt td a.sym{color:inherit;text-decoration:none;font-weight:500}.pt td a.sym:hover{text-decoration:underline;text-underline-offset:3px}.pt td a.sym:focus-visible,.pt th[data-k]:focus-visible{outline:2px solid var(--fg-2);outline-offset:2px}
-#tk-table td.num b{color:var(--fg);font-weight:500}#tk-table td.num.pos b{color:var(--good)}#tk-table td.num.neg b{color:var(--bad)}
-#tr-table,#tk-table{min-width:0}
+#tk-table td.num b,#tk-table2 td.num b{color:var(--fg);font-weight:500}#tk-table td.num.pos b,#tk-table2 td.num.pos b{color:var(--good)}#tk-table td.num.neg b,#tk-table2 td.num.neg b{color:var(--bad)}
+#tr-table,#tk-table,#tk-table2{min-width:0}
 @media (min-width:761px){
 .pf-tbl th,#pf-ord th,#tr-table th,#tr-ord th,#tk-table th{padding:9px 8px;white-space:normal;line-height:1.25;vertical-align:bottom}
 .pf-tbl td,#pf-ord td,#tr-table td,#tr-ord td,#tk-table td{padding:10px 8px;vertical-align:middle}
@@ -795,4 +795,34 @@ body.app #pf-rng{margin-top:6px}
 @media (max-width:1200px){.paper .albums{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.paper .albums{grid-template-columns:1fr}.paper .album .pic{aspect-ratio:16/9}}
 /* the ledger fits a 1440 screen: entry/exit texts may wrap */
-@media (min-width:761px){#tk-table td.num{white-space:normal;max-width:220px}}
+@media (min-width:761px){#tk-table td.num,#tk-table2 td.num{white-space:normal;max-width:200px}}
+
+/* Track Record · the ledger: a thumbnail of the post beside each call; the scoreboard's small label */
+#tk-table td.em,#tk-table2 td.em{white-space:normal}
+#tk-table .th,#tk-table2 .th{display:inline-block;width:64px;height:44px;border:1px solid var(--line);background:var(--bg);overflow:hidden;vertical-align:middle;margin-right:12px;flex:none}
+#tk-table .th img,#tk-table2 .th img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+#tk-table .ttl,#tk-table2 .ttl{display:inline-block;vertical-align:middle;max-width:calc(100% - 80px);line-height:1.3}
+#tk-table td.em a.sym,#tk-table2 td.em a.sym{white-space:normal;text-transform:none}
+@media (min-width:761px){#tk-table td.em,#tk-table2 td.em{min-width:260px;width:auto}#tk-table .ttl,#tk-table2 .ttl{max-width:260px}}
+@media (max-width:760px){#tk-table td.em,#tk-table2 td.em{display:flex;align-items:center;gap:0}#tk-table .ttl,#tk-table2 .ttl{max-width:none;font-size:15px}}
+.paper .score .sc span i{font-style:normal;color:var(--fg-2);letter-spacing:0;text-transform:none;margin-left:4px}
+.paper .alb-tabs{margin:0 0 18px}
+/* Active Positions · a price that moved flashes like an exchange ticker: green up, red down */
+@keyframes flashUp{0%{background:rgba(127,191,138,.32)}100%{background:transparent}}
+@keyframes flashDn{0%{background:rgba(217,122,122,.32)}100%{background:transparent}}
+.pf-tbl td.flash-up{animation:flashUp 1.4s var(--ease) 1}
+.pf-tbl td.flash-dn{animation:flashDn 1.4s var(--ease) 1}
+@media (prefers-reduced-motion:reduce){.pf-tbl td.flash-up,.pf-tbl td.flash-dn{animation:none}}
+/* the position page · About the asset */
+#pos-page .about{margin:30px 0 0;padding:22px 0 0;border-top:1px solid var(--line)}
+#pos-page .about h2.k{margin:0 0 14px}
+#pos-page .about-g{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:0 48px;align-items:start}
+#pos-page .about .txt p{margin:0;font-size:15.5px;line-height:1.6;color:var(--fg-2);max-width:62ch}
+#pos-page .about .site{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line-2);padding-bottom:2px}
+#pos-page .about .site:hover{border-color:var(--fg)}
+#pos-page .about .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;margin:0;border:0}
+#pos-page .about .facts div{padding:10px 0;border-bottom:1px solid var(--line)}
+#pos-page .about .facts b small{font:inherit;font-size:12px;color:var(--fg-3);letter-spacing:0;text-transform:none;margin-left:6px}
+#pos-page .about .facts b small.pos{color:var(--good)}#pos-page .about .facts b small.neg{color:var(--bad)}
+@media (max-width:900px){#pos-page .about-g{grid-template-columns:1fr;gap:18px}}
+#tk-table td.act,#tk-table2 td.act{white-space:nowrap}

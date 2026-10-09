@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=a5bf6ea4">
+<link rel="stylesheet" href="/mws.css?v=230d3c4c">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=a5bf6ea4"></script>
+<script src="/mws.js?v=230d3c4c"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -43,7 +43,8 @@
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
-      <a href="#telegram" data-p="telegram">Core<span class="cnt" id="n-tg"></span></a>
+      <p class="grp">Core</p>
+      <a href="#telegram" data-p="telegram">Telegram<span class="cnt" id="n-tg"></span></a>
       <p class="grp">Portfolio <span class="soon" id="desk-grp-tag">In development</span></p>
       <a href="#portfolio" data-p="portfolio">Active Positions<span class="cnt" id="n-pf"></span></a>
       <a href="#track" data-p="track">Track Record<span class="cnt" id="n-tk"></span></a>
@@ -66,7 +67,7 @@
   <div class="mainc">
     <header class="bar">
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><span></span></button>
-      <div class="crumbs"><span id="crumb">Core</span><span class="soon" id="bar-tag" hidden></span></div>
+      <div class="crumbs"><span id="crumb">Telegram</span><span class="soon" id="bar-tag" hidden></span></div>
       <span class="tag" id="bar-st">—</span>
     </header>
 
@@ -97,9 +98,9 @@
         </div>
       </section>
 
-      <!-- 01 core: the Telegram channels (the heart of the membership; building your own portfolio joins this page later) -->
+      <!-- 01 Core · Telegram: the channels (the heart of the membership; "build your portfolio" joins the Core group later) -->
       <section class="page" data-page="telegram">
-        <div class="head rv"><h1>Core.</h1><p id="tg-sub" hidden></p></div>
+        <div class="head rv"><h1>Your channels.</h1><p id="tg-sub" hidden></p></div>
         <div id="ov-notices"></div>
         <div id="ov-banner"></div>
         <div class="acct">
@@ -149,7 +150,7 @@
       </section>
       <section class="page" data-page="track">
         <div class="head rv"><h1>Track record. <span class="soon" id="tk-tag">In development</span></h1></div>
-        <div id="tk-live" hidden><div class="paper" id="tk-paper"></div><div class="sh" style="margin-top:44px"><h2>The ledger <span class="muted" id="tk-ledger-n"></span></h2></div><div class="ptw"><table class="pt cards ruled" id="tk-table"></table></div><p class="small muted" style="margin-top:18px" id="tk-foot"></p></div>
+        <div id="tk-live" hidden><div class="paper" id="tk-paper"></div><div class="ptw"><table class="pt cards ruled" id="tk-table"></table></div><div id="tk-noexit" hidden><div class="sh" style="margin-top:36px"><h2>Called, exit not posted <span class="muted" id="tk-noexit-n"></span></h2></div><div class="ptw"><table class="pt cards ruled" id="tk-table2"></table></div></div><p class="small muted" style="margin-top:18px" id="tk-foot"></p></div>
         <div id="tk-locked" hidden class="banner"><div><b>Members only.</b><p>The track record opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
         <div id="tk-empty" hidden class="banner"><div><b>Nothing closed yet.</b><p>Closed calls land here with entry, exit and result.</p></div></div>
       </section>
@@ -287,7 +288,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { telegram:'Core', portfolio:'Active Positions', track:'Track Record', position:'Active Positions', calendar:'Economic Calendar', earnings:'Stock Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
+  var PAGES = { telegram:'Telegram', portfolio:'Active Positions', track:'Track Record', position:'Active Positions', calendar:'Economic Calendar', earnings:'Stock Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
   var posId = null, posHome = 'portfolio', trackAlbum = null; /* #track/crypto: one album of the track record */ /* #position/<id>: one position, its numbers and the Telegram posts; posHome = the section it belongs to */
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
@@ -552,8 +553,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var POSTS = null, postsReq = null;
   function loadPosts(){ if (POSTS || postsReq) return postsReq; postsReq = fetch('/posts/index.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; }).then(function(j){ POSTS = j || {}; return POSTS; }); return postsReq; }
   /* the story of each call (stories.json, keyed by positions.story_key): the lede, then chapter by chapter with the post that was made that day */
-  var STORIES = null, storiesReq = null;
-  function loadStories(){ if (STORIES || storiesReq) return storiesReq; storiesReq = Promise.all([loadPosts(), fetch('/stories.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; })]).then(function(a){ STORIES = a[1] || {}; return STORIES; }); return storiesReq; }
+  var STORIES = null, COMPANIES = {}, storiesReq = null;
+  function loadStories(){ if (STORIES || storiesReq) return storiesReq; storiesReq = Promise.all([loadPosts(), fetch('/stories.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; }), fetch('/companies.json', { cache: 'no-cache' }).then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; })]).then(function(a){ STORIES = a[1] || {}; COMPANIES = a[2] || {}; return STORIES; }); return storiesReq; }
   function storyOf(p){ if (!STORIES || !p) return null; if (p.story_key && STORIES[p.story_key]) return STORIES[p.story_key]; var k = Object.keys(STORIES).filter(function(k){ var s = STORIES[k]; return s.symbol === p.symbol && s.side === (p.side || 'long') && s.kind === pfKind(p) && s.status === p.status; }); return k.length === 1 ? STORIES[k[0]] : null; } /* a row without a key still finds its story when it is the only one of its kind */
   function postImg(id){ var x = POSTS && POSTS[id]; return x && x.img ? (/^(https?:)?\//.test(x.img) ? x.img : '/' + x.img) : null; }
   function postWhen(id){ var x = POSTS && POSTS[id]; if (!(x && x.t)) return ''; var d = new Date(x.t); try { return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Dubai' }) + ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Dubai' }) + ' Dubai'; } catch (e) { return fmtWhen(x.t); } } /* the time the post was made, in the channel's own time */
@@ -562,7 +563,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function resultHtml(p){ var s = resultSign(p); return '<span class="' + (s > 0 ? 'pos' : s < 0 ? 'neg' : 'muted') + '">' + esc(p.result || '—') + '</span>'; }
   /* the headline of a call: "Short Bitcoin from $95,350" */
   function usdHl(v){ v = Number(v); var dp = v >= 1000 || Math.abs(v - Math.round(v)) < 1e-9 ? 0 : v < 1 ? 4 : 2; return '$' + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }); } /* a price in a headline: no cents unless there are cents */
-  function storyTitle(p){ var side = String(p.side || 'long'), k = pfKind(p); var verb = k === 'order' ? side.charAt(0).toUpperCase() + side.slice(1) : k === 'spot' ? (side === 'sell' ? 'Sold' : 'Bought') : (side === 'short' || side === 'sell' ? 'Short' : 'Long'); return verb + ' ' + esc(p.name || p.symbol) + (p.entry_price != null ? (k === 'leveraged' ? ' from ' : ' at ') + usdHl(p.entry_price) : ''); } /* "Short Bitcoin from $95,350" · "Bought Strategy at $95.26" · an order: "Buy Bitcoin at $57,000" (the dateline says it is resting) */
+  function storyTitle(p){ var st = storyOf(p); if (st && st.headline) return esc(st.headline); var side = String(p.side || 'long'), k = pfKind(p); var verb = k === 'order' ? side.charAt(0).toUpperCase() + side.slice(1) : k === 'spot' ? (side === 'sell' ? 'Sold' : 'Bought') : (side === 'short' || side === 'sell' ? 'Short' : 'Long'); return verb + ' ' + esc(p.name || p.symbol) + (p.entry_price != null ? (k === 'leveraged' ? ' from ' : ' at ') + usdHl(p.entry_price) : ''); } /* "Short Bitcoin from $95,350" · "Bought Strategy at $95.26" · an order: "Buy Bitcoin at $57,000" (the dateline says it is resting) */
   function fmtWhen(iso){ if (!iso) return ''; var d = new Date(iso); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   /* prices and money on the page: a price always carries its dollar sign */
   function usdPx(v){ if (v == null || !isFinite(v)) return '—'; v = Number(v); var dp = v >= 10000 ? 0 : v < 1 ? 4 : 2; return (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
@@ -602,7 +603,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (devFor('position')) { box.innerHTML = '<p class="back"><a href="#portfolio">← Active Positions</a></p><div class="banner"><div><b>In development.</b><p>The positions and their stories are being built. Until they open, every call is posted in the Exclusive channel.</p></div></div>'; return; }
     var D = pfData(); var p = D.list.filter(function(x){ return String(x.id) === String(posId); })[0];
     if (!p) { box.innerHTML = '<p class="back"><a href="#portfolio">← Active Positions</a></p><p class="muted">' + (positions ? 'This position is no longer in the list.' : 'Loading…') + '</p>'; return; }
-    var trade = isTrade(p), closed = p.status === 'closed', order = pfKind(p) === 'order', T = tradeNums(p, D.Q);
+    var trade = isTrade(p), closed = p.status === 'closed' || p.status === 'archived', order = pfKind(p) === 'order', T = tradeNums(p, D.Q);
     var fact = function(k, v){ return v == null || v === '' ? '' : '<div><span>' + k + '</span><b>' + v + '</b></div>'; };
     var sg = function(v, txt){ return v == null ? '—' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
     var lastTxt = T.last != null ? usdPx(T.last) + (T.mark ? ' <small>mark · ' + esc(M.fmtDate(T.mark)) + '</small>' : '') : '—';
@@ -612,7 +613,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       : order
       ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + ' market' : '—') + levFact + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
       : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('1D', sg(T.roi1, pct(T.roi1))) + fact('Since entry', sg(T.ret, pct(T.ret)));
-    var ids = pfIds(p), story = storyOf(p);
+    var ids = pfIds(p), story = storyOf(p), co = COMPANIES[String(p.symbol).toUpperCase()];
+    /* what the asset is: name, site, a paragraph, and the live figures (market cap = price × shares or supply, approximate) */
+    var bigUsd = function(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); };
+    var about = function(){ if (!co) return ''; var q = pfQuote(p, D.Q) || D.Q[String(p.symbol).toUpperCase() + '/USD'] || D.Q[String(p.symbol).toUpperCase()] || null; if (q && (q.price == null || q.error)) q = null; var px = q ? Number(q.price) : null; var cap = px != null && (co.shares || co.supply) ? bigUsd(px * (co.shares ? co.shares * 1e9 : co.supply * 1e6)) : null;
+      var f = function(k, v){ return v ? '<div><span>' + k + '</span><b>' + v + '</b></div>' : ''; };
+      var site = co.site ? '<a class="site" href="' + esc(co.site) + '" target="_blank" rel="noopener">' + esc(String(co.site).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')) + ' ↗</a>' : '';
+      return '<section class="about"><h2 class="k">About ' + esc(co.name) + '</h2><div class="about-g"><div class="txt"><p>' + esc(co.desc) + '</p>' + site + '</div><div class="facts">'
+        + f('Last price', px != null ? usdPx(px) + (q.change_pct != null ? ' <small class="' + sgn(Number(q.change_pct)).trim() + '">' + pct(Number(q.change_pct)) + ' today</small>' : '') : null) + f('Market cap', cap ? cap + ' <small>approx.</small>' : null)
+        + f(co.kind === 'crypto' ? 'Network' : 'Sector', co.sector) + f('Exchange', co.exchange) + f('Headquarters', co.hq) + f(co.kind === 'crypto' ? 'Launched' : co.kind === 'company' ? 'Founded' : 'Since', co.founded ? String(co.founded) : null)
+        + f(co.supply ? 'Circulating supply' : null, co.supply ? (co.supply >= 1000 ? (co.supply / 1000).toFixed(1) + 'B' : co.supply.toFixed(co.supply < 100 ? 1 : 0) + 'M') + ' ' + esc(co.unit || '') : null) + '</div></div></section>'; };
     var postFig = function(i, cap){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
       return src ? '<figure class="post"><img src="' + esc(src) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"><figcaption><span>' + esc(when) + '</span><span>' + (cap || 'Exclusive channel') + '</span></figcaption></figure>'
         : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; };
@@ -632,7 +642,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
       + '<div class="pos-hd"><p class="dateline">' + dateline + '</p><h1>' + storyTitle(p) + (closed && p.result ? ' <span class="res">' + resultHtml(p) + '</span>' : '') + '</h1><p class="tags"><span class="tag">' + esc(p.symbol) + '</span>' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(classOf(p)) + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
-      + '<div id="pf-story">' + (STORIES ? body() : '<p class="small muted">Loading…</p>') + '</div>';
+      + (STORIES ? about() : '') + '<div id="pf-story">' + (STORIES ? body() : '<p class="small muted">Loading…</p>') + '</div>';
     if (!STORIES) loadStories().then(function(){ if (current === 'position') renderPosition(); });
   }
   document.addEventListener('click', function(ev){ var tr = ev.target.closest('#pf-groups tr.clk, #tk-table tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
@@ -640,11 +650,12 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var by = {}; rows.forEach(function(p){ var g = PF_CLASS[p.asset_class] || 'Other'; (by[g] = by[g] || []).push(p); });
     return PF_ORDER.filter(function(g){ return by[g]; }).map(function(g){ return '<tr class="grp"><td colspan="' + cols + '">' + g + '</td></tr>' + by[g].map(rowFn).join(''); }).join('');
   }
+  M.refreshQuotes = function(){ return loadQuotes().then(function(){ if (current === 'portfolio' || current === 'track') renderPortfolio(); if (current === 'position') renderPosition(); }); };
   async function loadQuotes(){
     if (!positions || !positions.length) { quotes = {}; return; }
     try { var q = await sb.from('quotes').select('*'); quotes = {}; (q.data || []).forEach(function(r){ quotes[String(r.symbol).toUpperCase()] = r; }); } catch (e) { quotes = {}; }
   }
-  var pfSort = { k: 'ret', d: -1 }; /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
+  var pfSort = { k: 'ret', d: -1 }, lastPx = {}; /* the last price each row was drawn with: a move flashes the cell green or red */ /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
   /* the section tag: Live for members, a warning for the owner while members do not see it yet */
   function deskTag(id, unlocked, has){ var onlyMe = staffRole && !sim && !deskLive.portfolio; var t = $('#' + id); t.textContent = unlocked && has ? (onlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); t.className = 'soon' + (onlyMe && has ? ' warn' : ''); return onlyMe; }
   /* sortable tables: every row carries its values; a header click sorts by that column, again to flip */
@@ -666,15 +677,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: String(p.side || 'long') + ' ' + T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist) } }; };
     var sortGroup = function(rows, orders){ var st = pfSort; if (orders && (st.k === 'ret' || st.k === 'roi1')) st = { k: 'dist', d: 1 }; /* orders: the nearest level first */ return sortRows(rows, st); };
     var tick = function(p){ return cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em') + cell('Name', esc(p.name || '—'), 'nm2'); };
-    var lastCell = function(T){ if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', usdPx(T.last) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : ''), 'num'); };
-    var roiCells = function(T){ return cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('All-time ROI', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret)); };
+    var flash = {}; open.forEach(function(p){ var T = tradeNums(p, Q), k = String(p.id); if (T.last != null && lastPx[k] != null && T.last !== lastPx[k]) flash[k] = T.last > lastPx[k] ? ' flash-up' : ' flash-dn'; if (T.last != null) lastPx[k] = T.last; });
+    var lastCell = function(T, p){ var fl = flash[String(p.id)] || ''; if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', usdPx(T.last) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : ''), 'num' + fl); };
+    var roiCells = function(T, p){ var fl = flash[String(p.id)] || ''; return cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1) + fl) + cell('All-time ROI', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret) + fl); };
     var head = function(cols){ return '<thead><tr>' + cols.map(function(c){ return th(c[0], c[1], pfSort, c[2] || '', c[3] || ''); }).join('') + '<th></th></tr></thead>'; };
     var spotHead = head([['Ticker', 'sym'], ['Name', 'name'], ['Type', 'cls'], ['Since', 'since', '', 'The day of the call'], ['Entry price', 'entry', 'num', 'Average entry as posted'], ['Last price', 'last', 'num'], ['1D ROI', 'roi1', 'num', 'Since the previous close'], ['All-time ROI', 'ret', 'num', 'Since the call']]);
     var levHead = head([['Ticker', 'sym'], ['Name', 'name'], ['Direction', 'side', '', 'Long or short, and the leverage'], ['Type', 'cls'], ['Since', 'since'], ['Entry price', 'entry', 'num'], ['Last price', 'last', 'num'], ['1D ROI', 'roi1', 'num', 'Since the previous close · shorts the other way round'], ['All-time ROI', 'ret', 'num', LEV_ROI === 'margin' ? 'The move in the price, times the leverage' : 'The move in the price since the call; shorts the other way round']]);
     var ordHead = head([['Ticker', 'sym'], ['Name', 'name'], ['Side', 'side'], ['Type', 'cls'], ['Placed', 'since'], ['Level', 'entry', 'num', 'The price the order waits at'], ['Last price', 'last', 'num'], ['Distance', 'dist', 'num', 'How far the market is from the level']]);
-    var spotRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Type', esc(classOf(p)), 'muted') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry price', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T) + roiCells(T) + detailsCell(p) + '</tr>'; };
-    var levRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Direction', pfSide(p)) + cell('Type', esc(classOf(p)), 'muted') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry price', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T) + roiCells(T) + detailsCell(p) + '</tr>'; };
-    var ordRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Side', pfSide(p)) + cell('Type', esc(classOf(p)), 'muted') + cell('Placed', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T) + cell('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num muted') + detailsCell(p) + '</tr>'; };
+    var spotRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Type', esc(classOf(p)), 'muted') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry price', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + roiCells(T, p) + detailsCell(p) + '</tr>'; };
+    var levRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Direction', pfSide(p)) + cell('Type', esc(classOf(p)), 'muted') + cell('Since', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Entry price', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + roiCells(T, p) + detailsCell(p) + '</tr>'; };
+    var ordRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Side', pfSide(p)) + cell('Type', esc(classOf(p)), 'muted') + cell('Placed', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + cell('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num muted') + detailsCell(p) + '</tr>'; };
     var block = function(title, sub, headHtml, rows, rowFn){ return rows.length ? '<section class="pf-sec"><div class="sh"><h2>' + title + ' <span class="muted">· ' + rows.length + ' ' + sub + '</span></h2></div><div class="ptw"><table class="pt cards ruled pf-tbl">' + headHtml + '<tbody>' + rows.map(rowFn).join('') + '</tbody></table></div></section>' : ''; };
     var spot = sortGroup(P.spot.map(mk)), lev = sortGroup(P.lev.map(mk)), ord = sortGroup(P.ord.map(mk), true);
     $('#pf-groups').innerHTML = block('Spot', spot.length === 1 ? 'position' : 'positions', spotHead, spot, spotRow) + block('Leveraged', lev.length === 1 ? 'trade' : 'trades', levHead, lev, levRow) + block('Orders', 'waiting to fill', ordHead, ord, ordRow);
@@ -686,8 +698,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var LIVE_KEY = { portfolio: 'portfolio', track: 'portfolio', position: 'portfolio', calendar: 'calendar', earnings: 'earnings' };
   /* members (and the owner's "View as") see a section once it is live (admin → Settings → What goes live); staff see the real state at all times, the tag saying "Only you" until then */
   function devFor(page){ return !!DEV_PAGES[page] || ((!staffRole || !!sim) && !deskLive[LIVE_KEY[page] || page]); }
-  /* Track Record: the paper. The lead story, then every closed call as an article (the cover post, the headline, the result,
-     the lede), the open ones, the calls whose exit was never posted; the ledger (one line per call) at the end. */
+  /* Track Record: the record at a glance (scoreboard), the market tabs, then the ledger — one line per call, grouped by asset,
+     a row opens the story. Calls whose exit was never posted sit in a second, smaller ledger and are not counted. */
   function renderTrack(D, P, unlocked){
     var closed = P.closed.slice().sort(function(a, b){ return String(b.closed_at || '').localeCompare(String(a.closed_at || '')) || String(b.opened_at || '').localeCompare(String(a.opened_at || '')); });
     if (devFor('track')) { $('#tk-locked').hidden = true; $('#tk-live').hidden = true; $('#tk-empty').hidden = false; $('#tk-empty').innerHTML = '<div><b>In development.</b><p>The track record is being built: every call with entry, exit and result, and the posts behind it.</p></div>'; var kt = $('#tk-tag'); kt.textContent = 'In development'; kt.className = 'soon'; return; }
@@ -697,56 +709,37 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var S = function(p){ return storyOf(p) || null; };
     var posted = closed.filter(function(p){ var s = S(p); return !s || s.tier !== 'noexit'; }), unposted = closed.filter(function(p){ var s = S(p); return s && s.tier === 'noexit'; });
     var wins = posted.filter(function(p){ return resultSign(p) > 0; }).length, losses = posted.filter(function(p){ return resultSign(p) < 0; }).length, flat = posted.length - wins - losses;
-    var first = closed.concat(P.open).map(function(p){ return p.opened_at; }).filter(Boolean).sort()[0];
-    var lead = posted.filter(function(p){ var s = S(p); return s && s.lead; })[0] || posted[0];
-    var cover = function(p){ var s = S(p); var id = s && s.cover; var src = id && postImg(id); var x = id && POSTS && POSTS[id]; var wide = x && x.w && x.h && x.w / x.h >= 1.35; /* a wide post sits whole in the frame; a tall one is cropped from the top */ return src ? '<img src="' + esc(src) + '" alt="" loading="lazy"' + (wide ? ' class="fit"' : '') + '>' : '<span class="nopic"></span>'; };
-    var when = function(p){ return p.status === 'closed' ? (p.closed_at ? esc(M.fmtDate(p.opened_at)) + ' → ' + esc(M.fmtDate(p.closed_at)) : 'from ' + esc(M.fmtDate(p.opened_at))) : 'since ' + esc(M.fmtDate(p.opened_at)); };
-    var kindTxt = function(p){ return (pfKind(p) === 'leveraged' ? 'Trade' : 'Spot') + ' · ' + esc(classOf(p)); };
-    var art = function(p, cls){ var s = S(p), main = !s || s.tier !== 'noexit', T = p.status === 'open' ? tradeNums(p, D.Q) : null;
-      var fig = p.status === 'closed' ? (main ? '<span class="res">' + resultHtml(p) + '</span>' + (p.exit ? '<span class="out">out ' + esc(p.exit) + '</span>' : '') : '<span class="res"><span class="muted">no exit posted</span></span>')
-        : '<span class="res">' + (T && T.ret != null ? '<span class="' + (T.ret > 0 ? 'pos' : T.ret < 0 ? 'neg' : 'muted') + '">' + pct(T.ret) + '</span>' : '<span class="muted">open</span>') + '</span><span class="out">' + (T && T.ret != null ? 'so far · last ' + usdPx(T.last) : 'the story so far') + '</span>';
-      return '<a class="art ' + (cls || '') + '" href="#position/' + esc(String(p.id)) + '"><span class="pic">' + cover(p) + '</span><span class="bd"><span class="dt">' + when(p) + (heldTxt(p) ? ' · ' + esc(heldTxt(p)) : '') + '</span><span class="fig">' + fig + '</span><span class="hl">' + storyTitle(p) + '</span>' + (s ? '<span class="ld">' + esc(s.lede) + '</span>' : '') + '<span class="ft">' + kindTxt(p) + (pfKind(p) === 'leveraged' && p.leverage ? ' · ' + esc(p.leverage) : '') + '</span></span></a>'; };
-    var open = P.open.filter(function(p){ return pfKind(p) !== 'order'; }).slice().sort(function(a, b){ return (a.sort || 100) - (b.sort || 100) || String(b.opened_at || '').localeCompare(String(a.opened_at || '')); });
-    /* the albums: one per asset class (Crypto, Stocks, Commodities, Indices…), the newest cover on the front */
-    var ALB = { Crypto: 'crypto', Stocks: 'stocks', Commodities: 'commodities', Indices: 'indices', FX: 'fx', Other: 'other' }, ALB_NAME = {}; Object.keys(ALB).forEach(function(k){ ALB_NAME[ALB[k]] = k; });
-    var all = closed.concat(open), albums = {};
-    all.forEach(function(p){ var k = ALB[classOf(p)] || 'other'; var g = albums[k] = albums[k] || { key: k, name: classOf(p), closed: [], open: [], syms: {} }; (p.status === 'closed' ? g.closed : g.open).push(p); g.syms[p.symbol] = (g.syms[p.symbol] || 0) + 1; });
-    var albumList = PF_ORDER.map(function(n){ return albums[ALB[n]]; }).filter(Boolean);
-    var albumTile = function(g){ var cands = g.closed.concat(g.open), lead0 = cands.filter(function(p){ var s = S(p); return s && s.lead; })[0]; /* the cover: the lead if it is here, otherwise the call whose post fits the 4:3 frame best (recent first on a tie) */
-      var fit = function(p){ var s = S(p), x = s && POSTS && POSTS[s.cover]; return x && x.w && x.h ? Math.abs(x.w / x.h - 1.5) : 9; };
-      var front = lead0 || cands.slice().sort(function(a, b){ return fit(a) - fit(b); })[0]; var syms = Object.keys(g.syms).sort(function(x, y){ return g.syms[y] - g.syms[x]; });
-      return '<a class="album" href="#track/' + g.key + '"><span class="pic">' + cover(front) + '</span><span class="nm">' + esc(g.name) + '</span><span class="ct">' + g.closed.length + ' closed' + (g.open.length ? ' · ' + g.open.length + ' open' : '') + '</span><span class="syms">' + esc(syms.slice(0, 6).join(' · ')) + (syms.length > 6 ? ' · …' : '') + '</span></a>'; };
-    var html = '';
-    if (trackAlbum && albums[trackAlbum]) {
-      /* one album: its calls grouped by asset, the most recent asset first */
-      var g = albums[trackAlbum], names = {}; all.forEach(function(p){ if (p.name && !names[p.symbol]) names[p.symbol] = p.name; });
-      var bySym = {}; g.closed.concat(g.open).forEach(function(p){ (bySym[p.symbol] = bySym[p.symbol] || []).push(p); });
-      var latest = function(x){ return bySym[x].map(function(p){ return p.closed_at || p.opened_at || ''; }).sort().pop() || ''; };
-      var syms = Object.keys(bySym).sort(function(x, y){ return bySym[y].length - bySym[x].length || String(latest(y)).localeCompare(String(latest(x))); }); /* the assets with most calls first, then the most recent */
-      var gw = g.closed.filter(function(p){ return resultSign(p) > 0 && (!S(p) || S(p).tier !== 'noexit'); }).length, gp = g.closed.filter(function(p){ return !S(p) || S(p).tier !== 'noexit'; }).length;
-      html += '<p class="back"><a href="#track">← Track Record</a></p><p class="dateline">' + esc(g.name) + ' · ' + g.closed.length + ' closed call' + (g.closed.length === 1 ? '' : 's') + (gp ? ' · ' + gw + ' of ' + gp + ' with a posted exit positive' : '') + (g.open.length ? ' · ' + g.open.length + ' open' : '') + ' · ' + syms.length + ' asset' + (syms.length === 1 ? '' : 's') + '</p>';
-      html += '<div class="alb-tabs">' + albumList.map(function(x){ return '<a class="chip' + (x.key === g.key ? ' on' : '') + '" href="#track/' + x.key + '">' + esc(x.name) + ' <i>' + (x.closed.length + x.open.length) + '</i></a>'; }).join('') + '</div>';
-      syms.forEach(function(sym){ var rows = bySym[sym].slice().sort(function(a, b){ return (a.status === 'open') - (b.status === 'open') || String(b.closed_at || b.opened_at || '').localeCompare(String(a.closed_at || a.opened_at || '')); });
-        html += '<div class="sh"><h2>' + esc(names[sym] || sym) + ' <span class="muted">· ' + esc(sym) + ' · ' + rows.length + ' call' + (rows.length === 1 ? '' : 's') + '</span></h2></div><div class="arts">' + rows.map(function(p){ return art(p, p.status === 'open' ? 'open' : ''); }).join('') + '</div>'; });
-      closed = g.closed; /* the ledger below follows the album */
-    } else {
-      var hit = posted.length ? Math.round(wins / posted.length * 100) : 0;
-      var sc = function(k, v, cls){ return '<div class="sc"><b class="' + (cls || '') + '">' + v + '</b><span>' + k + '</span></div>'; };
-      html = '<div class="score">' + sc('Closed calls', posted.length) + sc('Positive', wins, 'pos') + sc('Negative', losses, 'neg') + sc('Flat', flat) + sc('Hit rate', hit + '%', hit >= 50 ? 'pos' : 'neg') + sc('Open now', P.spot.length + P.lev.length) + '</div>'
-        + '<p class="dateline">Since ' + (first ? esc(M.fmtDate(first)) : 'the first call') + ' · every call from the Exclusive channel, prices and dates as posted' + (unposted.length ? ' · ' + unposted.length + ' called without a posted exit, listed apart and not counted' : '') + '</p>';
-      if (lead) { var ls = S(lead); html += '<a class="lead" href="#position/' + esc(String(lead.id)) + '"><span class="txt"><span class="dt">' + when(lead) + ' · ' + kindTxt(lead) + ' · ' + esc(heldTxt(lead)) + '</span><span class="hl">' + storyTitle(lead) + '</span><span class="res">' + resultHtml(lead) + (lead.exit ? ' <span class="muted">· out ' + esc(lead.exit) + '</span>' : '') + '</span>' + (ls ? '<span class="ld">' + esc(ls.lede) + '</span>' : '') + '<span class="more">Read the story →</span></span><span class="pic">' + cover(lead) + '</span></a>'; }
-      if (albumList.length) html += '<div class="sh"><h2>Albums <span class="muted">· every call by market, then by asset</span></h2></div><div class="albums">' + albumList.map(albumTile).join('') + '</div>';
-      var others = posted.filter(function(p){ return p !== lead; });
-      if (others.length) html += '<div class="sh"><h2>Closed calls <span class="muted">· newest first</span></h2></div><div class="arts">' + others.map(function(p){ return art(p); }).join('') + '</div>';
-      if (open.length) html += '<div class="sh"><h2>Open now <span class="muted">· ' + open.length + ' position' + (open.length === 1 ? '' : 's') + ' · the story so far</span></h2></div><div class="arts">' + open.map(function(p){ return art(p, 'open'); }).join('') + '</div>';
-      if (unposted.length) html += '<div class="sh"><h2>Called, exit not posted <span class="muted">· ' + unposted.length + ' · the entry was posted, the close was not — no result is claimed</span></h2></div><div class="arts sm">' + unposted.map(function(p){ return art(p, 'sm'); }).join('') + '</div>';
-    }
+    var first = closed.map(function(p){ return p.opened_at; }).filter(Boolean).sort()[0];
+    var pctOf = function(p){ var m = String(p.result || '').match(/([+\-−]?\s*\d+(?:[.,]\d+)?)\s*%/); return m ? parseFloat(m[1].replace('−', '-').replace(',', '.').replace(/\s/g, '')) : null; };
+    var best = posted.map(function(p){ return { p: p, v: pctOf(p) }; }).filter(function(x){ return x.v != null; }).sort(function(a, b){ return b.v - a.v; })[0];
+    /* markets (the albums): a tab each; "All" is the whole record */
+    var ALB = { Crypto: 'crypto', Stocks: 'stocks', Commodities: 'commodities', Indices: 'indices', FX: 'fx', Other: 'other' };
+    var byAlb = {}; closed.forEach(function(p){ var k = ALB[classOf(p)] || 'other'; (byAlb[k] = byAlb[k] || { key: k, name: classOf(p), n: 0 }).n++; });
+    var albumList = PF_ORDER.map(function(n){ return byAlb[ALB[n]]; }).filter(Boolean);
+    var album = trackAlbum && byAlb[trackAlbum] ? byAlb[trackAlbum] : null;
+    var inAlb = function(p){ return !album || (ALB[classOf(p)] || 'other') === album.key; };
+    var hit = posted.length ? Math.round(wins / posted.length * 100) : 0;
+    var sc = function(k, v, cls, sub){ return '<div class="sc"><b class="' + (cls || '') + '">' + v + '</b><span>' + k + (sub ? ' <i>' + sub + '</i>' : '') + '</span></div>'; };
+    var html = '<div class="score">' + sc('Closed calls', posted.length) + sc('Positive', wins, 'pos') + sc('Negative', losses, 'neg') + sc('Flat', flat) + sc('Hit rate', hit + '%', hit >= 50 ? 'pos' : 'neg') + (best ? sc('Best call', esc(String(best.p.result).replace(/\s*\(.*\)$/, '')), 'pos', esc(best.p.symbol)) : sc('Since', first ? esc(M.fmtDate(first)) : '—')) + '</div>'
+      + '<p class="dateline">Since ' + (first ? esc(M.fmtDate(first)) : 'the first call') + ' · every call from the Exclusive channel, prices and dates as posted · a position added to several times is one call' + (unposted.length ? ' · ' + unposted.length + ' called without a posted exit, listed apart and not counted' : '') + '</p>'
+      + '<div class="alb-tabs"><a class="chip' + (album ? '' : ' on') + '" href="#track">All <i>' + closed.length + '</i></a>' + albumList.map(function(x){ return '<a class="chip' + (album && x.key === album.key ? ' on' : '') + '" href="#track/' + x.key + '">' + esc(x.name) + ' <i>' + x.n + '</i></a>'; }).join('') + '</div>';
     $('#tk-paper').innerHTML = html;
-    $('#tk-ledger-n').textContent = '· ' + closed.length + ' closed call' + (closed.length === 1 ? '' : 's');
-    $('#tk-table').innerHTML = '<thead><tr><th>Position</th><th>Type</th><th>Side</th><th class="num">Entry</th><th class="num">Exit</th><th class="num">Result</th><th>Opened</th><th>Closed</th><th>Held</th><th></th></tr></thead><tbody>'
-      + closed.map(function(p){ var s = resultSign(p); return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + cell('Position', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + (p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + pfDraft(p), 'em') + cell('Type', pfKind(p) === 'leveraged' ? 'Trade' + (p.leverage ? ' · ' + esc(p.leverage) : '') : 'Spot', 'muted') + cell('Side', pfSideOnly(p))
-        + cell('Entry', esc(p.entry || usdPx(p.entry_price)), 'num') + cell('Exit', esc(p.exit || '—'), 'num') + cell('Result', '<b>' + esc(p.result || '—') + '</b>', 'num' + (s > 0 ? ' pos' : s < 0 ? ' neg' : '')) + cell('Opened', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Closed', esc(p.closed_at ? M.fmtDate(p.closed_at) : '—'), 'muted') + cell('Held', esc(heldTxt(p) || '—'), 'muted') + detailsCell(p) + '</tr>'; }).join('') + '</tbody>';
-    $('#tk-foot').innerHTML = wins + ' of ' + posted.length + ' closed calls with a posted exit were positive · prices and dates exactly as posted in the Exclusive channel, nothing added later · results on the price (leveraged trades: the move in the price, not the return on the margin) · "small loss" and "breakeven" as written at the time · every story opens the posts of the day, in the order they were made · not financial advice: this is what was done.';
+    /* the ledger, grouped by asset: the assets with most calls first, then the most recent */
+    var names = {}; D.list.forEach(function(p){ if (p.name && !names[p.symbol]) names[p.symbol] = p.name; });
+    var thumb = function(p){ var s = S(p); var id = s && s.cover; var src = id && postImg(id); return src ? '<span class="th"><img src="' + esc(src) + '" alt="" loading="lazy"></span>' : '<span class="th none"></span>'; };
+    var callCell = function(p){ return cell('Call', thumb(p) + '<span class="ttl"><a class="sym" href="#position/' + esc(String(p.id)) + '">' + storyTitle(p) + '</a>' + pfDraft(p) + '</span>', 'em'); };
+    var row = function(p){ var sg = resultSign(p); return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + callCell(p) + cell('Direction', pfSide(p)) + cell('Type', (pfKind(p) === 'leveraged' ? 'Trade' : 'Spot') + ' <span class="muted">· ' + esc(classOf(p)) + '</span>', 'muted')
+      + cell('Entry', esc(p.entry || usdPx(p.entry_price)), 'num') + cell('Exit', esc(p.exit || '—'), 'num') + cell('Result', '<b>' + esc(p.result || '—') + '</b>', 'num' + (sg > 0 ? ' pos' : sg < 0 ? ' neg' : '')) + cell('Opened', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted') + cell('Closed', esc(p.closed_at ? M.fmtDate(p.closed_at) : '—'), 'muted') + cell('Held', esc(heldTxt(p) || '—'), 'muted') + detailsCell(p) + '</tr>'; };
+    var head = '<thead><tr><th>Call</th><th>Direction</th><th>Type</th><th class="num">Entry</th><th class="num">Exit</th><th class="num">Result</th><th>Opened</th><th>Closed</th><th>Held</th><th></th></tr></thead>';
+    var grouped = function(list){ var by = {}; list.forEach(function(p){ (by[p.symbol] = by[p.symbol] || []).push(p); });
+      var latest = function(x){ return by[x].map(function(p){ return p.closed_at || p.opened_at || ''; }).sort().pop() || ''; };
+      var syms = Object.keys(by).sort(function(x, y){ return by[y].length - by[x].length || String(latest(y)).localeCompare(String(latest(x))); });
+      return syms.map(function(sym){ return '<tr class="grp"><td colspan="10">' + esc(names[sym] || sym) + ' <span class="muted">· ' + esc(sym) + ' · ' + by[sym].length + ' call' + (by[sym].length === 1 ? '' : 's') + '</span></td></tr>' + by[sym].map(row).join(''); }).join(''); };
+    var main = posted.filter(inAlb), rest = unposted.filter(inAlb);
+    $('#tk-table').innerHTML = head + '<tbody>' + (main.length ? grouped(main) : '<tr><td colspan="10" class="muted">Nothing closed in this market yet.</td></tr>') + '</tbody>';
+    $('#tk-noexit').hidden = !rest.length; $('#tk-noexit-n').textContent = '· ' + rest.length + ' · the entry was posted, the close was not — no result is claimed';
+    if (rest.length) $('#tk-table2').innerHTML = head + '<tbody>' + grouped(rest) + '</tbody>';
+    $('#tk-foot').innerHTML = wins + ' of ' + posted.length + ' closed calls were positive · prices and dates exactly as posted in the Exclusive channel, nothing added later · a position built in several entries counts once, at the average entry · results on the price (leveraged trades: the move in the price, not the return on the margin) · "small loss" and "breakeven" as written at the time · a row opens the story of the call with every post as it was made · not financial advice: this is what was done.';
   }
   function pfSideOnly(p){ var s = String(p.side || 'long'); var warn = s === 'short' || s === 'sell'; return '<span class="tag ' + (warn ? 'warn' : 'ok') + '">' + esc(s) + '</span>'; }
   /* a donut of weights: monochrome slices, labels outside, the biggest first */

@@ -1,0 +1,271 @@
+{
+"MSTR":{
+"name":"Strategy",
+"kind":"company",
+"site":"https://www.strategy.com",
+"desc":"Strategy (formerly MicroStrategy) is the largest corporate holder of Bitcoin, funding its purchases through equity and convertible debt, with an enterprise analytics software business alongside. Led by executive chairman Michael Saylor.",
+"sector":"Bitcoin treasury · software",
+"exchange":"Nasdaq",
+"hq":"Tysons Corner, Virginia",
+"founded":1989,
+"shares":0.3
+},
+"PLTR":{
+"name":"Palantir Technologies",
+"kind":"company",
+"site":"https://www.palantir.com",
+"desc":"Palantir builds data and AI platforms — Gotham for governments and defence, Foundry for enterprises, and AIP for deploying large language models on operational data.",
+"sector":"Software · AI",
+"exchange":"Nasdaq",
+"hq":"Denver, Colorado",
+"founded":2003,
+"shares":2.4
+},
+"MSFT":{
+"name":"Microsoft",
+"kind":"company",
+"site":"https://www.microsoft.com",
+"desc":"Microsoft runs Windows, Office and the Azure cloud, and is the largest backer of OpenAI. Cloud and AI infrastructure are the growth engine; Office and Windows the cash machine.",
+"sector":"Software · cloud",
+"exchange":"Nasdaq",
+"hq":"Redmond, Washington",
+"founded":1975,
+"shares":7.43
+},
+"COIN":{
+"name":"Coinbase",
+"kind":"company",
+"site":"https://www.coinbase.com",
+"desc":"Coinbase is the largest crypto exchange in the United States and the custodian behind most US spot Bitcoin ETFs. Revenue follows trading volumes, with staking, custody and the USDC partnership as steadier income.",
+"sector":"Crypto exchange",
+"exchange":"Nasdaq",
+"hq":"Remote-first (United States)",
+"founded":2012,
+"shares":0.255
+},
+"TSM":{
+"name":"Taiwan Semiconductor",
+"kind":"company",
+"site":"https://www.tsmc.com",
+"desc":"TSMC manufactures the most advanced chips in the world for Nvidia, Apple, AMD and nearly every other designer. It is the one company every AI data centre depends on.",
+"sector":"Semiconductors",
+"exchange":"NYSE (ADR)",
+"hq":"Hsinchu, Taiwan",
+"founded":1987,
+"shares":5.19
+},
+"SNDK":{
+"name":"Sandisk",
+"kind":"company",
+"site":"https://www.sandisk.com",
+"desc":"Sandisk makes NAND flash memory and storage — SSDs, memory cards, enterprise flash — spun out of Western Digital in 2025 as an independent company just as AI demand tightened the memory market.",
+"sector":"Memory · storage",
+"exchange":"Nasdaq",
+"hq":"Milpitas, California",
+"founded":2025,
+"shares":0.146
+},
+"MU":{
+"name":"Micron Technology",
+"kind":"company",
+"site":"https://www.micron.com",
+"desc":"Micron is one of three companies in the world making DRAM, and a leader in high-bandwidth memory (HBM) for AI accelerators. Memory prices drive the cycle; AI drives the demand.",
+"sector":"Memory · semiconductors",
+"exchange":"Nasdaq",
+"hq":"Boise, Idaho",
+"founded":1978,
+"shares":1.12
+},
+"ASST":{
+"name":"Strive",
+"kind":"company",
+"site":"https://www.strive.com",
+"desc":"Strive is a Bitcoin treasury company and asset manager co-founded by Vivek Ramaswamy, listed through its 2025 merger with Asset Entities. Its stated plan is to accumulate Bitcoin per share through acquisitions and capital raises.",
+"sector":"Bitcoin treasury · asset management",
+"exchange":"Nasdaq",
+"hq":"Dallas, Texas",
+"founded":2022
+},
+"NVDA":{
+"name":"Nvidia",
+"kind":"company",
+"site":"https://www.nvidia.com",
+"desc":"Nvidia designs the GPUs that train and run nearly every large AI model, along with the networking and software (CUDA) around them. The most valuable company in the AI build-out.",
+"sector":"Semiconductors · AI",
+"exchange":"Nasdaq",
+"hq":"Santa Clara, California",
+"founded":1993,
+"shares":24.4
+},
+"TSLA":{
+"name":"Tesla",
+"kind":"company",
+"site":"https://www.tesla.com",
+"desc":"Tesla makes electric vehicles and energy storage, and is betting its valuation on autonomy — robotaxis and the Optimus robot — under Elon Musk.",
+"sector":"Automotive · energy",
+"exchange":"Nasdaq",
+"hq":"Austin, Texas",
+"founded":2003,
+"shares":3.22
+},
+"META":{
+"name":"Meta Platforms",
+"kind":"company",
+"site":"https://www.meta.com",
+"desc":"Meta owns Facebook, Instagram, WhatsApp and Threads, funded by the largest advertising business after Google, and spends tens of billions a year on AI infrastructure and the Llama models.",
+"sector":"Internet · advertising",
+"exchange":"Nasdaq",
+"hq":"Menlo Park, California",
+"founded":2004,
+"shares":2.52
+},
+"INTC":{
+"name":"Intel",
+"kind":"company",
+"site":"https://www.intel.com",
+"desc":"Intel designs and manufactures x86 processors and is trying to rebuild its foundry business to make chips for others, with the US government as a shareholder since 2025.",
+"sector":"Semiconductors",
+"exchange":"Nasdaq",
+"hq":"Santa Clara, California",
+"founded":1968,
+"shares":4.5
+},
+"AMD":{
+"name":"Advanced Micro Devices",
+"kind":"company",
+"site":"https://www.amd.com",
+"desc":"AMD makes CPUs and GPUs for PCs, servers and AI data centres, the main challenger to Intel in processors and to Nvidia in accelerators.",
+"sector":"Semiconductors",
+"exchange":"Nasdaq",
+"hq":"Santa Clara, California",
+"founded":1969,
+"shares":1.62
+},
+"ORCL":{
+"name":"Oracle",
+"kind":"company",
+"site":"https://www.oracle.com",
+"desc":"Oracle sells databases and enterprise software and has become a major builder of AI data-centre capacity, with OpenAI among its largest cloud customers.",
+"sector":"Software · cloud",
+"exchange":"NYSE",
+"hq":"Austin, Texas",
+"founded":1977,
+"shares":2.81
+},
+"BTC":{
+"name":"Bitcoin",
+"kind":"crypto",
+"site":"https://bitcoin.org",
+"desc":"Bitcoin is the first and largest cryptocurrency: a fixed supply of 21 million coins, secured by proof-of-work mining, with no issuer. It trades 24/7 and is held by ETFs, companies and sovereigns.",
+"sector":"Crypto · store of value",
+"founded":2009,
+"supply":19.9,
+"unit":"BTC"
+},
+"ETH":{
+"name":"Ethereum",
+"kind":"crypto",
+"site":"https://ethereum.org",
+"desc":"Ethereum is the largest smart-contract blockchain, the base layer for stablecoins, DeFi and most tokenised assets, secured by proof-of-stake since 2022.",
+"sector":"Crypto · smart contracts",
+"founded":2015,
+"supply":120.7,
+"unit":"ETH"
+},
+"XRP":{
+"name":"XRP",
+"kind":"crypto",
+"site":"https://xrpl.org",
+"desc":"XRP is the native asset of the XRP Ledger, built for fast, cheap settlement and promoted by Ripple for cross-border payments.",
+"sector":"Crypto · payments",
+"founded":2012,
+"supply":59000,
+"unit":"XRP"
+},
+"LINK":{
+"name":"Chainlink",
+"kind":"crypto",
+"site":"https://chain.link",
+"desc":"Chainlink runs the oracle networks that feed prices and real-world data into blockchains, and the CCIP standard for moving assets between chains, used by DeFi and banks.",
+"sector":"Crypto · oracles",
+"founded":2017,
+"supply":680,
+"unit":"LINK"
+},
+"BNB":{
+"name":"BNB",
+"kind":"crypto",
+"site":"https://www.bnbchain.org",
+"desc":"BNB is the token of the BNB Chain and of Binance, the largest crypto exchange, used for fees, staking and the ecosystem around the exchange.",
+"sector":"Crypto · exchange chain",
+"founded":2017,
+"supply":139,
+"unit":"BNB"
+},
+"SOL":{
+"name":"Solana",
+"kind":"crypto",
+"site":"https://solana.com",
+"desc":"Solana is a high-throughput blockchain built for fast, cheap transactions, home to much of the retail trading, memecoin and consumer-app activity in crypto.",
+"sector":"Crypto · smart contracts",
+"founded":2020,
+"supply":560,
+"unit":"SOL"
+},
+"ASTER":{
+"name":"Aster",
+"kind":"crypto",
+"site":"https://www.asterdex.com",
+"desc":"Aster is a decentralised perpetuals exchange, launched in September 2025 with backing associated with the Binance ecosystem, competing with Hyperliquid for on-chain derivatives volume.",
+"sector":"Crypto · perpetuals DEX",
+"founded":2025
+},
+"XPL":{
+"name":"Plasma",
+"kind":"crypto",
+"site":"https://www.plasma.to",
+"desc":"Plasma is a layer-1 blockchain built for stablecoin payments, with zero-fee USDT transfers, launched in September 2025.",
+"sector":"Crypto · stablecoin chain",
+"founded":2025
+},
+"OIL":{
+"name":"WTI crude oil",
+"kind":"commodity",
+"site":"https://www.cmegroup.com/markets/energy/crude-oil/light-sweet-crude.html",
+"desc":"West Texas Intermediate is the US benchmark for crude oil, priced per barrel at Cushing, Oklahoma, and traded as futures on the CME. It moves on OPEC+ supply, US shale output, inventories and geopolitics.",
+"sector":"Energy",
+"exchange":"NYMEX (CME)"
+},
+"SILVER":{
+"name":"Silver",
+"kind":"commodity",
+"site":"https://www.cmegroup.com/markets/metals/precious/silver.html",
+"desc":"Silver is both a precious metal and an industrial one — solar panels, electronics — so it trades with gold and with the industrial cycle, with a smaller, more volatile market.",
+"sector":"Precious metals",
+"exchange":"COMEX (CME)"
+},
+"SPX":{
+"name":"S&P 500",
+"kind":"index",
+"site":"https://www.spglobal.com/spdji/en/indices/equity/sp-500/",
+"desc":"The S&P 500 tracks the 500 largest listed companies in the United States, weighted by market value — the benchmark for the US stock market.",
+"sector":"US equities",
+"founded":1957
+},
+"NDX":{
+"name":"Nasdaq 100",
+"kind":"index",
+"site":"https://www.nasdaq.com/solutions/nasdaq-100",
+"desc":"The Nasdaq 100 holds the 100 largest non-financial companies on the Nasdaq exchange, dominated by the big technology names.",
+"sector":"US technology equities",
+"founded":1985
+},
+"NI225":{
+"name":"Nikkei 225",
+"kind":"index",
+"site":"https://indexes.nikkei.co.jp/en/nkave",
+"desc":"The Nikkei 225 is Japan's best-known stock index: 225 large companies on the Tokyo Stock Exchange, price-weighted, published by the Nikkei newspaper since 1950.",
+"sector":"Japanese equities",
+"founded":1950
+}
+}

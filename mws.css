@@ -808,8 +808,6 @@ body.app #pf-rng{margin-top:6px}
 @media (max-width:760px){#tk-table td.em,#tk-table2 td.em{display:flex;align-items:center;gap:0}#tk-table .ttl,#tk-table2 .ttl{max-width:none;font-size:15px}}
 .paper .score .sc span i{font-style:normal;color:var(--fg-2);letter-spacing:0;text-transform:none;margin-left:4px}
 .paper .alb-tabs{margin:0 0 18px}
-/* the last price carries the colour of its last move (green up, red down), like an exchange; nothing flashes */
-.pf-tbl td.px-up{color:var(--good)}.pf-tbl td.px-dn{color:var(--bad)}
 /* the position page · About the asset */
 #pos-page .about{margin:30px 0 0;padding:22px 0 0;border-top:1px solid var(--line)}
 #pos-page .about h2.k{margin:0 0 14px}

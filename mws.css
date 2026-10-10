@@ -1020,7 +1020,8 @@ body.app #pf-rng{margin-top:6px}
 .er-col.tba .er-co{width:auto;min-width:72px}
 .er-co{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:10px 4px 9px;font:inherit;color:var(--fg);cursor:pointer;min-width:0;width:100%}
 .er-co:hover,.er-co:focus-visible{background:var(--bg-2);outline:none}
-.er-co .sym{font-weight:500;font-size:12.5px;letter-spacing:.03em;font-family:var(--mono);max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.er-co .sym{font-weight:700;font-size:12.5px;letter-spacing:.03em;font-family:var(--mono);max-width:100%;overflow:hidden;text-overflow:ellipsis;color:var(--fg)}
+.er-co .mkt{font-size:10.5px;color:var(--fg-3);margin-top:-3px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .er-co.mine .clogo{box-shadow:0 0 0 2px var(--fg)}
 .er-co .beat{font-size:9px;padding:2px 5px}
 .er-day.past .er-co:not(.out){opacity:.6}
@@ -1034,6 +1035,7 @@ body.app #pf-rng{margin-top:6px}
 .er-tbl th.s{cursor:pointer;user-select:none}.er-tbl th.s:hover{color:var(--fg)}.er-tbl th.on{color:var(--fg)}.er-tbl th i{font-style:normal;color:var(--fg-3)}
 .er-tbl tr.clk-er{cursor:pointer}.er-tbl tr.clk-er:hover td{background:var(--bg-2)}
 .er-tbl td.c-co{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.er-tbl td.c-mkt{white-space:nowrap}
 .er-tbl td.em{min-width:0}
 @media (min-width:761px){
   .er-tbl th,.er-tbl td{padding-left:7px;padding-right:7px}

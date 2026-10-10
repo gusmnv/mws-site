@@ -841,6 +841,21 @@ body.app #pf-rng{margin-top:6px}
   .pf-tbl th.num,.pf-tbl td.num{min-width:110px}
   .pf-tbl td{vertical-align:middle}
 }
+/* the tables of the desk, the way charts set type: the data in white, regular; the column titles and the tickers in white, bold; every column starts at the left;
+   the price sits on the row's line like every other value, and "market closed" hangs under it as a note */
+.pf-tbl th,.er-tbl th,#pf-ord th{font-family:var(--sans);font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--fg);font-weight:700;text-align:left}
+.pf-tbl th.num,.pf-tbl td.num,.er-tbl th.num,.er-tbl td.num,#pf-ord th.num,#pf-ord td.num{text-align:left}
+.pf-tbl td,.er-tbl td,#pf-ord td{color:var(--fg)}
+.pf-tbl td.muted,.pf-tbl td.c-cap,.pf-tbl td .nm,.er-tbl td.muted,.pf-tbl td.c-type{color:var(--fg)}
+.pf-tbl td.nm2,.pf-tbl td.nm2 .co-btn{color:var(--fg)}
+.pf-tbl td a.sym,.er-tbl td.c-tk .sym{font-weight:700;color:var(--fg)}
+.pf-tbl th i,.er-tbl th i{color:var(--fg-3);font-weight:400}
+@media (min-width:761px){
+  .pf-tbl td,#pf-ord td{height:64px;box-sizing:border-box;padding-top:0;padding-bottom:0;vertical-align:middle}
+  .pf-tbl td.px,#pf-ord td.px{position:relative}
+  .pf-tbl td.px .sub,#pf-ord td.px .sub{position:absolute;left:8px;right:8px;top:calc(50% + 9px);margin:0;text-align:left;font-size:11.5px;line-height:1.2;color:var(--fg-3)}
+  .pf-tbl td.px .sub.ph{display:none}
+}
 /* laptops (1401 to 1499 px): the same nine columns, a little tighter, so the list never scrolls sideways beside the sidebar */
 @media (min-width:761px) and (max-width:1499px){
   .pf-tbl th.c-type,.pf-tbl td.c-type{width:108px;min-width:108px}
@@ -1047,7 +1062,7 @@ body.app #pf-rng{margin-top:6px}
 /* the price with its day change beside it */
 .pt td.px i.chg,#pos-page .facts b i.chg{font-style:normal;font-size:12.5px;margin-left:6px;font-variant-numeric:tabular-nums}
 .pt td.px i.chg.pos,#pos-page .facts b i.chg.pos{color:var(--good)}.pt td.px i.chg.neg,#pos-page .facts b i.chg.neg{color:var(--bad)}
-.pf-tbl td.c-cap{color:var(--fg-3)}
+.pf-tbl td.c-cap{color:var(--fg)}
 
 /* the caption under a post: date · time · price (one grey), the source; stacked on the phone */
 #pos-page .post figcaption .px{font-weight:400;white-space:nowrap}

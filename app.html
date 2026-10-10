@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=ba0cfa33">
+<link rel="stylesheet" href="/mws.css?v=bb35496f">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=ba0cfa33"></script>
+<script src="/mws.js?v=bb35496f"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -854,14 +854,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function dayTitle(key){ var t = new Date(key + 'T12:00:00'); var today = dayKey(Date.now()), tom = dayKey(Date.now() + 864e5); var lbl = t.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' }); return key === today ? 'Today <span class="muted">· ' + lbl + '</span>' : key === tom ? 'Tomorrow <span class="muted">· ' + lbl + '</span>' : lbl; }
   function fmtV(v, unit){ if (v == null) return '—'; v = Number(v); var a = Math.abs(v), s; if (a >= 1e12) s = (v / 1e12).toFixed(2) + 'T'; else if (a >= 1e9) s = (v / 1e9).toFixed(2) + 'B'; else if (a >= 1e6) s = (v / 1e6).toFixed(1) + 'M'; else if (a >= 1e4) s = (v / 1e3).toFixed(0) + 'K'; else s = v.toLocaleString('en-US', { minimumFractionDigits: unit === '%' ? 1 : 0, maximumFractionDigits: 2 }); return s + (unit === '%' ? '%' : ''); }
   function countdown(ms){ if (ms <= 0) return 'now'; var m = Math.round(ms / 60000); if (m < 60) return 'in ' + m + ' min'; var h = Math.floor(m / 60); if (h < 24) return 'in ' + h + ' h ' + String(m % 60).padStart(2, '0') + ' min'; var d = Math.floor(h / 24); return 'in ' + d + ' day' + (d === 1 ? '' : 's'); }
+  /* PostgREST answers at most 1 000 rows a call: the calendar and the company list are read in pages */
+  function fetchAll(mk){ var out = []; function step(i){ return mk().range(i, i + 999).then(function(r){ if (r.error) throw r.error; out = out.concat(r.data || []); return (r.data || []).length === 1000 && i < 20000 ? step(i + 1000) : out; }); } return step(0); }
   async function loadCalendar(){
     if (!(access && access.valid)) { events = events || []; earnings = earnings || []; return; }
     var from = new Date(Date.now() - 9 * 864e5).toISOString(), to = new Date(Date.now() + 16 * 864e5).toISOString(), hist0 = new Date(Date.now() - 75 * 864e5).toISOString();
     /* the window members browse, plus the last prints of the important series (for the "last 3" line) */
     try { var ev = await sb.from('calendar_events').select('*').gte('at', hist0).lte('at', to).or('importance.gte.3,at.gte.' + from).order('at').limit(1000); events = ev.error ? [] : (ev.data || []); } catch (e) { events = []; }
-    try { var d0 = dayKey(Date.now() - 29 * 864e5), d1 = dayKey(Date.now() + 43 * 864e5); var er = await sb.from('earnings').select('*').gte('day', d0).lte('day', d1).order('day').limit(10000); earnings = er.error ? [] : (er.data || []); } catch (e) { earnings = []; }
+    try { var d0 = dayKey(Date.now() - 29 * 864e5), d1 = dayKey(Date.now() + 43 * 864e5); earnings = await fetchAll(function(){ return sb.from('earnings').select('*').gte('day', d0).lte('day', d1).order('day').order('symbol'); }); } catch (e) { earnings = []; }
     /* every company above $10B: name, market cap, logo (the page filters at $40B); the full record (last quarters, highlights) only for the book, the rest on demand */
-    try { var em = await sb.from('earnings_history').select('symbol,name,market_cap,logo,next_report,primary:data->>primary').gte('market_cap', 10e9).limit(6000); erMeta = {}; (em.data || []).forEach(function(r){ erMeta[String(r.symbol).toUpperCase()] = r; }); } catch (e) { erMeta = {}; }
+    try { var em = await fetchAll(function(){ return sb.from('earnings_history').select('symbol,name,market_cap,logo,next_report,primary:data->>primary').gte('market_cap', 10e9).is('data->>stub', null).order('market_cap', { ascending: false }); }); erMeta = {}; em.forEach(function(r){ erMeta[String(r.symbol).toUpperCase()] = r; }); } catch (e) { erMeta = {}; }
     try { var bookSyms = Object.keys(erBookMap()); var eh = await sb.from('earnings_history').select('*').in('symbol', bookSyms.length ? bookSyms : ['-']); (eh.data || []).forEach(function(r){ erHist[String(r.symbol).toUpperCase()] = r.data || {}; }); } catch (e) { }
   }
   function renderCalendar(){

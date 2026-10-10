@@ -969,6 +969,8 @@ body.app #pf-rng{margin-top:6px}
 .er-bar .er-nav button:hover:not(:disabled){background:var(--bg-2);color:var(--fg)}
 .er-bar .er-nav button:disabled{color:var(--fg-3);cursor:default;opacity:.5}
 .er-bar .er-nav .lbl{font-weight:500;color:var(--fg);min-width:170px;text-align:center}
+.er-bar .er-nav .t{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+@media (max-width:760px){.er-bar .er-nav .t{display:none}}
 .er-bar .er-nav .lbl .muted{font-weight:400;color:var(--fg-3)}
 .er-bar .er-right{display:inline-flex;gap:10px;margin-left:auto}
 .er-bar .er-find{margin-left:0;flex:1 1 180px;max-width:260px}

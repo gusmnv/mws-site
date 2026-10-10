@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=31f83be6">
+<link rel="stylesheet" href="/mws.css?v=851e9a71">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=31f83be6"></script>
+<script src="/mws.js?v=851e9a71"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -184,7 +184,7 @@
         <div id="er-live" hidden>
           <div id="er-book" class="rv"></div>
           <div class="fbar rv d1 er-bar" id="er-bar">
-            <span class="er-nav" id="er-wk"><button type="button" data-v="-1" title="Previous week" aria-label="Previous week">‹</button><button type="button" data-v="0" class="lbl" id="er-wk-lbl">This week</button><button type="button" data-v="1" title="Next week" aria-label="Next week">›</button></span>
+            <span class="er-nav" id="er-wk"><button type="button" data-v="-1" title="Previous week" aria-label="Previous week">‹ <span class="t">Prev week</span></button><button type="button" data-v="0" class="lbl" id="er-wk-lbl">This week</button><button type="button" data-v="1" title="Next week" aria-label="Next week"><span class="t">Next week</span> ›</button></span>
             <span class="chips" id="er-scope"><button type="button" data-v="all" class="on" title="Companies worth $40B or more, and ours">$40B and up</button><button type="button" data-v="book">Our book only</button></span>
             <span class="chips" id="er-reg" hidden><button type="button" data-v="all" class="on">All markets</button><button type="button" data-v="US">US</button><button type="button" data-v="EU">Europe</button><button type="button" data-v="AS">Asia</button></span>
             <span class="er-right"><span class="chips" id="er-view"><button type="button" data-v="board" class="on" title="The week, day by day">Board</button><button type="button" data-v="table" title="One line per company">Table</button></span><span class="chips" id="er-n" title="How many companies, the biggest first"><button type="button" data-v="25" class="on">25</button><button type="button" data-v="50">50</button><button type="button" data-v="0">All</button></span></span>
@@ -923,7 +923,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#er-wk-lbl').innerHTML = (erF.wk === 0 ? 'This week' : erF.wk === 1 ? 'Next week' : erF.wk === -1 ? 'Last week' : 'In ' + erF.wk + ' weeks') + (wkLbl && !q ? ' <span class="muted">· ' + wkLbl + '</span>' : ''); $('#er-wk-lbl').title = erF.wk ? 'Back to this week' : '';
     M.$$('#er-wk button').forEach(function(b){ if (b.dataset.v === '-1') b.disabled = erF.wk <= ER_WK_MIN; if (b.dataset.v === '1') b.disabled = erF.wk >= ER_WK_MAX; });
     M.$$('#er-view button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === erF.view); }); M.$$('#er-n button').forEach(function(b){ b.classList.toggle('on', Number(b.dataset.v) === erF.n); });
-    var seen = {}, rows = list.filter(function(e){ if (days.indexOf(e.day) < 0 || !pass(e)) return false; var k = String(e.symbol).toUpperCase() + '|' + e.day; if (seen[k]) return false; seen[k] = 1; return true; });
+    var seen = {}, rows = []; list.forEach(function(e){ if (days.indexOf(e.day) < 0 || !pass(e)) return; var k = String(e.symbol).toUpperCase() + '|' + e.day, i = seen[k]; if (i == null) { seen[k] = rows.length; rows.push(e); } else if ((e.eps_actual != null && rows[i].eps_actual == null) || (rows[i].eps_estimate == null && e.eps_estimate != null)) rows[i] = e; }); /* two feeds, one line: the one with the figures */
     var byCap = function(a, b){ return (capOf(b) || 0) - (capOf(a) || 0) || (isBook(b) ? 1 : 0) - (isBook(a) ? 1 : 0) || a.symbol.localeCompare(b.symbol); };
     rows.sort(byCap); var total = rows.length; if (erF.n && !q && rows.length > erF.n) rows = rows.slice(0, erF.n);
     var logoHtml = function(S){ var m = ME[S]; return '<span class="clogo' + (m && m.logo ? '' : ' x') + '">' + (m && m.logo ? '<img src="' + LOGOS + encodeURIComponent(S) + '.png" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'x\')">' : '') + '<i>' + esc(S.replace(/[.-].*$/, '').slice(0, 4)) + '</i></span>'; };

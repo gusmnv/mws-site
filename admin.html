@@ -170,8 +170,9 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <a href="#telegram" data-v="telegram"><i>07</i>Telegram</a>
       <div class="grp">Manage</div>
       <a href="#access" data-v="access"><i>08</i>Grant access</a>
-      <a href="#positions" data-v="positions"><i>09</i>Positions</a>
-      <a href="#settings" data-v="settings"><i>10</i>Settings</a>
+      <a href="#guests" data-v="guests"><i>09</i>Guests <span class="nn" id="nav-guests" hidden>0</span></a>
+      <a href="#positions" data-v="positions"><i>10</i>Positions</a>
+      <a href="#settings" data-v="settings"><i>11</i>Settings</a>
       <a href="/app" class="mob-ma"><i>→</i>Member area</a>
     </nav>
     <div class="me"><span>Signed in as</span><b id="me-email">…</b><a class="btn sm ghost ma" href="/app">Member area <span class="ar"></span></a><button class="link" id="out" type="button">Log out</button></div>
@@ -253,6 +254,20 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
         </form>
       </div>
       <div class="card rv d1" style="margin-top:22px"><h3>Manual access</h3><div class="tblw"><table class="tbl"><thead><tr><th>Member</th><th>Plan</th><th>Status</th><th>Ends</th><th>Note</th><th></th></tr></thead><tbody id="mrows"></tbody></table></div></div>
+    </section>
+
+    <!-- GUESTS: friends and colleagues with free access, by name -->
+    <section class="view" data-v="guests">
+      <div class="card rv"><h3>Guests · friends and colleagues</h3><p class="small muted" style="margin-bottom:16px">Free access, no end date, no billing. Put the name so you know who is who. If they already have an account with this e-mail, access is live now; otherwise it activates the moment they create their account with it (tick the box and the invitation goes out by e-mail). Remove takes the access away the same minute.</p>
+        <form class="grant" id="f-guest" novalidate style="grid-template-columns:minmax(0,1.3fr) minmax(0,1.6fr) minmax(0,1.6fr) auto">
+          <div class="field"><label for="gu-name">Name</label><input id="gu-name" type="text" placeholder="João Silva" autocomplete="off" maxlength="80"></div>
+          <div class="field"><label for="gu-email">Email</label><input id="gu-email" type="email" placeholder="joao@email.com" autocomplete="off"></div>
+          <div class="field"><label for="gu-note">Who · note (optional)</label><input id="gu-note" type="text" placeholder="colleague at the bank · friend from Porto" maxlength="200"></div>
+          <label class="chk" for="gu-invite"><input id="gu-invite" type="checkbox" checked> Email the invitation now (if they have no account yet)</label>
+          <button class="btn acc" type="submit" data-busy="Adding">Add guest <span class="ar"></span></button>
+        </form>
+      </div>
+      <div class="card rv d1" style="margin-top:22px"><h3>Guest list <span class="small muted" id="gu-count"></span></h3><div class="tblw"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Account</th><th>Telegram</th><th>Since</th><th>Note</th><th></th></tr></thead><tbody id="grows"></tbody></table></div></div>
     </section>
 
     <!-- PORTFOLIO: one list — spot positions, leveraged trades, resting orders (members: Portfolio → Active Positions; closed ones: Track Record) -->
@@ -639,7 +654,16 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var sh = $('#chans-show'); if (sh) sh.addEventListener('click', function(){ showHidden = !showHidden; render(); });
 
     // access (manual)
-    var man = D.memberships.filter(function(m){ return m.id.indexOf('manual_') === 0; });
+    var isGuest = function(m){ return m.id.indexOf('manual_') === 0 && m.metadata && m.metadata.source === 'guest'; };
+    var man = D.memberships.filter(function(m){ return m.id.indexOf('manual_') === 0 && !isGuest(m); });
+    // guests: friends and colleagues, by name
+    var guests = D.memberships.filter(isGuest).sort(function(a, b){ return (valid(b) ? 1 : 0) - (valid(a) ? 1 : 0) || String((a.metadata && a.metadata.name) || '').localeCompare(String((b.metadata && b.metadata.name) || '')); });
+    var liveGuests = guests.filter(valid); $('#gu-count').textContent = liveGuests.length ? '· ' + liveGuests.length + ' with access' : ''; var ng = $('#nav-guests'); ng.textContent = String(liveGuests.length); ng.hidden = !liveGuests.length;
+    var gProf = {}; D.profiles.forEach(function(p){ gProf[String(p.email).toLowerCase()] = p; }); var gLink = {}; D.links.forEach(function(l){ gLink[l.user_id] = l; }); var gAcc = {}; D.access.forEach(function(a){ (gAcc[a.user_id] = gAcc[a.user_id] || []).push(a); });
+    $('#grows').innerHTML = guests.map(function(m){ var pr = gProf[String(m.email).toLowerCase()] || null, e = { profile: pr, link: pr ? gLink[pr.id] : null, acc: pr ? (gAcc[pr.id] || []) : [] }, inv = D.invited && D.invited[m.email];
+      var acct = e.profile ? ((inv && !inv.accepted) ? tag('warn', 'invited') : D.unconf[m.email] ? tag('warn', 'not confirmed') : tag('ok', 'on site')) : (inv ? tag('warn', 'invited · no account yet') : tag('', 'no account yet'));
+      var joined = (e.acc || []).filter(function(a){ return a.status === 'joined'; }).length, tg = e.link ? tag('ok', '@' + X(e.link.telegram_username || e.link.telegram_id)) + ' <span class="small muted">' + joined + ' ch</span>' : '<span class="muted">–</span>';
+      return '<tr' + (valid(m) ? '' : ' style="opacity:.55"') + '><td><b style="font-weight:500">' + X((m.metadata && m.metadata.name) || '–') + '</b>' + (valid(m) ? '' : ' ' + tag('bad', 'removed')) + '</td><td class="em">' + X(m.email) + '</td><td>' + acct + '</td><td>' + tg + '</td><td>' + M.fmtDate((m.metadata && m.metadata.since) || m.created_at) + '</td><td class="small muted">' + X((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? (!e.profile ? '<button class="link" data-a="invite" data-email="' + X(m.email) + '">Send invite</button> ' : '') + '<button class="link bad" data-a="revoke" data-id="' + X(m.id) + '">Remove</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="7" class="muted">No guests yet. Add a friend or a colleague above.</td></tr>';
     $('#mrows').innerHTML = man.map(function(m){ return '<tr><td class="em">' + X(m.email) + '</td><td>' + X(m.plan_key) + '</td><td>' + (valid(m) ? tag('ok', 'active') : tag('bad', m.status === 'active' ? 'expired' : m.status)) + '</td><td>' + (m.plan_key === 'lifetime' ? 'Never' : M.fmtDate(m.renewal_period_end)) + '</td><td class="small muted">' + X((m.metadata && m.metadata.note) || '') + '</td><td><div class="act">' + (valid(m) ? '<button class="link bad" data-a="revoke" data-id="' + X(m.id) + '">Revoke</button>' : '') + '</div></td></tr>'; }).join('') || '<tr><td colspan="6" class="muted">No manual access yet.</td></tr>';
 
     // settings
@@ -692,7 +716,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   async function fnForce(body){ try { return await M.fn('admin', body); } catch (e) { var t = String(e && e.message || ''); if (/waiting to be bound/.test(t) && confirm(t + '\n\nContinue anyway?')) return await M.fn('admin', Object.assign({}, body, { force: true })); throw e; } }
   async function act(a, body, btn){
     if (a === 'kick' && !confirm('Remove this member from every Telegram channel? Automatic invites stay paused until you resend them.')) return;
-    if (a === 'revoke' && !confirm('Revoke this manual access?')) return;
+    if (a === 'revoke' && !confirm('Remove this access? They lose the site and the Telegram channels the same minute.')) return;
     if (a === 'confirm_account' && !confirm('Confirm this account without the e-mail code? Only when the member proved the address is theirs (wrote to you from it, or from the Whop account that paid).')) return;
     if (a === 'temp_password') { if (!confirm('Set a temporary password for this member? You send it to them yourself (Telegram, Whop chat). It works for one login: the site then makes them choose their own password. Only for a member who contacted you.')) return; if (btn) M.busy(btn, true); M.msg('#m', ''); try { var tr = await fnForce({ action: 'temp_password', user_id: body.user_id }); var tbox = $('#d-link'); tbox.hidden = false; var txt = 'Log in at https://mrofwallstreet.com/login\nE-mail: ' + tr.email + '\nTemporary password: ' + tr.password + '\nThe site asks you to choose your own password right after.'; tbox.innerHTML = '<p class="small muted" style="margin-top:10px">Send this to the member. The password works for one login, then they choose their own:</p><textarea class="ta" readonly style="min-height:96px;font-family:var(--mono);font-size:12px">' + X(txt) + '</textarea><div class="row" style="margin-top:8px"><button class="btn sm ghost" type="button" id="d-copy">Copy</button><span class="small muted">for ' + X(tr.email) + '</span></div>'; $('#d-copy').addEventListener('click', function(){ navigator.clipboard.writeText(txt).then(function(){ M.msg('#m', 'Copied.', 'ok'); }); }); } catch (e) { M.msg('#m', M.human(e), 'bad'); } if (btn) M.busy(btn, false); return; }
     if (a === 'login_link') { if (!confirm('Make a one-time login link for this member? Send it to them yourself (Telegram, Whop chat): it opens the site, asks for a new password and logs them in. Works once, for 24 hours. Only for a member who contacted you.')) return; if (btn) M.busy(btn, true); M.msg('#m', ''); try { var lr = await fnForce({ action: 'login_link', user_id: body.user_id }); var box = $('#d-link'); box.hidden = false; box.innerHTML = '<p class="small muted" style="margin-top:10px">Send this to the member (works once, 24 h). It confirms their e-mail and lets them set a password:</p><textarea class="ta" readonly style="min-height:72px;font-family:var(--mono);font-size:12px">' + X(lr.link) + '</textarea><div class="row" style="margin-top:8px"><button class="btn sm ghost" type="button" id="d-copy">Copy link</button><span class="small muted">for ' + X(lr.email) + '</span></div>'; $('#d-copy').addEventListener('click', function(){ try { navigator.clipboard.writeText(lr.link); M.msg('#m', 'Link copied.', 'ok'); } catch (e) { box.querySelector('textarea').select(); } }); } catch (e) { M.msg('#m', M.human(e), 'bad'); } finally { if (btn) M.busy(btn, false); } return; }
@@ -768,6 +792,17 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: plan, months: months, note: note, paid_on: paid });
       var invited = false; if (!r.user_exists && $('#g-invite').checked) { try { var iv = await M.fn('admin', { action: 'invite', emails: [email] }); invited = (iv.sent || []).indexOf(email) >= 0; } catch (e2) { invited = false; } }
       M.msg('#m', 'Access granted to ' + email + (r.user_exists ? ' — live now.' : invited ? ' — invitation emailed; access is live the moment they choose a password.' : ' — activates when they create their account with this email.'), 'ok'); $('#g-email').value = ''; $('#g-note').value = ''; $('#g-months').value = ''; $('#g-paid').value = ''; await load(); }
+    catch (e) { M.msg('#m', M.human(e), 'bad'); }
+    finally { M.busy(btn, false); }
+  });
+  $('#f-guest').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var name = $('#gu-name').value.trim().replace(/\s+/g, ' '), email = $('#gu-email').value.trim().toLowerCase(), note = $('#gu-note').value.trim();
+    if (name.length < 2) return M.msg('#m', 'Put the guest\'s name.', 'bad'); if (!M.validEmail(email)) return M.msg('#m', 'Enter a valid email.', 'bad');
+    var btn = $('#f-guest .btn'); M.busy(btn, true); M.msg('#m', '');
+    try { var r = await M.fn('admin', { action: 'grant', email: email, plan_key: 'guest', name: name, note: note });
+      var invited = false; if (!r.user_exists && $('#gu-invite').checked) { try { var iv = await M.fn('admin', { action: 'invite', emails: [email] }); invited = (iv.sent || []).indexOf(email) >= 0; } catch (e2) { invited = false; } }
+      M.msg('#m', (r.renamed ? name + ' updated' : name + ' added as a guest') + (r.user_exists ? ' — access is live now.' : invited ? ' — invitation emailed; access is live the moment they choose a password.' : ' — activates when they create their account with ' + email + '.'), 'ok'); $('#gu-name').value = ''; $('#gu-email').value = ''; $('#gu-note').value = ''; await load(); }
     catch (e) { M.msg('#m', M.human(e), 'bad'); }
     finally { M.busy(btn, false); }
   });
@@ -977,7 +1012,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   });
 
   // routing
-  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], positions: ['Positions', 'What members see under Portfolio → Active Positions: spot positions, leveraged trades and resting orders, in one list. Closed calls make the Track Record.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
+  var TITLES = { overview: ['Overview', 'Mr. Wall Street at a glance.'], activity: ['Activity', 'What happened with members, in plain words. Newest first.'], support: ['Inbox', 'Feedback, ideas and questions from members. Answer here.'], emails: ['Emails', 'Everything the site sends to members, as sent.'], members: ['Members', 'Members of the site: purchases through the checkout and the ones you add by hand.'], payments: ['Payments', 'Money received through the site.'], telegram: ['Telegram', 'Channels, invites and who is inside.'], access: ['Grant access', 'Manual access outside Whop.'], guests: ['Guests', 'Friends and colleagues with free access, by name.'], positions: ['Positions', 'What members see under Portfolio → Active Positions: spot positions, leveraged trades and resting orders, in one list. Closed calls make the Track Record.'], settings: ['Settings', 'What goes live, the rules, notices to members.'] };
   function route(){ var v = currentView(); if (v === 'spot' || v === 'leveraged' || v === 'portfolio') v = 'positions'; /* old links */ if (!Object.prototype.hasOwnProperty.call(TITLES, v)) v = 'overview'; M.$$('.view').forEach(function(s){ s.classList.toggle('on', s.dataset.v === v); }); M.$$('#nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.v === v); }); $('#title').textContent = TITLES[v][0]; $('#subtitle').textContent = TITLES[v][1]; window.scrollTo(0, 0);
     if (v === 'activity') { hlSince = seenAt(); renderActivity(); } /* opening Activity: what arrived since last time is marked NEW, then counts as read */ }
   window.addEventListener('hashchange', route);

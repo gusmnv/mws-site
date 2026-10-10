@@ -365,8 +365,9 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (k === 'track' && trackAlbum) { var an = { crypto: 'Crypto', stocks: 'Stocks', commodities: 'Commodities', indices: 'Indices', fx: 'FX', other: 'Other' }[trackAlbum]; if (an) { $('#crumb').textContent = an; document.title = an + ' · Track Record · Mr. Wall Street'; } }
     if (k === 'position' && typeof renderPosition === 'function') renderPosition();
     if ((k === 'portfolio' || k === 'track') && typeof renderPortfolio === 'function' && positions) renderPortfolio();
+    if (k === 'earnings' && typeof renderEarnings === 'function' && access) renderEarnings(); if (k === 'calendar' && typeof renderCalendar === 'function' && access) renderCalendar(); /* the desk's feeds may have landed after the first paint */
     drawer(false); window.scrollTo(0, 0);
-    if (k === 'telegram' && access && access.valid && !invites) { fetchInvites(false).then(paintInvites); }
+    if (k === 'telegram' && access && access.valid && !invites) { renderTg(true); }
   }
   window.addEventListener('hashchange', route);
   route();
@@ -390,31 +391,49 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     catch (e) { if (!access) { gate('Could not load your account.', 'Check your connection and try again.', { reload: true }); } else { M.toast('Could not refresh. Will retry.'); } }
     finally { loading = false; if (queued !== null) { var q = queued; queued = null; setTimeout(function(){ load(q); }, 400); } }
   }
+  /* boot: the session, then everything the pages need in one round trip (not one after the other), the first paint from the last snapshot of this
+     account (this tab's storage) while the fresh data is on its way, and the calendar's feeds in the background after the paint */
+  var BOOT_V = 3, booted = false;
+  function applyLoaded(d, simOn){
+    profile = d.profile; staffRole = !!(profile && (profile.role === 'owner' || profile.role === 'admin')) || !!M.isStaff;
+    access = d.access; link = d.link; channels = d.channels || []; tgAccess = d.tgAccess || []; positions = d.positions; deskLive = d.deskLive || deskLive; notices = d.notices || [];
+    if (d.quotes) { var prev = quotes; quotes = {}; Object.keys(d.quotes).forEach(function(k){ var r = d.quotes[k], cur = prev[k]; quotes[k] = cur && cur.live_at && Date.now() - cur.live_at < 120000 ? Object.assign({}, r, { price: cur.price, change_pct: cur.change_pct, live_at: cur.live_at }) : r; }); }
+    sim = simOn ? M.sim(channels) : null;
+    if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); } else { document.body.classList.remove('sim'); }
+  }
   async function doLoad(claimIfEmpty){
     var s = await sb.auth.getSession(); user = s.data.session && s.data.session.user; if (!user) { M.go('/login?next=' + encodeURIComponent(location.pathname + location.search + location.hash)); return; }
-    var pr = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle(); if (pr.error) throw pr.error; profile = pr.data;
-    staffRole = !!(profile && (profile.role === 'owner' || profile.role === 'admin')) || !!M.isStaff;
-    var simOn = !!(staffRole && M.sim()); /* only staff can preview; a stale preview flag on a member's browser is ignored */
-    var ac = await sb.rpc('my_access'); if (ac.error) throw ac.error; var acc = ac.data || { valid:false, reason:'none' };
+    var uid = user.id, simFlag = !!M.sim();
+    if (!booted) { var snap = M.sess.get('mws_boot'); if (snap && snap.v === BOOT_V && snap.uid === uid && Date.now() - snap.at < 12 * 3600e3) { try { applyLoaded(snap, !!(snap.staff && simFlag)); render(); booted = true; } catch (e) {} } } /* the page as it was: instant */
+    var q = await Promise.all([
+      sb.from('profiles').select('*').eq('id', uid).maybeSingle(),
+      sb.rpc('my_access'),
+      sb.from('telegram_links').select('*').eq('user_id', uid).maybeSingle(),
+      sb.from('channels').select('chat_id,title,sort').eq('enabled', true).order('sort'),
+      sb.from('telegram_access').select('chat_id,status,invite_link,updated_at').eq('user_id', uid),
+      sb.from('positions').select('*').order('sort').order('opened_at', { ascending: false }),
+      sb.rpc('desk_state'),
+      sb.from('notices').select('id,body,kind,link,link_label,created_at').eq('active', true).order('created_at', { ascending: false }).limit(3),
+      sb.from('quotes').select('*')
+    ]);
+    var pr = q[0]; if (pr.error) throw pr.error;
+    var staff = !!(pr.data && (pr.data.role === 'owner' || pr.data.role === 'admin')) || !!M.isStaff, simOn = !!(staff && simFlag); /* only staff can preview; a stale preview flag on a member's browser is ignored */
+    var ac = q[1]; if (ac.error) throw ac.error; var acc = ac.data || { valid:false, reason:'none' };
     /* a fresh receipt is always claimed once (upgrade or rejoin while another plan is still valid), otherwise only when access is missing */
     if (!simOn && ((signup.receipt && !claimedReceipt) || (claimIfEmpty && !acc.valid))) { claimedReceipt = !!signup.receipt; await claim(); ac = await sb.rpc('my_access'); if (!ac.error && ac.data) acc = ac.data; }
     if (acc.valid && (signup.receipt || signup.paid)) { M.store.del('mws_signup'); M.sess.del('mws_signup'); signup = {}; } /* handoff done */
-    var lk = await sb.from('telegram_links').select('*').eq('user_id', user.id).maybeSingle(); if (lk.error) throw lk.error;
-    var ch = await sb.from('channels').select('chat_id,title,sort').eq('enabled', true).order('sort'); if (ch.error) throw ch.error;
-    var ta = await sb.from('telegram_access').select('chat_id,status,invite_link,updated_at').eq('user_id', user.id); if (ta.error) throw ta.error;
-    access = acc; link = lk.data; channels = ch.data || []; tgAccess = ta.data || [];
+    if (q[2].error) throw q[2].error; if (q[3].error) throw q[3].error; if (q[4].error) throw q[4].error;
+    var qmap = {}; (q[8].data || []).forEach(function(r){ qmap[String(r.symbol).toUpperCase()] = r; });
+    var fresh = { profile: pr.data, access: acc, link: q[2].data, channels: q[3].data || [], tgAccess: q[4].data || [], positions: q[5].error ? null : (q[5].data || []), deskLive: (!q[6].error && q[6].data) ? q[6].data : deskLive, notices: q[7].error ? [] : (q[7].data || []), quotes: qmap }; /* positions: RLS leaves them empty for non-members */
     if (!simOn) M.store.set('mws_access', { valid: !!acc.valid, at: Date.now() });
-    try { var ps = await sb.from('positions').select('*').order('sort').order('opened_at', { ascending: false }); positions = ps.error ? null : (ps.data || []); } catch (e) { positions = null; } /* RLS: empty for non-members */
-    await loadQuotes(); await loadCalendar();
-    try { var ds = await sb.rpc('desk_state'); if (!ds.error && ds.data) deskLive = ds.data; } catch (e) {} /* which sections members see: Settings → What goes live (the admin). Off while unknown. */
-    try { var ns = await sb.from('notices').select('id,body,kind,link,link_label,created_at').eq('active', true).order('created_at', { ascending: false }).limit(3); notices = ns.error ? [] : (ns.data || []); } catch (e) { notices = []; }
-    /* owner preview: a preset replaces the data (never touches the database) */
-    sim = simOn ? M.sim(channels) : null;
-    if (sim) { access = sim.access; link = sim.link; channels = sim.channels; tgAccess = sim.tgAccess; document.body.classList.add('sim'); } else { document.body.classList.remove('sim'); }
-    render();
+    applyLoaded(fresh, simOn);
+    render(); booted = true;
+    if (!simOn) M.sess.set('mws_boot', Object.assign({ v: BOOT_V, uid: uid, at: Date.now(), staff: staff }, fresh));
+    if (positions && positions.length) { liveStart(); tickStart(); }
     if (current === 'devices') loadDevices();
     loadBilling(); loadManage();
     if (!supLoaded) { supLoaded = true; loadSupport(); }
+    loadCalendar().then(function(){ if (current === 'calendar') renderCalendar(); if (current === 'earnings') renderEarnings(); syncBarTag(); }).catch(function(){}); /* the desk's feeds come after the paint */
   }
   /* in preview, buttons and checkout links inside the pages do nothing (they act on real members' accounts) */
   $('#content').addEventListener('click', function(ev){ if (!sim) return; var b = ev.target.closest('button[type=submit], button[data-mg], button[data-reclaim], #tg-refresh, #tg-unlink, #out-others, a[target=_blank], a[href^="/join"]'); if (!b) return; ev.preventDefault(); ev.stopPropagation(); M.toast('Preview only. For a real member this button works.'); }, true);
@@ -856,15 +875,31 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function countdown(ms){ if (ms <= 0) return 'now'; var m = Math.round(ms / 60000); if (m < 60) return 'in ' + m + ' min'; var h = Math.floor(m / 60); if (h < 24) return 'in ' + h + ' h ' + String(m % 60).padStart(2, '0') + ' min'; var d = Math.floor(h / 24); return 'in ' + d + ' day' + (d === 1 ? '' : 's'); }
   /* PostgREST answers at most 1 000 rows a call: the calendar and the company list are read in pages */
   function fetchAll(mk){ var out = []; function step(i){ return mk().range(i, i + 999).then(function(r){ if (r.error) throw r.error; out = out.concat(r.data || []); return (r.data || []).length === 1000 && i < 20000 ? step(i + 1000) : out; }); } return step(0); }
+  async function loadErMeta(){ try { var em = await fetchAll(function(){ return sb.from('earnings_history').select('symbol,name,market_cap,logo,next_report,primary:data->>primary').gte('market_cap', 10e9).is('data->>stub', null).order('market_cap', { ascending: false }); }); var m = {}; em.forEach(function(r){ m[String(r.symbol).toUpperCase()] = r; }); erMeta = m; } catch (e) { } }
+  /* the company records arrive all day (40 a minute while the universe fills): the page picks them up every two minutes without a reload */
+  var erViaView = false;
+  M.debug = function(){ return { earnings: earnings ? earnings.length : null, meta: Object.keys(erMeta).length, viaView: erViaView, events: events ? events.length : null, current: current, deskLive: deskLive, staff: staffRole, sim: !!sim }; }; /* read-only, for the console */
+  setInterval(function(){ if (current === 'earnings' && !sim && access && access.valid && !document.hidden) { var before = Object.keys(erMeta).length + (earnings || []).length; (erViaView ? loadCalendar() : loadErMeta()).then(function(){ if (Object.keys(erMeta).length + (earnings || []).length !== before && current === 'earnings') renderEarnings(); }); } }, 120000);
   async function loadCalendar(){
     if (!(access && access.valid)) { events = events || []; earnings = earnings || []; return; }
     var from = new Date(Date.now() - 9 * 864e5).toISOString(), to = new Date(Date.now() + 16 * 864e5).toISOString(), hist0 = new Date(Date.now() - 75 * 864e5).toISOString();
-    /* the window members browse, plus the last prints of the important series (for the "last 3" line) */
-    try { var ev = await sb.from('calendar_events').select('*').gte('at', hist0).lte('at', to).or('importance.gte.3,at.gte.' + from).order('at').limit(1000); events = ev.error ? [] : (ev.data || []); } catch (e) { events = []; }
-    try { var d0 = dayKey(Date.now() - 29 * 864e5), d1 = dayKey(Date.now() + 43 * 864e5); earnings = await fetchAll(function(){ return sb.from('earnings').select('*').gte('day', d0).lte('day', d1).order('day').order('symbol'); }); } catch (e) { earnings = []; }
-    /* every company above $10B: name, market cap, logo (the page filters at $40B); the full record (last quarters, highlights) only for the book, the rest on demand */
-    try { var em = await fetchAll(function(){ return sb.from('earnings_history').select('symbol,name,market_cap,logo,next_report,primary:data->>primary').gte('market_cap', 10e9).is('data->>stub', null).order('market_cap', { ascending: false }); }); erMeta = {}; em.forEach(function(r){ erMeta[String(r.symbol).toUpperCase()] = r; }); } catch (e) { erMeta = {}; }
-    try { var bookSyms = Object.keys(erBookMap()); var eh = await sb.from('earnings_history').select('*').in('symbol', bookSyms.length ? bookSyms : ['-']); (eh.data || []).forEach(function(r){ erHist[String(r.symbol).toUpperCase()] = r.data || {}; }); } catch (e) { }
+    var d0 = dayKey(Date.now() - 29 * 864e5), d1 = dayKey(Date.now() + 43 * 864e5), bookSyms = Object.keys(erBookMap()), bookS = bookSyms.filter(function(k){ return /^[A-Z0-9.\-]+$/.test(k); });
+    /* three feeds in one round trip: the macro window (plus the last prints of the important series), the earnings board, the book's company records */
+    var boardQ = fetchAll(function(){ return sb.from('earnings_board').select('*').gte('day', d0).lte('day', d1).or('cap_usd.gte.10000000000' + (bookS.length ? ',symbol.in.(' + bookS.join(',') + ')' : '')).order('day').order('symbol'); }).then(function(rows){ return { rows: rows }; }, function(e){ return { error: e }; });
+    var r = await Promise.all([
+      sb.from('calendar_events').select('*').gte('at', hist0).lte('at', to).or('importance.gte.3,at.gte.' + from).order('at').limit(1000).then(function(x){ return x; }, function(e){ return { error: e }; }),
+      boardQ,
+      sb.from('earnings_history').select('*').in('symbol', bookSyms.length ? bookSyms : ['-']).then(function(x){ return x; }, function(e){ return { error: e }; })
+    ]);
+    events = r[0].error ? [] : (r[0].data || []);
+    if (!r[1].error) { /* the board view: the window's reports with the company's cap, name, logo and primary listing in the same row, only the companies above $10B and ours */
+      var rows = r[1].rows, m = {}; rows.forEach(function(x){ var S = String(x.symbol).toUpperCase(); if (x.cap_usd != null && !m[S]) m[S] = { symbol: S, name: x.co_name, market_cap: Number(x.cap_usd), logo: !!x.logo, primary: x.primary_code || null }; }); earnings = rows; erMeta = m; erViaView = true;
+    } else { /* the view is not there yet: the raw table and the company list, the long way */
+      erViaView = false;
+      try { earnings = await fetchAll(function(){ return sb.from('earnings').select('*').gte('day', d0).lte('day', d1).order('day').order('symbol'); }); } catch (e) { earnings = []; }
+      await loadErMeta();
+    }
+    (r[2].data || []).forEach(function(x){ erHist[String(x.symbol).toUpperCase()] = x.data || {}; });
   }
   function renderCalendar(){
     var unlocked = !!(access && access.valid), list = sim ? SIM_EVENTS : (events || []);
@@ -1098,7 +1133,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     body.innerHTML = (allIn ? '' : '<p class="small muted" style="margin-bottom:14px">Personal links: each one works for you only, once.</p>') + '<ul class="list" id="tg-list"><li><span class="small muted"><span class="spin"></span>Preparing your links…</span></li></ul><div class="row" style="margin-top:16px"><span class="small muted">' + (link ? 'Connected as <b>' + (who ? '@' + esc(who) : esc(link.telegram_name || 'your Telegram account')) + '</b>' : 'No Telegram connected yet') + '</span><span class="small">' + (allIn ? '' : '<button class="link" id="tg-refresh" type="button">Links not working? Get new ones</button>') + (link ? (allIn ? '' : ' · ') + '<button class="link" id="tg-unlink" type="button">Disconnect Telegram</button>' : '') + '</span></div><div class="msg" id="m-tg" aria-live="polite"></div>';
     var rf = $('#tg-refresh'); if (rf) rf.addEventListener('click', async function(){ if (this.disabled) return; var b = this; b.disabled = true; b.textContent = 'Refreshing…'; try { await fetchInvites(true); paintInvites(); } finally { b.disabled = false; b.textContent = 'Links not working? Get new ones'; } });
     var un = $('#tg-unlink'); if (un) un.addEventListener('click', async function(){ if (!confirm('Disconnect Telegram? You will be removed from the channels and can join again with new links.')) return; var b = this; b.disabled = true; b.textContent = 'Disconnecting…'; try { await M.fn('tg-link', { action: 'unlink' }); invites = null; load(false); } catch(e){ M.msg('#m-tg', M.human(e), 'bad'); b.disabled = false; b.textContent = 'Disconnect Telegram'; } });
-    if (invites && invitesFor === user.id && !sim) { paintInvites(); } else if (current === 'telegram' || sim) { fetchInvites(false).then(paintInvites); }
+    if (invites && invitesFor === user.id && !sim) { paintInvites(); return; }
+    /* what the tables already say paints at once: joined channels and stored links; the function is asked only for a link that is missing (and in the background when one is older than a day) */
+    if (!sim && channels.length) { var stale = false, missing = false; invites = channels.map(function(c){ var a = tgAccess.filter(function(x){ return String(x.chat_id) === String(c.chat_id); })[0]; var st = a ? a.status : 'pending'; if (st !== 'joined' && !(a && a.invite_link)) missing = true; if (st !== 'joined' && a && a.updated_at && Date.now() - new Date(a.updated_at).getTime() > 864e5) stale = true; return { chat_id: c.chat_id, title: c.title, status: st === 'joined' ? 'joined' : st === 'left' ? 'left' : (a && a.invite_link ? 'invited' : 'pending'), invite_link: a && a.invite_link ? a.invite_link : null }; }); invitesFor = user.id;
+      if (!missing) { paintInvites(); if (stale && (current === 'telegram')) fetchInvites(false).then(paintInvites); return; } invites = null; }
+    if (current === 'telegram' || sim) { fetchInvites(false).then(paintInvites); }
   }
   function paintInvites(){
     var ul = $('#tg-list'); if (!ul) return;

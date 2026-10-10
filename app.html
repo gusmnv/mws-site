@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=ec18dfb6">
+<link rel="stylesheet" href="/mws.css?v=7cf35cfc">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=ec18dfb6"></script>
+<script src="/mws.js?v=7cf35cfc"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -131,7 +131,6 @@
       <section class="page" data-page="portfolio">
         <div class="head rv"><h1>Active positions. <span class="soon" id="pf-tag">In development</span></h1><p id="pf-sub" hidden></p></div>
         <div id="pf-live" hidden>
-          <p class="mkt rv" id="pf-mkt"></p>
           <div id="pf-groups" class="rv d1"></div>
           <p class="small muted" style="margin-top:18px" id="pf-foot"></p>
         </div>
@@ -613,39 +612,37 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var fact = function(k, v){ return v == null || v === '' ? '' : '<div><span>' + k + '</span><b>' + v + '</b></div>'; };
     var sg = function(v, txt){ return v == null ? '—' : '<span class="' + sgn(v).trim() + '">' + txt + '</span>'; };
     var buildFacts = function(){ T = tradeNums(p, D.Q);
-      var lastTxt = T.last != null ? usdPx(T.last) + (T.mark ? ' <small>mark · ' + esc(M.fmtDate(T.mark)) + '</small>' : '') : '—';
-      var levFact = T.L > 1 ? fact('Leverage', T.L + '×') : '';
+      var lastTxt = T.last != null ? pxWith(T) + (T.mark ? ' <small>mark · ' + esc(M.fmtDate(T.mark)) + '</small>' : (shutNote(p) ? ' <small class="note">market closed</small>' : '')) : '—';
+      var levFact = T.L > 1 ? fact('Leverage', T.L + '×') : '', held = heldTxt(p);
       return (closed
-        ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (resultSign(p) > 0 ? 'pos' : resultSign(p) < 0 ? 'neg' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (pfKind(p) === 'leveraged' ? fact('Leverage', esc(p.leverage || '—')) : '')
+        ? fact('Entry', esc(p.entry || usdPx(p.entry_price))) + fact('Exit', esc(p.exit || '—')) + fact('Result', '<span class="' + (resultSign(p) > 0 ? 'pos' : resultSign(p) < 0 ? 'neg' : '') + '">' + esc(p.result || '—') + '</span>') + fact('Opened', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Closed', p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (held ? fact('Held', esc(held)) : '') + (pfKind(p) === 'leveraged' ? fact('Leverage', esc(p.leverage || '—')) : '')
         : order
         ? fact('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + fact('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + ' market' : '—') + levFact + fact('Placed', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—')
-        : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('1D', sg(T.roi1, pct(T.roi1))) + fact('Since entry', sg(T.ret, pct(T.ret)))) + (typeof about === 'function' ? about() : ''); };
+        : fact('Since', p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + fact('Entry', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—')) + fact('Last', lastTxt) + levFact + fact('All-time change', sg(T.ret, pct(T.ret)))) + (typeof about === 'function' ? about() : ''); };
     var hidden = (STORIES && STORIES._hidden) || [], ids = pfIds(p).filter(function(i){ return hidden.indexOf(i) < 0; }), story = storyOf(p), co = COMPANIES[String(p.symbol).toUpperCase()]; /* posts about several positions at once are never shown on one position's page */
-    var bigUsd = function(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); };
     /* the asset's live market cap (price × shares or supply, approximate) and its site join the facts; the rest of the company text stays in companies.json for the earnings panel */
-    var about = function(){ if (!co) return ''; var q = pfQuote(p, D.Q) || D.Q[String(p.symbol).toUpperCase() + '/USD'] || D.Q[String(p.symbol).toUpperCase()] || null; if (q && (q.price == null || q.error)) q = null; var px = q ? Number(q.price) : null; var cap = px != null && (co.shares || co.supply) ? bigUsd(px * (co.shares ? co.shares * 1e9 : co.supply * 1e6)) : null;
+    var about = function(){ if (!co) return ''; var cap = mcapOf(p, D.Q);
       var site = co.site ? '<a class="site" href="' + esc(co.site) + '" target="_blank" rel="noopener">' + esc(String(co.site).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')) + ' ↗</a>' : '';
       return (cap ? fact('Market cap', cap + ' <small>approx.</small>') : '') + (site ? fact('Website', site) : ''); };
     var facts = buildFacts(); posFacts = buildFacts; /* a live tick redraws the facts only */
-    var postFig = function(i, cap){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
-      return src ? '<figure class="post"><img src="' + esc(src) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"><figcaption><span>' + esc(when) + '</span><span>' + (cap || 'Exclusive channel') + '</span></figcaption></figure>'
+    var postFig = function(i, cap, px){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
+      return src ? '<figure class="post"><img src="' + esc(src) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"><figcaption><span>' + esc(when) + (px ? ' · <b class="px">' + px + '</b>' : '') + '</span><span class="src">' + (cap || 'Telegram Exclusive channel') + '</span></figcaption></figure>'
         : '<div class="post none">' + esc(when) + ' · screenshot coming' + (staffRole ? ' · <a href="https://t.me/c/2077854583/' + i + '" target="_blank" rel="noopener">open in Telegram</a>' : '') + '</div>'; };
     /* the story: the lede, then every chapter with the post of that day beside it; the posts not in any chapter follow */
     var body = function(){
       if (!story) return (ids.length ? '<h2 class="k">The calls <span class="muted">· ' + ids.length + ' post' + (ids.length === 1 ? '' : 's') + ' in the Exclusive channel</span></h2><div class="posts-list">' + ids.map(function(i){ return postFig(i); }).join('') + '</div>' : '<h2 class="k">The calls</h2><p class="small muted">No posts attached to this position.</p>');
       var seen = {}, n = 0;
       var chapters = story.chapters.filter(function(c){ return c.post && postImg(c.post); }).map(function(c){ n++; seen[c.post] = 1;
-        return '<article class="chap"><div class="txt"><span class="dt">' + esc(M.fmtDate(postDay(c.post) || c.d)) + (c.px ? '<b>' + esc(c.px) + '</b>' : '') + '</span><h3>' + esc(c.h) + '</h3></div>' + postFig(c.post) + '</article>'; }).join('');
+        var px = c.price != null ? (c.est ? '≈ ' : '') + usdPx(c.price) : '';
+        return '<article class="chap"><div class="txt"><h3>' + esc(c.h) + '</h3></div>' + postFig(c.post, null, px) + '</article>'; }).join('');
       var rest = ids.filter(function(i){ return !seen[i]; });
       return '<div class="story">' + (story.note ? '<p class="note small muted">' + esc(story.note) + '</p>' : '')
-        + (n ? '<h2 class="k">The calls <span class="muted">· ' + n + ' post' + (n === 1 ? '' : 's') + ' · as they were made in the Exclusive channel</span></h2><div class="chapters">' + chapters + '</div>' : '<p class="small muted">The posts on this call covered several positions at once, so they are not shown here.</p>')
+        + (n ? '<h2 class="k">The calls</h2><div class="chapters">' + chapters + '</div>' : '<p class="small muted">The posts on this call covered several positions at once, so they are not shown here.</p>')
         + (rest.length ? '<h2 class="k">More posts</h2><div class="posts-list">' + rest.map(function(i){ return postFig(i); }).join('') + '</div>' : '') + '</div>';
     };
     var home = pfHome(p), homeName = home === '#track' ? 'Track Record' : 'Active Positions'; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
-    var held = heldTxt(p), dateline = order ? 'Placed ' + esc(M.fmtDate(p.opened_at)) + (held ? ' · waiting ' + held : '')
-      : 'Opened ' + (p.opened_at ? esc(M.fmtDate(p.opened_at)) : '—') + (closed ? ' · closed ' + (p.closed_at ? esc(M.fmtDate(p.closed_at)) : '—') + (held ? ' · held ' + held : '') : (held ? ' · held ' + held + ' so far' : ''));
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
-      + '<div class="pos-hd"><p class="dateline">' + dateline + '</p><h1>' + storyTitle(p) + (closed && p.result ? ' <span class="res">' + resultHtml(p) + '</span>' : '') + '</h1><p class="tags"><span class="tag">' + esc(p.symbol) + '</span>' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(classOf(p)) + '</span>' + pfDraft(p) + '</p></div>'
+      + '<div class="pos-hd"><h1>' + storyTitle(p) + (closed && p.result ? ' <span class="res">' + resultHtml(p) + '</span>' : '') + '</h1><p class="tags"><span class="tag">' + esc(p.symbol) + '</span>' + (trade || order ? pfSide(p) + ' ' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(classOf(p)) + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
       + '<div id="pf-story">' + (STORIES ? body() : '<p class="small muted">Loading…</p>') + '</div>';
     if (!STORIES) loadStories().then(function(){ if (current === 'position') renderPosition(); });
@@ -671,8 +668,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   /* a tick redraws only what moved: the price cells of the rows concerned (with the flash), the facts of an open story */
   function livePatch(){
     if (current === 'portfolio') { var D = pfData(); D.list.forEach(function(p){ if (p.status !== 'open' || !liveSet[String(p.quote_symbol || '').toUpperCase()]) return; var tr = document.querySelector('#pf-groups tr[data-pid="' + String(p.id).replace(/"/g, '') + '"]'); if (!tr) return; var T = tradeNums(p, D.Q), k = String(p.id); if (T.last != null) lastPx[k] = T.last;
-      var set = function(label, html, cls){ var td = tr.querySelector('td[data-l="' + label + '"]'); if (!td) return; td.innerHTML = html; td.classList.remove('px-up', 'px-dn', 'pos', 'neg'); (cls || '').trim().split(/\s+/).forEach(function(c){ if (c) td.classList.add(c); }); return td; };
-      set('Last price', T.last != null ? usdPx(T.last) : '—', ''); if (tr._mkt !== tickOn) { tr._mkt = tickOn; mktLine(); } set('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), sgn(T.roi1)); set('All-time ROI', T.ret == null ? '—' : pct(T.ret), sgn(T.ret)); set('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—'); }); }
+      var set = function(label, html, cls){ var td = tr.querySelector('td[data-l="' + label + '"]'); if (!td) return; td.innerHTML = html; td.classList.remove('pos', 'neg'); (cls || '').trim().split(/\s+/).forEach(function(c){ if (c) td.classList.add(c); }); return td; };
+      set('Last price', pxWith(T) + shutNote(p), ''); set('All-time change', T.ret == null ? '—' : pct(T.ret), sgn(T.ret)); set('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—'); set('Market cap', mcapOf(p, D.Q) || '<span class="muted">—</span>'); }); }
     else if (current === 'position') posRefresh();
     else if (current === 'earnings') renderEarnings();
   }
@@ -711,10 +708,11 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function usSession(now){ var p = {}; NYF.formatToParts(now || new Date()).forEach(function(x){ p[x.type] = x.value; }); var dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday), mins = (Number(p.hour) % 24) * 60 + Number(p.minute), wk = dow >= 1 && dow <= 5, open = wk && mins >= 570 && mins < 960;
     var until; if (open) until = 960 - mins; else { var d = 0, m = mins; if (wk && mins < 570) until = 570 - mins; else { d = dow === 5 ? 3 : dow === 6 ? 2 : 1; until = (1440 - m) + 570 + (d - 1) * 1440; } }
     return { open: open, until: until, dow: dow }; }
-  function untilTxt(mins){ var h = Math.floor(mins / 60), m = mins % 60; return h >= 48 ? Math.round(h / 24) + ' days' : h ? h + ' h ' + (m ? String(m).padStart(2, '0') + ' min' : '') : m + ' min'; }
-  function mktLine(){ var el = $('#pf-mkt'); if (!el) return; var st = usSession(); el.innerHTML = '<span class="dot' + (st.open ? ' on' : '') + '"></span>' + (st.open ? 'US market open <span class="muted">· closes in ' + untilTxt(st.until) + (tickOn ? ' · stocks tick live' : '') + '</span>' : 'US market closed <span class="muted">· stocks at the last close · opens in ' + untilTxt(st.until) + '</span>') + '<span class="muted"> · crypto trades 24/7' + (Object.keys(liveSyms).length ? ', live from Binance' : '') + '</span>'; }
-  setInterval(function(){ if (current === 'portfolio') mktLine(); }, 60000);
-  var pfSort = { k: "ret", d: -1 }, lastPx = {}; /* the last price each row was drawn with */ /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
+  var pfSort = { k: "ret", d: -1 }, lastPx = {}; /* the last price each row was drawn with */
+  function bigUsd(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); }
+  function mcapOf(p, Q){ var co = COMPANIES[String(p.symbol).toUpperCase()]; if (!co || !(co.shares || co.supply)) return null; var q = pfQuote(p, Q) || Q[String(p.symbol).toUpperCase() + '/USD'] || Q[String(p.symbol).toUpperCase()] || null; if (!q || q.price == null || q.error) return null; return bigUsd(Number(q.price) * (co.shares ? co.shares * 1e9 : co.supply * 1e6)); } /* price × shares (or supply), approximate */
+  function pxWith(T){ return T.last == null ? '—' : usdPx(T.last) + (T.roi1 != null ? ' <i class="chg' + sgn(T.roi1) + '">' + pct(T.roi1) + '</i>' : ''); } /* the price with the day's change beside it, as a terminal shows it */
+  function shutNote(p){ return !usSession().open && !liveKey(p.quote_symbol) && (p.asset_class === 'equity' || p.asset_class === 'etf' || p.asset_class === 'index') ? '<span class="sub muted">market closed</span>' : ''; } /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
   /* the section tag: Live for members, a warning for the owner while members do not see it yet */
   function deskTag(id, unlocked, has){ var onlyMe = staffRole && !sim && !deskLive.portfolio; var t = $('#' + id); t.textContent = unlocked && has ? (onlyMe ? 'Only you · not live for members' : 'Live') : (unlocked ? 'In development' : 'Members'); t.className = 'soon' + (onlyMe && has ? ' warn' : ''); return onlyMe; }
   /* sortable tables: every row carries its values; a header click sorts by that column, again to flip */
@@ -736,20 +734,18 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: String(p.side || 'long') + ' ' + T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist) } }; };
     var sortGroup = function(rows, orders){ var st = pfSort; if (orders && (st.k === 'ret' || st.k === 'roi1')) st = { k: 'dist', d: 1 }; /* orders: the nearest level first */ return sortRows(rows, st); };
     var tick = function(p){ return cell('Type', esc(classOf(p)), 'muted c-type') + cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em c-tick') + cell('Name', esc(p.name || '—'), 'nm2 c-name'); };
-    var flash = {}; open.forEach(function(p){ var T = tradeNums(p, Q), k = String(p.id); if (T.last != null) lastPx[k] = T.last; flash[k] = ''; }); /* the price itself carries no colour, like an exchange list; the ROI columns do */
-    var shut = !usSession().open;
-    var lastCell = function(T, p){ var fl = flash[String(p.id)] || ''; if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', usdPx(T.last) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : (shut && !liveKey(p.quote_symbol) && (p.asset_class === 'equity' || p.asset_class === 'etf' || p.asset_class === 'index') ? '<span class="sub muted">at close</span>' : '')), 'num' + fl); };
-    var roiCells = function(T, p){ return cell('1D ROI', T.roi1 == null ? '—' : pct(T.roi1), 'num' + sgn(T.roi1)) + cell('All-time ROI', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret)); };
+    open.forEach(function(p){ var T = tradeNums(p, Q); if (T.last != null) lastPx[String(p.id)] = T.last; });
+    var lastCell = function(T, p){ if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', pxWith(T) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : shutNote(p)), 'num px'); };
+    var roiCells = function(T, p){ return cell('All-time change', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret)) + cell('Market cap', mcapOf(p, Q) || '<span class="muted">—</span>', 'num muted c-cap'); };
     var head = function(cols){ return '<thead><tr>' + cols.map(function(c){ return th(c[0], c[1], pfSort, c[2] || '', c[3] || ''); }).join('') + '<th class="c-act"></th></tr></thead>'; };
-    var spotHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Bought', 'since', 'c-date', 'The day of the call'], ['Entry price', 'entry', 'num', 'Average entry as posted'], ['Last price', 'last', 'num'], ['1D ROI', 'roi1', 'num', 'Since the previous close'], ['All-time ROI', 'ret', 'num', 'Since the call']]);
-    var levHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Direction', 'side', 'c-dir', 'Long or short, and the leverage'], ['Opened', 'since', 'c-date'], ['Entry price', 'entry', 'num'], ['Last price', 'last', 'num'], ['1D ROI', 'roi1', 'num', 'Since the previous close · shorts the other way round'], ['All-time ROI', 'ret', 'num', LEV_ROI === 'margin' ? 'The move in the price, times the leverage' : 'The move in the price since the call; shorts the other way round']]);
-    var ordHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Side', 'side', 'c-dir'], ['Placed', 'since', 'c-date'], ['Level', 'entry', 'num', 'The price the order waits at'], ['Last price', 'last', 'num'], ['Distance', 'dist', 'num', 'How far the market is from the level']]);
+    var spotHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Bought', 'since', 'c-date', 'The day of the call'], ['Entry price', 'entry', 'num', 'Average entry as posted'], ['Last price', 'last', 'num', 'With the change since the previous close'], ['All-time change', 'ret', 'num', 'Since the call'], ['Market cap', 'cap', 'num c-cap', 'Price × shares, approximate']]);
+    var levHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Direction', 'side', 'c-dir', 'Long or short, and the leverage'], ['Opened', 'since', 'c-date'], ['Entry price', 'entry', 'num'], ['Last price', 'last', 'num', 'With the change since the previous close'], ['All-time change', 'ret', 'num', LEV_ROI === 'margin' ? 'The move in the price, times the leverage' : 'The move in the price since the call; shorts the other way round'], ['Market cap', 'cap', 'num c-cap', 'Price × shares, approximate']]);
+    var ordHead = head([['Type', 'cls', 'c-type'], ['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Side', 'side', 'c-dir'], ['Placed', 'since', 'c-date'], ['Level', 'entry', 'num', 'The price the order waits at'], ['Last price', 'last', 'num', 'With the change since the previous close'], ['Distance', 'dist', 'num', 'How far the market is from the level'], ['Market cap', 'cap', 'num c-cap', 'Price × shares, approximate']]);
     var spotRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Bought', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted c-date') + cell('Entry price', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + roiCells(T, p) + detailsCell(p) + '</tr>'; };
     var levRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Direction', pfSide(p), 'c-dir') + cell('Opened', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted c-date') + cell('Entry price', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + roiCells(T, p) + detailsCell(p) + '</tr>'; };
-    var ordRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Side', pfSide(p), 'c-dir') + cell('Placed', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted c-date') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + cell('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num muted') + detailsCell(p) + '</tr>'; };
+    var ordRow = function(h){ var p = h.p, T = h.T; return '<tr class="clk" data-pid="' + esc(String(p.id)) + '">' + tick(p) + cell('Side', pfSide(p), 'c-dir') + cell('Placed', esc(p.opened_at ? M.fmtDate(p.opened_at) : '—'), 'muted c-date') + cell('Level', T.entry != null ? usdPx(T.entry) : esc(p.entry || '—'), 'num') + lastCell(T, p) + cell('Distance', T.dist != null ? Math.abs(T.dist).toFixed(1) + '% ' + (T.dist < 0 ? 'below' : 'above') + '<span class="sub muted">market vs level</span>' : '—', 'num muted') + cell('Market cap', mcapOf(p, Q) || '<span class="muted">—</span>', 'num muted c-cap') + detailsCell(p) + '</tr>'; };
     var block = function(title, sub, headHtml, rows, rowFn){ return rows.length ? '<section class="pf-sec"><div class="sh"><h2>' + title + ' <span class="muted">· ' + rows.length + ' ' + sub + '</span></h2></div><div class="ptw"><table class="pt cards ruled pf-tbl">' + headHtml + '<tbody>' + rows.map(rowFn).join('') + '</tbody></table></div></section>' : ''; };
     var spot = sortGroup(P.spot.map(mk)), lev = sortGroup(P.lev.map(mk)), ord = sortGroup(P.ord.map(mk), true);
-    mktLine();
     $('#pf-groups').innerHTML = block('Spot', spot.length === 1 ? 'position' : 'positions', spotHead, spot, spotRow) + block('Leveraged', lev.length === 1 ? 'trade' : 'trades', levHead, lev, levRow) + block('Orders', 'waiting to fill', ordHead, ord, ordRow);
     var asOf = open.map(function(p){ var q = pfQuote(p, Q); return q && (q.updated_at || q.quoted_at); }).filter(Boolean).sort().pop();
     var nDraft = list.filter(function(p){ return p.published === false; }).length;

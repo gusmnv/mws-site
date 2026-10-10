@@ -965,8 +965,14 @@ body.app #pf-rng{margin-top:6px}
   body.app .pt.cards.ruled.er td.act{display:none}
   .er-chart text{font-size:12.5px}
 }
-/* Active Positions: the market line (session open or shut, when it turns) */
-#pf-mkt{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--fg);margin:0 0 16px;flex-wrap:wrap}
-#pf-mkt .dot{width:8px;height:8px;background:var(--fg-3);flex:none;display:inline-block}
-#pf-mkt .dot.on{background:var(--good);box-shadow:0 0 0 3px rgba(127,191,138,.18)}
-#pf-mkt .muted{color:var(--fg-3)}
+/* the price with its day change beside it */
+.pt td.px i.chg,#pos-page .facts b i.chg{font-style:normal;font-size:12.5px;margin-left:6px;font-variant-numeric:tabular-nums}
+.pt td.px i.chg.pos,#pos-page .facts b i.chg.pos{color:var(--good)}.pt td.px i.chg.neg,#pos-page .facts b i.chg.neg{color:var(--bad)}
+.pf-tbl td.c-cap{color:var(--fg-3)}
+
+/* the caption under a post: date · time · price (one grey), the source; stacked on the phone */
+#pos-page .post figcaption .px{font-weight:400;white-space:nowrap}
+#pos-page .post figcaption .src{text-align:right;flex:none}
+@media (max-width:760px){#pos-page .post figcaption{flex-direction:column;gap:3px}#pos-page .post figcaption .src{text-align:left}}
+.pf-tbl th{white-space:nowrap}
+#pos-page .facts b small.note{display:block;margin:2px 0 0;font-size:12px;color:var(--fg-3)}

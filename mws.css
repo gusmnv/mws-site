@@ -835,6 +835,17 @@ body.app #pf-rng{margin-top:6px}
   .pf-tbl th.num,.pf-tbl td.num{min-width:110px}
   .pf-tbl td{vertical-align:middle}
 }
+/* laptops (1401 to 1499 px): the same nine columns, a little tighter, so the list never scrolls sideways beside the sidebar */
+@media (min-width:761px) and (max-width:1499px){
+  .pf-tbl th.c-type,.pf-tbl td.c-type{width:108px;min-width:108px}
+  body.app .pf-tbl td.em.c-tick,.pf-tbl th.c-tick{width:100px;min-width:100px}
+  .pf-tbl th.c-date,.pf-tbl td.c-date{width:118px;min-width:118px}
+  .pf-tbl th.num,.pf-tbl td.num{min-width:96px}
+  .pf-tbl th.c-name,.pf-tbl td.c-name{width:200px;min-width:150px}
+}
+/* smaller laptops: the Type column goes (ticker and name already say what it is) and the name gets a little less room */
+@media (min-width:761px) and (max-width:1400px){.pf-tbl th.c-type,.pf-tbl td.c-type{display:none}}
+@media (min-width:761px) and (max-width:1300px){.pf-tbl th.c-name,.pf-tbl td.c-name{width:150px;min-width:110px;max-width:150px;white-space:normal;line-height:1.3}.pf-tbl th.c-date,.pf-tbl td.c-date{width:108px;min-width:108px}.pf-tbl th.c-act,.pf-tbl td.act{width:86px}}
 @media (max-width:760px){
   /* on the phone the card still opens with the ticker, then the name, then the facts in reading order */
   body.app .pt.cards.ruled td.em.c-tick{order:-3}

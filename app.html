@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=7cf35cfc">
+<link rel="stylesheet" href="/mws.css?v=93b9c98a">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=7cf35cfc"></script>
+<script src="/mws.js?v=93b9c98a"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -710,7 +710,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     return { open: open, until: until, dow: dow }; }
   var pfSort = { k: "ret", d: -1 }, lastPx = {}; /* the last price each row was drawn with */
   function bigUsd(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); }
-  function mcapOf(p, Q){ var co = COMPANIES[String(p.symbol).toUpperCase()]; if (!co || !(co.shares || co.supply)) return null; var q = pfQuote(p, Q) || Q[String(p.symbol).toUpperCase() + '/USD'] || Q[String(p.symbol).toUpperCase()] || null; if (!q || q.price == null || q.error) return null; return bigUsd(Number(q.price) * (co.shares ? co.shares * 1e9 : co.supply * 1e6)); } /* price × shares (or supply), approximate */
+  function sharesOf(S){ var H = (typeof sim !== 'undefined' && sim) ? SIM_ERHIST : erHist, h = H && H[S], co = COMPANIES[S]; if (h && Number(h.shares) > 0) return Number(h.shares); if (co && co.shares) return co.shares * 1e9; if (co && co.supply) return co.supply * 1e6; return 0; } /* shares outstanding: EODHD (earnings_history, daily) first, then companies.json; crypto = supply */
+  function mcapOf(p, Q){ var S = String(p.symbol).toUpperCase(), n = sharesOf(S); if (!n) return null; var q = pfQuote(p, Q) || Q[S + '/USD'] || Q[S] || null; if (!q || q.price == null || q.error) return null; return bigUsd(Number(q.price) * n); } /* price × shares (or supply), approximate */
   function pxWith(T){ return T.last == null ? '—' : usdPx(T.last) + (T.roi1 != null ? ' <i class="chg' + sgn(T.roi1) + '">' + pct(T.roi1) + '</i>' : ''); } /* the price with the day's change beside it, as a terminal shows it */
   function shutNote(p){ return !usSession().open && !liveKey(p.quote_symbol) && (p.asset_class === 'equity' || p.asset_class === 'etf' || p.asset_class === 'index') ? '<span class="sub muted">market closed</span>' : ''; } /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
   /* the section tag: Live for members, a warning for the owner while members do not see it yet */
@@ -724,6 +725,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var onlyMe = deskTag('pf-tag', unlocked, list.length > 0); deskTag('tk-tag', unlocked, list.length > 0);
     $('#desk-grp-tag').textContent = devFor('portfolio') ? 'In development' : (unlocked && list.length ? (onlyMe ? 'Owner preview' : 'Live') : 'In development');
     renderBook(D, P, unlocked); renderTrack(D, P, unlocked); pressChips(); syncBarTag();
+    if (!STORIES && unlocked && P.open.length) loadStories().then(function(){ if (current === 'portfolio') renderPortfolio(); }); /* market caps need companies.json: draw the list once more when it lands */
   }
   /* Active Positions: every open call in one list — spot positions, leveraged trades, resting orders — each a price, a move and a Details link to its story. */
   function renderBook(D, P, unlocked){
@@ -955,7 +957,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var qLbl = function(d){ var m = Number(String(d).slice(5, 7)), y = String(d).slice(2, 4); return 'Q' + Math.ceil(m / 3) + "’" + y; };
     var revenue = function(){ if (!(h && h.revenue && h.revenue.length)) return ''; var rs = h.revenue.slice(-8), mx = Math.max.apply(null, rs.map(function(r){ return r.revenue || 0; })); if (!(mx > 0)) return ''; var last = rs[rs.length - 1], yago = rs.length >= 5 ? rs[rs.length - 5] : null, g = yago && yago.revenue ? last.revenue / yago.revenue - 1 : null;
       return '<section class="er-rev"><h3 class="k">Revenue by quarter</h3><div class="bars">' + rs.map(function(r){ var hgt = r.revenue ? Math.max(2, r.revenue / mx * 100) : 0; return '<span title="' + esc(qLbl(r.q)) + ' · ' + big$(r.revenue) + (r.net_income != null ? ' · net ' + big$(r.net_income) : '') + '"><b>' + big$(r.revenue).replace(/^\$/, '').replace(/\.0+([A-Z])$/, '$1') + '</b><i style="height:' + hgt.toFixed(0) + '%"></i><em>' + esc(qLbl(r.q)) + '</em></span>'; }).join('') + '</div><p class="lg">Last quarter ' + big$(last.revenue) + (g != null ? ' · ' + pctF(g, 1, true) + ' vs a year ago' : '') + (last.net_income != null ? ' · net income ' + big$(last.net_income) : '') + '</p></section>'; };
-    var cap = h && h.market_cap != null ? big$(h.market_cap) : (co && (co.shares || co.supply) && q && q.price != null ? big$(Number(q.price) * (co.shares ? co.shares * 1e9 : co.supply * 1e6)) + ' <small>approx.</small>' : null);
+    var cap = h && h.market_cap != null ? big$(h.market_cap) : (sharesOf(sym) && q && q.price != null ? big$(Number(q.price) * sharesOf(sym)) + ' <small>approx.</small>' : null);
     var html = '<button type="button" class="x" id="er-close" aria-label="Close">×</button>'
       + '<p class="dateline">' + esc(sym) + (h && h.exchange ? ' · ' + esc(h.exchange) : (e && e.exchange ? ' · ' + esc(e.exchange) : '')) + (h && h.sector ? ' · ' + esc(h.sector) : (co && co.sector ? ' · ' + esc(co.sector) : '')) + '</p><h2>' + esc(name) + '</h2>'
       + (q && q.price != null ? '<p class="px">' + usdPx(q.price) + ' <span class="' + sgn(Number(q.change_pct)).trim() + '">' + pct(Number(q.change_pct)) + ' today</span>' + (T && T.ret != null ? ' <span class="muted">·</span> <span class="' + sgn(T.ret).trim() + '">' + pct(T.ret) + '</span> <span class="muted">since our entry at ' + usdPx(T.entry) + '</span>' : '') + '</p>' : '')

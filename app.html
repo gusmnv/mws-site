@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=93b9c98a">
+<link rel="stylesheet" href="/mws.css?v=31f83be6">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=93b9c98a"></script>
+<script src="/mws.js?v=31f83be6"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -43,9 +43,8 @@
       <button class="side-close" id="side-close" type="button" aria-label="Close menu">×</button>
     </div>
     <nav class="snav" id="snav">
-      <p class="grp">Core</p>
+      <p class="grp">Core <span class="soon" id="desk-grp-tag">In development</span></p>
       <a href="#telegram" data-p="telegram">Telegram<span class="cnt" id="n-tg"></span></a>
-      <p class="grp">Portfolio <span class="soon" id="desk-grp-tag">In development</span></p>
       <a href="#portfolio" data-p="portfolio">Active Positions<span class="cnt" id="n-pf"></span></a>
       <a href="#track" data-p="track">Track Record<span class="cnt" id="n-tk"></span></a>
       <p class="grp">The Desk</p>
@@ -184,14 +183,14 @@
         <div class="head rv"><h1>Stock earnings. <span class="soon" id="er-tag">In development</span></h1></div>
         <div id="er-live" hidden>
           <div id="er-book" class="rv"></div>
-          <div class="fbar rv d1" id="er-bar">
-            <span class="chips" id="er-scope"><button type="button" data-v="all" class="on">All companies</button><button type="button" data-v="book">Our book only</button></span>
-            <span class="chips" id="er-reg"><button type="button" data-v="all" class="on">All markets</button><button type="button" data-v="US">US</button><button type="button" data-v="EU">Europe</button><button type="button" data-v="AS">Asia</button></span>
-            <span class="chips" id="er-wk"><button type="button" data-v="-1" title="Previous week">‹</button><button type="button" data-v="0" class="on">This week</button><button type="button" data-v="1" title="Next week">›</button></span>
-            <label class="er-find"><input id="er-q" type="search" placeholder="Find a company reporting in the next two weeks" autocomplete="off" aria-label="Find a company"></label>
+          <div class="fbar rv d1 er-bar" id="er-bar">
+            <span class="er-nav" id="er-wk"><button type="button" data-v="-1" title="Previous week" aria-label="Previous week">‹</button><button type="button" data-v="0" class="lbl" id="er-wk-lbl">This week</button><button type="button" data-v="1" title="Next week" aria-label="Next week">›</button></span>
+            <span class="chips" id="er-scope"><button type="button" data-v="all" class="on" title="Companies worth $40B or more, and ours">$40B and up</button><button type="button" data-v="book">Our book only</button></span>
+            <span class="chips" id="er-reg" hidden><button type="button" data-v="all" class="on">All markets</button><button type="button" data-v="US">US</button><button type="button" data-v="EU">Europe</button><button type="button" data-v="AS">Asia</button></span>
+            <span class="er-right"><span class="chips" id="er-view"><button type="button" data-v="board" class="on" title="The week, day by day">Board</button><button type="button" data-v="table" title="One line per company">Table</button></span><span class="chips" id="er-n" title="How many companies, the biggest first"><button type="button" data-v="25" class="on">25</button><button type="button" data-v="50">50</button><button type="button" data-v="0">All</button></span></span>
+            <label class="er-find"><input id="er-q" type="search" placeholder="Find a company in the next weeks" autocomplete="off" aria-label="Find a company"></label>
           </div>
           <div id="er-week" class="rv d1"></div>
-          <div id="er-reported" class="rv d2"></div>
           <p class="small muted" style="margin-top:18px" id="er-foot"></p>
         </div>
         <div id="er-locked" hidden class="banner"><div><b>Members only.</b><p>Earnings open with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
@@ -674,7 +673,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     else if (current === 'earnings') renderEarnings();
   }
   function posRefresh(){ if (posFacts) { var f = document.querySelector('#pos-page .facts'); if (f) f.innerHTML = posFacts(); } else renderPosition(); } /* prices moved: the facts row only, never the posts */
-  function liveKey(qs){ var x = /^([A-Z0-9]{2,10})\/(USD|USDT)$/.exec(String(qs || '').toUpperCase()); return x ? x[1].toLowerCase() + 'usdt' : ''; }
+  var NOT_CRYPTO = /^(WTI|BRENT|XAU|XAG|XPT|XPD|XCU|NG|HG)\//i; /* commodity pairs quoted like crypto (WTI/USD): Twelve Data, not Binance */
+  function liveKey(qs){ if (NOT_CRYPTO.test(String(qs || ''))) return ''; var x = /^([A-Z0-9]{2,10})\/(USD|USDT)$/.exec(String(qs || '').toUpperCase()); return x ? x[1].toLowerCase() + 'usdt' : ''; }
   function liveMap(){ var m = {}; (positions || []).forEach(function(p){ if (p.status !== 'open') return; var k = liveKey(p.quote_symbol); if (k) m[k] = String(p.quote_symbol).toUpperCase(); }); return m; }
   function liveStart(){
     if (sim || typeof WebSocket === 'undefined') return; var m = liveMap(), pairs = Object.keys(m); var key = pairs.join('/');
@@ -711,7 +711,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var pfSort = { k: "ret", d: -1 }, lastPx = {}; /* the last price each row was drawn with */
   function bigUsd(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); }
   function sharesOf(S){ var H = (typeof sim !== 'undefined' && sim) ? SIM_ERHIST : erHist, h = H && H[S], co = COMPANIES[S]; if (h && Number(h.shares) > 0) return Number(h.shares); if (co && co.shares) return co.shares * 1e9; if (co && co.supply) return co.supply * 1e6; return 0; } /* shares outstanding: EODHD (earnings_history, daily) first, then companies.json; crypto = supply */
-  function mcapOf(p, Q){ var S = String(p.symbol).toUpperCase(), n = sharesOf(S); if (!n) return null; var q = pfQuote(p, Q) || Q[S + '/USD'] || Q[S] || null; if (!q || q.price == null || q.error) return null; return bigUsd(Number(q.price) * n); } /* price × shares (or supply), approximate */
+  function mcapNum(p, Q){ var S = String(p.symbol).toUpperCase(), n = sharesOf(S); if (!n) return null; var q = pfQuote(p, Q) || Q[S + '/USD'] || Q[S] || null; if (!q || q.price == null || q.error) return null; return Number(q.price) * n; } /* price × shares (or supply), approximate */
+  function mcapOf(p, Q){ var v = mcapNum(p, Q); return v == null ? null : bigUsd(v); }
   function pxWith(T){ return T.last == null ? '—' : usdPx(T.last) + (T.roi1 != null ? ' <i class="chg' + sgn(T.roi1) + '">' + pct(T.roi1) + '</i>' : ''); } /* the price with the day's change beside it, as a terminal shows it */
   function shutNote(p){ return !usSession().open && !liveKey(p.quote_symbol) && (p.asset_class === 'equity' || p.asset_class === 'etf' || p.asset_class === 'index') ? '<span class="sub muted">market closed</span>' : ''; } /* the list: sorted within each group by a header click (the choice is kept while the page is open) */
   /* the section tag: Live for members, a warning for the owner while members do not see it yet */
@@ -733,7 +734,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (devFor('portfolio')) { $('#pf-locked').hidden = true; $('#pf-live').hidden = true; $('#pf-none').hidden = true; $('#pf-empty').hidden = false; var pt = $('#pf-tag'); pt.textContent = 'In development'; pt.className = 'soon'; $('#n-pf').textContent = ''; return; }
     $('#pf-locked').hidden = unlocked; $('#pf-live').hidden = !(unlocked && open.length); $('#pf-empty').hidden = true; $('#pf-none').hidden = !(unlocked && !open.length); $('#pf-sub').hidden = true;
     if (!(unlocked && open.length)) return;
-    var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: String(p.side || 'long') + ' ' + T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist) } }; };
+    var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: String(p.side || 'long') + ' ' + T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist), cap: mcapNum(p, Q) } }; };
     var sortGroup = function(rows, orders){ var st = pfSort; if (orders && (st.k === 'ret' || st.k === 'roi1')) st = { k: 'dist', d: 1 }; /* orders: the nearest level first */ return sortRows(rows, st); };
     var tick = function(p){ return cell('Type', esc(classOf(p)), 'muted c-type') + cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em c-tick') + cell('Name', esc(p.name || '—'), 'nm2 c-name'); };
     open.forEach(function(p){ var T = tradeNums(p, Q); if (T.last != null) lastPx[String(p.id)] = T.last; });
@@ -818,7 +819,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     { id: 's7', symbol:'BTC', name:'Bitcoin · 2022 cycle', kind:'spot', side:'long', asset_class:'crypto', entry:'16-18K', exit:'100-126K', result:'x7', status:'closed', opened_at:'2022-11-20', closed_at:'2025-11-16', thesis:'Bought when the market called for 10-12K.' } ];
   var SIM_QUOTES = { MSTR: { symbol:'MSTR', price:162.4, prev_close:158, change_pct:2.78, quoted_at:new Date().toISOString() }, PLTR: { symbol:'PLTR', price:171, prev_close:172.5, change_pct:-0.87, quoted_at:new Date().toISOString() }, 'BTC/USD': { symbol:'BTC/USD', price:72150, prev_close:71000, change_pct:1.62, quoted_at:new Date().toISOString() }, SPY: { symbol:'SPY', price:580.2, prev_close:578, change_pct:0.38 }, QQQ: { symbol:'QQQ', price:500.1, prev_close:501.2, change_pct:-0.22 } };
   /* The Desk · Calendar (public.calendar_events) and Earnings (public.earnings), filled by the calendar function. RLS hides both from non-members. */
-  var events = null, earnings = null, erHist = {}, calF = { imp: 3, reg: 'all', wk: 0 }, erF = { scope: 'all', reg: 'all', wk: 0, q: '' }, calT = null, erOpen = null;
+  var events = null, earnings = null, erHist = {}, calF = { imp: 3, reg: 'all', wk: 0 }, erF = { scope: 'all', reg: 'all', wk: 0, q: '', view: 'board', n: 25, sort: 'day' }, calT = null, erOpen = null, erMeta = {}, erHistReq = {};
+  var ER_MIN_CAP = 40e9, ER_WK_MIN = -1, ER_WK_MAX = 3, LOGOS = (C.SUPABASE_URL.indexOf('__') === 0 ? 'https://rgvyyxphqhtedhgvwopy.supabase.co' : C.SUPABASE_URL) + '/storage/v1/object/public/logos/'; /* the page starts at $40B; the window runs from last week to three weeks out */
   var REGION = { US: 'US', CA: 'US', EU: 'EU', DE: 'EU', FR: 'EU', IT: 'EU', ES: 'EU', GB: 'EU', CH: 'EU', JP: 'AS', CN: 'AS', HK: 'AS', AU: 'AS', NZ: 'AS', KR: 'AS', IN: 'AS', SG: 'AS', CRYPTO: 'CRYPTO' };
   var CNAME = { US: 'United States', EU: 'Euro area', GB: 'United Kingdom', JP: 'Japan', CN: 'China', DE: 'Germany', CA: 'Canada', AU: 'Australia', CH: 'Switzerland', NZ: 'New Zealand', FR: 'France', IT: 'Italy', ES: 'Spain', HK: 'Hong Kong', KR: 'South Korea', IN: 'India', CRYPTO: 'Crypto' };
   var ER_REGION = { 'United States': 'US', 'Canada': 'US', 'United Kingdom': 'EU', 'Germany': 'EU', 'France': 'EU', 'Netherlands': 'EU', 'Switzerland': 'EU', 'Italy': 'EU', 'Spain': 'EU', 'Sweden': 'EU', 'Denmark': 'EU', 'Norway': 'EU', 'Finland': 'EU', 'Belgium': 'EU', 'Ireland': 'EU', 'Japan': 'AS', 'China': 'AS', 'Hong Kong': 'AS', 'Australia': 'AS', 'South Korea': 'AS', 'India': 'AS', 'Singapore': 'AS', 'Taiwan': 'AS' };
@@ -832,8 +834,10 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var from = new Date(Date.now() - 9 * 864e5).toISOString(), to = new Date(Date.now() + 16 * 864e5).toISOString(), hist0 = new Date(Date.now() - 75 * 864e5).toISOString();
     /* the window members browse, plus the last prints of the important series (for the "last 3" line) */
     try { var ev = await sb.from('calendar_events').select('*').gte('at', hist0).lte('at', to).or('importance.gte.3,at.gte.' + from).order('at').limit(1000); events = ev.error ? [] : (ev.data || []); } catch (e) { events = []; }
-    try { var d0 = dayKey(Date.now() - 8 * 864e5), d1 = dayKey(Date.now() + 15 * 864e5); var er = await sb.from('earnings').select('*').gte('day', d0).lte('day', d1).order('day'); earnings = er.error ? [] : (er.data || []); } catch (e) { earnings = []; }
-    try { var eh = await sb.from('earnings_history').select('*'); erHist = {}; (eh.data || []).forEach(function(r){ erHist[String(r.symbol).toUpperCase()] = r.data || {}; }); } catch (e) { erHist = {}; } /* the book's companies: last quarters, next report, highlights (EODHD, once a day) */
+    try { var d0 = dayKey(Date.now() - 8 * 864e5), d1 = dayKey(Date.now() + 29 * 864e5); var er = await sb.from('earnings').select('*').gte('day', d0).lte('day', d1).order('day').limit(6000); earnings = er.error ? [] : (er.data || []); } catch (e) { earnings = []; }
+    /* every company above $10B: name, market cap, logo (the page filters at $40B); the full record (last quarters, highlights) only for the book, the rest on demand */
+    try { var em = await sb.from('earnings_history').select('symbol,name,market_cap,logo,next_report').gte('market_cap', 10e9).limit(4000); erMeta = {}; (em.data || []).forEach(function(r){ erMeta[String(r.symbol).toUpperCase()] = r; }); } catch (e) { erMeta = {}; }
+    try { var bookSyms = Object.keys(erBookMap()); var eh = await sb.from('earnings_history').select('*').in('symbol', bookSyms.length ? bookSyms : ['-']); (eh.data || []).forEach(function(r){ erHist[String(r.symbol).toUpperCase()] = r.data || {}; }); } catch (e) { }
   }
   function renderCalendar(){
     var unlocked = !!(access && access.valid), list = sim ? SIM_EVENTS : (events || []);
@@ -906,32 +910,52 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
         + '<span class="ft">' + (q && q.price != null ? usdPx(q.price) + ' <i class="' + sgn(Number(q.change_pct)).trim() + '">' + pct(Number(q.change_pct)) + '</i>' : '') + (T.ret != null ? '<i class="pos-ret ' + sgn(T.ret).trim() + '">' + pct(T.ret) + ' since our entry</i>' : '') + (streak >= 2 ? '<i class="muted">' + streak + ' beats in a row</i>' : '') + '</span></button>'; }).join('') + '</div>'
       : '<div class="banner"><div><b>No earnings in the window for the book.</b><p>The next reports of our companies appear here as soon as they are scheduled.</p></div></div>';
     var nBook = cards.filter(function(c){ return c.up && (Date.parse(c.when + 'T12:00:00') - Date.parse(today + 'T12:00:00')) / 864e5 <= 7; }).length; $('#n-er').textContent = String(nBook || ''); /* the badge: our companies reporting within a week */
-    /* 2 · the week, day by day */
-    var q = erF.q.trim().toLowerCase();
-    var pass = function(e){ if (q) return String(e.symbol).toLowerCase().indexOf(q) === 0 || String(e.name || '').toLowerCase().indexOf(q) >= 0; if (erF.scope === 'book' && !isBook(e)) return false; if (erF.reg !== 'all' && (ER_REGION[e.country] || 'other') !== erF.reg) return false; return true; };
+    /* 2 · the week: the companies above $40B (and ours), as a board (day by day, before the open / after the close) or a table */
+    var q = erF.q.trim().toLowerCase(), ME = sim ? SIM_ERMETA : erMeta, anyMeta = Object.keys(ME).length > 0;
+    var metaOf = function(e){ var S = String(e.symbol).toUpperCase(); return ME[S] || null; };
+    var capOf = function(e){ var m = metaOf(e); if (m && m.market_cap != null) return Number(m.market_cap); var hh = H[String(e.symbol).toUpperCase()]; return hh && hh.market_cap != null ? Number(hh.market_cap) : null; };
+    var pass = function(e){ if (q) return String(e.symbol).toLowerCase().indexOf(q) === 0 || String(e.name || '').toLowerCase().indexOf(q) >= 0; if (erF.scope === 'book') return isBook(e); if (erF.reg !== 'all' && (ER_REGION[e.country] || 'other') !== erF.reg) return false; if (isBook(e) || !anyMeta) return true; var c = capOf(e); return c != null && c >= ER_MIN_CAP; };
     var regs = {}; list.forEach(function(e){ regs[ER_REGION[e.country] || 'other'] = 1; }); $('#er-reg').hidden = Object.keys(regs).length < 2; if ($('#er-reg').hidden && erF.reg !== 'all') erF.reg = 'all';
-    var mon = new Date(dayKey(now) + 'T12:00:00'); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7) + erF.wk * 7);
+    var mon = new Date(dayKey(now) + 'T12:00:00'), dow = mon.getDay(); mon.setDate(mon.getDate() - ((dow + 6) % 7) + (dow === 0 || dow === 6 ? 7 : 0) + erF.wk * 7); /* on a weekend 'this week' is the week about to start */
     var days = []; for (var i = 0; i < 5; i++) { var d = new Date(mon.getTime() + i * 864e5); days.push(dayKey(d)); }
     if (q) { var dq = {}; list.forEach(function(e){ if (pass(e)) dq[e.day] = 1; }); days = Object.keys(dq).sort(); } /* a search looks through the whole window */
-    M.$$('#er-wk button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === '0' && erF.wk === 0); if (b.dataset.v === '0') b.textContent = erF.wk === 0 ? 'This week' : erF.wk === 1 ? 'Next week' : erF.wk === -1 ? 'Last week' : (erF.wk > 0 ? '+' : '') + erF.wk + ' weeks'; });
     var wkLbl = days.length ? erDayLbl(days[0]).d + ' – ' + erDayLbl(days[days.length - 1]).d : '';
-    var sortDay = function(a, b){ return (isBook(b) ? 1 : 0) - (isBook(a) ? 1 : 0) || (ER_TOD(a.time) === 'pre' ? 0 : 1) - (ER_TOD(b.time) === 'pre' ? 0 : 1) || a.symbol.localeCompare(b.symbol); };
-    var item = function(e, hid){ var mine = isBook(e), out = e.eps_actual != null; return '<button type="button" class="er-it' + (mine ? ' mine' : '') + (out ? ' out' : '') + '"' + (hid ? ' hidden' : '') + ' data-er="' + esc(erKey(e)) + '">' + erTag(e.time) + '<span class="sym">' + esc(e.symbol) + '</span><span class="nm">' + esc(e.name || '') + '</span><span class="v">' + (out ? epsTxt(e.eps_actual) + ' ' + beatHtml(e) : (e.eps_estimate != null ? '<span class="muted">est.</span> ' + epsTxt(e.eps_estimate) : '')) + '</span></button>'; };
-    var LIMIT = erF.scope === 'book' || q ? 60 : 12;
-    $('#er-week').innerHTML = '<div class="sh"><h2>' + (q ? 'Search <span class="muted">· “' + esc(erF.q.trim()) + '”</span>' : 'The week <span class="muted">· ' + wkLbl + '</span>') + '</h2></div>' + (days.length ? '<div class="er-week' + (q ? ' n' + Math.min(days.length, 5) : '') + '">' + days.map(function(k){ var l = erDayLbl(k), rows = list.filter(function(e){ return e.day === k && pass(e); }).sort(sortDay), more = rows.length - LIMIT, isToday = k === today;
-      return '<div class="er-day' + (isToday ? ' today' : '') + (k < today ? ' past' : '') + '"><div class="dh"><b>' + (isToday ? 'Today' : l.wd) + '</b><span>' + l.d + '</span>' + (rows.length ? '<i>' + rows.length + '</i>' : '') + '</div>' + (rows.length ? rows.map(function(e, i){ return item(e, i >= LIMIT); }).join('') + (more > 0 ? '<button type="button" class="er-more" data-day="' + k + '">+ ' + more + ' more</button>' : '') : '<p class="none">' + (erF.scope === 'book' && !q ? 'None of ours' : 'Nothing scheduled') + '</p>') + '</div>'; }).join('') + '</div>' : '<div class="banner"><div><b>No company matches “' + esc(erF.q.trim()) + '”.</b><p>The search covers the companies reporting from last week to two weeks ahead.</p></div></div>');
-    /* 3 · what was reported in the window, newest first */
-    var done = list.filter(function(e){ return e.eps_actual != null && pass(e); }).sort(function(a, b){ return b.day.localeCompare(a.day) || (isBook(b) ? 1 : 0) - (isBook(a) ? 1 : 0) || String(b.reported_at || '').localeCompare(String(a.reported_at || '')); }).slice(0, 40);
-    $('#er-reported').innerHTML = done.length ? '<div class="sh"><h2>Reported <span class="muted">· newest first' + (erF.scope === 'book' && !q ? ' · our book' : '') + '</span></h2></div><div class="ptw"><table class="pt cards ruled er"><thead><tr><th>Company</th><th>When</th><th class="num">EPS expected</th><th class="num">EPS reported</th><th class="num">Surprise</th><th></th></tr></thead><tbody>' + done.map(function(e){ var mine = isBook(e), fresh = e.reported_at && now - new Date(e.reported_at).getTime() < 60 * 60000;
-      return '<tr class="clk-er' + (mine ? ' mine' : '') + (fresh ? ' fresh' : '') + '" data-er="' + esc(erKey(e)) + '">' + cell('Company', '<span class="sym">' + esc(e.symbol) + '</span><span class="nm">' + esc(e.name || '') + '</span>' + (mine ? ' <span class="tag ok">in the book</span>' : ''), 'em') + cell('When', erWhen(e.day) + '<span class="sub muted">' + erTime(e.time) + (fresh && e.reported_at ? ' · ' + agoTxt(e.reported_at) : '') + '</span>', 'muted') + cell('EPS expected', epsTxt(e.eps_estimate, e.currency), 'num') + cell('EPS reported', '<b>' + epsTxt(e.eps_actual, e.currency) + '</b>', 'num') + cell('Surprise', beatHtml(e, true), 'num') + '<td class="num act"><span class="more">Details <span aria-hidden="true">→</span></span></td></tr>'; }).join('') + '</tbody></table></div>' : '';
+    $('#er-wk-lbl').innerHTML = (erF.wk === 0 ? 'This week' : erF.wk === 1 ? 'Next week' : erF.wk === -1 ? 'Last week' : 'In ' + erF.wk + ' weeks') + (wkLbl && !q ? ' <span class="muted">· ' + wkLbl + '</span>' : ''); $('#er-wk-lbl').title = erF.wk ? 'Back to this week' : '';
+    M.$$('#er-wk button').forEach(function(b){ if (b.dataset.v === '-1') b.disabled = erF.wk <= ER_WK_MIN; if (b.dataset.v === '1') b.disabled = erF.wk >= ER_WK_MAX; });
+    M.$$('#er-view button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === erF.view); }); M.$$('#er-n button').forEach(function(b){ b.classList.toggle('on', Number(b.dataset.v) === erF.n); });
+    var seen = {}, rows = list.filter(function(e){ if (days.indexOf(e.day) < 0 || !pass(e)) return false; var k = String(e.symbol).toUpperCase() + '|' + e.day; if (seen[k]) return false; seen[k] = 1; return true; });
+    var byCap = function(a, b){ return (capOf(b) || 0) - (capOf(a) || 0) || (isBook(b) ? 1 : 0) - (isBook(a) ? 1 : 0) || a.symbol.localeCompare(b.symbol); };
+    rows.sort(byCap); var total = rows.length; if (erF.n && !q && rows.length > erF.n) rows = rows.slice(0, erF.n);
+    var logoHtml = function(S){ var m = ME[S]; return '<span class="clogo' + (m && m.logo ? '' : ' x') + '">' + (m && m.logo ? '<img src="' + LOGOS + encodeURIComponent(S) + '.png" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'x\')">' : '') + '<i>' + esc(S.replace(/[.-].*$/, '').slice(0, 4)) + '</i></span>'; };
+    var tile = function(e){ var S = String(e.symbol).toUpperCase(), mine = isBook(e), out = e.eps_actual != null; return '<button type="button" class="er-co' + (mine ? ' mine' : '') + (out ? ' out' : '') + '" data-er="' + esc(erKey(e)) + '" title="' + esc(e.name || S) + (capOf(e) != null ? ' · ' + big$(capOf(e)) : '') + '">' + logoHtml(S) + '<span class="sym">' + esc(S) + '</span>' + (out ? beatHtml(e) : '') + '</button>'; };
+    var head = '<div class="sh"><h2>' + (q ? 'Search <span class="muted">· “' + esc(erF.q.trim()) + '”</span>' : (erF.scope === 'book' ? 'Our book' : 'Companies above $40B') + ' <span class="muted">· ' + (rows.length < total ? rows.length + ' of ' + total : total) + ' report' + (total === 1 ? '' : 's') + (rows.length < total ? ', the biggest first' : '') + '</span>') + '</h2></div>';
+    if (erF.view === 'board' || q) {
+      $('#er-week').innerHTML = head + (days.length ? '<div class="er-week' + (q ? ' n' + Math.min(days.length, 5) : '') + '">' + days.map(function(k){ var l = erDayLbl(k), dr = rows.filter(function(e){ return e.day === k; }), isToday = k === today;
+        var pre = dr.filter(function(e){ return ER_TOD(e.time) === 'pre'; }), aft = dr.filter(function(e){ return ER_TOD(e.time) === 'after'; }), tba = dr.filter(function(e){ var t = ER_TOD(e.time); return t !== 'pre' && t !== 'after'; });
+        var col = function(h, xs){ return '<div class="er-col"><h4>' + h + '</h4>' + (xs.length ? '<div class="er-tiles">' + xs.map(tile).join('') + '</div>' : '<p class="none">No companies</p>') + '</div>'; };
+        return '<div class="er-day' + (isToday ? ' today' : '') + (k < today ? ' past' : '') + '"><div class="dh"><b>' + (isToday ? 'Today' : l.wd) + '</b><span>' + l.d + '</span>' + (dr.length ? '<i>' + dr.length + '</i>' : '') + '</div><div class="er-cols">' + col('Before open', pre) + col('After close', aft) + '</div>' + (tba.length ? '<div class="er-col tba"><h4>Time to be confirmed</h4><div class="er-tiles">' + tba.map(tile).join('') + '</div></div>' : '') + '</div>'; }).join('') + '</div>'
+        : '<div class="banner"><div><b>Nothing found.</b><p>No company in the next weeks matches “' + esc(erF.q.trim()) + '”.</p></div></div>');
+    } else {
+      /* the table: one line per company, with the revenue columns when the company record is in (fetched on demand for the lines on screen) */
+      var srt = rows.slice().sort(erF.sort === 'cap' ? byCap : function(a, b){ return a.day.localeCompare(b.day) || byCap(a, b); });
+      var revOf = function(e, hh){ if (!hh) return { est: null, act: null }; var est = hh.trend && hh.trend.rev_est_avg != null ? Number(hh.trend.rev_est_avg) : null, act = null; if (e.eps_actual != null && hh.revenue && hh.revenue.length) { var lo = dayKey(Date.parse(e.day + 'T12:00:00') - 110 * 864e5); hh.revenue.forEach(function(r){ if (r.q && r.q <= e.day && r.q >= lo && r.revenue != null) act = Number(r.revenue); }); } return { est: est, act: act }; };
+      var revBeat = function(r){ if (r.est == null || r.act == null || !r.est) return '—'; var sp = (r.act / r.est - 1) * 100, w = sp > 0.5 ? 'up' : sp < -0.5 ? 'dn' : 'eq'; return '<span class="beat ' + w + '">' + (w === 'up' ? 'Beat' : w === 'dn' ? 'Miss' : 'In line') + (Math.abs(sp) >= 0.5 ? ' ' + (sp > 0 ? '+' : '') + sp.toFixed(1) + '%' : '') + '</span>'; };
+      var th2 = function(l, k, cls){ return '<th class="' + (cls || '') + (k ? ' s' : '') + (k && erF.sort === k ? ' on' : '') + '"' + (k ? ' data-k="' + k + '" tabindex="0" role="button" title="Sort by ' + l.toLowerCase() + '"' : '') + '>' + l + (k && erF.sort === k ? ' <i aria-hidden="true">↓</i>' : '') + '</th>'; };
+      $('#er-week').innerHTML = head + (srt.length ? '<div class="ptw"><table class="pt cards ruled er-tbl"><thead><tr>' + th2('Ticker', null, 'c-tk') + th2('Company', null, 'c-co') + th2('Date', 'day', 'c-date') + th2('Time', null, 'c-tod') + th2('Market cap', 'cap', 'num c-cap') + th2('EPS est', null, 'num c-eps') + th2('EPS actual', null, 'num c-eps') + th2('EPS beat / miss', null, 'c-bm') + th2('Rev est', null, 'num c-rev') + th2('Rev actual', null, 'num c-rev') + th2('Rev beat / miss', null, 'c-rev c-bm') + '</tr></thead><tbody>' + srt.map(function(e){ var S = String(e.symbol).toUpperCase(), mine = isBook(e), hh = H[S] || null, rv = revOf(e, hh), c = capOf(e), tod = ER_TOD(e.time);
+        return '<tr class="clk-er' + (mine ? ' mine' : '') + '" data-er="' + esc(erKey(e)) + '">' + cell('Ticker', logoHtml(S) + '<span class="sym">' + esc(S) + '</span>', 'em c-tk') + cell('Company', esc(e.name || (ME[S] && ME[S].name) || S) + (mine ? ' <span class="tag ok">in the book</span>' : ''), 'c-co') + cell('Date', (e.day === today ? 'Today' : erWhen(e.day)), 'muted c-date') + cell('Time', tod === 'pre' ? '<span class="tod pre">BMO</span>' : tod === 'after' ? '<span class="tod after">AMC</span>' : '<span class="muted">—</span>', 'c-tod') + cell('Market cap', c != null ? big$(c) : '—', 'num c-cap') + cell('EPS est', epsTxt(e.eps_estimate, e.currency), 'num c-eps') + cell('EPS actual', e.eps_actual != null ? epsTxt(e.eps_actual, e.currency) : '—', 'num c-eps' + (e.eps_actual != null ? ' em' : ' muted')) + cell('EPS beat / miss', beatHtml(e, true) || '—', 'c-bm') + cell('Rev est', rv.est != null ? big$(rv.est) : '—', 'num c-rev') + cell('Rev actual', rv.act != null ? big$(rv.act) : '—', 'num c-rev') + cell('Rev beat / miss', revBeat(rv), 'c-rev c-bm') + '</tr>'; }).join('') + '</tbody></table></div>'
+        : '<div class="banner"><div><b>No reports this week' + (erF.scope === 'book' ? ' from the book' : ' above $40B') + '.</b><p>Try the next week.</p></div></div>');
+      /* the lines on screen without a company record: fetch them once, then draw again */
+      if (!sim && access && access.valid) { var need = srt.map(function(e){ return String(e.symbol).toUpperCase(); }).filter(function(S, i, a){ return a.indexOf(S) === i && !H[S] && !erHistReq[S]; }).slice(0, 60); if (need.length) { need.forEach(function(S){ erHistReq[S] = 1; }); sb.from('earnings_history').select('symbol,data').in('symbol', need).then(function(r){ var got = 0; (r.data || []).forEach(function(x){ erHist[String(x.symbol).toUpperCase()] = x.data || {}; got++; }); if (got && current === 'earnings') renderEarnings(); }); } }
+    }
     var latest = list.map(function(e){ return e.updated_at; }).filter(Boolean).sort().pop();
-    $('#er-foot').textContent = 'Consensus = analysts’ average EPS before the report · surprise = reported vs consensus · pre = before the US open, after = after the close · refreshed through the reporting windows; the company pages once a day' + (latest ? ' · updated ' + new Date(latest).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '') + ' · not financial advice.';
+    $('#er-foot').textContent = 'Companies worth $40B or more (our book always shows) · BMO = before the US open, AMC = after the close · est = analysts’ consensus · beat / miss = reported vs consensus · market cap and revenue from the company record, refreshed daily' + (latest ? ' · reports updated ' + new Date(latest).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '') + ' · not financial advice.';
     if (erOpen) erPanel(erOpen, true);
   }
   /* the company panel */
   function erPanel(key, quiet){
     var list = sim ? SIM_EARNINGS : (earnings || []), H = sim ? SIM_ERHIST : erHist, Q = sim ? SIM_QUOTES : quotes, book = erBookMap();
     var e = null, sym = null; if (/^sym\|/.test(key)) sym = key.slice(4); else { list.forEach(function(x){ if (erKey(x) === key) e = x; }); if (!e) return; sym = String(e.symbol).toUpperCase(); }
+    if (!sim && !H[sym] && !erHistReq[sym] && access && access.valid) { erHistReq[sym] = 1; sb.from('earnings_history').select('symbol,data').eq('symbol', sym).maybeSingle().then(function(r){ if (r.data && r.data.data) { erHist[sym] = r.data.data; if (erOpen === key) erPanel(key, true); } }); } /* beyond the book: the record arrives a moment later */
     var p = book[sym] || null, h = H[sym] || null, co = COMPANIES[sym] || null, q = p && p.quote_symbol ? Q[String(p.quote_symbol).toUpperCase()] : Q[sym], T = p ? tradeNums(p, Q) : null;
     var name = (e && e.name) || (p && p.name) || (h && h.name) || (co && co.name) || sym;
     var mine = list.filter(function(x){ return String(x.symbol).toUpperCase() === sym; }).sort(function(a, b){ return a.day.localeCompare(b.day); });
@@ -972,13 +996,14 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   }
   function erClose(){ $('#er-panel').hidden = true; $('#er-scrim').hidden = true; erOpen = null; document.body.classList.remove('er-open'); }
   document.addEventListener('click', function(ev){ var c = ev.target.closest('[data-er]'); if (c) { erPanel(c.getAttribute('data-er')); return; } if (ev.target.closest('#er-close, #er-scrim')) { erClose(); return; } var m = ev.target.closest('.er-more'); if (m) { m.parentNode.querySelectorAll('.er-it').forEach(function(x){ x.hidden = false; }); m.remove(); } });
-  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape' && erOpen) erClose(); });
+  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape' && erOpen) erClose(); if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.closest && ev.target.closest('.er-tbl th.s')) { ev.preventDefault(); erF.sort = ev.target.closest('th').dataset.k; renderEarnings(); } });
   var erQT = null; document.addEventListener('input', function(ev){ if (ev.target && ev.target.id === 'er-q') { clearTimeout(erQT); var v = ev.target.value; erQT = setTimeout(function(){ erF.q = v; renderEarnings(); var i = $('#er-q'); if (i && document.activeElement !== i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 160); } });
   document.addEventListener('click', function(ev){
-    var b = ev.target.closest('#cal-imp button, #cal-reg button, #cal-wk button, #er-scope button, #er-reg button, #er-wk button'); if (!b) return;
-    var grp = b.parentNode.id; M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x === b); });
+    var sh = ev.target.closest('.er-tbl th.s'); if (sh) { erF.sort = sh.dataset.k; renderEarnings(); return; }
+    var b = ev.target.closest('#cal-imp button, #cal-reg button, #cal-wk button, #er-scope button, #er-reg button, #er-wk button, #er-view button, #er-n button'); if (!b) return;
+    var grp = b.parentNode.id; if (grp !== 'er-wk') M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x === b); });
     if (grp === 'cal-imp') calF.imp = Number(b.dataset.v); if (grp === 'cal-reg') calF.reg = b.dataset.v; if (grp === 'cal-wk') { var dv = Number(b.dataset.v); calF.wk = dv === 0 ? 0 : Math.max(-1, Math.min(2, calF.wk + dv)); M.$$('button', b.parentNode).forEach(function(x){ x.classList.toggle('on', x.dataset.v === '0'); }); }
-    if (grp === 'er-scope') erF.scope = b.dataset.v; if (grp === 'er-reg') erF.reg = b.dataset.v; if (grp === 'er-wk') { var ev2 = Number(b.dataset.v); erF.wk = ev2 === 0 ? 0 : Math.max(-1, Math.min(2, erF.wk + ev2)); }
+    if (grp === 'er-scope') erF.scope = b.dataset.v; if (grp === 'er-reg') erF.reg = b.dataset.v; if (grp === 'er-wk') { var ev2 = Number(b.dataset.v); erF.wk = ev2 === 0 ? 0 : Math.max(ER_WK_MIN, Math.min(ER_WK_MAX, erF.wk + ev2)); } if (grp === 'er-view') erF.view = b.dataset.v; if (grp === 'er-n') erF.n = Number(b.dataset.v);
     if (/^cal/.test(grp)) renderCalendar(); else renderEarnings(); pressChips(); syncBarTag();
   });
   /* owner preview data */
@@ -1027,6 +1052,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       market_cap: 455e9, pe: 480, forward_pe: 170, eps_ttm: 0.41, revenue_ttm: 3.9e9, profit_margin: 0.26, operating_margin: 0.31, rev_growth_yoy: 0.48, eps_growth_yoy: 1.01, target_price: 165, dividend_yield: null, short_pct: 0.028, shares: 2.37e9,
       next: { q: q(1), report: null, when: 'AfterMarket', est: 0.11 }, history: H([[0.08, 0.08], [0.08, 0.09], [0.09, 0.10], [0.11, 0.14], [0.13, 0.13], [0.14, 0.16], [0.16, 0.18], [0.17, 0.21]]),
       revenue: R([[634, 106], [678, 134], [726, 144], [828, 79], [884, 214], [1004, 327], [1181, 476], [1290, 540]]), trend: { rev_est_avg: 1.36e9, rev_growth: 0.52, eps_est_year_ago: 0.10 }, fetched_at: new Date().toISOString() } }; })();
+  var SIM_CAPS = { JPM: 892, WFC: 253, C: 222, BLK: 168, GS: 264, DPZ: 15, JNJ: 630, BAC: 385, MS: 300, ASML: 686, ABT: 240, PGR: 126, PNC: 80, UAL: 32, UNH: 344, CSX: 65, TRV: 60, MTB: 32, SCHW: 170, AXP: 230, TFC: 60, STT: 48, FITB: 30, ALLY: 12, HBAN: 25, RF: 22, CFG: 20, CMA: 8, WIT: 28, ALV: 8, KO: 300, NFLX: 450, GE: 300, LMT: 110, TSLA: 1100, IBM: 260, T: 200, NOW: 180, INTC: 150, UNP: 140, PG: 380, HCA: 110, DAL: 40, PEP: 200, AZZ: 3, STZ: 30, HELE: 1, CAG: 9, NKE: 100, MKC: 20, RPM: 15, TSM: 2351 }; /* $B, the owner preview */
+  var SIM_ERMETA = (function(){ var m = {}; Object.keys(SIM_ERHIST).forEach(function(k){ m[k] = { symbol: k, name: SIM_ERHIST[k].name, market_cap: SIM_ERHIST[k].market_cap, logo: true }; }); SIM_EARNINGS.forEach(function(e){ var S = String(e.symbol).toUpperCase(); if (!m[S] && SIM_CAPS[S]) m[S] = { symbol: S, name: e.name, market_cap: SIM_CAPS[S] * 1e9, logo: SIM_CAPS[S] >= 10 }; }); return m; })();
 
   /* Telegram: personal join links, one per channel. Tap → Telegram opens the channel → Join → approved in a second. */
   var invitesInFlight = null;

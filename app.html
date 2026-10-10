@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=851e9a71">
+<link rel="stylesheet" href="/mws.css?v=bf180fa0">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=851e9a71"></script>
+<script src="/mws.js?v=bf180fa0"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -622,7 +622,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     /* the asset's live market cap (price × shares or supply, approximate) and its site join the facts; the rest of the company text stays in companies.json for the earnings panel */
     var about = function(){ if (!co) return ''; var cap = mcapOf(p, D.Q);
       var site = co.site ? '<a class="site" href="' + esc(co.site) + '" target="_blank" rel="noopener">' + esc(String(co.site).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')) + ' ↗</a>' : '';
-      return (cap ? fact('Market cap', cap + ' <small>approx.</small>') : '') + (site ? fact('Website', site) : ''); };
+      var page = isCo(p) ? fact('Company', '<button type="button" class="co-btn fact-btn" data-co="' + esc(String(p.symbol).toUpperCase()) + '">Open page ↗</button>') : '';
+      return (cap ? fact('Market cap', cap + ' <small>approx.</small>') : '') + (site ? fact('Website', site) : '') + page; };
     var facts = buildFacts(); posFacts = buildFacts; /* a live tick redraws the facts only */
     var postFig = function(i, cap, px){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
       return src ? '<figure class="post"><img src="' + esc(src) + '" alt="Telegram post, ' + esc(when) + '" loading="lazy"><figcaption><span>' + esc(when) + (px ? ' · <b class="px">' + px + '</b>' : '') + '</span><span class="src">' + (cap || 'Telegram Exclusive channel') + '</span></figcaption></figure>'
@@ -646,7 +647,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
       + '<div id="pf-story">' + (STORIES ? body() : '<p class="small muted">Loading…</p>') + '</div>';
     if (!STORIES) loadStories().then(function(){ if (current === 'position') renderPosition(); });
   }
-  document.addEventListener('click', function(ev){ var tr = ev.target.closest('#pf-groups tr.clk, #tk-table tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
+  document.addEventListener('click', function(ev){ var cb = ev.target.closest('[data-co]'); if (cb) { ev.preventDefault(); ev.stopPropagation(); if (typeof erPanel === 'function') erPanel('sym|' + cb.getAttribute('data-co')); return; } var tr = ev.target.closest('#pf-groups tr.clk, #tk-table tr.clk'); if (tr && !ev.target.closest('a')) location.hash = '#position/' + tr.dataset.pid; });
   function pfGrouped(rows, cols, rowFn){ /* one heading row per asset class, in a fixed order */
     var by = {}; rows.forEach(function(p){ var g = PF_CLASS[p.asset_class] || 'Other'; (by[g] = by[g] || []).push(p); });
     return PF_ORDER.filter(function(g){ return by[g]; }).map(function(g){ return '<tr class="grp"><td colspan="' + cols + '">' + g + '</td></tr>' + by[g].map(rowFn).join(''); }).join('');
@@ -708,6 +709,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function usSession(now){ var p = {}; NYF.formatToParts(now || new Date()).forEach(function(x){ p[x.type] = x.value; }); var dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday), mins = (Number(p.hour) % 24) * 60 + Number(p.minute), wk = dow >= 1 && dow <= 5, open = wk && mins >= 570 && mins < 960;
     var until; if (open) until = 960 - mins; else { var d = 0, m = mins; if (wk && mins < 570) until = 570 - mins; else { d = dow === 5 ? 3 : dow === 6 ? 2 : 1; until = (1440 - m) + 570 + (d - 1) * 1440; } }
     return { open: open, until: until, dow: dow }; }
+  var isCo = function(p){ return p && (p.asset_class === 'equity' || p.asset_class === 'etf'); }; /* a listed company: the name opens its page (report, quarters, financials) */
   var pfSort = { k: "ret", d: -1 }, lastPx = {}; /* the last price each row was drawn with */
   function bigUsd(v){ if (v == null || !isFinite(v)) return null; var a = Math.abs(v); return '$' + (a >= 1e12 ? (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? (a / 1e9).toFixed(1) + 'B' : a >= 1e6 ? (a / 1e6).toFixed(0) + 'M' : a.toLocaleString('en-US', { maximumFractionDigits: 0 })); }
   function sharesOf(S){ var H = (typeof sim !== 'undefined' && sim) ? SIM_ERHIST : erHist, h = H && H[S], co = COMPANIES[S]; if (h && Number(h.shares) > 0) return Number(h.shares); if (co && co.shares) return co.shares * 1e9; if (co && co.supply) return co.supply * 1e6; return 0; } /* shares outstanding: EODHD (earnings_history, daily) first, then companies.json; crypto = supply */
@@ -736,7 +738,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!(unlocked && open.length)) return;
     var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: String(p.side || 'long') + ' ' + T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist), cap: mcapNum(p, Q) } }; };
     var sortGroup = function(rows, orders){ var st = pfSort; if (orders && (st.k === 'ret' || st.k === 'roi1')) st = { k: 'dist', d: 1 }; /* orders: the nearest level first */ return sortRows(rows, st); };
-    var tick = function(p){ return cell('Type', esc(classOf(p)), 'muted c-type') + cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em c-tick') + cell('Name', esc(p.name || '—'), 'nm2 c-name'); };
+    var tick = function(p){ return cell('Type', esc(classOf(p)), 'muted c-type') + cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em c-tick') + cell('Name', isCo(p) ? '<button type="button" class="co-btn" data-co="' + esc(String(p.symbol).toUpperCase()) + '" title="Company page: report, last quarters, financials">' + esc(p.name || '—') + '</button>' : esc(p.name || '—'), 'nm2 c-name'); };
     open.forEach(function(p){ var T = tradeNums(p, Q); if (T.last != null) lastPx[String(p.id)] = T.last; });
     var lastCell = function(T, p){ if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', pxWith(T) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : shutNote(p)), 'num px'); };
     var roiCells = function(T, p){ return cell('All-time change', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret)) + cell('Market cap', mcapOf(p, Q) || '<span class="muted">—</span>', 'num muted c-cap'); };

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=f0d8e7cf">
+<link rel="stylesheet" href="/mws.css?v=2181477e">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=f0d8e7cf"></script>
+<script src="/mws.js?v=2181477e"></script>
 </head>
 <body class="app">
 <!-- gate: password reset / expired links (no shell) -->
@@ -564,7 +564,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   function pfKind(p){ return p.kind === 'leveraged' || p.kind === 'order' ? p.kind : 'spot'; }
   function pfDraft(p){ return p.published === false ? '<span class="tag warn" style="margin-left:8px">Draft</span>' : ''; } /* only staff ever receive drafts (RLS); the tag shows what members do not see yet */
   function pfLinks(p){ var l = Array.isArray(p.links) ? p.links.filter(function(u){ return /^https:\/\/t\.me\//.test(String(u)); }) : []; return l.length ? '<span class="posts">' + l.map(function(u, i){ return '<a href="' + esc(u) + '" target="_blank" rel="noopener" title="Open the call in Telegram">' + (l.length > 1 ? 'post ' + (i + 1) : 'post') + '</a>'; }).join('') + '</span>' : ''; }
-  function pfSide(p){ var s = String(p.side || 'long'); var warn = s === 'short' || s === 'sell'; return '<span class="tag ' + (warn ? 'warn' : 'ok') + '">' + esc(s) + (pfKind(p) !== 'spot' && levOf(p) > 1 ? ' ' + levOf(p) + '×' : '') + '</span>'; }
+  function sideTxt(p){ var s = String(p.side || 'long'); return esc(s.charAt(0).toUpperCase() + s.slice(1)); }
+  function pfSide(p){ return sideTxt(p) + (pfKind(p) !== 'spot' && levOf(p) > 1 ? ' ' + levOf(p) + '×' : ''); } /* plain text like every other cell: "Short 4×", "Long" (11 Oct: no coloured pill) */
   function pfName(p, side, bare){ var s = String(p.side || 'long'); var says = side && (s === 'short' || s === 'sell' || pfKind(p) !== 'spot'); return '<a class="sym" href="#position/' + esc(String(p.id)) + '"' + (bare && p.name ? ' title="' + esc(p.name) + '"' : '') + '>' + esc(p.symbol) + '</a>' + (!bare && p.name ? '<span class="nm" title="' + esc(p.name) + '">' + esc(p.name) + '</span>' : '') + (says ? ' ' + pfSide(p) : '') + pfDraft(p); }
   function detailsCell(p){ return '<td class="num act"><a class="more" href="#position/' + esc(String(p.id)) + '">Details <span aria-hidden="true">→</span></a></td>'; } /* the row stays clean: everything else lives on the position page (the symbol is the link, the whole row a shortcut) */
   function pfIds(p){ return (Array.isArray(p.links) ? p.links : []).map(function(u){ var m = String(u).match(/t\.me\/c\/2077854583\/(\d+)/); return m ? m[1] : null; }).filter(Boolean); }
@@ -769,9 +770,8 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     var block = function(title, sub, headHtml, rows, rowFn){ return rows.length ? '<section class="pf-sec"><div class="sh"><h2>' + title + ' <span class="muted">· ' + rows.length + ' ' + sub + '</span></h2></div><div class="ptw"><table class="pt cards ruled pf-tbl">' + headHtml + '<tbody>' + rows.map(rowFn).join('') + '</tbody></table></div></section>' : ''; };
     var spot = sortGroup(P.spot.map(mk)), lev = sortGroup(P.lev.map(mk)), ord = sortGroup(P.ord.map(mk), true);
     $('#pf-groups').innerHTML = block('Spot', spot.length === 1 ? 'position' : 'positions', spotHead, spot, spotRow) + block('Leveraged', lev.length === 1 ? 'trade' : 'trades', levHead, lev, levRow) + block('Orders', 'waiting to fill', ordHead, ord, ordRow);
-    var asOf = open.map(function(p){ var q = pfQuote(p, Q); return q && (q.updated_at || q.quoted_at); }).filter(Boolean).sort().pop();
-    var nDraft = list.filter(function(p){ return p.published === false; }).length;
-    $('#pf-foot').innerHTML = (nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see · ' : '') + 'Every open call from the Exclusive channel, priced live: entry as posted, last price, the move since the call (shorts gain when the price falls' + (LEV_ROI === 'margin' ? '; leveraged trades at their leverage' : '; leveraged trades show the move in the price, the leverage beside the direction') + ') · 1D = since the previous close (US stocks: the previous session; crypto: 00:00 UTC) · orders show the level and how far the market is from it' + (asOf && !tickOn ? ' · stocks as of ' + hhmm(asOf) + ' (your time)' : '') + ' · Details opens the story of the call with every post as it was made · not financial advice: this is what we hold.';
+    var nDraft = list.filter(function(p){ return p.published === false; }).length, foot = $('#pf-foot'); /* 11 Oct: no explanatory footnote under the tables; staff still see how many drafts members do not */
+    foot.textContent = nDraft ? nDraft + ' draft' + (nDraft === 1 ? '' : 's') + ' only you can see.' : ''; foot.hidden = !nDraft;
   }
   var DEV_PAGES = {}; /* sections still being built: everyone sees "In development" whatever the data says */
   var LIVE_KEY = { portfolio: 'portfolio', track: 'portfolio', position: 'portfolio', calendar: 'calendar', earnings: 'earnings' };
@@ -820,7 +820,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (rest.length) $('#tk-table2').innerHTML = head + '<tbody>' + grouped(rest) + '</tbody>';
     $('#tk-foot').innerHTML = wins + ' of ' + posted.length + ' closed calls were positive · prices and dates exactly as posted in the Exclusive channel, nothing added later · a position built in several entries counts once, at the average entry · results on the price (leveraged trades: the move in the price, not the return on the margin) · "small loss" and "breakeven" as written at the time · a row opens the story of the call with every post as it was made · not financial advice: this is what was done.';
   }
-  function pfSideOnly(p){ var s = String(p.side || 'long'); var warn = s === 'short' || s === 'sell'; return '<span class="tag ' + (warn ? 'warn' : 'ok') + '">' + esc(s) + '</span>'; }
+  function pfSideOnly(p){ return sideTxt(p); }
   /* a donut of weights: monochrome slices, labels outside, the biggest first */
   function sortBy(h){ var st = pfSort, tbl = h.closest('table'), idx = tbl ? Array.prototype.indexOf.call($$('#pf-groups table'), tbl) : 0; if (st.k === h.dataset.k) st.d = -st.d; else { st.k = h.dataset.k; st.d = /^(sym|name|cls|side|since)$/.test(h.dataset.k) ? 1 : -1; } renderPortfolio(); var again = $$('#pf-groups table')[idx]; again = again && again.querySelector('th[data-k="' + st.k + '"]'); if (again) again.focus(); }
   document.addEventListener('click', function(ev){ var h = ev.target.closest('#pf-groups th[data-k]'); if (h) sortBy(h); });

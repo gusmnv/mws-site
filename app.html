@@ -46,7 +46,7 @@
       <p class="grp">Core <span class="soon" id="desk-grp-tag">In development</span></p>
       <a href="#telegram" data-p="telegram">Telegram<span class="cnt" id="n-tg"></span></a>
       <a href="#portfolio" data-p="portfolio">Active Positions<span class="cnt" id="n-pf"></span></a>
-      <a href="#track" data-p="track">Track Record<span class="cnt" id="n-tk"></span></a>
+      <a href="#track" data-p="track">Closed Positions<span class="cnt" id="n-tk"></span></a>
       <p class="grp">Calendar</p>
       <a href="#earnings" data-p="earnings">Earnings Calendar<span class="cnt" id="n-er"></span></a>
       <a href="#calendar" data-p="calendar">Economic Calendar<span class="cnt" id="n-cal"></span></a>
@@ -148,9 +148,9 @@
         </div>
       </section>
       <section class="page" data-page="track">
-        <div class="head rv"><h1>Track record. <span class="soon" id="tk-tag">In development</span></h1></div>
+        <div class="head rv"><h1>Closed positions. <span class="soon" id="tk-tag">In development</span></h1></div>
         <div id="tk-live" hidden><div id="tk-paper"></div></div>
-        <div id="tk-locked" hidden class="banner"><div><b>Members only.</b><p>The track record opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
+        <div id="tk-locked" hidden class="banner"><div><b>Members only.</b><p>Closed Positions opens with any plan.</p></div><a class="btn sm acc" href="#membership">Choose a plan <span class="ar"></span></a></div>
         <div id="tk-empty" hidden class="banner"><div><b>Nothing closed yet.</b><p>Closed calls land here with entry, exit and result.</p></div></div>
       </section>
       <section class="page" data-page="position"><div id="pos-page"></div></section>
@@ -288,7 +288,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { telegram:'Telegram', portfolio:'Active Positions', track:'Track Record', position:'Active Positions', calendar:'Economic Calendar', earnings:'Earnings Calendar', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
+  var PAGES = { telegram:'Telegram', portfolio:'Active Positions', track:'Closed Positions', position:'Active Positions', calendar:'Economic Calendar', earnings:'Earnings Calendar', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
   var posId = null, posHome = 'portfolio', trackAlbum = null; /* #track/crypto: one album of the track record */ /* #position/<id>: one position, its numbers and the Telegram posts; posHome = the section it belongs to */
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
@@ -461,7 +461,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     (function(){ var n = channels.length, j = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length, who = link ? (link.telegram_username || tgUser) : null;
       $('#tg-sub').textContent = !access.valid ? 'Your channels open the moment your membership is active.' : (n && j === n) ? ('You are in. ' + (n === 1 ? 'The channel is' : n === 2 ? 'Both channels are' : 'All ' + n + ' channels are') + ' on your Telegram' + (who ? ' as @' + who : '') + '.') : (n === 1 ? 'One private channel. ' : n ? n + ' private channels. ' : 'Private channels. ') + 'Tap Join, confirm in Telegram, and you are in.';
       $('#tg-how').hidden = !!(n && j === n); })();
-    $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>Portfolio: Active Positions, Track Record</span>' + (deskLive.portfolio ? '<span class="tag ok">Included</span>' : '<span class="soon">Soon</span>') + '</li><li><span>Calendar: earnings, economic</span>' + (deskLive.earnings || deskLive.calendar ? '<span class="tag ok">Included</span>' : '<span class="soon">Soon</span>') + '</li>'; /* what the membership holds; Soon until it goes live for members */
+    $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>Portfolio: Active Positions, Closed Positions</span>' + (deskLive.portfolio ? '<span class="tag ok">Included</span>' : '<span class="soon">Soon</span>') + '</li><li><span>Calendar: earnings, economic</span>' + (deskLive.earnings || deskLive.calendar ? '<span class="tag ok">Included</span>' : '<span class="soon">Soon</span>') + '</li>'; /* what the membership holds; Soon until it goes live for members */
 
     if (access.valid) {
       var owner = access.plan_key === 'owner', guest = access.plan_key === 'guest', lifetime = access.plan_key === 'lifetime' || guest, pastDue = access.status === 'past_due';
@@ -665,7 +665,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
         + (n ? '<h2 class="k">The calls</h2><div class="chapters">' + chapters + '</div>' : '<p class="small muted">The posts on this call covered several positions at once, so they are not shown here.</p>')
         + (rest.length ? '<h2 class="k">More posts</h2><div class="posts-list">' + rest.map(function(i){ return postFig(i); }).join('') + '</div>' : '') + '</div>';
     };
-    var home = pfHome(p), homeName = home === '#track' ? 'Track Record' : 'Active Positions'; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
+    var home = pfHome(p), homeName = home === '#track' ? 'Closed Positions' : 'Active Positions'; posHome = home.slice(1); PAGES.position = homeName; $$('#snav a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-p') === posHome); }); var cr = $('#crumb'); if (cr) cr.textContent = homeName;
     box.innerHTML = '<p class="back"><a href="' + home + '">← ' + homeName + '</a></p>'
       + '<div class="pos-hd"><h1>' + storyTitle(p) + (closed ? (function(){ var R = recOf(p); return R.chg != null ? ' <span class="res"><span class="' + sgn(R.chg).trim() + '">' + pct(R.chg, 1) + '</span></span>' : (p.result ? ' <span class="res">' + resultHtml(p) + '</span>' : ''); })() : '') + '</h1><p class="tags"><span class="tag">' + esc(p.symbol) + '</span>' + (trade || order ? '<span class="tag">' + pfSide(p) + '</span>' : '') + '<span class="tag">' + esc(closed ? 'closed' : order ? 'order' : trade ? 'trade' : 'spot') + '</span><span class="tag">' + esc(classOf(p)) + '</span>' + pfDraft(p) + '</p></div>'
       + '<div class="facts">' + facts + '</div>'
@@ -790,7 +790,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var tkSort = { k: 'closed', d: -1 };
   function renderTrack(D, P, unlocked){
     var closed = P.closed.slice();
-    if (devFor('track')) { $('#tk-locked').hidden = true; $('#tk-live').hidden = true; $('#tk-empty').hidden = false; $('#tk-empty').innerHTML = '<div><b>In development.</b><p>The track record is being built: every call with entry, exit and result, and the posts behind it.</p></div>'; var kt = $('#tk-tag'); kt.textContent = 'In development'; kt.className = 'soon'; return; }
+    if (devFor('track')) { $('#tk-locked').hidden = true; $('#tk-live').hidden = true; $('#tk-empty').hidden = false; $('#tk-empty').innerHTML = '<div><b>In development.</b><p>Closed Positions is being built: every call with entry, exit and change, and the posts behind it.</p></div>'; var kt = $('#tk-tag'); kt.textContent = 'In development'; kt.className = 'soon'; return; }
     $('#tk-locked').hidden = unlocked; $('#tk-live').hidden = !(unlocked && closed.length); $('#tk-empty').hidden = !(unlocked && !closed.length);
     if (!(unlocked && closed.length)) return;
     if (!STORIES) { $('#tk-paper').innerHTML = '<p class="small muted">Loading…</p>'; loadStories().then(function(){ if (current === 'track') renderPortfolio(); }); return; }

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=2181477e">
+<link rel="stylesheet" href="/mws.css?v=ed43ff2c">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=2181477e"></script>
+<script src="/mws.js?v=ed43ff2c"></script>
 <style>
 body{display:block}
 header.top{display:none}
@@ -907,7 +907,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#pf-head').innerHTML = '<tr>' + th('Type', 'kind') + th('Symbol', 'sym') + th('Entry', 'entry', 'num', 'Average entry; the level for an order') + th('Last', 'last', 'num') + th('1D', 'roi1', 'num', 'Since the previous close; shorts the other way round') + th('Since entry', 'ret', 'num', 'The move in the price since the call; shorts the other way round') + th('Since', 'since') + '<th></th></tr>';
     var td = function(h, cls){ return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + h + '</td>'; };
     $('#pf-open').innerHTML = rows.length ? rows.map(function(o){ var p = o.p, v = o.v, k = o.k;
-      var sideH = k === 'spot' ? '' : ' ' + tag(p.side === 'short' || p.side === 'sell' ? 'warn' : 'ok', p.side + (o.L > 1 ? ' ' + o.L + '×' : ''));
+      var sideH = k === 'spot' ? '' : ' ' + tag(p.side === 'short' || p.side === 'sell' ? 'warn' : 'ok', (o.L > 1 ? 'x' + o.L + ' ' : '') + p.side);
       var lastH = o.v.last == null ? '<span class="neg">—</span><span class="sub">no feed, no mark</span>' : usdPx(o.v.last) + (o.src === 'mark' ? '<span class="sub">mark' + (p.mark_at ? ' ' + M.fmtDate(p.mark_at).replace(/ \d{4}$/, '') : '') + '</span>' : (k === 'order' && o.dist != null ? '<span class="sub">' + Math.abs(o.dist).toFixed(1) + '% ' + (o.dist < 0 ? 'below' : 'above') + ' the level</span>' : ''));
       var acts = k === 'order' ? '<button class="link" data-pa="filled">Filled</button><button class="link" data-pa="edit">Edit</button><button class="link" data-pa="close">Cancel</button><button class="link danger" data-pa="del">Delete</button>' : '<button class="link" data-pa="edit">Edit</button><button class="link" data-pa="close">Close</button><button class="link danger" data-pa="del">Delete</button>';
       return '<tr data-id="' + X(p.id) + '">' + td('<span class="kd ' + (k === 'spot' ? 'sp' : k === 'leveraged' ? 'lv' : '') + '">' + KIND_T[k] + '</span>') + td(X(p.symbol) + (p.name ? ' <span class="small muted">' + X(p.name) + '</span>' : '') + '<span class="sub">' + X(CLASS_T[p.asset_class] || p.asset_class || '') + (p.quote_symbol ? ' · ' + X(p.quote_symbol) : ' · <span class="neg">no price feed</span>') + sideH + (p.weight_entry != null ? ' · weight ' + Number(p.weight_entry).toFixed(2) + '%' : '') + '</span>', 'em')

@@ -9,9 +9,9 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="96x96" href="/favicon.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/mws.css?v=f6c5b5ac">
+<link rel="stylesheet" href="/mws.css?v=6d55dbc7">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js" integrity="sha384-WgXwGL6fUsYJWNaKJgVbrJKGRQwc1vieh2oy4kw9nXqpNDz3tdSsqEYUgeHD/NuF" crossorigin="anonymous"></script>
-<script src="/mws.js?v=f6c5b5ac"></script>
+<script src="/mws.js?v=6d55dbc7"></script>
 <style>
 body{display:block}
 header.top{display:none}
@@ -442,13 +442,15 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
   /* one row per person: the account (if any) plus every membership under it; a membership bound to an account belongs to
      that account even if Whop recorded another email at checkout */
+  /* a guest (friend, colleague, family) has free access by name: listed in 09 Guests, never among the members or in their counts */
+  function isGuestMem(m){ return String(m.id || '').indexOf('manual_') === 0 && m.metadata && m.metadata.source === 'guest'; }
   function people(){
     var by = {};
     var emailOf = {}; D.profiles.forEach(function(p){ emailOf[p.id] = p.email; by[p.email] = by[p.email] || { email: p.email }; by[p.email].profile = p; });
     D.memberships.forEach(function(m){ var key = (m.user_id && emailOf[m.user_id]) || m.email; var e = by[key] = by[key] || { email: key }; if (!e.best || rank(m) < rank(e.best)) e.best = m; e.mems = (e.mems || []).concat([m]); });
     var linkBy = {}; D.links.forEach(function(l){ linkBy[l.user_id] = l; });
     var accBy = {}; D.access.forEach(function(a){ (accBy[a.user_id] = accBy[a.user_id] || []).push(a); });
-    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; e.test = isTest(e); return e; });
+    return Object.keys(by).map(function(k){ var e = by[k]; e.link = e.profile ? linkBy[e.profile.id] : null; e.acc = e.profile ? (accBy[e.profile.id] || []) : []; e.valid = e.best ? valid(e.best) : false; e.guest = (e.mems || []).some(function(m){ return isGuestMem(m) && valid(m); }) && !(e.mems || []).some(function(m){ return !isGuestMem(m) && valid(m); }); e.since = (e.mems || []).map(function(m){ return m.created_at; }).concat(e.profile ? [e.profile.created_at] : []).sort()[0]; e.test = isTest(e); return e; });
   }
   /* a test account: listed by the owner in Settings → Test accounts, or someone whose only purchases are on the hidden test plan */
   function testPlan(m){ var C = M.config.PLANS; for (var k in C) if (C[k].hidden && (C[k].id === m.plan_id || k === m.plan_key)) return true; return false; }
@@ -588,7 +590,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   $('#a-minor').addEventListener('change', function(){ aMinor = this.checked; renderActivity(); });
 
   function render(){
-    var everyone = people(), tests = everyone.filter(function(e){ return e.test; }), rows = everyone.filter(function(e){ return !e.test; }), now = Date.now(), d30 = now - 30 * 86400000;
+    var everyone = people(), tests = everyone.filter(function(e){ return e.test; }), rows = everyone.filter(function(e){ return !e.test && !e.guest; }), now = Date.now(), d30 = now - 30 * 86400000;
     var active = rows.filter(function(e){ return e.valid; });
     var mrr = active.reduce(function(s, e){ var k = e.best.plan_key; return s + (k === 'monthly' ? 99 : k === 'yearly' ? 990 / 12 : 0); }, 0);
     var allPays = payments().filter(function(p){ return !D.tests[String(p.email || '').toLowerCase()]; }), pays = allPays.filter(isPlanPay), other = allPays.filter(function(p){ return !isPlanPay(p); }); var p30 = pays.filter(function(p){ return p.at.getTime() > d30; });

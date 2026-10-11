@@ -794,7 +794,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     $('#tk-locked').hidden = unlocked; $('#tk-live').hidden = !(unlocked && closed.length); $('#tk-empty').hidden = !(unlocked && !closed.length);
     if (!(unlocked && closed.length)) return;
     if (!STORIES) { $('#tk-paper').innerHTML = '<p class="small muted">Loading…</p>'; loadStories().then(function(){ if (current === 'track') renderPortfolio(); }); return; }
-    var calls = closed.filter(function(p){ var s = storyOf(p); return !s || s.tier !== 'noexit'; });
+    var calls = closed.filter(function(p){ var s = storyOf(p); return !s || (s.tier !== 'noexit' && s.status !== 'archived'); }); /* a call taken off the record (its story archived) stays off even before the row is */
     var rows = calls.map(function(p){ var R = recOf(p); return { p: p, R: R, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: pfKind(p) === 'spot' ? 'Spot' : pfSide(p), entry: R.ea, exit: R.xa, ret: R.chg, since: String(p.opened_at || ''), closed: String(p.closed_at || ''), held: daysBetween(p.opened_at, p.closed_at) } }; });
     sortRows(rows, tkSort);
     var cols = [['Ticker', 'sym', 'c-tick'], ['Name', 'name', 'c-name'], ['Type', 'cls', 'c-type'], ['Position', 'side', 'c-dir', 'Spot, or the leverage and the side of a trade'], ['Entry', 'entry', 'num c-px', 'The zone of the posted entries, or the one entry'], ['Exit', 'exit', 'num c-px', 'The zone of the exits, or the one exit'], ['Change', 'ret', 'num', 'From the average entry to the exit, times the leverage'], ['Opened', 'since', 'c-date c-open'], ['Closed', 'closed', 'c-date'], ['Held', 'held', 'c-held']];

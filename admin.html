@@ -307,7 +307,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
     <section class="view" data-v="settings">
       <div class="two">
         <div class="card rv"><h3>What goes live</h3>
-        <p class="small muted" style="margin-bottom:12px">Each part is <b>only you</b> (owner and admins see it in the member area, members see "In development") until you make it live. Live means every member with access sees it: the Portfolio (Active Positions and the Track Record, with every story), the calendar, the earnings.</p>
+        <p class="small muted" style="margin-bottom:12px">Each part is <b>only you</b> (owner and admins see it in the member area, members see "In development") until you make it live. Live means every member with access sees it: the Portfolio (Active Positions and the Track Record, with every story), the earnings calendar, the economic calendar.</p>
         <ul class="attn" id="desk-live"></ul>
         </div>
         <div class="card rv d1"><h3>Rules</h3>
@@ -319,7 +319,7 @@ select.sel,.grant select{background:var(--bg-2);border:1px solid var(--line-2);c
       <div class="card rv d1" style="margin-top:22px"><h3>Notice to members</h3>
           <p class="small muted" style="margin-bottom:12px">Shows at the top of the member area for everyone logged in, until they dismiss it or you switch it off.</p>
           <form id="f-notice" novalidate>
-            <div class="field"><label for="n-body">Message</label><textarea id="n-body" rows="3" placeholder="The Desk opens Monday. Portfolio first." style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:12px 14px;outline:none;border-radius:0;resize:vertical;width:100%"></textarea></div>
+            <div class="field"><label for="n-body">Message</label><textarea id="n-body" rows="3" placeholder="The calendar opens Monday. Portfolio first." style="background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:12px 14px;outline:none;border-radius:0;resize:vertical;width:100%"></textarea></div>
             <div class="grant" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:12px">
               <div class="field"><label for="n-kind">Tone</label><select id="n-kind"><option value="info">Neutral</option><option value="good">Good news</option><option value="warn">Warning</option></select></div>
               <div class="field"><label for="n-label">Button text (if there is a link)</label><input id="n-label" type="text" placeholder="Open"></div>
@@ -645,7 +645,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
 
     // telegram
     var joinedBy = {}; D.access.forEach(function(a){ if (a.status === 'joined') joinedBy[a.chat_id] = (joinedBy[a.chat_id] || 0) + 1; });
-    var DESK = { portfolio: 'Portfolio (Active Positions + Track Record)', calendar: 'Calendar', earnings: 'Earnings' };
+    var DESK = { portfolio: 'Portfolio (Active Positions + Track Record)', earnings: 'Earnings calendar', calendar: 'Economic calendar' };
     $('#desk-live').innerHTML = Object.keys(DESK).map(function(k){ var on = D.settings['desk_' + k + '_live'] === 'on'; return '<li><span>' + DESK[k] + ' <span class="small muted">' + (on ? 'members with access see it' : 'only you see it (members: In development)') + '</span></span><span>' + (on ? tag('ok', 'live for members') : tag('warn', 'only you')) + ' <button class="link" data-desk="' + k + '" data-on="' + (on ? '0' : '1') + '">' + (on ? 'Take it back' : 'Make it live') + '</button></span></li>'; }).join('');
     var hiddenCh = []; try { hiddenCh = JSON.parse(D.settings.tg_hidden_channels || '[]').map(Number); } catch (e) { hiddenCh = []; }
     var chRow = function(c){ var hid = hiddenCh.indexOf(Number(c.chat_id)) >= 0; return '<li' + (hid ? ' class="muted"' : '') + '><span>' + X(c.title || c.chat_id) + ' <span class="small muted">' + X(c.chat_id) + '</span></span><span>' + (joinedBy[c.chat_id] || 0) + ' joined ' + (c.enabled ? tag('ok', 'live') : tag('bad', 'off')) + ' <button class="link" data-ch="' + X(c.chat_id) + '" data-on="' + (c.enabled ? '0' : '1') + '">' + (c.enabled ? 'Switch off' : 'Switch on') + '</button> · <button class="link" data-chh="' + X(c.chat_id) + '" data-hide="' + (hid ? '0' : '1') + '">' + (hid ? 'Unhide' : 'Hide') + '</button></span></li>'; };
@@ -888,7 +888,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     POS = r.data || []; if (POS.length) HAS_Q = Object.prototype.hasOwnProperty.call(POS[0], 'quote_symbol');
     /* visibility is decided once, in Settings → What goes live: a row is never a draft */
     var drafts = POS.filter(function(p){ return p.published === false; });
-    if (drafts.length && !autoPub) { autoPub = true; try { var up = await sb.from('positions').update({ published: true }).in('id', drafts.map(function(p){ return p.id; })); if (!up.error) { drafts.forEach(function(p){ p.published = true; }); M.msg('#m', drafts.map(function(p){ return p.symbol; }).join(', ') + (drafts.length === 1 ? ' was a draft — it is' : ' were drafts — they are') + ' now visible like everything else (whether members see The Desk is set in Settings).', 'ok'); } } catch (e) {} }
+    if (drafts.length && !autoPub) { autoPub = true; try { var up = await sb.from('positions').update({ published: true }).in('id', drafts.map(function(p){ return p.id; })); if (!up.error) { drafts.forEach(function(p){ p.published = true; }); M.msg('#m', drafts.map(function(p){ return p.symbol; }).join(', ') + (drafts.length === 1 ? ' was a draft — it is' : ' were drafts — they are') + ' now visible like everything else (whether members see the portfolio is set in Settings).', 'ok'); } } catch (e) {} }
     await loadQuotes(); qstat(); renderPositions();
   }
   function renderPositions(){

@@ -47,8 +47,8 @@
       <a href="#telegram" data-p="telegram">Telegram<span class="cnt" id="n-tg"></span></a>
       <a href="#portfolio" data-p="portfolio">Active Positions<span class="cnt" id="n-pf"></span></a>
       <a href="#track" data-p="track">Track Record<span class="cnt" id="n-tk"></span></a>
-      <p class="grp">The Desk</p>
-      <a href="#earnings" data-p="earnings">Stock Earnings<span class="cnt" id="n-er"></span></a>
+      <p class="grp">Calendar</p>
+      <a href="#earnings" data-p="earnings">Earnings Calendar<span class="cnt" id="n-er"></span></a>
       <a href="#calendar" data-p="calendar">Economic Calendar<span class="cnt" id="n-cal"></span></a>
       <p class="grp">Settings</p>
       <a href="#account" data-p="account">Account</a>
@@ -180,7 +180,7 @@
         </div>
       </section>
       <section class="page" data-page="earnings">
-        <div class="head rv"><h1>Stock earnings. <span class="soon" id="er-tag">In development</span></h1></div>
+        <div class="head rv"><h1>Earnings calendar. <span class="soon" id="er-tag">In development</span></h1></div>
         <div id="er-live" hidden>
           <div class="fbar rv d1 er-bar" id="er-bar">
             <span class="chips" id="er-mkt"><button type="button" data-v="all" class="on">All</button><button type="button" data-v="book">Our book</button></span>
@@ -255,7 +255,7 @@
           <div>
             <section class="panel rv" id="sup-new"><div class="ttl"><h3>Write to Mr. Wall Street</h3><span class="tag">Inbox</span></div>
               <form id="f-sup" novalidate>
-                <div class="field"><label for="sup-subject">Subject</label><input id="sup-subject" type="text" maxlength="120" placeholder="An idea for the Desk, a question, a problem…"></div>
+                <div class="field"><label for="sup-subject">Subject</label><input id="sup-subject" type="text" maxlength="120" placeholder="An idea for the site, a question, a problem…"></div>
                 <div class="field"><label for="sup-body">Message</label><textarea id="sup-body" class="ta" rows="5" maxlength="4000" placeholder="Say it plainly. For payment issues, add the receipt email and date."></textarea></div>
                 <div class="msg" id="m-sup" aria-live="polite"></div>
                 <div class="row"><span class="small muted">Answers arrive here, usually within a day.</span><button class="btn acc" type="submit" data-busy="Sending">Send <span class="ar"></span></button></div>
@@ -288,7 +288,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   var M = window.MWS, $ = M.$, $$ = M.$$, C = M.config, esc = M.esc;
   var initialHash = location.hash; /* read before the Supabase client consumes it */
   var sb = M.sb();
-  var PAGES = { telegram:'Telegram', portfolio:'Active Positions', track:'Track Record', position:'Active Positions', calendar:'Economic Calendar', earnings:'Stock Earnings', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
+  var PAGES = { telegram:'Telegram', portfolio:'Active Positions', track:'Track Record', position:'Active Positions', calendar:'Economic Calendar', earnings:'Earnings Calendar', account:'Account', membership:'Membership', devices:'Devices', feedback:'Feedback' };
   var posId = null, posHome = 'portfolio', trackAlbum = null; /* #track/crypto: one album of the track record */ /* #position/<id>: one position, its numbers and the Telegram posts; posHome = the section it belongs to */
   /* ---- gate: links from emails arrive with the outcome in the URL hash ---- */
   var hashErr = /error_code=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : (/error=([a-z_]+)/.exec(initialHash) ? RegExp.$1 : '');
@@ -370,7 +370,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
   route();
 
   /* ---- data ---- */
-  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, deskLive = { portfolio: false, calendar: false, earnings: false }, tgUser = null, notices = [], lastLoad = 0; /* deskLive: which parts of the Portfolio and the Desk members see (Settings → What goes live); off until the RPC says otherwise */
+  var profile = null, access = null, link = null, channels = [], tgAccess = [], invites = null, invitesFor = null, sim = null, paidTries = 0, staffRole = false, pollT = null, positions = null, quotes = {}, deskLive = { portfolio: false, calendar: false, earnings: false }, tgUser = null, notices = [], lastLoad = 0; /* deskLive: which parts of the Portfolio and the Calendar members see (Settings → What goes live); off until the RPC says otherwise */
   var signup = M.signupState();
   /* the handoff belongs to the e-mail typed at checkout: another account on the same browser must not inherit its receipt or its "paid" state */
   if (signup.email && user.email && String(signup.email).toLowerCase() !== String(user.email).toLowerCase()) { signup = {}; M.store.del('mws_signup'); M.sess.del('mws_signup'); }
@@ -461,7 +461,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     (function(){ var n = channels.length, j = channels.filter(function(c){ return statusOf(c.chat_id) === 'joined'; }).length, who = link ? (link.telegram_username || tgUser) : null;
       $('#tg-sub').textContent = !access.valid ? 'Your channels open the moment your membership is active.' : (n && j === n) ? ('You are in. ' + (n === 1 ? 'The channel is' : n === 2 ? 'Both channels are' : 'All ' + n + ' channels are') + ' on your Telegram' + (who ? ' as @' + who : '') + '.') : (n === 1 ? 'One private channel. ' : n ? n + ' private channels. ' : 'Private channels. ') + 'Tap Join, confirm in Telegram, and you are in.';
       $('#tg-how').hidden = !!(n && j === n); })();
-    $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>The Desk: portfolio, calendar, earnings</span><span class="soon">Soon</span></li>';
+    $('#incl').innerHTML = channels.map(function(c){ return '<li><span>' + esc(c.title) + '</span><span class="tag ' + (statusOf(c.chat_id) === 'joined' ? 'ok' : '') + '">' + (statusOf(c.chat_id) === 'joined' ? 'Joined' : 'Telegram') + '</span></li>'; }).join('') + '<li><span>Portfolio: Active Positions, Track Record</span>' + (deskLive.portfolio ? '<span class="tag ok">Included</span>' : '<span class="soon">Soon</span>') + '</li><li><span>Calendar: earnings, economic</span>' + (deskLive.earnings || deskLive.calendar ? '<span class="tag ok">Included</span>' : '<span class="soon">Soon</span>') + '</li>'; /* what the membership holds; Soon until it goes live for members */
 
     if (access.valid) {
       var owner = access.plan_key === 'owner', guest = access.plan_key === 'guest', lifetime = access.plan_key === 'lifetime' || guest, pastDue = access.status === 'past_due';
@@ -638,7 +638,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     /* the asset's live market cap (price × shares or supply, approximate) and its site join the facts; the rest of the company text stays in companies.json for the earnings panel */
     var about = function(){ if (!co) return ''; var cap = mcapOf(p, D.Q);
       var site = co.site ? '<a class="site" href="' + esc(co.site) + '" target="_blank" rel="noopener">' + esc(String(co.site).replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')) + ' ↗</a>' : '';
-      var page = isCo(p) ? fact('Company', '<button type="button" class="co-btn fact-btn" data-co="' + esc(String(p.symbol).toUpperCase()) + '">Open page ↗</button>') : '';
+      var page = ''; /* the company page (report, quarters, financials) is not opened from the positions yet: it goes to members once explored */
       return (cap ? fact('Market cap', cap + ' <small>approx.</small>') : '') + (site ? fact('Website', site) : '') + page; };
     var facts = buildFacts(); posFacts = buildFacts; /* a live tick redraws the facts only */
     var postFig = function(i, cap, px){ var src = postImg(i), when = postWhen(i) || 'Telegram post';
@@ -755,7 +755,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     if (!(unlocked && open.length)) return;
     var mk = function(p){ var T = tradeNums(p, Q); return { p: p, T: T, v: { sym: String(p.symbol), name: String(p.name || ''), cls: classOf(p), side: String(p.side || 'long') + ' ' + T.L, since: String(p.opened_at || ''), entry: T.entry, last: T.last, roi1: T.roi1, ret: T.ret, dist: T.dist == null ? null : Math.abs(T.dist), cap: mcapNum(p, Q) } }; };
     var sortGroup = function(rows, orders){ var st = pfSort; if (orders && (st.k === 'ret' || st.k === 'roi1')) st = { k: 'dist', d: 1 }; /* orders: the nearest level first */ return sortRows(rows, st); };
-    var tick = function(p){ return cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em c-tick') + cell('Name', isCo(p) ? '<button type="button" class="co-btn" data-co="' + esc(String(p.symbol).toUpperCase()) + '" title="Company page: report, last quarters, financials">' + esc(p.name || '—') + '</button>' : esc(p.name || '—'), 'nm2 c-name') + cell('Type', esc(classOf(p)), 'muted c-type'); };
+    var tick = function(p){ return cell('Ticker', '<a class="sym" href="#position/' + esc(String(p.id)) + '">' + esc(p.symbol) + '</a>' + pfDraft(p), 'em c-tick') + cell('Name', esc(p.name || '—'), 'nm2 c-name') + cell('Type', esc(classOf(p)), 'muted c-type'); };
     open.forEach(function(p){ var T = tradeNums(p, Q); if (T.last != null) lastPx[String(p.id)] = T.last; });
     var lastCell = function(T, p){ if (T.last == null) return cell('Last price', '<span class="muted">—</span><span class="sub muted">no price feed</span>', 'num'); return cell('Last price', pxWith(T) + (T.mark ? '<span class="sub muted">mark · ' + esc(M.fmtDate(T.mark)) + '</span>' : shutNote(p)), 'num px'); };
     var roiCells = function(T, p){ return cell('Change', T.ret == null ? '—' : pct(T.ret), 'num' + sgn(T.ret)) + cell('Market cap', mcapOf(p, Q) || '<span class="muted">—</span>', 'num muted c-cap'); };
@@ -837,7 +837,7 @@ if (top !== self) { try { top.location = location; } catch (e) { document.docume
     { id: 's6', symbol:'MSTR', name:'Strategy', kind:'order', side:'buy', asset_class:'equity', entry:'$80, $70, $60, $50', entry_price:80, quote_symbol:'MSTR', status:'open', opened_at:'2026-09-20', links:['https://t.me/c/2077854583/4450'] },
     { id: 's7', symbol:'BTC', name:'Bitcoin · 2022 cycle', kind:'spot', side:'long', asset_class:'crypto', entry:'16-18K', exit:'100-126K', result:'x7', status:'closed', opened_at:'2022-11-20', closed_at:'2025-11-16', thesis:'Bought when the market called for 10-12K.' } ];
   var SIM_QUOTES = { MSTR: { symbol:'MSTR', price:162.4, prev_close:158, change_pct:2.78, quoted_at:new Date().toISOString() }, PLTR: { symbol:'PLTR', price:171, prev_close:172.5, change_pct:-0.87, quoted_at:new Date().toISOString() }, 'BTC/USD': { symbol:'BTC/USD', price:72150, prev_close:71000, change_pct:1.62, quoted_at:new Date().toISOString() }, SPY: { symbol:'SPY', price:580.2, prev_close:578, change_pct:0.38 }, QQQ: { symbol:'QQQ', price:500.1, prev_close:501.2, change_pct:-0.22 } };
-  /* The Desk · Calendar (public.calendar_events) and Earnings (public.earnings), filled by the calendar function. RLS hides both from non-members. */
+  /* Calendar · Economic (public.calendar_events) and Earnings (public.earnings), filled by the calendar function. RLS hides both from non-members. */
   var events = null, earnings = null, erHist = {}, calF = { imp: 3, reg: 'all', wk: 0 }, erF = { mkt: 'all', wk: 0, q: '', view: 'board', n: 25, sort: 'day', dir: 'asc' }, calT = null, erOpen = null, erMeta = {}, erHistReq = {};
   var ER_MIN_CAP = 40e9, ER_CHART_MIN = 10e9, ER_WK_MIN = -4, ER_WK_MAX = 5, LOGOS = (C.SUPABASE_URL.indexOf('__') === 0 ? 'https://rgvyyxphqhtedhgvwopy.supabase.co' : C.SUPABASE_URL) + '/storage/v1/object/public/logos/'; /* the page starts at $40B; the window runs from last week to three weeks out */
   var REGION = { US: 'US', CA: 'US', EU: 'EU', DE: 'EU', FR: 'EU', IT: 'EU', ES: 'EU', GB: 'EU', CH: 'EU', JP: 'AS', CN: 'AS', HK: 'AS', AU: 'AS', NZ: 'AS', KR: 'AS', IN: 'AS', SG: 'AS', CRYPTO: 'CRYPTO' };

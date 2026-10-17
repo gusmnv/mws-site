@@ -12,6 +12,17 @@
   try { var saved = JSON.parse(localStorage.getItem("mws_sa") || "{}"); if (saved.per) S.per = saved.per; if (saved.cur) S.cur = saved.cur; } catch (e) { /* none */ }
   function remember() { try { localStorage.setItem("mws_sa", JSON.stringify({ per: S.per, cur: S.cur })); } catch (e) { /* none */ } }
   function sb() { try { return MWS.sb && MWS.sb(); } catch (e) { return null; } }
+  /* speed (134e): what was read once is kept in this browser and shown at once; the fresh copy is read behind it and replaces it.
+     The list in localStorage, each company in IndexedDB (no size worry). Any storage error: the page simply reads the database. */
+  var LS = { get: function (k) { try { var v = W.localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }, set: function (k, v) { try { W.localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* full or blocked */ } } };
+  var IDB = (function () {
+    var dbp = null;
+    function open() { if (dbp) return dbp; dbp = new Promise(function (res) { try { var r = W.indexedDB.open("mws_stocks", 1); r.onupgradeneeded = function () { r.result.createObjectStore("co"); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { res(null); }; r.onblocked = function () { res(null); }; } catch (e) { res(null); } }); return dbp; }
+    return {
+      get: function (k) { return open().then(function (db) { if (!db) return null; return new Promise(function (res) { try { var q = db.transaction("co").objectStore("co").get(k); q.onsuccess = function () { res(q.result || null); }; q.onerror = function () { res(null); }; } catch (e) { res(null); } }); }); },
+      put: function (k, v) { return open().then(function (db) { if (!db) return; try { db.transaction("co", "readwrite").objectStore("co").put(v, k); } catch (e) { /* none */ } }); }
+    };
+  })();
 
   /* ---------- formatting ---------- */
   var fin = function (v) { return v != null && v !== "" && isFinite(v); };
@@ -35,8 +46,9 @@
     var c = String(ccy || "").trim(); if (!c || c.toUpperCase() === "USD") return Promise.resolve(null);
     var C = (CCY_FIX[c] || [c.toUpperCase()])[0];
     if (S.fx[C] !== undefined) return S.fx[C] && S.fx[C].then ? S.fx[C] : Promise.resolve(S.fx[C]);
+    var kept = LS.get("mws_sa_fx_" + C); if (kept && kept.m && Date.now() - kept.at < 12 * 3600e3) { S.fx[C] = kept.m; return Promise.resolve(kept.m); }
     var c2 = sb(); if (!c2) return Promise.resolve(null);
-    var p = c2.from("stock_fx").select("ccy,m").eq("ccy", C).maybeSingle().then(function (r) { S.fx[C] = r && r.data ? r.data.m : null; return S.fx[C]; }, function () { S.fx[C] = null; return null; });
+    var p = c2.from("stock_fx").select("ccy,m").eq("ccy", C).maybeSingle().then(function (r) { S.fx[C] = r && r.data ? r.data.m : null; if (S.fx[C]) LS.set("mws_sa_fx_" + C, { at: Date.now(), m: S.fx[C] }); return S.fx[C]; }, function () { S.fx[C] = null; return null; });
     S.fx[C] = p; return p;
   }
   function fxRate(ccy, start, end) {
@@ -69,6 +81,11 @@
       ".sa-note{color:var(--fg-3);font-size:12.5px;margin-top:12px;line-height:1.5}.sa-note b{color:var(--fg-2);font-weight:500}.sa-kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:13.5px}.sa-kv span{color:var(--fg-3)}.sa-kv b{font-weight:400;color:var(--fg-2);overflow-wrap:anywhere}",
       ".sa-tv{height:520px;border:1px solid var(--line)}.sa-tv.sm{height:300px}.sa-tvno{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px;text-align:center;color:var(--fg-3);font-size:14px}.sa-tvno p{margin:0;max-width:440px}.sa-staff{border:1px dashed var(--line-2);padding:10px 14px;margin:0 0 14px;font-size:12.5px;color:var(--fg-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}.sa-staff button{background:0 0;border:1px solid var(--line-2);color:var(--fg-2);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;cursor:pointer}.sa-staff button:hover{color:var(--fg);border-color:var(--fg-2)}",
       ".sa-pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-2);padding:2px 6px;color:var(--fg-3);margin-left:6px;vertical-align:2px}.sa-more{margin-top:12px}.sa-more button{background:0 0;border:0;color:var(--fg-2);font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}",
+      ".sa-co{display:grid;grid-template-columns:212px minmax(0,1fr);gap:22px;align-items:start}.sa-main{min-width:0}.sa-ttl{font-size:20px;font-weight:500;letter-spacing:-.01em;margin:0 0 14px}.sa-h{font-size:15px;font-weight:500;margin:6px 0 10px}",
+      ".sa-side{position:sticky;top:12px;border:1px solid var(--line);background:var(--bg);max-height:calc(100vh - 24px);overflow:auto;scrollbar-width:thin}.sa-side .g{padding:8px 0}.sa-side .g+.g{border-top:1px solid var(--line)}.sa-side h4{font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin:4px 14px 6px}.sa-side a{display:block;padding:6px 14px 6px 12px;font-size:13.5px;color:var(--fg-2);text-decoration:none;border-left:2px solid transparent}.sa-side a:hover{color:var(--fg);background:var(--bg-2)}.sa-side a.on{color:var(--fg);background:var(--bg-2);border-left-color:var(--fg)}.sa-side select{display:none}",
+      "@media (max-width:900px){.sa-co{grid-template-columns:1fr;gap:12px}.sa-side{position:static;max-height:none;border:0;background:none}.sa-side .g{display:none}.sa-side select{display:block;width:100%;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:10px 12px;border-radius:0}}",
+      ".sa-check{border:1px solid var(--warn);border-left-width:3px;background:var(--bg);padding:10px 14px;margin:0 0 14px}.sa-check p{margin:0;font-size:13.5px;color:var(--fg-2);line-height:1.5}.sa-check p+p{margin-top:6px}",
+      ".sa-pr td.bar{min-width:170px;width:30%}.sa-pr td.bar i{display:block;height:6px;background:var(--line-2);position:relative}.sa-pr td.bar i b{position:absolute;left:0;top:0;bottom:0;background:var(--fg-2)}.sa-pr td.bar i em{position:absolute;top:-3px;width:2px;height:12px;background:var(--warn)}",
       "@media (max-width:720px){.sa-hd .quote{text-align:left}.sa-fin th:first-child,.sa-fin td:first-child{min-width:150px}.sa-tv{height:380px}}",
     ].join("\n");
     document.head.appendChild(st);
@@ -80,14 +97,32 @@
   var ME = /^(saudi arabia|united arab emirates|qatar|kuwait|israel|turkey|sa|ae|qa|kw|il|tr)$/i;
   function region(c) { c = String(c || ""); if (/^(united states|us|usa)$/i.test(c)) return "us"; if (EUROPE.test(c)) return "eu"; if (ASIA.test(c)) return "asia"; if (ME.test(c)) return "me"; return "other"; }
   var LIST_COLS = "id,name,country,sector,kind,rank,cap_usd,active,pe:metrics->v->pe,evx:metrics->v->ev_ebitda,ps:metrics->v->ps,fcfy:metrics->v->fcf_y,grev:metrics->f->g_rev,nm:metrics->f->nm,roic:metrics->f->roic,dy:metrics->p->dy,r1y:metrics->r->r1y,sec:status->sec->>at,eod:status->eod->>at";
-  function loadList(force) {
-    if (S.list && !force && Date.now() - S.listAt < 10 * 60e3) return Promise.resolve(S.list);
+  var LIST_KEY = "mws_sa_list_v2";
+  /* the list: shown at once from this browser's copy, read again behind it (three pages at the same time, not one after the other) */
+  function fetchList() {
     if (S.listBusy) return S.listBusy;
     var c = sb(); if (!c) return Promise.reject(new Error("no client"));
-    var out = [], page = function (from) { return c.from("stock_universe").select(LIST_COLS).eq("active", true).order("rank", { ascending: true, nullsFirst: false }).order("cap_usd", { ascending: false }).range(from, from + 999).then(function (r) { if (r.error) throw r.error; out = out.concat(r.data || []); return (r.data || []).length === 1000 && from < 6000 ? page(from + 1000) : out; }); };
-    S.listBusy = page(0).then(function (rows) { S.list = rows; S.listAt = Date.now(); S.listBusy = null; return rows; }, function (e) { S.listBusy = null; throw e; });
+    var page = function (from) { return c.from("stock_universe").select(LIST_COLS).eq("active", true).order("rank", { ascending: true, nullsFirst: false }).order("cap_usd", { ascending: false }).order("id", { ascending: true }).range(from, from + 999).then(function (r) { if (r.error) throw r.error; return r.data || []; }); };
+    var more = function (rows, from) { return rows.length === from && from < 8000 ? page(from).then(function (x) { return more(rows.concat(x), from + 1000); }) : rows; };
+    S.listBusy = Promise.all([page(0), page(1000), page(2000)]).then(function (p) { var rows = p[0].concat(p[1], p[2]); return more(rows, 3000); }).then(function (rows) {
+      S.list = rows; S.listAt = Date.now(); S.listBusy = null; LS.set(LIST_KEY, { at: S.listAt, rows: rows }); return rows;
+    }, function (e) { S.listBusy = null; throw e; });
     return S.listBusy;
   }
+  function loadList(force) {
+    if (force) return fetchList();
+    if (S.list && Date.now() - S.listAt < 10 * 60e3) return Promise.resolve(S.list);
+    if (!S.list) { var kept = LS.get(LIST_KEY); if (kept && kept.rows && kept.rows.length) { S.list = kept.rows; S.listAt = kept.at || 0; } }
+    if (S.list) { /* shown now; the fresh list replaces it when it arrives */
+      if (Date.now() - S.listAt > 60e3) fetchList().then(function () { if (S.onList) S.onList(); }, function () { /* the kept copy stays */ });
+      return Promise.resolve(S.list);
+    }
+    return fetchList();
+  }
+  /* a company is read as soon as the pointer rests on its row, and the 20 largest while the list is idle: opening one is then immediate */
+  var preq = [], pbusy = false;
+  function prefetch(id, front) { if (!id || S.co[id]) return; if (front) preq.unshift(id); else preq.push(id); pump(); }
+  function pump() { if (pbusy || !preq.length) return; var id = preq.shift(); if (S.co[id]) return pump(); pbusy = true; loadCompany(id).then(done, done); function done() { pbusy = false; setTimeout(pump, 150); } }
   var SORTS = { rank: function (r) { return r.rank != null ? r.rank : 1e9 - (r.cap_usd || 0) / 1e9; }, name: function (r) { return String(r.name || r.id).toLowerCase(); }, cap: function (r) { return r.cap_usd; }, r1y: function (r) { return r.r1y; }, pe: function (r) { return r.pe; }, evx: function (r) { return r.evx; }, ps: function (r) { return r.ps; }, fcfy: function (r) { return r.fcfy; }, grev: function (r) { return r.grev; }, nm: function (r) { return r.nm; }, roic: function (r) { return r.roic; }, dy: function (r) { return r.dy; } };
   function renderList(el) {
     css(); var head = '<div class="head rv"><h1>Stock analysis.</h1><p>Every company worth $10 billion or more. Their own filings, every statement since 2009, estimates, dividends, holders, and how each one ranks against the rest.</p></div>';
@@ -103,7 +138,10 @@
       '<select id="sa-size">' + [[10, "$10B and more"], [50, "$50B and more"], [200, "$200B and more"], [1000, "$1T and more"]].map(function (x) { return '<option value="' + x[0] + '"' + (S.size === x[0] ? " selected" : "") + ">" + x[1] + "</option>"; }).join("") + "</select></div>";
     el.innerHTML = head + staffBar(null) + progress(rows) + bar + '<div id="sa-lt"></div>';
     var pr = $("#sa-prog-go", el); if (pr) pr.addEventListener("click", function () { pr.disabled = true; pr.textContent = "Refreshing…"; loadList(true).then(function (r2) { drawList(el, r2, head); }, function () { pr.disabled = false; pr.textContent = "Refresh"; }); });
-    var redraw = function () { drawRows($("#sa-lt", el), rows); };
+    var redraw = function () { drawRows($("#sa-lt", el), S.list || rows); };
+    S.onList = function () { if ($("#sa-lt", el) && el.isConnected) redraw(); }; /* the fresh list, quietly, without touching the search box */
+    var idle = W.requestIdleCallback || function (f) { return setTimeout(f, 1200); };
+    idle(function () { (S.list || rows).slice(0, 20).forEach(function (r) { prefetch(r.id); }); });
     $("#sa-q", el).addEventListener("input", function (e) { S.q = e.target.value; S.shown = 100; redraw(); });
     $("#sa-reg", el).addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; S.region = b.dataset.v; $$("#sa-reg button", el).forEach(function (x) { x.classList.toggle("on", x === b); }); S.shown = 100; redraw(); });
     $("#sa-sec", el).addEventListener("change", function (e) { S.sector = e.target.value; S.shown = 100; redraw(); });
@@ -127,7 +165,8 @@
       '<div class="sa-wrap"><table class="pt sa-tbl"><thead><tr>' + th("rank", "#", 1) + th("name", "Company") + "<th>Country</th><th>Sector</th>" + th("cap", "Market cap", 1) + th("r1y", "1 year", 1) + th("pe", "P/E", 1) + th("evx", "EV/EBITDA", 1) + th("ps", "P/S", 1) + th("fcfy", "FCF yield", 1) + th("grev", "Sales growth", 1) + th("nm", "Net margin", 1) + th("roic", "ROIC", 1) + th("dy", "Dividend", 1) + '<th class="num">Data</th></tr></thead><tbody>' + (body || '<tr><td colspan="15">No company matches.</td></tr>') + "</tbody></table></div>" +
       (list.length > n ? '<div class="sa-more"><button type="button" id="sa-more">Show ' + Math.min(100, list.length - n) + " more</button></div>" : "");
     $$("th[data-k]", box).forEach(function (h) { h.addEventListener("click", function () { var k = h.dataset.k; S.sort = { k: k, d: S.sort.k === k ? -S.sort.d : (k === "rank" || k === "name" || k === "pe" || k === "evx" || k === "ps" ? 1 : -1) }; drawRows(box, rows); }); });
-    $$("tr.clk", box).forEach(function (tr) { tr.addEventListener("click", function (e) { if (e.target.closest("a")) return; location.hash = "#stocks/" + encodeURIComponent(tr.dataset.id); }); });
+    $$("tr.clk", box).forEach(function (tr) { tr.addEventListener("click", function (e) { if (e.target.closest("a")) return; location.hash = "#stocks/" + encodeURIComponent(tr.dataset.id); });
+      var pre = function () { prefetch(tr.dataset.id, true); }; tr.addEventListener("mouseenter", pre); tr.addEventListener("touchstart", pre, { passive: true }); });
     var more = $("#sa-more", box); if (more) more.addEventListener("click", function () { S.shown = n + 100; drawRows(box, rows); });
   }
   /* staff only: how far the first load has got, and how long the rest should take at the pace of the last half hour */
@@ -138,11 +177,11 @@
     rows.forEach(function (r) { var t = at(r); if (!t) return; done++; if (now - t <= 30 * 60e3) { last30++; first30 = Math.min(first30, t); } if (now - t <= 120 * 60e3) { last120++; first120 = Math.min(first120, t); } });
     /* companies per minute over the window, or over the time since loading began when that is shorter */
     var span = function (first, w) { return Math.max(1, Math.min(w, (now - first) / 60e3)); };
-    var pace = last30 >= 5 ? last30 / span(first30, 30) : last120 ? last120 / span(first120, 120) : 0, left = total - done, txt;
+    var pace = last30 >= 5 ? last30 / span(first30, 30) : last120 ? last120 / span(first120, 120) : 0, left = total - done, txt; if (pace < 0.1) pace = 0;
     if (!left) txt = "Data: all " + fmtNum(total) + " companies loaded. Each one refreshes by itself (prices every day, filings when the company files).";
     else if (!pace) txt = "Data: " + fmtNum(done) + " of " + fmtNum(total) + " companies loaded. The function loads a few every minute; nothing new in the last two hours, so it may be waiting for the daily EODHD limit to reset (00:10 UTC).";
     else { var mins = Math.round(left / pace), end = new Date(now + mins * 60e3), hh = Math.floor(mins / 60), mm = mins % 60;
-      txt = "Data: " + fmtNum(done) + " of " + fmtNum(total) + " companies loaded (" + Math.floor(done / total * 100) + "%). At the current pace (about " + (pace >= 1 ? Math.round(pace) : pace.toFixed(1)) + " a minute), the rest takes about " + (hh ? hh + " h " : "") + mm + " min, so around " + String(end.getUTCHours()).padStart(2, "0") + ":" + String(end.getUTCMinutes()).padStart(2, "0") + " UTC" + (end.getUTCDate() !== new Date(now).getUTCDate() ? " tomorrow" : "") + ". An estimate: the daily EODHD limit can move the last ones to after 00:10 UTC."; }
+      txt = "Data: " + fmtNum(done) + " of " + fmtNum(total) + " companies loaded (" + Math.floor(done / total * 100) + "%). At the current pace (about " + (pace >= 1 ? Math.round(pace) : pace.toFixed(1)) + " a minute), the rest takes about " + (hh ? hh + " h " : "") + mm + " min, so around " + String(end.getUTCHours()).padStart(2, "0") + ":" + String(end.getUTCMinutes()).padStart(2, "0") + " UTC" + (mins >= 48 * 60 ? " on " + date(end.toISOString().slice(0, 10)) : end.getUTCDate() !== new Date(now).getUTCDate() ? " tomorrow" : "") + ". An estimate: the daily EODHD limit can move the last ones to after 00:10 UTC."; }
     return '<div class="sa-staff" id="sa-prog"><span>' + esc(txt) + '</span><button type="button" id="sa-prog-go">Refresh</button></div>';
   }
   function staffBar(id) {
@@ -154,16 +193,37 @@
 
   /* ---------- one company ---------- */
   var U_COLS = "id,name,country,sector,industry,kind,eodhd,adr,cik,tv,rank,cap_usd,currency,fin_currency,status,metrics,active,updated_at";
-  function loadCompany(id, force) {
-    var have = S.co[id]; if (have && !force && Date.now() - have.at < 5 * 60e3) return Promise.resolve(have);
+  /* one company: from memory, else from this browser's copy (shown at once, read again behind it), else from the database */
+  var CO_KEY = "v2:";
+  function withFx(co) {
+    var st = stmts(co.d), cs = [st.A && st.A.cur, st.Q && st.Q.cur, co.d.profile && co.d.profile.ccy, co.u.currency, co.u.fin_currency];
+    (st.A ? st.A.rows : []).concat(st.Q ? st.Q.rows : []).forEach(function (x) { if (x.cur) cs.push(x.cur); });
+    var uniq = cs.filter(function (x, i) { return x && cs.indexOf(x) === i; });
+    return Promise.all(uniq.map(loadFx)).then(function () { return co; });
+  }
+  var coBusy = {};
+  function fetchCompany(id) {
+    if (coBusy[id]) return coBusy[id];
     var c = sb(); if (!c) return Promise.reject(new Error("no client"));
-    return Promise.all([c.from("stock_universe").select(U_COLS).eq("id", id).maybeSingle(), c.from("stock_data").select("*").eq("id", id).maybeSingle()]).then(function (r) {
+    coBusy[id] = Promise.all([c.from("stock_universe").select(U_COLS).eq("id", id).maybeSingle(), c.from("stock_data").select("*").eq("id", id).maybeSingle()]).then(function (r) {
       if (r[0].error) throw r[0].error; if (!r[0].data) return null;
-      var co = { u: r[0].data, d: r[1].data || {}, at: Date.now() }; S.co[id] = co;
-      var st = stmts(co.d), cs = [st.A && st.A.cur, st.Q && st.Q.cur, co.d.profile && co.d.profile.ccy];
-      (st.A ? st.A.rows : []).concat(st.Q ? st.Q.rows : []).forEach(function (x) { if (x.cur) cs.push(x.cur); });
-      var uniq = cs.filter(function (x, i) { return x && cs.indexOf(x) === i; });
-      return Promise.all(uniq.map(loadFx)).then(function () { return co; });
+      var co = { u: r[0].data, d: r[1].data || {}, at: Date.now() };
+      return withFx(co).then(function () { S.co[id] = co; IDB.put(CO_KEY + id, co); return co; });
+    }).then(function (co) { delete coBusy[id]; return co; }, function (e) { delete coBusy[id]; throw e; });
+    return coBusy[id];
+  }
+  function stamp(co) { return co ? String(co.u && co.u.updated_at) + "|" + String(co.d && co.d.updated_at) : ""; }
+  function behind(id, kept) { /* the fresh copy; the page is drawn again only if something changed */
+    fetchCompany(id).then(function (co) { if (co && stamp(co) !== stamp(kept) && S.onCo) S.onCo(id); }, function () { /* the kept copy stays */ });
+  }
+  function loadCompany(id, force) {
+    if (force) return fetchCompany(id);
+    var have = S.co[id];
+    if (have && Date.now() - have.at < 5 * 60e3) return Promise.resolve(have);
+    if (have) { behind(id, have); return Promise.resolve(have); }
+    return IDB.get(CO_KEY + id).then(function (kept) {
+      if (kept && kept.u && Date.now() - (kept.at || 0) < 24 * 3600e3) { S.co[id] = kept; if (Date.now() - kept.at > 60e3) behind(id, kept); return withFx(kept); }
+      return fetchCompany(id);
     });
   }
   /* which statements: the SEC's when they are current (US companies file every quarter), else EODHD's; a foreign company filing a 20-F has SEC years and EODHD quarters */
@@ -237,10 +297,11 @@
     var maxAbs = 0; shown.forEach(function (r) { ["rev", "ta", "cfo"].forEach(function (k) { var v = conv(r.d[k], r, set, "f", per); if (fin(v)) maxAbs = Math.max(maxAbs, Math.abs(v)); }); });
     var unit = maxAbs >= 5e10 ? 1e9 : 1e6, unitName = unit === 1e9 ? "billions" : "millions";
     var ccyName = S.cur === "usd" && !noRate ? "US dollars" : (set.cur || "reported currency");
-    var body = "", any = false;
+    var body = "", any = false, hdr = "", bankNet = set.src === "eodhd" && D.fin && D.fin.bankNet;
     lines.forEach(function (ln) {
-      if (ln[0] === "hd") { body += '<tr class="hd"><td>' + esc(ln[1]) + '</td><td colspan="' + shown.length + '"></td></tr>'; return; }
-      var vals = shown.map(function (r) { return lineVal(ln, r, set, per); }); if (!vals.some(fin)) return; any = true;
+      if (ln[0] === "hd") { hdr = '<tr class="hd"><td>' + esc(ln[1]) + '</td><td colspan="' + shown.length + '"></td></tr>'; return; } /* a heading only above lines that have figures */
+      var vals = shown.map(function (r) { return lineVal(ln, r, set, per); }); if (!vals.some(fin)) return; any = true; body += hdr; hdr = "";
+      if (bankNet && ln[1] === "rev") ln = ["Net revenue (after interest paid)"].concat(ln.slice(1));
       var key = typeof ln[1] === "string" ? ln[1] : null, kind = ln[2];
       body += '<tr class="' + (ln[3] || "") + '"><td>' + esc(ln[0]) + "</td>" + vals.map(function (v, i) {
         var r = shown[i], t = !fin(v) ? DASH : kind === "e" ? neg(fmtNum(v, 2), v) : kind === "s" || kind === "n" ? fmtNum(v / 1e6, 1) : fmtMoney(v, unit);
@@ -250,7 +311,7 @@
     });
     if (!any) return '<p class="muted">No figures on these lines.</p>';
     var head = "<tr><th>" + esc(ccyName + ", " + unitName) + "</th>" + shown.map(function (r) { return '<th class="num">' + esc(colLabel(r, per)) + '<br><small class="muted">' + esc(mShort(r.end)) + "</small></th>"; }).join("") + "</tr>";
-    var src = set.src === "sec" ? "From the company's own filings at the SEC (" + (D.sec && D.sec.tax === "ifrs-full" ? "20-F, IFRS" : "10-K and 10-Q") + "): the latest figure filed for each period." + (set.added ? " The last " + (set.added > 1 ? set.added + " years are" : "year is") + " from EODHD: the SEC's data does not have " + (set.added > 1 ? "them" : "it") + " yet." : "") : "From EODHD's records of the company's reports.";
+    var src = set.src === "sec" ? "From the company's own filings at the SEC (" + (D.sec && D.sec.tax === "ifrs-full" ? "20-F, IFRS" : "10-K and 10-Q") + "): the latest figure filed for each period." + (set.added ? " The last " + (set.added > 1 ? set.added + " years are" : "year is") + " from EODHD: the SEC's data does not have " + (set.added > 1 ? "them" : "it") + " yet." : "") : "From EODHD's records of the company's reports." + (bankNet ? " A bank's revenue here is net: the interest and fees it received less the interest it paid (shown as interest expense), as the bank and Koyfin count it." : "");
     var more = per !== "a" && rows.length > 12 ? '<div class="sa-more"><button type="button" id="sa-all">' + (S.all ? "Show the last 12 only" : "Show all " + rows.length + " periods") + "</button></div>" : "";
     return '<div class="sa-wrap"><table class="pt sa-tbl sa-fin"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" + more +
       '<p class="sa-note">' + esc(src) + (noRate ? " In " + esc(set.cur) + ", the currency of the reports: there is no dollar rate for " + esc(set.cur) + " yet." : "") + (S.cur === "usd" && !noRate && set.cur && set.cur !== "USD" ? " Reported in " + esc(set.cur) + "; shown in US dollars at each period's average rate (balance sheet: the rate at its end). A period without a rate shows —." : "") + (shown.some(function (r) { return r.split; }) ? " Per-share figures and share counts before a stock split are on today's basis." : "") + ' <b>◦</b> derived from the year or year-to-date figure. <b>r</b> restated: the company changed the figure in a later filing (hover for both).</p>';
@@ -296,19 +357,23 @@
   var RATIO_LINES = [["hd", "Margins"], ["Gross margin", "gm", "p"], ["Operating margin", "om", "p"], ["EBITDA margin", "em", "p"], ["Net margin", "nm", "p"], ["Free cash flow margin", "fm", "p"], ["hd", "Returns"], ["Return on equity", "roe", "p"], ["Return on assets", "roa", "p"], ["Return on invested capital", "roic", "p"], ["hd", "Growth, year on year"], ["Revenue", "g_rev", "g"], ["Operating income", "g_op", "g"], ["Net income", "g_ni", "g"], ["EPS, diluted", "g_eps", "g"], ["Free cash flow", "g_fcf", "g"],
     ["hd", "Balance sheet"], ["Debt / equity", "de", "x"], ["Net debt / EBITDA", "nde", "xx"], ["Interest cover (operating income / interest)", "cov", "x"], ["Current ratio", "cr", "x"], ["Liabilities / assets", "la", "p"],
     ["hd", "Valuation at the period's end (US dollars)"], ["Market value", "cap", "m"], ["Enterprise value", "ev", "m"], ["Price / earnings", "pe", "x"], ["Price / sales", "ps", "x"], ["Price / book", "pb", "x"], ["EV / EBITDA", "eve", "x"], ["EV / sales", "evs", "x"], ["Free cash flow yield", "fy", "p"], ["Dividend yield", "dy", "p"]];
-  function ratioTable(co, per) {
+  /* groups: the headings of RATIO_LINES to show (one page each in the side menu); all when not given */
+  function ratioTable(co, per, groups, note) {
     var R = ratioRows(co, per); if (!R) return '<p class="muted">No statements yet for this company.</p>';
     var shown = per === "a" ? R.rows.slice(-15) : S.all ? R.rows : R.rows.slice(-12);
-    var body = "";
+    var body = "", inG = !groups, anyRow = false, hdr = "";
     RATIO_LINES.forEach(function (ln) {
-      if (ln[0] === "hd") { body += '<tr class="hd"><td>' + esc(ln[1]) + '</td><td colspan="' + shown.length + '"></td></tr>'; return; }
+      if (ln[0] === "hd") { inG = !groups || groups.indexOf(ln[1]) >= 0; hdr = inG && (!groups || groups.length > 1) ? '<tr class="hd"><td>' + esc(ln[1]) + '</td><td colspan="' + shown.length + '"></td></tr>' : ""; return; }
+      if (!inG) return;
       var vals = shown.map(function (x) { return x[ln[1]]; }); if (!vals.some(fin)) return;
+      body += hdr; hdr = ""; anyRow = true;
       body += "<tr><td>" + esc(ln[0]) + "</td>" + vals.map(function (v) { var t = ln[2] === "p" ? pct(v) : ln[2] === "g" ? pctS(v) : ln[2] === "x" ? (fin(v) ? v.toFixed(v >= 100 ? 0 : 1) + "x" : DASH) : ln[2] === "xx" ? (fin(v) ? v.toFixed(1) + "x" : DASH) : big(v); return '<td class="num ' + (ln[2] === "g" ? cls(v) : "") + '">' + t + "</td>"; }).join("") + "</tr>";
     });
+    if (!anyRow) return '<p class="muted">' + esc(note && note.none || "No figures for these lines.") + "</p>";
     var head = "<tr><th>" + (per === "a" ? "Fiscal years" : "Trailing twelve months, at each quarter") + "</th>" + shown.map(function (r) { return '<th class="num">' + esc(colLabel(r, per === "a" ? "a" : "t")) + '<br><small class="muted">' + esc(mShort(r.end)) + "</small></th>"; }).join("") + "</tr>";
     var more = per !== "a" && R.rows.length > 12 ? '<div class="sa-more"><button type="button" id="sa-all">' + (S.all ? "Show the last 12 only" : "Show all " + R.rows.length + " periods") + "</button></div>" : "";
     return '<div class="sa-wrap"><table class="pt sa-tbl sa-fin"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" + more +
-      '<p class="sa-note">Computed here from the statements above. Return on invested capital: operating income after tax (the company\'s own rate, 21% when unclear) over equity plus debt less cash. Valuation: the share price at the end of the month the period closed, times the shares then outstanding. A multiple on a loss, or one we cannot check, shows —.</p>';
+      '<p class="sa-note">' + esc(note && note.text || "Computed here from the company's statements. A ratio on a loss, or one we cannot check, shows —.") + "</p>";
   }
 
   /* ---------- small charts ---------- */
@@ -350,7 +415,40 @@
   }
 
   /* ---------- the company page ---------- */
-  var TABS = [["summary", "Summary"], ["financials", "Financials"], ["ratios", "Ratios"], ["earnings", "Earnings"], ["estimates", "Estimates"], ["dividends", "Dividends"], ["ownership", "Ownership"], ["filings", "Filings"], ["news", "News"], ["chart", "Chart"]];
+  /* the side menu, as on Koyfin: snapshots, analysts' estimates, financial analysis, news and filings, graphs (one page each) */
+  var MENU = [
+    ["Snapshots", [["overview", "Overview"], ["description", "Description"], ["rank", "Percentile rank"], ["dividends", "Dividends"], ["ownership", "Ownership"], ["earnings", "Earnings history"]]],
+    ["Analyst estimates", [["estimates", "Estimates"], ["target", "Price target"]]],
+    ["Financial analysis", [["highlights", "Highlights"], ["is", "Income statement"], ["bs", "Balance sheet"], ["cf", "Cash flow"], ["multiples", "Multiples"], ["ev", "Enterprise value"], ["profitability", "Profitability"], ["returns", "Returns (ROE, ROIC)"], ["growth", "Growth"], ["solvency", "Solvency"]]],
+    ["News and filings", [["news", "News"], ["filings", "SEC filings"]]],
+    ["Graphs", [["chart", "Price chart"]]]
+  ];
+  var ALIAS = { summary: "overview", financials: "is", ratios: "profitability" }; /* the old links keep working */
+  function pageOf(tab) { tab = ALIAS[tab] || tab; return MENU.some(function (g) { return g[1].some(function (t) { return t[0] === tab; }); }) ? tab : "overview"; }
+  function pageName(tab) { var n = "Overview"; MENU.forEach(function (g) { g[1].forEach(function (t) { if (t[0] === tab) n = t[1]; }); }); return n; }
+  function side(id, on) {
+    var href = function (t) { return "#stocks/" + encodeURIComponent(id) + "/" + t; };
+    var list = MENU.map(function (g) { return '<div class="g"><h4>' + esc(g[0]) + "</h4>" + g[1].map(function (t) { return '<a href="' + href(t[0]) + '"' + (t[0] === on ? ' class="on" aria-current="page"' : "") + ">" + esc(t[1]) + "</a>"; }).join("") + "</div>"; }).join("");
+    var sel = '<select id="sa-sidesel" aria-label="Section">' + MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (t) { return '<option value="' + t[0] + '"' + (t[0] === on ? " selected" : "") + ">" + esc(t[1]) + "</option>"; }).join("") + "</optgroup>"; }).join("") + "</select>";
+    return '<nav class="sa-side" aria-label="Sections">' + sel + list + "</nav>";
+  }
+  /* what the checks on the data found, said once at the top of every page in plain words */
+  function xOf(s) { var m = /x(-?[\d.]+)/.exec(String(s || "")); return m ? "\u00d7" + m[1] : DASH; }
+  function checks(co) {
+    var u = co.u, m = u.metrics || {}, f = m.f || {}, v = m.v || {}, st = u.status || {}, out = [];
+    if (st.res && st.res.dead) out.push(st.res.plan || /\b403\b/.test(String(st.res.err || "")) ? "EODHD's plan does not include company data from this exchange (EODHD answers 403), so there are no figures for this company yet. It is asked again every week; nothing needs doing." : "EODHD has no record we can read for this company yet. It is asked again every month.");
+    if (f.withheld && /market-value/.test(f.check || "")) out.push("Amounts withheld: this company's figures in EODHD are out of all proportion to its market value (" + xOf(f.check) + "), a currency or unit error in EODHD's records. No amount is shown until it is corrected; margins, growth and returns, which do not depend on the currency, are shown.");
+    else if (f.withheld) out.push("Amounts withheld: EODHD's statements for this company and EODHD's own twelve-month figures differ by more than double (" + xOf(f.check) + "), so one of them is in another currency or unit. No amount is shown until the two agree; margins, growth and returns, which do not depend on the currency, are shown.");
+    else if (/^eodhd-vs-sec/.test(f.check || "")) out.push("EODHD's statements differed from the company's own 20-F at the SEC (" + xOf(f.check) + "): the 20-F's figures are shown.");
+    else if (/^sec-revenue-partial/.test(f.check || "")) out.push("The revenue line in the company's SEC filings is only part of its revenue (" + xOf(f.check) + " of the total): EODHD's twelve-month revenue is shown; net income is the filings'.");
+    else if (/^bank-gross/.test(f.check || "")) out.push("EODHD gives this bank's gross income (interest received plus fees): its net revenue, EODHD's own twelve-month figure, is shown.");
+    if (f.qbad && !f.withheld) out.push("EODHD's quarterly figures for this company do not add up to its yearly ones (a half-year or a change of definition among the quarters): the latest year is shown instead of the last twelve months, and the quarterly views are left out.");
+    if (v.capcheck) out.push("EODHD's market value for this company disagrees with its own enterprise value less the company's net debt (" + xOf(v.capcheck) + "): no market value is shown until the two agree, and the multiples that need it show —.");
+    return out.length ? '<div class="sa-check" role="note">' + out.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") + "</div>" : "";
+  }
+  /* withheld amounts: the SEC's own years stay, the EODHD years added after them go */
+  function secOnly(D) { if (!D.fin) return D; var x = {}; for (var k in D) x[k] = D[k]; x.fin = null; return x; }
+  function withheldMsg() { return '<p class="sa-note">The amounts for this company are withheld until EODHD\'s statements and its own twelve-month figures agree (see the note above).</p>'; }
   var RANK_LABEL = { cap: "Size", g_rev: "Sales growth", g_eps: "EPS growth", gm: "Gross margin", om: "Operating margin", nm: "Net margin", roe: "Return on equity", roic: "Return on capital", pe: "P/E (cheaper higher)", ps: "P/S (cheaper higher)", pb: "P/B (cheaper higher)", ev_ebitda: "EV/EBITDA (cheaper higher)", fcf_y: "Free cash flow yield", dy: "Dividend yield", de: "Debt/equity (less higher)", r1y: "1-year return", r3m: "3-month return" };
   function header(co) {
     var u = co.u, D = co.d, P = D.profile || {}, m = u.metrics || {}, r = m.r || {}, dl = (D.prices && D.prices.d) || [];
@@ -362,38 +460,102 @@
       '<div class="quote">' + (last ? "<b>" + esc(px(last[2] != null ? last[2] : last[1], lc)) + '</b><span class="chg ' + cls(chg) + '">' + pctS(chg, 2) + " on " + esc(date(last[0])) + "</span>" : "") +
       '<span class="chg muted">Market value ' + esc(big(u.cap_usd)) + (u.rank ? " · #" + u.rank + " in the world" : "") + "</span>" + (next ? '<span class="chg muted">Next results ' + esc(date(next[1])) + (next[2] ? " · " + esc(next[2]) : "") + "</span>" : "") + "</div></div>";
   }
-  function tabs(id, on) { return '<nav class="sa-tabs" aria-label="Sections">' + TABS.map(function (t) { return '<a href="#stocks/' + encodeURIComponent(id) + "/" + t[0] + '" class="' + (t[0] === on ? "on" : "") + '">' + t[1] + "</a>"; }).join("") + "</nav>"; }
   function grid(items) { return '<div class="sa-grid">' + items.filter(function (x) { return x; }).map(function (x) { return "<div><span>" + esc(x[0]) + "</span><b>" + x[1] + "</b></div>"; }).join("") + "</div>"; }
   function vSummary(co) {
     var u = co.u, D = co.d, P = D.profile || {}, m = u.metrics || {}, v = m.v || {}, f = m.f || {}, p = m.p || {}, r = m.r || {};
     var g = grid([["Market value", esc(big(v.cap != null ? v.cap : u.cap_usd))], ["Enterprise value", esc(big(v.ev))], ["P/E, last 12 months", esc(mult(v.pe))], ["P/E, next 12 months", esc(mult(p.fpe))], ["EV / EBITDA", esc(mult(v.ev_ebitda))], ["Price / sales", esc(mult(v.ps))], ["Price / book", esc(mult(v.pb))], ["Free cash flow yield", esc(pct(v.fcf_y))], ["Dividend yield", esc(pct(p.dy))],
-      ["Revenue, 12 months", esc(big(v.rev_usd))], ["Net income, 12 months", esc(big(v.ni_usd))], ["Sales growth", '<span class="' + cls(f.g_rev) + '">' + esc(pctS(f.g_rev)) + "</span>"], ["Gross margin", esc(pct(f.gm))], ["Operating margin", esc(pct(f.om))], ["Net margin", esc(pct(f.nm))], ["Return on equity", esc(pct(f.roe))], ["Return on capital", esc(pct(f.roic))], ["Debt / equity", esc(fin(f.de) ? f.de.toFixed(2) + "x" : DASH)],
+      [f.ttm === false && f.end ? "Revenue, year to " + mShort(f.end) : "Revenue, 12 months", esc(big(v.rev_usd))], [f.ttm === false && f.end ? "Net income, year to " + mShort(f.end) : "Net income, 12 months", esc(big(v.ni_usd))], ["Sales growth", '<span class="' + cls(f.g_rev) + '">' + esc(pctS(f.g_rev)) + "</span>"], ["Gross margin", esc(pct(f.gm))], ["Operating margin", esc(pct(f.om))], ["Net margin", esc(pct(f.nm))], ["Return on equity", esc(pct(f.roe))], ["Return on capital", esc(pct(f.roic))], ["Debt / equity", esc(fin(f.de) ? f.de.toFixed(2) + "x" : DASH)],
       ["1 year", '<span class="' + cls(r.r1y) + '">' + esc(pctS(r.r1y)) + "</span>"], ["Since 1 January", '<span class="' + cls(r.ytd) + '">' + esc(pctS(r.ytd)) + "</span>"], ["5 years", '<span class="' + cls(r.r5y) + '">' + esc(pctS(r.r5y, 0)) + "</span>"], ["52-week range", (function () { var T = P.tech || {}, lo = fin(r.lo52) ? r.lo52 : fin(T["52WeekLow"]) ? T["52WeekLow"] : null, hi = fin(r.hi52) ? r.hi52 : fin(T["52WeekHigh"]) ? T["52WeekHigh"] : null; return esc(fin(lo) && fin(hi) ? px(lo, P.ccy) + " – " + px(hi, P.ccy) : DASH); })()], ["Beta", esc(fin(p.beta) ? p.beta.toFixed(2) : DASH)], ["Analysts' target", p.analysts > 0 ? esc(px(p.target, P.ccy)) + " <small>" + p.analysts + " analysts</small>" : DASH]]);
     var pr = m.pr || {}, ps = m.ps || {};
     var ranks = Object.keys(RANK_LABEL).filter(function (k) { return fin(pr[k]); }).map(function (k) { return "<span>" + esc(RANK_LABEL[k]) + '</span><i><b style="width:' + pr[k] + '%"></b>' + (fin(ps[k]) ? '<em style="left:' + ps[k] + '%" title="In its sector: ' + ps[k] + '"></em>' : "") + '</i><span class="n">' + pr[k] + '</span><span class="n">' + (fin(ps[k]) ? ps[k] : DASH) + "</span>"; }).join("");
-    var st = stmts(D), Q = st.Q, qs = Q ? Q.rows.slice(-12) : [];
-    var revChart = bars(qs.map(function (q) { return { l: mShort(q.end), a: conv(q.d.rev, q, Q, "f", "q"), b: conv(q.d.ni, q, Q, "f", "q") }; }), { label: "Revenue and net income by quarter" });
+    var st = stmts(D), Q = st.Q, byYear = f.qbad && (!Q || Q.src === "eodhd"), set = byYear ? st.A : Q, qs = set ? set.rows.slice(byYear ? -10 : -12) : [];
+    /* withheld amounts are not drawn either; quarters that do not add up to the year: the years instead */
+    var revChart = f.withheld && (!set || set.src === "eodhd") ? "" : bars(qs.map(function (q) { return { l: byYear ? "FY" + String(q.fyl || q.end.slice(0, 4)).slice(2) : mShort(q.end), a: conv(q.d.rev, q, set, "f", byYear ? "a" : "q"), b: conv(q.d.ni, q, set, "f", byYear ? "a" : "q") }; }), { label: "Revenue and net income by " + (byYear ? "year" : "quarter") });
     var hist = (D.earnings && D.earnings.hist) || [];
-    var A = P.officers && P.officers[0], F = D.filings || {};
-    /* the SEC's record fills what EODHD has not given yet: address, website, year end, industry code */
+    return g + '<div class="sa-cols"><div>' +
+      (revChart ? '<section class="sa-sec"><h3>Revenue and net income</h3><p class="sub">By ' + (byYear ? "year" : "quarter") + ", " + (S.cur === "usd" ? "US dollars" : esc(set && set.cur || "")) + " · wide bar revenue, narrow bar net income</p>" + revChart + "</section>" : "") +
+      (hist.length ? '<section class="sa-sec"><h3>Earnings per share against the estimate</h3><p class="sub">Ring: analysts\' average before the report · dot: the result</p>' + epsChart(hist) + "</section>" : "") +
+      (P.desc ? '<section class="sa-sec"><h3>The business</h3><p>' + esc(P.desc.length > 420 ? P.desc.slice(0, P.desc.lastIndexOf(" ", 400)) + "…" : P.desc) + '</p><p><a href="#stocks/' + encodeURIComponent(u.id) + '/description">Description and company facts</a></p></section>' : "") +
+      '</div><div><section class="sa-sec"><h3>How it ranks</h3><p class="sub">Percentile among every company of $10B and more (bar) and in its sector (mark). 100 is the best.</p>' + (ranks ? '<div class="sa-rank">' + ranks + "</div>" : '<p class="muted">Ranked once a day; not yet.</p>') + "</section>" +
+      (u.tv ? '<section class="sa-sec"><h3>Price</h3><div class="sa-tv sm" id="sa-tv-s"></div></section>' : "") +
+      "</div></div>";
+  }
+  /* the company's facts: EODHD's profile, with the SEC's record filling what EODHD has not given (address, website, year end, industry code) */
+  function facts(co) {
+    var u = co.u, D = co.d, P = D.profile || {}, A = P.officers && P.officers[0], F = D.filings || {};
     var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var fyeSec = /^\d{4}$/.test(String(F.fye || "")) ? MONTHS[Number(String(F.fye).slice(0, 2)) - 1] + " " + Number(String(F.fye).slice(2)) : null;
     var web = P.web || (F.web ? (/^https?:/.test(F.web) ? F.web : "https://" + F.web) : null);
-    var kv = [["Headquarters", P.addr || F.addr], ["Employees", fin(P.employees) ? fmtNum(P.employees) : null], ["Chief executive", A && /chief executive|ceo/i.test(String(A[1])) ? A[0] : null], ["Website", web ? '<a href="' + esc(web) + '" target="_blank" rel="noopener">' + esc(String(web).replace(/^https?:\/\//, "")) + "</a>" : null], ["Listed since", P.ipo ? date(P.ipo) : null], ["Fiscal year ends", P.fye || fyeSec], ["ISIN", P.isin], ["SEC CIK", u.cik ? '<a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + esc(u.cik) + '" target="_blank" rel="noopener">' + esc(String(u.cik).replace(/^0+/, "")) + "</a>" : null], ["Industry (GICS)", P.gics && [P.gics.sector, P.gics.industry, P.gics.sub].filter(Boolean).join(" › ")], ["Industry (SEC code)", !P.gics && F.sicd ? F.sicd + (F.sic ? " (" + F.sic + ")" : "") : null], ["Incorporated in", F.inc]].filter(function (x) { return x[1]; });
-    return g + '<div class="sa-cols"><div>' +
-      (revChart ? '<section class="sa-sec"><h3>Revenue and net income</h3><p class="sub">By quarter, ' + (S.cur === "usd" ? "US dollars" : esc(Q && Q.cur || "")) + " · wide bar revenue, narrow bar net income</p>" + revChart + "</section>" : "") +
-      (hist.length ? '<section class="sa-sec"><h3>Earnings per share against the estimate</h3><p class="sub">Ring: analysts\' average before the report · dot: the result</p>' + epsChart(hist) + "</section>" : "") +
-      (P.desc ? '<section class="sa-sec"><h3>The business</h3><p>' + esc(P.desc) + "</p></section>" : "") +
-      '</div><div><section class="sa-sec"><h3>How it ranks</h3><p class="sub">Percentile among every company of $10B and more (bar) and in its sector (mark). 100 is the best.</p>' + (ranks ? '<div class="sa-rank">' + ranks + "</div>" : '<p class="muted">Ranked once a day; not yet.</p>') + "</section>" +
-      (u.tv ? '<section class="sa-sec"><h3>Price</h3><div class="sa-tv sm" id="sa-tv-s"></div></section>' : "") +
-      (kv.length ? '<section class="sa-sec"><h3>The company</h3><div class="sa-kv">' + kv.map(function (x) { return "<span>" + esc(x[0]) + "</span><b>" + (/^</.test(String(x[1])) ? x[1] : esc(x[1])) + "</b>"; }).join("") + "</div></section>" : "") + "</div></div>";
+    return [["Headquarters", P.addr || F.addr], ["Employees", fin(P.employees) ? fmtNum(P.employees) : null], ["Chief executive", A && /chief executive|ceo/i.test(String(A[1])) ? A[0] : null], ["Website", web ? '<a href="' + esc(web) + '" target="_blank" rel="noopener">' + esc(String(web).replace(/^https?:\/\//, "")) + "</a>" : null], ["Listed since", P.ipo ? date(P.ipo) : null], ["Fiscal year ends", P.fye || fyeSec], ["ISIN", P.isin], ["SEC CIK", u.cik ? '<a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + esc(u.cik) + '" target="_blank" rel="noopener">' + esc(String(u.cik).replace(/^0+/, "")) + "</a>" : null], ["Industry (GICS)", P.gics && [P.gics.sector, P.gics.industry, P.gics.sub].filter(Boolean).join(" \u203a ")], ["Industry (SEC code)", !P.gics && F.sicd ? F.sicd + (F.sic ? " (" + F.sic + ")" : "") : null], ["Incorporated in", F.inc]].filter(function (x) { return x[1]; });
+  }
+  function kvHtml(kv) { return kv.map(function (x) { return "<span>" + esc(x[0]) + "</span><b>" + (/^</.test(String(x[1])) ? x[1] : esc(x[1])) + "</b>"; }).join(""); }
+  function vDescription(co) {
+    var P = co.d.profile || {}, kv = facts(co), off = (P.officers || []).filter(function (o) { return o && o[0]; });
+    return '<div class="sa-cols"><div><section class="sa-sec"><h3>The business</h3>' + (P.desc ? "<p>" + esc(P.desc) + "</p>" : '<p class="muted">No description yet.</p>') + "</section></div><div>" +
+      (kv.length ? '<section class="sa-sec"><h3>The company</h3><div class="sa-kv">' + kvHtml(kv) + "</div></section>" : "") +
+      (off.length ? '<section class="sa-sec"><h3>Officers</h3><div class="sa-kv">' + off.map(function (o) { return "<span>" + esc(o[1] || "") + "</span><b>" + esc(o[0]) + (o[2] ? ' <small class="muted">born ' + esc(o[2]) + "</small>" : "") + "</b>"; }).join("") + "</div></section>" : "") + "</div></div>";
+  }
+  function vRank(co) {
+    var m = co.u.metrics || {}, pr = m.pr || {}, ps = m.ps || {}, v = m.v || {}, f = m.f || {}, p = m.p || {}, r = m.r || {};
+    var val = { cap: big(v.cap != null ? v.cap : co.u.cap_usd), g_rev: pctS(f.g_rev), g_eps: pctS(f.g_eps), gm: pct(f.gm), om: pct(f.om), nm: pct(f.nm), roe: pct(f.roe), roic: pct(f.roic), pe: mult(v.pe), ps: mult(v.ps), pb: mult(v.pb), ev_ebitda: mult(v.ev_ebitda), fcf_y: pct(v.fcf_y), dy: pct(p.dy), de: fin(f.de) ? f.de.toFixed(2) + "x" : DASH, r1y: pctS(r.r1y), r3m: pctS(r.r3m) };
+    var keys = Object.keys(RANK_LABEL); if (!keys.some(function (k) { return fin(pr[k]); })) return '<p class="muted">Ranked once a day; not yet for this company.</p>';
+    var rows = keys.map(function (k) { return "<tr><td>" + esc(RANK_LABEL[k]) + '</td><td class="num">' + esc(val[k] || DASH) + '</td><td class="bar">' + (fin(pr[k]) ? '<i><b style="width:' + pr[k] + '%"></b>' + (fin(ps[k]) ? '<em style="left:' + ps[k] + '%"></em>' : "") + "</i>" : "") + '</td><td class="num">' + (fin(pr[k]) ? pr[k] : DASH) + '</td><td class="num">' + (fin(ps[k]) ? ps[k] : DASH) + "</td></tr>"; }).join("");
+    return '<div class="sa-wrap"><table class="pt sa-tbl sa-pr"><thead><tr><th>Measure</th><th class="num">This company</th><th>Percentile</th><th class="num">All companies</th><th class="num">' + esc(co.u.sector || "Sector") + "</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
+      '<p class="sa-note">Percentile among every company of $10B and more in the list (bar) and in its sector (mark): 100 is the best; for price multiples and debt, the lowest is the best. Ranked once a day' + (m.ranked_at ? ", last on " + esc(date(String(m.ranked_at).slice(0, 10))) : "") + ".</p>";
   }
   function chips(id, opts, on) { return '<div class="chips sm" id="' + id + '">' + opts.map(function (o) { return '<button type="button" data-v="' + o[0] + '" class="' + (o[0] === on ? "on" : "") + '">' + o[1] + "</button>"; }).join("") + "</div>"; }
-  function vFinancials(co) {
-    S.stmt = S.stmt || "is"; var P = co.d.profile || {}, st = stmts(co.d), rc = (st.A && st.A.cur) || (st.Q && st.Q.cur) || "";
-    return '<div class="sa-bar">' + chips("sa-st", [["is", "Income statement"], ["bs", "Balance sheet"], ["cf", "Cash flow"]], S.stmt) + chips("sa-per", [["a", "Years"], ["q", "Quarters"], ["t", "Last 12 months"]], S.per) + (rc && rc !== "USD" ? chips("sa-cur", [["usd", "US dollars"], ["rep", rc]], S.cur) : "") + "</div>" + finTable(co.d, S.stmt, S.per);
+  /* the period chips: years always; quarters and twelve months only where EODHD's quarters add up to its years */
+  function perOpts(co, withQ) { var f = (co.u.metrics || {}).f || {}, st = stmts(co.d), bad = f.qbad && (!st.Q || st.Q.src === "eodhd"); return bad ? [["a", "Years"]] : withQ ? [["a", "Years"], ["q", "Quarters"], ["t", "Last 12 months"]] : [["a", "Years"], ["t", "Last 12 months"]]; }
+  function perNow(opts, want) { return opts.some(function (o) { return o[0] === want; }) ? want : "a"; }
+  function vStmt(co, which) {
+    var f = (co.u.metrics || {}).f || {}, st = stmts(co.d), rc = (st.A && st.A.cur) || (st.Q && st.Q.cur) || "", opts = perOpts(co, true), per = perNow(opts, S.per), set = per === "a" ? st.A : st.Q;
+    var bar = '<div class="sa-bar">' + chips("sa-per", opts, per) + (rc && rc !== "USD" ? chips("sa-cur", [["usd", "US dollars"], ["rep", rc]], S.cur) : "") + "</div>";
+    if (f.withheld && set && set.src === "eodhd") return bar + withheldMsg();
+    return bar + finTable(f.withheld ? secOnly(co.d) : co.d, which, per);
   }
-  function vRatios(co) { var per = S.per === "a" ? "a" : "t"; return '<div class="sa-bar">' + chips("sa-per", [["a", "Years"], ["t", "Last 12 months"]], per) + "</div>" + ratioTable(co, per); }
+  /* the main figures year by year, as Koyfin's Highlights */
+  function vHighlights(co) {
+    var f = (co.u.metrics || {}).f || {}, st = stmts(co.d), A = st.A; if (!A || !A.rows.length) return '<p class="muted">No statements yet for this company.</p>';
+    if (f.withheld && A.src === "eodhd") return withheldMsg();
+    if (f.withheld) A = stmts(secOnly(co.d)).A || A;
+    var rows = A.rows.slice(-10), lastEnd = rows[rows.length - 1].end, noRate = S.cur === "usd" && A.cur && String(A.cur).toUpperCase() !== "USD" && fxRate(A.cur, null, lastEnd) == null;
+    var rc = A.cur || ""; S.local = noRate || S.cur !== "usd";
+    try {
+      var ebitdaOf = function (d) { return fin(d.opinc) && fin(d.da) ? d.opinc + d.da : (fin(d.ebitda) ? d.ebitda : null); }, fcfOf = function (d) { return fin(d.cfo) && fin(d.capex) ? d.cfo - d.capex : null; };
+      var raw = function (r, k) { return typeof k === "function" ? k(r.d) : r.d[k]; };
+      var L = [["Revenue", "rev", "m", "sum"], ["Growth", "rev", "g"], ["Gross profit", "gp", "m", "sum"], ["Gross margin", "gp", "mg"], ["Operating income", "opinc", "m", "sum"], ["Operating margin", "opinc", "mg"], ["EBITDA", ebitdaOf, "m"], ["Net income", "ni", "m", "sum"], ["Net margin", "ni", "mg"], ["Growth", "ni", "g"], ["EPS, diluted", "epsd", "e"], ["Growth", "epsd", "g"], ["Operating cash flow", "cfo", "m", "sum"], ["Free cash flow", fcfOf, "m", "sum"], ["Free cash flow margin", fcfOf, "mg"], ["Dividend per share", "dps", "e"]];
+      var maxAbs = 0; rows.forEach(function (r) { var v = conv(r.d.rev, r, A, "f", "a"); if (fin(v)) maxAbs = Math.max(maxAbs, Math.abs(v)); });
+      var unit = maxAbs >= 5e10 ? 1e9 : 1e6, body = "";
+      L.forEach(function (ln) {
+        var vals = rows.map(function (r, i) { var v = raw(r, ln[1]), p = i ? raw(rows[i - 1], ln[1]) : null;
+          if (ln[2] === "m") return conv(v, r, A, "f", "a");
+          if (ln[2] === "e") return fin(v) ? v : null;
+          if (ln[2] === "mg") return fin(v) && r.d.rev > 0 && v / r.d.rev <= 1 && v / r.d.rev >= -10 ? v / r.d.rev : null;
+          return fin(v) && fin(p) && p > 0 && i && (Date.parse(r.end) - Date.parse(rows[i - 1].end)) / 864e5 < 380 ? v / p - 1 : null; /* growth: the reported currency, a year apart */ });
+        if (!vals.some(fin)) return;
+        body += '<tr class="' + (ln[3] || (ln[2] === "g" || ln[2] === "mg" ? "sub" : "")) + '"><td>' + esc(ln[0]) + "</td>" + vals.map(function (v) { return '<td class="num ' + (ln[2] === "g" ? cls(v) : "") + '">' + (ln[2] === "m" ? (fin(v) ? fmtMoney(v, unit) : DASH) : ln[2] === "e" ? (fin(v) ? neg(fmtNum(v, 2), v) : DASH) : ln[2] === "g" ? pctS(v) : pct(v)) + "</td>"; }).join("") + "</tr>";
+      });
+      if (!body) return '<p class="muted">No figures on these lines.</p>';
+      var ccyName = S.cur === "usd" && !noRate ? "US dollars" : (rc || "reported currency");
+      var head = "<tr><th>" + esc(ccyName + ", " + (unit === 1e9 ? "billions" : "millions")) + "</th>" + rows.map(function (r) { return '<th class="num">' + esc(colLabel(r, "a")) + '<br><small class="muted">' + esc(mShort(r.end)) + "</small></th>"; }).join("") + "</tr>";
+      return '<div class="sa-bar">' + (rc && rc !== "USD" ? chips("sa-cur", [["usd", "US dollars"], ["rep", rc]], S.cur) : "") + "</div>" + '<div class="sa-wrap"><table class="pt sa-tbl sa-fin"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
+        '<p class="sa-note">The last ten fiscal years, from ' + (A.src === "sec" ? "the company's filings at the SEC" : "EODHD's records of the company's reports") + ". Growth in the reported currency; margins over revenue. Per-share figures in " + esc(rc || "the reported currency") + "." + (noRate ? " No dollar rate for " + esc(rc) + " yet: amounts in " + esc(rc) + "." : "") + "</p>";
+    } finally { S.local = false; }
+  }
+  function vRatioPage(co, groups, text) { var opts = perOpts(co, false), per = perNow(opts, S.per === "a" ? "a" : "t"); return '<div class="sa-bar">' + chips("sa-per", opts, per) + "</div>" + ratioTable(co, per, groups, { text: text }); }
+  function vMultiples(co) {
+    var m = co.u.metrics || {}, v = m.v || {}, p = m.p || {}, opts = perOpts(co, false), per = perNow(opts, S.per === "a" ? "a" : "t"), hasPx = co.d.prices && co.d.prices.m && co.d.prices.m.length;
+    var g = grid([["Market value", esc(big(v.cap != null ? v.cap : co.u.cap_usd))], ["Enterprise value", esc(big(v.ev))], ["P/E, last 12 months", esc(mult(v.pe))], ["P/E, next 12 months", esc(mult(p.fpe))], ["Price / sales", esc(mult(v.ps))], ["Price / book", esc(mult(v.pb))], ["EV / EBITDA", esc(mult(v.ev_ebitda))], ["EV / sales", esc(mult(v.ev_sales))], ["Free cash flow yield", esc(pct(v.fcf_y))], ["Dividend yield", esc(pct(p.dy))]]);
+    return '<h3 class="sa-h">Today</h3>' + g + '<h3 class="sa-h">At the end of each period</h3>' + (hasPx ? '<div class="sa-bar">' + chips("sa-per", opts, per) + "</div>" + ratioTable(co, per, ["Valuation at the period's end (US dollars)"], { text: "The share price at the end of the month each period closed, times the shares then outstanding, against that period's figures. A multiple on a loss, or one we cannot check, shows —." }) :
+      '<p class="muted">The history needs the share price at the end of each period, and EODHD\'s plan does not include prices (it answers 403). Today\'s multiples above use EODHD\'s market value, the latest twelve months\' figures and today\'s exchange rates.</p>');
+  }
+  function vEV(co) {
+    var m = co.u.metrics || {}, v = m.v || {}, f = m.f || {}, cap = v.cap != null ? v.cap : co.u.cap_usd;
+    var rows = [["Market value", cap, "sum"], ["Plus debt", v.debt_usd, "sub"], ["Plus minority interests", v.nci_usd, "sub"], ["Less cash and short-term investments", v.cash_usd, "sub"], ["Enterprise value", v.ev, "sum"]];
+    var fins = f.fin || /bank|insur/i.test(String(co.u.industry || ""));
+    var tbl = '<div class="sa-wrap" style="max-width:640px"><table class="pt sa-tbl sa-fin"><thead><tr><th>US dollars, today</th><th class="num">Value</th></tr></thead><tbody>' + rows.map(function (r) { return '<tr class="' + r[2] + '"><td>' + esc(r[0]) + '</td><td class="num">' + esc(big(r[1])) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+    return tbl + '<p class="sa-note">EODHD\'s market value, plus the debt and minority interests on the latest balance sheet' + (f.bs_end ? " (" + esc(date(f.bs_end)) + ")" : "") + ", less its cash and short-term investments, at today\'s exchange rate." + (fins ? " For a bank or an insurer, debt is part of the business: enterprise value says little and the ranks leave it out." : "") + " The history needs share prices at each period\'s end, which EODHD\'s plan does not include yet.</p>";
+  }
   function vEarnings(co) {
     var hist = ((co.d.earnings && co.d.earnings.hist) || []).slice().reverse(); if (!hist.length) return '<p class="muted">No earnings history yet.</p>';
     var rows = hist.slice(0, S.all ? 400 : 40).map(function (h) { var s = fin(h[4]) && fin(h[5]) && h[5] !== 0 ? (h[4] - h[5]) / Math.abs(h[5]) : null; return "<tr><td>" + esc(mShort(h[0])) + "</td><td>" + esc(h[1] ? date(h[1]) : DASH) + "</td><td>" + esc(h[2] || "") + '</td><td class="num">' + (fin(h[5]) ? fmtNum(h[5], 2) : DASH) + '</td><td class="num">' + (fin(h[4]) ? fmtNum(h[4], 2) : h[1] && h[1] >= new Date().toISOString().slice(0, 10) ? "due" : DASH) + '</td><td class="num ' + cls(s) + '">' + pctS(s) + "</td><td>" + esc(h[3] || "") + "</td></tr>"; }).join("");
@@ -417,8 +579,17 @@
     var votes = [ar.StrongBuy, ar.Buy, ar.Hold, ar.Sell, ar.StrongSell].map(function (x) { return Number(x) || 0; }), tot = votes.reduce(function (a, b) { return a + b; }, 0);
     var vt = tot ? '<div class="sa-rank" style="grid-template-columns:120px 1fr 44px">' + ["Strong buy", "Buy", "Hold", "Sell", "Strong sell"].map(function (l, i) { return "<span>" + l + '</span><i><b style="width:' + Math.round(votes[i] / tot * 100) + '%"></b></i><span class="n">' + votes[i] + "</span>"; }).join("") + "</div>" : '<p class="muted">No ratings.</p>';
     var hist = (log || []).map(function (x) { return [x.day, x.data && x.data.target]; }), hy = (log || []).map(function (x) { return [x.day, x.data && x.data.y0 && x.data.y0.eps]; });
-    return '<div class="sa-cols"><div>' + tbl + '</div><div><section class="sa-sec"><h3>Price target</h3><p class="sub">Analysts\' average, ' + esc(P.ccy || "") + "</p>" + grid([["Target", (function () { var n = ["StrongBuy", "Buy", "Hold", "Sell", "StrongSell"].reduce(function (t, k) { return t + (Number(ar[k]) || 0); }, 0); return n > 0 ? esc(px(ar.TargetPrice != null ? ar.TargetPrice : P.hl && P.hl.WallStreetTargetPrice, P.ccy)) + " <small>" + n + " analysts</small>" : DASH; })()] /* a target with no analyst behind it (999,999.99) is not a figure */, ["Rating (1 sell, 5 buy)", esc(fin(ar.Rating) ? Number(ar.Rating).toFixed(2) : DASH)]]) + vt + "</section>" +
-      '<section class="sa-sec"><h3>The estimates over time</h3><p class="sub">Kept here every day from ' + (log && log.length ? esc(date(log[0].day)) : "today") + "; the history grows with each day.</p>" + (line(hist, { fmt: function (v) { return px(v, P.ccy); } }) || '<p class="muted">The line starts after two days of records.</p>') + (line(hy) ? '<p class="sub" style="margin-top:12px">EPS estimate for this year</p>' + line(hy) : "") + "</section></div></div>";
+    return '<div class="sa-cols"><div>' + tbl + '</div><div><section class="sa-sec"><h3>The EPS estimate over time</h3><p class="sub">This year\'s, kept here every day from ' + (log && log.length ? esc(date(log[0].day)) : "today") + "; the line grows with each day.</p>" + (line(hy) || '<p class="muted">The line starts after two days of records.</p>') + "</section></div></div>" +
+      '<p class="sa-note">Analysts\' consensus from EODHD. Revenue estimates in ' + esc(P.ccy || "the listing's currency") + ", as EODHD gives them.</p>";
+  }
+  function vTarget(co, log) {
+    var P = co.d.profile || {}, ar = P.ar || {}, votes = [ar.StrongBuy, ar.Buy, ar.Hold, ar.Sell, ar.StrongSell].map(function (x) { return Number(x) || 0; }), tot = votes.reduce(function (a, b) { return a + b; }, 0);
+    var target = tot > 0 ? (ar.TargetPrice != null ? ar.TargetPrice : P.hl && P.hl.WallStreetTargetPrice) : null; /* a target with no analyst behind it (999,999.99) is not a figure */
+    var vt = tot ? '<div class="sa-rank" style="grid-template-columns:120px 1fr 44px">' + ["Strong buy", "Buy", "Hold", "Sell", "Strong sell"].map(function (l, i) { return "<span>" + l + '</span><i><b style="width:' + Math.round(votes[i] / tot * 100) + '%"></b></i><span class="n">' + votes[i] + "</span>"; }).join("") + "</div>" : '<p class="muted">No ratings.</p>';
+    var hist = (log || []).map(function (x) { var d = x.data || {}, n = (d.votes || []).reduce(function (a, b) { return a + (Number(b) || 0); }, 0); return [x.day, n > 0 && fin(d.target) && d.target < 999999 ? d.target : null]; }); /* a day without analysts has no target */
+    return grid([["Target price", tot > 0 ? esc(px(target, P.ccy)) + " <small>" + tot + " analysts</small>" : DASH], ["Rating (1 sell, 5 buy)", esc(fin(ar.Rating) ? Number(ar.Rating).toFixed(2) : DASH)]]) +
+      '<div class="sa-cols"><div><section class="sa-sec"><h3>The target over time</h3><p class="sub">Analysts\' average, ' + esc(P.ccy || "") + ", kept here every day from " + (log && log.length ? esc(date(log[0].day)) : "today") + "</p>" + (line(hist, { fmt: function (v) { return px(v, P.ccy); } }) || '<p class="muted">The line starts after two days of records.</p>') + "</section></div>" +
+      '<div><section class="sa-sec"><h3>Ratings</h3><p class="sub">How many analysts say what</p>' + vt + "</section></div></div>" + '<p class="sa-note">From EODHD. The target is the analysts\' average 12-month price target.</p>';
   }
   function vDividends(co) {
     var D = co.d, P = D.profile || {}, dv = P.div || {}, list = ((D.divs && D.divs.list) || []).slice();
@@ -471,17 +642,20 @@
 
   /* ---------- routing, access, wiring ---------- */
   function sources(co) {
-    var st = co.u.status || {}, d = function (x) { return x && x.at ? date(String(x.at).slice(0, 10)) : "not yet"; };
-    var NAME = { px: "prices", div: "dividends", news: "news" };
-    var bits = []; if (co.u.cik) bits.push("SEC filings read " + d(st.subs) + ", statements " + d(st.sec)); bits.push("EODHD profile and estimates " + d(st.eod) + (st.px && st.px.err ? "" : ", prices " + d(st.px)));
-    var plan = ["px", "div", "news"].filter(function (k) { return st[k] && st[k].plan; }).map(function (k) { return NAME[k]; });
+    var st = co.u.status || {}, d = function (x) { return x && x.at && !x.err ? date(String(x.at).slice(0, 10)) : x && x.err ? "not read yet (tried " + date(String(x.at).slice(0, 10)) + ")" : "not yet"; };
+    var NAME = { px: "prices", div: "dividends", news: "news" }, is403 = function (x) { return x && (x.plan || /\b403\b/.test(String(x.err || ""))); };
+    var bits = []; if (co.u.cik) bits.push("SEC filings read " + d(st.subs) + ", statements " + d(st.sec)); if (!(st.res && st.res.dead)) bits.push("EODHD profile and statements " + d(st.eod) + (st.px && !st.px.err ? ", prices " + d(st.px) : ""));
+    /* EODHD refusing a kind of data (403) is the plan, not a fault: said plainly, never as an error */
+    var plan = ["px", "div", "news"].filter(function (k) { return is403(st[k]); }).map(function (k) { return NAME[k]; });
     if (plan.length) bits.push("not in the EODHD plan: " + plan.join(", ") + " (asked again every week)");
-    var slow = ["px", "div", "news"].filter(function (k) { return st[k] && st[k].err && !st[k].plan && /timed out|aborted/i.test(st[k].err); }).map(function (k) { return NAME[k]; });
+    var slow = ["px", "div", "news"].filter(function (k) { return st[k] && st[k].err && !is403(st[k]) && /timed out|aborted|did not answer/i.test(st[k].err); }).map(function (k) { return NAME[k]; });
     if (slow.length) bits.push("EODHD did not answer in time for " + slow.join(", ") + " (tried again later)");
-    var errs = ["sec", "subs", "eod", "px", "div", "news"].filter(function (k) { return st[k] && st[k].err && !st[k].plan && !/timed out|aborted/i.test(st[k].err); }).map(function (k) { return k + ": " + st[k].err; });
-    if (st.res && st.res.dead) errs.push("EODHD has no record we can read for this company" + (st.res.err ? " (" + st.res.err + ")" : ""));
+    var errs = ["sec", "subs", "eod", "px", "div", "news"].filter(function (k) { return st[k] && st[k].err && !is403(st[k]) && !/timed out|aborted|did not answer|no EODHD record/i.test(st[k].err); }).map(function (k) { return k + ": " + st[k].err; });
+    if (st.res && st.res.dead && !(st.res.plan || /\b403\b/.test(String(st.res.err || "")))) errs.push("EODHD has no record we can read for this company" + (st.res.err ? " (" + st.res.err + ")" : ""));
     return '<p class="sa-note">' + esc(bits.join(" · ")) + "." + (errs.length && (S.ctx.staff && !S.ctx.sim) ? '<br><span style="color:var(--warn)">' + esc(errs.join(" · ")) + "</span>" : "") + "</p>";
   }
+  /* the refresh button's answer, in words: a refusal by the plan is not an error */
+  function noteText(n) { var m = /^(px|div|news|eod)\b[^:]*:\s*(.*)$/.exec(String(n)); if (m && /\b403\b/.test(m[2])) return ({ px: "prices", div: "dividends", news: "news", eod: "company data" })[m[1]] + ": not in the EODHD plan"; return String(n).replace(/\s*Please contact support@eodhistoricaldata\.com\.?/g, ""); }
   function loadLog(id, kind) {
     var key = id + "|" + kind; if (S.log[key]) return S.log[key];
     var c = sb(); if (!c) return Promise.resolve([]);
@@ -491,15 +665,23 @@
   function renderCompany(el, id, tab) {
     css(); var back = '<p class="back"><a href="#stocks">← Stock analysis</a></p>';
     if (!S.co[id]) el.innerHTML = back + '<p class="small muted">Loading ' + esc(id) + "…</p>";
+    S.onCo = function (id2) { if (id2 === id && el.isConnected && location.hash.indexOf("#stocks/" + encodeURIComponent(id)) === 0) renderCompany(el, id, tab); }; /* a fresher copy arrived */
     loadCompany(id).then(function (co) {
       if (!co) { el.innerHTML = back + "<h1>" + esc(id) + '</h1><p class="muted">This company is not in the list.</p>'; return; }
       var crumb = $("#crumb"); if (crumb) crumb.textContent = co.u.name || id; document.title = (co.u.name || id) + " · Stock analysis · Mr. Wall Street";
-      var view = { summary: vSummary, financials: vFinancials, ratios: vRatios, earnings: vEarnings, dividends: vDividends, ownership: vOwnership, news: vNews, chart: vChart }[tab];
+      tab = pageOf(tab);
+      var view = { overview: vSummary, description: vDescription, rank: vRank, dividends: vDividends, ownership: vOwnership, earnings: vEarnings, highlights: vHighlights,
+        is: function (c) { return vStmt(c, "is"); }, bs: function (c) { return vStmt(c, "bs"); }, cf: function (c) { return vStmt(c, "cf"); }, multiples: vMultiples, ev: vEV,
+        profitability: function (c) { return vRatioPage(c, ["Margins"], "Margins over revenue, computed here from the company's statements. Banks and insurers have no gross, operating or EBITDA margin: their revenue and costs mean other things."); },
+        returns: function (c) { return vRatioPage(c, ["Returns"], "Return on equity and on assets: net income over the average of the opening and closing balance. Return on invested capital: operating income after tax (the company's own rate, 21% when unclear) over equity plus debt less cash; not for banks and insurers."); },
+        growth: function (c) { return vRatioPage(c, ["Growth, year on year"], "Each period against the same period a year before, in the reported currency."); },
+        solvency: function (c) { return vRatioPage(c, ["Balance sheet"], "From the balance sheet at each period's end; interest cover from the period's operating income and interest paid."); },
+        news: vNews, chart: vChart }[tab];
       var draw = function (extra) {
-        var body; try { body = tab === "estimates" ? vEstimates(co, extra) : tab === "filings" ? vFilings(co, extra) : (view || vSummary)(co); } catch (e) { body = '<div class="banner bad"><div><b>This part could not be shown.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; if (W.console) console.error(e); }
-        el.innerHTML = back + staffBar(id) + header(co) + tabs(id, tab) + body + sources(co); wire(el, co, id, tab);
+        var body; try { body = tab === "estimates" ? vEstimates(co, extra) : tab === "target" ? vTarget(co, extra) : tab === "filings" ? vFilings(co, extra) : (view || vSummary)(co); } catch (e) { body = '<div class="banner bad"><div><b>This part could not be shown.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; if (W.console) console.error(e); }
+        el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-co">' + side(id, tab) + '<div class="sa-main"><h2 class="sa-ttl">' + esc(pageName(tab)) + "</h2>" + checks(co) + body + sources(co) + "</div></div>"; wire(el, co, id, tab);
       };
-      if (tab === "estimates") loadLog(id, "est").then(draw); else if (tab === "filings") loadLog(id, "restated").then(draw); else draw();
+      if (tab === "estimates" || tab === "target") loadLog(id, "est").then(draw); else if (tab === "filings") loadLog(id, "restated").then(draw); else draw();
     }, function (e) { el.innerHTML = back + '<div class="banner bad"><div><b>Could not load this company.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; });
   }
   function wire(el, co, id, tab) {
@@ -509,12 +691,13 @@
     var all = $("#sa-all", el); if (all) all.addEventListener("click", function () { S.all = !S.all; redraw(); });
     /* the statements read like the company's: the latest period at the right, in view; older ones a scroll away */
     $$(".sa-wrap", el).forEach(function (w) { if (w.querySelector(".sa-fin")) w.scrollLeft = w.scrollWidth; });
-    if (tab === "chart") tvWidget($("#sa-tv", el), co.u.tv, false); if (tab === "summary") tvWidget($("#sa-tv-s", el), co.u.tv, true);
+    if (tab === "chart") tvWidget($("#sa-tv", el), co.u.tv, false); if (tab === "overview") tvWidget($("#sa-tv-s", el), co.u.tv, true);
+    var sel = $("#sa-sidesel", el); if (sel) sel.addEventListener("change", function () { location.hash = "#stocks/" + encodeURIComponent(id) + "/" + sel.value; });
     var rb = $("#sa-refresh", el); if (rb) rb.addEventListener("click", function () {
       var msg = $("#sa-rmsg", el); rb.disabled = true; if (msg) msg.textContent = "Reading the SEC and EODHD now…";
       (MWS.fn ? MWS.fn("stocks", { action: "refresh", id: id }) : Promise.reject(new Error("no client"))).then(function (r) {
-        if (msg) msg.textContent = r && r.ok ? "Done" + (r.notes && r.notes.length ? ": " + r.notes.join("; ") : ".") : "Failed: " + (r && r.error || "unknown");
-        delete S.co[id]; S.log = {}; setTimeout(function () { renderCompany(el, id, tab); }, 600);
+        if (msg) msg.textContent = r && r.ok ? "Done" + (r.notes && r.notes.length ? ": " + r.notes.map(noteText).join("; ") : ".") : "Failed: " + (r && r.error || "unknown");
+        S.log = {}; setTimeout(function () { fetchCompany(id).then(function () { renderCompany(el, id, tab); }, function () { renderCompany(el, id, tab); }); }, 300);
       }, function (e) { if (msg) msg.textContent = "Failed: " + (e && e.message || e); rb.disabled = false; });
     });
   }

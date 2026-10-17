@@ -81,9 +81,10 @@
       ".sa-note{color:var(--fg-3);font-size:12.5px;margin-top:12px;line-height:1.5}.sa-note b{color:var(--fg-2);font-weight:500}.sa-kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:13.5px}.sa-kv span{color:var(--fg-3)}.sa-kv b{font-weight:400;color:var(--fg-2);overflow-wrap:anywhere}",
       ".sa-tv{height:520px;border:1px solid var(--line)}.sa-tv.sm{height:300px}.sa-tvno{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px;text-align:center;color:var(--fg-3);font-size:14px}.sa-tvno p{margin:0;max-width:440px}.sa-staff{border:1px dashed var(--line-2);padding:10px 14px;margin:0 0 14px;font-size:12.5px;color:var(--fg-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}.sa-staff button{background:0 0;border:1px solid var(--line-2);color:var(--fg-2);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;cursor:pointer}.sa-staff button:hover{color:var(--fg);border-color:var(--fg-2)}",
       ".sa-pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-2);padding:2px 6px;color:var(--fg-3);margin-left:6px;vertical-align:2px}.sa-more{margin-top:12px}.sa-more button{background:0 0;border:0;color:var(--fg-2);font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}",
-      ".sa-co{display:grid;grid-template-columns:212px minmax(0,1fr);gap:22px;align-items:start}.sa-main{min-width:0}.sa-ttl{font-size:20px;font-weight:500;letter-spacing:-.01em;margin:0 0 14px}.sa-h{font-size:15px;font-weight:500;margin:6px 0 10px}",
-      ".sa-side{position:sticky;top:12px;border:1px solid var(--line);background:var(--bg);max-height:calc(100vh - 24px);overflow:auto;scrollbar-width:thin}.sa-side .g{padding:8px 0}.sa-side .g+.g{border-top:1px solid var(--line)}.sa-side h4{font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin:4px 14px 6px}.sa-side a{display:block;padding:6px 14px 6px 12px;font-size:13.5px;color:var(--fg-2);text-decoration:none;border-left:2px solid transparent}.sa-side a:hover{color:var(--fg);background:var(--bg-2)}.sa-side a.on{color:var(--fg);background:var(--bg-2);border-left-color:var(--fg)}.sa-side select{display:none}",
-      "@media (max-width:900px){.sa-co{grid-template-columns:1fr;gap:12px}.sa-side{position:static;max-height:none;border:0;background:none}.sa-side .g{display:none}.sa-side select{display:block;width:100%;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:10px 12px;border-radius:0}}",
+      ".sa-main{min-width:0}.sa-ttl{font-size:20px;font-weight:500;letter-spacing:-.01em;margin:0 0 14px}.sa-h{font-size:15px;font-weight:500;margin:6px 0 10px}.sa-sel{display:none}",
+      "@media (max-width:960px){.sa-sel{display:block;width:100%;margin:0 0 14px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:10px 12px;border-radius:0}}",
+      "#sa-snav{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}#sa-snav .sa-cn{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2);padding:10px 10px 2px 28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+      "#sa-snav .sa-sg{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:12px 10px 4px 28px}#sa-snav a{padding:6px 10px 6px 28px;font-size:13.5px;border-left:1px solid transparent}#sa-snav a.on{color:var(--fg);background:var(--bg-2);border-left-color:var(--fg-3)}",
       ".sa-check{border:1px solid var(--warn);border-left-width:3px;background:var(--bg);padding:10px 14px;margin:0 0 14px}.sa-check p{margin:0;font-size:13.5px;color:var(--fg-2);line-height:1.5}.sa-check p+p{margin-top:6px}",
       ".sa-pr td.bar{min-width:170px;width:30%}.sa-pr td.bar i{display:block;height:6px;background:var(--line-2);position:relative}.sa-pr td.bar i b{position:absolute;left:0;top:0;bottom:0;background:var(--fg-2)}.sa-pr td.bar i em{position:absolute;top:-3px;width:2px;height:12px;background:var(--warn)}",
       "@media (max-width:720px){.sa-hd .quote{text-align:left}.sa-fin th:first-child,.sa-fin td:first-child{min-width:150px}.sa-tv{height:380px}}",
@@ -426,11 +427,23 @@
   var ALIAS = { summary: "overview", financials: "is", ratios: "profitability" }; /* the old links keep working */
   function pageOf(tab) { tab = ALIAS[tab] || tab; return MENU.some(function (g) { return g[1].some(function (t) { return t[0] === tab; }); }) ? tab : "overview"; }
   function pageName(tab) { var n = "Overview"; MENU.forEach(function (g) { g[1].forEach(function (t) { if (t[0] === tab) n = t[1]; }); }); return n; }
-  function side(id, on) {
+  /* the company's sections live in the site's own side menu, under Stock Analysis (as on Koyfin), not in a second menu beside it.
+     On a phone the side menu is a drawer: a list of the sections also sits at the top of the page there */
+  function sideSel(on) {
+    return '<select id="sa-sidesel" class="sa-sel" aria-label="Section">' + MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (t) { return '<option value="' + t[0] + '"' + (t[0] === on ? " selected" : "") + ">" + esc(t[1]) + "</option>"; }).join("") + "</optgroup>"; }).join("") + "</select>";
+  }
+  function sideNav(id, on, name) {
+    var old = document.getElementById("sa-snav"), anchor = document.getElementById("nav-stocks");
+    if (!id || !anchor) { if (old) old.remove(); return; }
     var href = function (t) { return "#stocks/" + encodeURIComponent(id) + "/" + t; };
-    var list = MENU.map(function (g) { return '<div class="g"><h4>' + esc(g[0]) + "</h4>" + g[1].map(function (t) { return '<a href="' + href(t[0]) + '"' + (t[0] === on ? ' class="on" aria-current="page"' : "") + ">" + esc(t[1]) + "</a>"; }).join("") + "</div>"; }).join("");
-    var sel = '<select id="sa-sidesel" aria-label="Section">' + MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (t) { return '<option value="' + t[0] + '"' + (t[0] === on ? " selected" : "") + ">" + esc(t[1]) + "</option>"; }).join("") + "</optgroup>"; }).join("") + "</select>";
-    return '<nav class="sa-side" aria-label="Sections">' + sel + list + "</nav>";
+    var html = '<span class="sa-cn" title="' + esc(name || id) + '">' + esc(name || id) + "</span>" + MENU.map(function (g) { return '<span class="sa-sg">' + esc(g[0]) + "</span>" + g[1].map(function (t) { return '<a href="' + href(t[0]) + '" data-sa="' + t[0] + '"' + (t[0] === on ? ' class="on" aria-current="page"' : "") + ">" + esc(t[1]) + "</a>"; }).join(""); }).join("");
+    var box = old; if (!box) { box = document.createElement("div"); box.id = "sa-snav"; box.className = "sa-snav"; box.setAttribute("role", "navigation"); box.setAttribute("aria-label", "Company sections");
+      box.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a"); if (!a) return; var close = document.getElementById("side-close"); if (close && W.matchMedia && W.matchMedia("(max-width:960px)").matches) setTimeout(function () { close.click(); }, 0); }); }
+    if (box.getAttribute("data-k") !== id) { box.innerHTML = html; box.setAttribute("data-k", id); }
+    Array.prototype.forEach.call(box.querySelectorAll("a"), function (a) { var me = a.getAttribute("data-sa") === on; a.classList.toggle("on", me); if (me) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }); /* the site's own router clears every mark in its menu on each page change */
+    if (box.previousElementSibling !== anchor) anchor.insertAdjacentElement("afterend", box);
+    /* a page opened from a link: its section brought into view in the side menu (the menu scrolls, the page does not) */
+    var cur = box.querySelector("a.on"), nav = anchor.parentElement; if (cur && nav && !old) { var r = cur.getBoundingClientRect(), nr = nav.getBoundingClientRect(); if (r.bottom > nr.bottom || r.top < nr.top) nav.scrollTop += r.top - nr.top - nr.height / 2; }
   }
   /* what the checks on the data found, said once at the top of every page in plain words */
   function xOf(s) { var m = /x(-?[\d.]+)/.exec(String(s || "")); return m ? "\u00d7" + m[1] : DASH; }
@@ -679,7 +692,7 @@
         news: vNews, chart: vChart }[tab];
       var draw = function (extra) {
         var body; try { body = tab === "estimates" ? vEstimates(co, extra) : tab === "target" ? vTarget(co, extra) : tab === "filings" ? vFilings(co, extra) : (view || vSummary)(co); } catch (e) { body = '<div class="banner bad"><div><b>This part could not be shown.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; if (W.console) console.error(e); }
-        el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-co">' + side(id, tab) + '<div class="sa-main"><h2 class="sa-ttl">' + esc(pageName(tab)) + "</h2>" + checks(co) + body + sources(co) + "</div></div>"; wire(el, co, id, tab);
+        el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-main">' + sideSel(tab) + '<h2 class="sa-ttl">' + esc(pageName(tab)) + "</h2>" + checks(co) + body + sources(co) + "</div>"; sideNav(id, tab, co.u.name || id); wire(el, co, id, tab);
       };
       if (tab === "estimates" || tab === "target") loadLog(id, "est").then(draw); else if (tab === "filings") loadLog(id, "restated").then(draw); else draw();
     }, function (e) { el.innerHTML = back + '<div class="banner bad"><div><b>Could not load this company.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; });
@@ -718,7 +731,7 @@
     var el = $("#sa-page"); if (!el) return; css();
     if (ctx && !ctx.ready) { el.innerHTML = '<p class="small muted">Loading…</p>'; return; }
     var arg = ctx && ctx.arg != null ? ctx.arg : (W.__saArg || ""); var parts = String(arg).split("/"), id = parts[0] ? decodeURIComponent(parts[0]) : "", tab = parts[1] || "summary";
-    var go = function () { if (id) renderCompany(el, id, tab); else renderList(el); };
+    var go = function () { if (id) renderCompany(el, id, tab); else { sideNav(null); renderList(el); } };
     if (S.ctx.staff || S.ctx.sim) { liveCheck().then(go); return; }
     liveCheck().then(function (live) { if (live && S.ctx.member) go(); else { el.innerHTML = ""; location.replace("#telegram"); } });
   }
@@ -731,5 +744,7 @@
     if (/^#stocks/.test(location.hash) && (d.staff || d.sim || member)) { var m = /^#stocks(?:\/(.*))?$/.exec(location.hash); show({ arg: m && m[1] ? m[1] : "", staff: !!d.staff, sim: !!d.sim, member: S.ctx.member, ready: true }); }
     return true;
   }
+  /* leaving a company (another page of the site, or the list): its sections leave the side menu */
+  W.addEventListener("hashchange", function () { if (!/^#stocks\/[^/]+/.test(location.hash)) sideNav(null); });
   if (!boot()) { var tries = 0, t = setInterval(function () { if (boot() || ++tries > 40) clearInterval(t); }, 250); }
 })();

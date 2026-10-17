@@ -84,7 +84,7 @@
       ".sa-main{min-width:0}.sa-ttl{font-size:20px;font-weight:500;letter-spacing:-.01em;margin:0 0 14px}.sa-h{font-size:15px;font-weight:500;margin:6px 0 10px}.sa-sel{display:none}",
       "@media (max-width:960px){.sa-sel{display:block;width:100%;margin:0 0 14px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:10px 12px;border-radius:0}}",
       "#sa-snav{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}#sa-snav .sa-cn{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2);padding:10px 10px 2px 28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
-      "#sa-snav .sa-sg{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:12px 10px 4px 28px}#sa-snav a{padding:6px 10px 6px 28px;font-size:13.5px;border-left:1px solid transparent}#sa-snav a.on{color:var(--fg);background:var(--bg-2);border-left-color:var(--fg-3)}",
+      "#sa-snav .sa-gh{display:flex;justify-content:space-between;align-items:center;width:100%;background:0 0;border:0;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:9px 12px 7px 28px;text-align:left}#sa-snav .sa-gh:hover{color:var(--fg)}#sa-snav .sa-gh i{font-style:normal;font-size:13px;color:var(--fg-3)}#sa-snav .sa-gh[aria-expanded=true]{color:var(--fg-2)}#sa-snav .sa-gb{display:flex;flex-direction:column;gap:1px}#sa-snav .sa-gb[hidden]{display:none}#sa-snav a{padding:6px 10px 6px 28px;font-size:13.5px;border-left:1px solid transparent}#sa-snav a.on{color:var(--fg);background:var(--bg-2);border-left-color:var(--fg-3)}",
       ".sa-check{border:1px solid var(--warn);border-left-width:3px;background:var(--bg);padding:10px 14px;margin:0 0 14px}.sa-check p{margin:0;font-size:13.5px;color:var(--fg-2);line-height:1.5}.sa-check p+p{margin-top:6px}",
       ".sa-pr td.bar{min-width:170px;width:30%}.sa-pr td.bar i{display:block;height:6px;background:var(--line-2);position:relative}.sa-pr td.bar i b{position:absolute;left:0;top:0;bottom:0;background:var(--fg-2)}.sa-pr td.bar i em{position:absolute;top:-3px;width:2px;height:12px;background:var(--warn)}",
       "@media (max-width:720px){.sa-hd .quote{text-align:left}.sa-fin th:first-child,.sa-fin td:first-child{min-width:150px}.sa-tv{height:380px}}",
@@ -432,14 +432,29 @@
   function sideSel(on) {
     return '<select id="sa-sidesel" class="sa-sel" aria-label="Section">' + MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (t) { return '<option value="' + t[0] + '"' + (t[0] === on ? " selected" : "") + ">" + esc(t[1]) + "</option>"; }).join("") + "</optgroup>"; }).join("") + "</select>";
   }
+  /* the menu is always there, under Stock Analysis, in five groups that open and close (the one of the page shown opens by itself).
+     Without a company open, its links go to the last company seen (else the largest) */
   function sideNav(id, on, name) {
     var old = document.getElementById("sa-snav"), anchor = document.getElementById("nav-stocks");
-    if (!id || !anchor) { if (old) old.remove(); return; }
+    if (!anchor || anchor.hidden) { if (old) old.remove(); return; }
+    var last = LS.get("mws_sa_last") || null;
+    if (id) { if (!last || last.id !== id || last.name !== name) LS.set("mws_sa_last", { id: id, name: name || id }); }
+    else if (last && last.id) { id = last.id; name = last.name; }
+    else { id = "NVDA"; name = "NVIDIA"; }
+    var opened = LS.get("mws_sa_open"); if (!Array.isArray(opened)) opened = [];
+    var gOn = -1; MENU.forEach(function (g, gi) { if (g[1].some(function (t) { return t[0] === on; })) gOn = gi; });
     var href = function (t) { return "#stocks/" + encodeURIComponent(id) + "/" + t; };
-    var html = '<span class="sa-cn" title="' + esc(name || id) + '">' + esc(name || id) + "</span>" + MENU.map(function (g) { return '<span class="sa-sg">' + esc(g[0]) + "</span>" + g[1].map(function (t) { return '<a href="' + href(t[0]) + '" data-sa="' + t[0] + '"' + (t[0] === on ? ' class="on" aria-current="page"' : "") + ">" + esc(t[1]) + "</a>"; }).join(""); }).join("");
+    var html = '<span class="sa-cn" title="' + esc(name || id) + '">' + esc(name || id) + "</span>" + MENU.map(function (g, gi) {
+      var open = gi === gOn || opened.indexOf(gi) >= 0;
+      return '<button type="button" class="sa-gh" data-g="' + gi + '" aria-expanded="' + open + '"><span>' + esc(g[0]) + '</span><i aria-hidden="true">' + (open ? "\u2212" : "+") + "</i></button>" +
+        '<div class="sa-gb"' + (open ? "" : " hidden") + ">" + g[1].map(function (t) { return '<a href="' + href(t[0]) + '" data-sa="' + t[0] + '">' + esc(t[1]) + "</a>"; }).join("") + "</div>"; }).join("");
     var box = old; if (!box) { box = document.createElement("div"); box.id = "sa-snav"; box.className = "sa-snav"; box.setAttribute("role", "navigation"); box.setAttribute("aria-label", "Company sections");
-      box.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a"); if (!a) return; var close = document.getElementById("side-close"); if (close && W.matchMedia && W.matchMedia("(max-width:960px)").matches) setTimeout(function () { close.click(); }, 0); }); }
-    if (box.getAttribute("data-k") !== id) { box.innerHTML = html; box.setAttribute("data-k", id); }
+      box.addEventListener("click", function (e) {
+        var h = e.target.closest && e.target.closest(".sa-gh");
+        if (h) { var gi = Number(h.getAttribute("data-g")), body = h.nextElementSibling, open = body.hidden; body.hidden = !open; h.setAttribute("aria-expanded", String(open)); h.querySelector("i").textContent = open ? "\u2212" : "+";
+          var o = LS.get("mws_sa_open"); if (!Array.isArray(o)) o = []; o = o.filter(function (x) { return x !== gi; }); if (open) o.push(gi); LS.set("mws_sa_open", o); return; }
+        var a = e.target.closest && e.target.closest("a"); if (!a) return; var close = document.getElementById("side-close"); if (close && W.matchMedia && W.matchMedia("(max-width:960px)").matches) setTimeout(function () { close.click(); }, 0); }); }
+    var key = id + "|" + (gOn >= 0 ? gOn : "-"); if (box.getAttribute("data-k") !== key) { box.innerHTML = html; box.setAttribute("data-k", key); }
     Array.prototype.forEach.call(box.querySelectorAll("a"), function (a) { var me = a.getAttribute("data-sa") === on; a.classList.toggle("on", me); if (me) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }); /* the site's own router clears every mark in its menu on each page change */
     if (box.previousElementSibling !== anchor) anchor.insertAdjacentElement("afterend", box);
     /* a page opened from a link: its section brought into view in the side menu (the menu scrolls, the page does not) */
@@ -724,15 +739,16 @@
     if (ctx) S.ctx = { staff: !!ctx.staff, sim: !!ctx.sim, member: !!ctx.member };
     var a = $("#nav-stocks"), g = $("#nav-res"); if (!a) return;
     var show = function (v) { a.hidden = !v; if (g) g.hidden = !v; };
-    if (S.ctx.staff || S.ctx.sim) { show(true); liveCheck(); return; }
-    liveCheck().then(function (live) { show(live && S.ctx.member); });
+    var menu = function () { var m = /^#stocks\/([^/]+)(?:\/([^/]+))?/.exec(location.hash); if (!m) sideNav(null, null); }; /* the company menu under Stock Analysis from the start, on every page */
+    if (S.ctx.staff || S.ctx.sim) { show(true); menu(); liveCheck(); return; }
+    liveCheck().then(function (live) { show(live && S.ctx.member); menu(); });
   }
   function show(ctx) {
     if (ctx) S.ctx = { staff: !!ctx.staff, sim: !!ctx.sim, member: !!ctx.member };
     var el = $("#sa-page"); if (!el) return; css();
     if (ctx && !ctx.ready) { el.innerHTML = '<p class="small muted">Loading…</p>'; return; }
     var arg = ctx && ctx.arg != null ? ctx.arg : (W.__saArg || ""); var parts = String(arg).split("/"), id = parts[0] ? decodeURIComponent(parts[0]) : "", tab = parts[1] || "summary";
-    var go = function () { if (id) renderCompany(el, id, tab); else { sideNav(null); renderList(el); } };
+    var go = function () { if (id) renderCompany(el, id, tab); else { sideNav(null, null); renderList(el); } };
     if (S.ctx.staff || S.ctx.sim) { liveCheck().then(go); return; }
     liveCheck().then(function (live) { if (live && S.ctx.member) go(); else { el.innerHTML = ""; location.replace("#telegram"); } });
   }
@@ -746,6 +762,6 @@
     return true;
   }
   /* leaving a company (another page of the site, or the list): its sections leave the side menu */
-  W.addEventListener("hashchange", function () { if (!/^#stocks\/[^/]+/.test(location.hash)) sideNav(null); });
+  W.addEventListener("hashchange", function () { if (!/^#stocks\/[^/]+/.test(location.hash)) sideNav(null, null); }); /* another page: the menu stays, nothing marked */
   if (!boot()) { var tries = 0, t = setInterval(function () { if (boot() || ++tries > 40) clearInterval(t); }, 250); }
 })();

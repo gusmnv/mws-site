@@ -85,6 +85,7 @@
       "@media (max-width:960px){.sa-sel{display:block;width:100%;margin:0 0 14px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:10px 12px;border-radius:0}}",
       "#sa-snav{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}#sa-snav .sa-cn{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2);padding:10px 10px 2px 28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
       "#sa-snav .sa-gh{display:flex;justify-content:space-between;align-items:center;width:100%;background:0 0;border:0;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:9px 12px 7px 28px;text-align:left}#sa-snav .sa-gh:hover{color:var(--fg)}#sa-snav .sa-gh i{font-style:normal;font-size:13px;color:var(--fg-3)}#sa-snav .sa-gh[aria-expanded=true]{color:var(--fg-2)}#sa-snav .sa-gb{display:flex;flex-direction:column;gap:1px}#sa-snav .sa-gb[hidden]{display:none}#sa-snav a{padding:6px 10px 6px 28px;font-size:13.5px;border-left:1px solid transparent}#sa-snav a.on{color:var(--fg);background:var(--bg-2);border-left-color:var(--fg-3)}",
+      ".sa-wait{display:flex;gap:6px;padding:28px 0}.sa-wait span{width:6px;height:6px;background:var(--fg-3);animation:saw 1s infinite ease-in-out}.sa-wait span:nth-child(2){animation-delay:.15s}.sa-wait span:nth-child(3){animation-delay:.3s}@keyframes saw{0%,100%{opacity:.2}50%{opacity:1}}",
       ".sa-check{border:1px solid var(--warn);border-left-width:3px;background:var(--bg);padding:10px 14px;margin:0 0 14px}.sa-check p{margin:0;font-size:13.5px;color:var(--fg-2);line-height:1.5}.sa-check p+p{margin-top:6px}",
       ".sa-pr td.bar{min-width:170px;width:30%}.sa-pr td.bar i{display:block;height:6px;background:var(--line-2);position:relative}.sa-pr td.bar i b{position:absolute;left:0;top:0;bottom:0;background:var(--fg-2)}.sa-pr td.bar i em{position:absolute;top:-3px;width:2px;height:12px;background:var(--warn)}",
       "@media (max-width:720px){.sa-hd .quote{text-align:left}.sa-fin th:first-child,.sa-fin td:first-child{min-width:150px}.sa-tv{height:380px}}",
@@ -228,7 +229,20 @@
     });
   }
   /* which statements: the SEC's when they are current (US companies file every quarter), else EODHD's; a foreign company filing a 20-F has SEC years and EODHD quarters */
-  function stmts(D) {
+  /* no revenue for banks and insurers (outside a US 10-K), nor where EODHD's revenue line is the profit: the same rule as the function's (134k) */
+  function revOff(D) { var p = D.profile || {}, g = p.gics || {}, ind = String(p.industry || "") + " " + String(g.sub || "") + " " + String(g.industry || ""); return /\bbank/i.test(ind) || (/insurance/i.test(ind) && !/broker/i.test(ind)) || /financial conglomerates/i.test(ind); }
+  function revHidden(D) { if (!revOff(D)) return false; var a = (D.sec && D.sec.annual) || [], f = ""; for (var i = a.length - 1; i >= 0; i--) if (a[i].form) { f = String(a[i].form); break; } return !/^10-K/.test(f); }
+  var REV_KEYS = ["rev", "grev", "gp", "cogs"];
+  function noRev(src, all) {
+    if (!src) return src; var x = {}; for (var k in src) x[k] = src[k];
+    var fix = function (rows) { return (rows || []).map(function (r) { var d = r.d || {}, same = function (a, b) { return a != null && b != null && Math.abs(a - b) <= 0.005 * Math.abs(a); };
+      var bad = all || (d.rev != null && (d.rev < 0 || (same(d.rev, d.opinc) && same(d.rev, d.pretax)))); if (!bad) return r;
+      var y = {}, e = {}; for (var k2 in r) y[k2] = r[k2]; for (var j in d) e[j] = d[j]; REV_KEYS.forEach(function (z) { delete e[z]; }); y.d = e; return y; }); };
+    x.annual = fix(src.annual); x.quarterly = fix(src.quarterly); return x;
+  }
+  function stmts(D0) {
+    var off = revOff(D0), lastForm = (function () { var a = (D0.sec && D0.sec.annual) || []; for (var i = a.length - 1; i >= 0; i--) if (a[i].form) return String(a[i].form); return ""; })();
+    var D = { sec: D0.sec && off && !/^10-K/.test(lastForm) ? noRev(D0.sec, true) : D0.sec, fin: noRev(D0.fin, off) };
     var sec = D.sec, f = D.fin, out = { A: null, Q: null };
     var fresh = function (rows) { return rows && rows.length && Date.now() - Date.parse(rows[rows.length - 1].end) < 200 * 864e5; };
     /* years: the SEC's, then the later years EODHD has when the SEC's data lags (some foreign filers' latest 20-F), in the same currency */
@@ -236,7 +250,7 @@
     if (sA.length) {
       var lastS = Date.parse(sA[sA.length - 1].end), newer = fA.filter(function (r) { return Date.parse(r.end) > lastS + 200 * 864e5; });
       if (!newer.length) out.A = { rows: sA, src: "sec", cur: sec.currency };
-      else if (f.currency === sec.currency) out.A = { rows: sA.concat(newer.map(function (r) { var x = {}; for (var k in r) x[k] = r[k]; x.src = "eodhd"; return x; })), src: "sec", cur: sec.currency, added: newer.length };
+      else if (f.currency === sec.currency) { var add = laterYears(sA[sA.length - 1], newer); out.A = add.length ? { rows: sA.concat(add), src: "sec", cur: sec.currency, added: add.length } : { rows: sA, src: "sec", cur: sec.currency }; }
       else out.A = { rows: fA, src: "eodhd", cur: f.currency };
     } else if (fA.length) out.A = { rows: fA, src: "eodhd", cur: f.currency };
     var steady = function (rows) { var r = rows.slice(-8); for (var i = 1; i < r.length; i++) if ((Date.parse(r[i].end) - Date.parse(r[i - 1].end)) / 864e5 > 125) return false; return r.length >= 4; }; /* foreign filers give half-years: not quarters */
@@ -244,6 +258,14 @@
     else if (f && f.quarterly && f.quarterly.length) out.Q = { rows: f.quarterly, src: "eodhd", cur: f.currency };
     else if (sec && sec.quarterly && sec.quarterly.length) out.Q = { rows: sec.quarterly, src: "sec", cur: sec.currency };
     return out;
+  }
+  /* EODHD's later years only when they continue the SEC's (the same scale; per-share lines on the same share count): the same rule as the function's */
+  function laterYears(last, newer) {
+    var ld = (last && last.d) || {}, nd = (newer[0] && newer[0].d) || {};
+    var q = function (a, b) { return a != null && b != null && a > 0 && b > 0 ? b / a : null; };
+    var scale = q(ld.rev, nd.rev); if (scale == null) scale = q(ld.ta, nd.ta); if (scale != null && (scale < 0.5 || scale > 2)) return [];
+    var sh = q(ld.shd != null ? ld.shd : ld.shb != null ? ld.shb : ld.sho, nd.shd != null ? nd.shd : nd.shb != null ? nd.shb : nd.sho), same = sh != null && sh > 0.7 && sh < 1.43;
+    return newer.map(function (r) { var x = {}, d = {}; for (var k in r) x[k] = r[k]; for (var j in r.d) d[j] = r.d[j]; if (!same) ["eps", "epsd", "dps", "shb", "shd", "sho"].forEach(function (z) { delete d[z]; }); x.d = d; x.src = "eodhd"; return x; });
   }
   function startOf(row, per) { if (row.start) return row.start; var d = new Date(Date.parse(row.end + "T00:00:00Z")); d.setUTCMonth(d.getUTCMonth() - (per === "a" ? 12 : 3)); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10); }
   /* a value of a period in the chosen currency: flows at the period's average rate, balances at its end; null when the rate is unknown */
@@ -437,6 +459,7 @@
   function sideNav(id, on, name) {
     var old = document.getElementById("sa-snav"), anchor = document.getElementById("nav-stocks");
     if (!anchor || anchor.hidden) { if (old) old.remove(); return; }
+    css(); /* its styles before it is drawn, on whatever page of the site (17 Oct: drawn unstyled until Stock Analysis was opened) */
     var last = LS.get("mws_sa_last") || null;
     if (id) { if (!last || last.id !== id || last.name !== name) LS.set("mws_sa_last", { id: id, name: name || id }); }
     else if (last && last.id) { id = last.id; name = last.name; }
@@ -471,8 +494,11 @@
     else if (/^eodhd-vs-sec/.test(f.check || "")) out.push("EODHD's statements differed from the company's own 20-F at the SEC (" + xOf(f.check) + "): the 20-F's figures are shown.");
     else if (/^sec-revenue-partial/.test(f.check || "")) out.push("The revenue line in the company's SEC filings is only part of its revenue (" + xOf(f.check) + " of the total): EODHD's twelve-month revenue is shown; net income is the filings'.");
     else if (/^bank-gross/.test(f.check || "")) out.push("EODHD gives this bank's gross income (interest received plus fees): its net revenue, EODHD's own twelve-month figure, is shown.");
+    if (co.d && revHidden(co.d)) out.push("No revenue is shown for this company: a bank's or insurer's revenue is not one figure across sources (interest received or net of interest paid, premiums written or earned), and EODHD's switches between them from year to year. Its profit, assets, equity and cash flow are shown; a US company's own 10-K revenue line is kept.");
     if (f.qbad && !f.withheld) out.push("EODHD's quarterly figures for this company do not add up to its yearly ones (a half-year or a change of definition among the quarters): the latest year is shown instead of the last twelve months, and the quarterly views are left out.");
-    if (v.capcheck) out.push("EODHD's market value for this company disagrees with its own enterprise value less the company's net debt (" + xOf(v.capcheck) + "): no market value is shown until the two agree, and the multiples that need it show —.");
+    if (v.capcheck && /^pe-vs-eodhd/.test(v.capcheck)) out.push("Our P/E for this company and EODHD's own (its price over its twelve months' earnings per share) are more than a third apart (" + xOf(v.capcheck) + "): the market value and the profit are not on one basis (several share classes, minorities in the profit, or a currency label), so the multiples and the amounts in dollars show — until they agree.");
+    else if (v.capcheck) out.push("EODHD's market value for this company disagrees with its own enterprise value less the company's net debt (" + xOf(v.capcheck) + "): no market value is shown until the two agree, and the multiples that need it show —.");
+    if (co.d && co.d.fin && co.d.fin.conv) out.push("Some of EODHD's recent figures for this company went through a currency conversion and back (their digits no longer match the company's own reports, and such figures were found 0.1% to 6% off): those periods show —, and the summary uses the latest period still whole.");
     return out.length ? '<div class="sa-check" role="note">' + out.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") + "</div>" : "";
   }
   /* withheld amounts: the SEC's own years stay, the EODHD years added after them go */
@@ -691,14 +717,26 @@
     var q = c.from("stock_log").select("day,data").eq("sid", id).eq("kind", kind).order("day", { ascending: kind === "est" }).limit(kind === "est" ? 2000 : 1000);
     S.log[key] = q.then(function (r) { return r.data || []; }, function () { return []; }); return S.log[key];
   }
+  /* a company opens at once: its name and place from the list in this browser, then its summary (a few kilobytes) as soon as it arrives,
+     then the statements; a page seen before comes back from memory */
+  var MEMO = {}, MEMO_KEYS = [];
+  function memo(key, f) { if (MEMO[key] != null) return MEMO[key]; var v = f(); MEMO[key] = v; MEMO_KEYS.push(key); if (MEMO_KEYS.length > 80) delete MEMO[MEMO_KEYS.shift()]; return v; }
+  var rowBusy = {};
+  function fetchRow(id) { if (rowBusy[id]) return rowBusy[id]; var c = sb(); if (!c) return Promise.reject(new Error("no client")); rowBusy[id] = c.from("stock_universe").select(U_COLS).eq("id", id).maybeSingle().then(function (r) { delete rowBusy[id]; if (r.error) throw r.error; return r.data; }, function (e) { delete rowBusy[id]; throw e; }); return rowBusy[id]; }
+  function shellHeader(r) { return '<div class="sa-hd"><div class="id"><h1>' + esc(r.name || r.id) + '</h1><div class="meta">' + [r.id, r.country, r.sector].filter(Boolean).map(esc).join(" · ") + '</div></div><div class="quote"><span class="chg muted">Market value ' + esc(big(r.cap_usd)) + (r.rank ? " · #" + r.rank + " in the world" : "") + "</span></div></div>"; }
   function renderCompany(el, id, tab) {
-    css(); var back = '<p class="back"><a href="#stocks">← Stock analysis</a></p>';
-    if (!S.co[id]) el.innerHTML = back + '<p class="small muted">Loading ' + esc(id) + "…</p>";
+    css(); tab = pageOf(tab); var back = '<p class="back"><a href="#stocks">← Stock analysis</a></p>';
+    var shell = function (head, name) { el.innerHTML = back + staffBar(id) + head + '<div class="sa-main">' + sideSel(tab) + '<h2 class="sa-ttl">' + esc(pageName(tab)) + '</h2><div class="sa-wait"><span></span><span></span><span></span></div></div>'; sideNav(id, tab, name || id); var sel = $("#sa-sidesel", el); if (sel) sel.addEventListener("change", function () { location.hash = "#stocks/" + encodeURIComponent(id) + "/" + sel.value; }); };
+    var full = false;
+    if (!S.co[id]) {
+      var lr = (S.list || []).filter(function (r) { return r.id === id; })[0];
+      shell(lr ? shellHeader(lr) : "<h1>" + esc(id) + "</h1>", lr && lr.name);
+      /* the summary row, small, while the statements come: the overview's figures can be shown from it */
+      fetchRow(id).then(function (u) { if (full || !u || !el.isConnected || location.hash.indexOf("#stocks/" + encodeURIComponent(id)) !== 0) return; if (tab === "overview") draw({ u: u, d: {}, partial: true }); else shell(header({ u: u, d: {} }), u.name); }, function () { /* the full read will say */ });
+    }
     S.onCo = function (id2) { if (id2 === id && el.isConnected && location.hash.indexOf("#stocks/" + encodeURIComponent(id)) === 0) renderCompany(el, id, tab); }; /* a fresher copy arrived */
-    loadCompany(id).then(function (co) {
-      if (!co) { el.innerHTML = back + "<h1>" + esc(id) + '</h1><p class="muted">This company is not in the list.</p>'; return; }
+    function draw(co, extra) {
       var crumb = $("#crumb"); if (crumb) crumb.textContent = co.u.name || id; document.title = (co.u.name || id) + " · Stock analysis · Mr. Wall Street";
-      tab = pageOf(tab);
       var view = { overview: vSummary, description: vDescription, rank: vRank, dividends: vDividends, ownership: vOwnership, earnings: vEarnings, highlights: vHighlights,
         is: function (c) { return vStmt(c, "is"); }, bs: function (c) { return vStmt(c, "bs"); }, cf: function (c) { return vStmt(c, "cf"); }, multiples: vMultiples, ev: vEV,
         profitability: function (c) { return vRatioPage(c, ["Margins"], "Margins over revenue, computed here from the company's statements. Banks and insurers have no gross, operating or EBITDA margin: their revenue and costs mean other things."); },
@@ -706,12 +744,16 @@
         growth: function (c) { return vRatioPage(c, ["Growth, year on year"], "Each period against the same period a year before, in the reported currency."); },
         solvency: function (c) { return vRatioPage(c, ["Balance sheet"], "From the balance sheet at each period's end; interest cover from the period's operating income and interest paid."); },
         news: vNews, chart: vChart }[tab];
-      var draw = function (extra) {
-        var body; try { body = tab === "estimates" ? vEstimates(co, extra) : tab === "target" ? vTarget(co, extra) : tab === "filings" ? vFilings(co, extra) : (view || vSummary)(co); } catch (e) { body = '<div class="banner bad"><div><b>This part could not be shown.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; if (W.console) console.error(e); }
-        el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-main">' + sideSel(tab) + '<h2 class="sa-ttl">' + esc(pageName(tab)) + "</h2>" + checks(co) + body + sources(co) + "</div>"; sideNav(id, tab, co.u.name || id); wire(el, co, id, tab);
-      };
-      if (tab === "estimates" || tab === "target") loadLog(id, "est").then(draw); else if (tab === "filings") loadLog(id, "restated").then(draw); else draw();
-    }, function (e) { el.innerHTML = back + '<div class="banner bad"><div><b>Could not load this company.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; });
+      var key = [id, tab, co.partial ? "p" : co.at, S.per, S.cur, S.stmt, S.all, S.fg, extra ? extra.length : ""].join("|");
+      var body; try { body = co.partial ? (view || vSummary)(co) : memo(key, function () { return tab === "estimates" ? vEstimates(co, extra) : tab === "target" ? vTarget(co, extra) : tab === "filings" ? vFilings(co, extra) : (view || vSummary)(co); }); } catch (e) { body = '<div class="banner bad"><div><b>This part could not be shown.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; if (W.console) console.error(e); }
+      el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-main">' + sideSel(tab) + '<h2 class="sa-ttl">' + esc(pageName(tab)) + "</h2>" + checks(co) + body + (co.partial ? '<div class="sa-wait"><span></span><span></span><span></span></div>' : sources(co)) + "</div>"; sideNav(id, tab, co.u.name || id); wire(el, co, id, tab);
+    }
+    loadCompany(id).then(function (co) {
+      full = true;
+      if (!co) { el.innerHTML = back + "<h1>" + esc(id) + '</h1><p class="muted">This company is not in the list.</p>'; return; }
+      if (!el.isConnected || location.hash.indexOf("#stocks/" + encodeURIComponent(id)) !== 0) return;
+      if (tab === "estimates" || tab === "target") loadLog(id, "est").then(function (x) { draw(co, x); }); else if (tab === "filings") loadLog(id, "restated").then(function (x) { draw(co, x); }); else draw(co);
+    }, function (e) { full = true; el.innerHTML = back + '<div class="banner bad"><div><b>Could not load this company.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; });
   }
   function wire(el, co, id, tab) {
     var redraw = function () { renderCompany(el, id, tab); };
@@ -720,7 +762,7 @@
     var all = $("#sa-all", el); if (all) all.addEventListener("click", function () { S.all = !S.all; redraw(); });
     /* the statements read like the company's: the latest period at the right, in view; older ones a scroll away */
     $$(".sa-wrap", el).forEach(function (w) { if (w.querySelector(".sa-fin")) w.scrollLeft = w.scrollWidth; });
-    if (tab === "chart") tvWidget($("#sa-tv", el), co.u.tv, false); if (tab === "overview") tvWidget($("#sa-tv-s", el), co.u.tv, true);
+    if (!co.partial) setTimeout(function () { if (tab === "chart") tvWidget($("#sa-tv", el), co.u.tv, false); if (tab === "overview") tvWidget($("#sa-tv-s", el), co.u.tv, true); }, 60); /* the chart (an outside widget) after the page is on screen */
     var sel = $("#sa-sidesel", el); if (sel) sel.addEventListener("change", function () { location.hash = "#stocks/" + encodeURIComponent(id) + "/" + sel.value; });
     var rb = $("#sa-refresh", el); if (rb) rb.addEventListener("click", function () {
       var msg = $("#sa-rmsg", el); rb.disabled = true; if (msg) msg.textContent = "Reading the SEC and EODHD now…";
@@ -737,7 +779,7 @@
   }
   function nav(ctx) {
     if (ctx) S.ctx = { staff: !!ctx.staff, sim: !!ctx.sim, member: !!ctx.member };
-    var a = $("#nav-stocks"), g = $("#nav-res"); if (!a) return;
+    var a = $("#nav-stocks"), g = $("#nav-res"); if (!a) return; css(); /* the menu's styles from the first page, not only once Stock Analysis is opened */
     var show = function (v) { a.hidden = !v; if (g) g.hidden = !v; };
     var menu = function () { var m = /^#stocks\/([^/]+)(?:\/([^/]+))?/.exec(location.hash); if (!m) sideNav(null, null); }; /* the company menu under Stock Analysis from the start, on every page */
     if (S.ctx.staff || S.ctx.sim) { show(true); menu(); liveCheck(); return; }

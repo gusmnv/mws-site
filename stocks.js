@@ -81,10 +81,10 @@
       ".sa-note{color:var(--fg-3);font-size:12.5px;margin-top:12px;line-height:1.5}.sa-note b{color:var(--fg-2);font-weight:500}.sa-kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:13.5px}.sa-kv span{color:var(--fg-3)}.sa-kv b{font-weight:400;color:var(--fg-2);overflow-wrap:anywhere}",
       ".sa-tv{height:520px;border:1px solid var(--line)}.sa-tv.sm{height:300px}.sa-tvno{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px;text-align:center;color:var(--fg-3);font-size:14px}.sa-tvno p{margin:0;max-width:440px}.sa-staff{border:1px dashed var(--line-2);padding:10px 14px;margin:0 0 14px;font-size:12.5px;color:var(--fg-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}.sa-staff button{background:0 0;border:1px solid var(--line-2);color:var(--fg-2);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;cursor:pointer}.sa-staff button:hover{color:var(--fg);border-color:var(--fg-2)}",
       ".sa-pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-2);padding:2px 6px;color:var(--fg-3);margin-left:6px;vertical-align:2px}.sa-more{margin-top:12px}.sa-more button{background:0 0;border:0;color:var(--fg-2);font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}",
-      ".sa-main{min-width:0}.sa-ttl{font-size:20px;font-weight:500;letter-spacing:-.01em;margin:0 0 14px}.sa-h{font-size:15px;font-weight:500;margin:6px 0 10px}.sa-sel{display:none}",
+      ".sa-main{min-width:0}.sa-crumb{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin:2px 0 6px}.sa-ttl{font-size:26px;font-weight:500;letter-spacing:-.015em;margin:0 0 16px}.sa-main.sa-in{animation:saIn .24s var(--ease) both}@keyframes saIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){.sa-main.sa-in,#sa-snav a.flash,.sa-ttl.sa-in2{animation:none}}.sa-h{font-size:15px;font-weight:500;margin:6px 0 10px}.sa-sel{display:none}",
       "@media (max-width:960px){.sa-sel{display:block;width:100%;margin:0 0 14px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:10px 12px;border-radius:0}}",
       "#sa-snav{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}#sa-snav .sa-cn{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2);padding:10px 10px 2px 28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
-      "#sa-snav .sa-gh{display:flex;justify-content:space-between;align-items:center;width:100%;background:0 0;border:0;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:9px 12px 7px 28px;text-align:left}#sa-snav .sa-gh:hover{color:var(--fg)}#sa-snav .sa-gh i{font-style:normal;font-size:13px;color:var(--fg-3)}#sa-snav .sa-gh[aria-expanded=true]{color:var(--fg-2)}#sa-snav .sa-gb{display:flex;flex-direction:column;gap:1px}#sa-snav .sa-gb[hidden]{display:none}#sa-snav a{padding:6px 10px 6px 28px;font-size:13.5px;border-left:1px solid transparent}#sa-snav a.on{color:var(--fg);background:var(--bg-2);border-left-color:var(--fg-3)}",
+      "#sa-snav .sa-gh{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;background:0 0;border:0;border-left:2px solid transparent;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding:10px 12px 8px 26px;text-align:left}#sa-snav .sa-gh:hover{color:var(--fg)}#sa-snav .sa-gh i{font-style:normal;font-size:14px;color:var(--fg-3);flex:none}#sa-snav .sa-gh[aria-expanded=true]{color:var(--fg)}#sa-snav .sa-gh.cur{color:var(--fg)}#sa-snav .sa-gn{display:flex;flex-direction:column;gap:4px;min-width:0}#sa-snav .sa-gh em{display:none;font-style:normal;font-family:var(--sans);font-size:13px;letter-spacing:0;text-transform:none;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#sa-snav .sa-gh.cur[aria-expanded=false]{border-left-color:var(--fg);background:rgba(245,245,243,.06)}#sa-snav .sa-gh.cur[aria-expanded=false] em{display:block}#sa-snav .sa-gb{display:flex;flex-direction:column;gap:1px;padding-bottom:4px}#sa-snav .sa-gb[hidden]{display:none}#sa-snav a{padding:7px 10px 7px 26px;font-size:13.5px;border-left:2px solid transparent}#sa-snav a{color:var(--fg-2)}#sa-snav a.on{color:var(--fg);background:rgba(245,245,243,.14);border-left:3px solid var(--fg);padding-left:25px;font-weight:600}#sa-snav a.on::after{content:'';float:right;width:6px;height:6px;margin-top:6px;border-radius:50%;background:var(--fg)}#sa-snav a.flash{animation:saFlash 1.1s var(--ease) both}@keyframes saFlash{0%{background:rgba(245,245,243,.38)}100%{background:rgba(245,245,243,.14)}}.sa-ttl.sa-in2{animation:saTtl .9s var(--ease) both}@keyframes saTtl{0%{color:var(--fg);text-shadow:0 0 18px rgba(245,245,243,.55)}100%{text-shadow:none}}",
       ".sa-wait{display:flex;gap:6px;padding:28px 0}.sa-wait span{width:6px;height:6px;background:var(--fg-3);animation:saw 1s infinite ease-in-out}.sa-wait span:nth-child(2){animation-delay:.15s}.sa-wait span:nth-child(3){animation-delay:.3s}@keyframes saw{0%,100%{opacity:.2}50%{opacity:1}}",
       ".sa-check{border:1px solid var(--warn);border-left-width:3px;background:var(--bg);padding:10px 14px;margin:0 0 14px}.sa-check p{margin:0;font-size:13.5px;color:var(--fg-2);line-height:1.5}.sa-check p+p{margin-top:6px}",
       ".sa-pr td.bar{min-width:170px;width:30%}.sa-pr td.bar i{display:block;height:6px;background:var(--line-2);position:relative}.sa-pr td.bar i b{position:absolute;left:0;top:0;bottom:0;background:var(--fg-2)}.sa-pr td.bar i em{position:absolute;top:-3px;width:2px;height:12px;background:var(--warn)}",
@@ -454,8 +454,16 @@
   function sideSel(on) {
     return '<select id="sa-sidesel" class="sa-sel" aria-label="Section">' + MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (t) { return '<option value="' + t[0] + '"' + (t[0] === on ? " selected" : "") + ">" + esc(t[1]) + "</option>"; }).join("") + "</optgroup>"; }).join("") + "</select>";
   }
-  /* the menu is always there, under Stock Analysis, in five groups that open and close (the one of the page shown opens by itself).
-     Without a company open, its links go to the last company seen (else the largest) */
+  function groupName(tab) { var n = ""; MENU.forEach(function (g) { g[1].forEach(function (t) { if (t[0] === tab) n = g[0]; }); }); return n; }
+  /* the menu is always there, under Stock Analysis, in five groups that open and close one at a time, as on Koyfin: opening one closes the
+     others, and a new page opens its own group. The page shown is marked (a bar, a lighter row, its group's name lit), and its name stays
+     under its group's name while that group is closed, so where you are is always written. Without a company open, its links go to the
+     last company seen (else the largest) */
+  function navOpen(box, gi) {
+    box.setAttribute("data-g", String(gi));
+    Array.prototype.forEach.call(box.querySelectorAll(".sa-gh"), function (h) { var me = Number(h.getAttribute("data-g")) === gi, body = h.nextElementSibling;
+      h.setAttribute("aria-expanded", String(me)); h.querySelector("i").textContent = me ? "\u2212" : "+"; if (body) body.hidden = !me; });
+  }
   function sideNav(id, on, name) {
     var old = document.getElementById("sa-snav"), anchor = document.getElementById("nav-stocks");
     if (!anchor || anchor.hidden) { if (old) old.remove(); return; }
@@ -464,24 +472,23 @@
     if (id) { if (!last || last.id !== id || last.name !== name) LS.set("mws_sa_last", { id: id, name: name || id }); }
     else if (last && last.id) { id = last.id; name = last.name; }
     else { id = "NVDA"; name = "NVIDIA"; }
-    var opened = LS.get("mws_sa_open"); if (!Array.isArray(opened)) opened = [];
-    var gOn = -1; MENU.forEach(function (g, gi) { if (g[1].some(function (t) { return t[0] === on; })) gOn = gi; });
+    var gOn = -1, onName = ""; MENU.forEach(function (g, gi) { g[1].forEach(function (t) { if (t[0] === on) { gOn = gi; onName = t[1]; } }); });
     var href = function (t) { return "#stocks/" + encodeURIComponent(id) + "/" + t; };
-    var html = '<span class="sa-cn" title="' + esc(name || id) + '">' + esc(name || id) + "</span>" + MENU.map(function (g, gi) {
-      var open = gi === gOn || opened.indexOf(gi) >= 0;
-      return '<button type="button" class="sa-gh" data-g="' + gi + '" aria-expanded="' + open + '"><span>' + esc(g[0]) + '</span><i aria-hidden="true">' + (open ? "\u2212" : "+") + "</i></button>" +
-        '<div class="sa-gb"' + (open ? "" : " hidden") + ">" + g[1].map(function (t) { return '<a href="' + href(t[0]) + '" data-sa="' + t[0] + '">' + esc(t[1]) + "</a>"; }).join("") + "</div>"; }).join("");
     var box = old; if (!box) { box = document.createElement("div"); box.id = "sa-snav"; box.className = "sa-snav"; box.setAttribute("role", "navigation"); box.setAttribute("aria-label", "Company sections");
       box.addEventListener("click", function (e) {
         var h = e.target.closest && e.target.closest(".sa-gh");
-        if (h) { var gi = Number(h.getAttribute("data-g")), body = h.nextElementSibling, open = body.hidden; body.hidden = !open; h.setAttribute("aria-expanded", String(open)); h.querySelector("i").textContent = open ? "\u2212" : "+";
-          var o = LS.get("mws_sa_open"); if (!Array.isArray(o)) o = []; o = o.filter(function (x) { return x !== gi; }); if (open) o.push(gi); LS.set("mws_sa_open", o); return; }
+        if (h) { var gi = Number(h.getAttribute("data-g")); navOpen(box, Number(box.getAttribute("data-g")) === gi ? -1 : gi); return; } /* one group open at a time; its own button closes it */
         var a = e.target.closest && e.target.closest("a"); if (!a) return; var close = document.getElementById("side-close"); if (close && W.matchMedia && W.matchMedia("(max-width:960px)").matches) setTimeout(function () { close.click(); }, 0); }); }
-    var key = id + "|" + (gOn >= 0 ? gOn : "-"); if (box.getAttribute("data-k") !== key) { box.innerHTML = html; box.setAttribute("data-k", key); }
-    Array.prototype.forEach.call(box.querySelectorAll("a"), function (a) { var me = a.getAttribute("data-sa") === on; a.classList.toggle("on", me); if (me) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }); /* the site's own router clears every mark in its menu on each page change */
+    var page = id + "|" + (on || ""), moved = box.getAttribute("data-p") !== page;
+    if (moved) { /* a new page (or company): the menu drawn for it, its group the one open */
+      box.innerHTML = '<span class="sa-cn" title="' + esc(name || id) + '">' + esc(name || id) + "</span>" + MENU.map(function (g, gi) {
+        return '<button type="button" class="sa-gh' + (gi === gOn ? " cur" : "") + '" data-g="' + gi + '" aria-expanded="false"><span class="sa-gn"><span>' + esc(g[0]) + "</span>" + (gi === gOn ? "<em>" + esc(onName) + "</em>" : "") + '</span><i aria-hidden="true">+</i></button>' +
+          '<div class="sa-gb" hidden>' + g[1].map(function (t) { var me = t[0] === on; return '<a href="' + href(t[0]) + '" data-sa="' + t[0] + '"' + (me ? ' class="on" aria-current="page"' : "") + ">" + esc(t[1]) + "</a>"; }).join("") + "</div>"; }).join("");
+      box.setAttribute("data-p", page); navOpen(box, gOn); var lit = box.querySelector("a.on"); if (lit && old) lit.classList.add("flash"); /* a new page: its line in the menu lights up for a moment */
+    } else Array.prototype.forEach.call(box.querySelectorAll("a"), function (a) { var me = a.getAttribute("data-sa") === on; a.classList.toggle("on", me); if (me) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }); /* the site's own router clears every mark in its menu on each page change */
     if (box.previousElementSibling !== anchor) anchor.insertAdjacentElement("afterend", box);
-    /* a page opened from a link: its section brought into view in the side menu (the menu scrolls, the page does not) */
-    var cur = box.querySelector("a.on"), nav = anchor.parentElement; if (cur && nav && !old) { var r = cur.getBoundingClientRect(), nr = nav.getBoundingClientRect(); if (r.bottom > nr.bottom || r.top < nr.top) nav.scrollTop += r.top - nr.top - nr.height / 2; }
+    /* the page's section brought into view in the side menu (the menu scrolls, the page does not) */
+    var cur = box.querySelector("a.on"), nav = anchor.parentElement; if (moved && cur && nav) { var r = cur.getBoundingClientRect(), nr = nav.getBoundingClientRect(); if (r.bottom > nr.bottom || r.top < nr.top) nav.scrollTop += r.top - nr.top - nr.height / 2; }
   }
   /* what the checks on the data found, said once at the top of every page in plain words */
   function xOf(s) { var m = /x(-?[\d.]+)/.exec(String(s || "")); return m ? "\u00d7" + m[1] : DASH; }
@@ -495,9 +502,13 @@
     else if (/^sec-revenue-partial/.test(f.check || "")) out.push("The revenue line in the company's SEC filings is only part of its revenue (" + xOf(f.check) + " of the total): EODHD's twelve-month revenue is shown; net income is the filings'.");
     else if (/^bank-gross/.test(f.check || "")) out.push("EODHD gives this bank's gross income (interest received plus fees): its net revenue, EODHD's own twelve-month figure, is shown.");
     if (co.d && revHidden(co.d)) out.push("No revenue is shown for this company: a bank's or insurer's revenue is not one figure across sources (interest received or net of interest paid, premiums written or earned), and EODHD's switches between them from year to year. Its profit, assets, equity and cash flow are shown; a US company's own 10-K revenue line is kept.");
+    var qg = co.d && co.d.fin && co.d.fin.qg; if (qg && qg.n > 0) { var QGW = { empty: "rows with nothing but a share count", neg: "costs, assets or liabilities below zero", total: "subtotals smaller than a line inside them", part: "lines larger than their subtotal", bs: "assets that liabilities and equity do not make", spike: "balances far off the periods on both sides", dupq: "two quarters with the same figures", qyear: "quarters equal to their whole year", qsum: "quarters more than 10% off their year", receipt: "share counts of a US receipt's record", parent: "a year with the parent company's balance sheet alone", partyear: "part-years among the years", cumq: "quarters holding the year to date", cumq2: "a second quarter holding the half year" };
+      var why = Object.keys(qg.by || {}).sort(function (a, b) { return (qg.by[b] || 0) - (qg.by[a] || 0); }).map(function (k) { return QGW[k] || k; }).slice(0, 4).join("; ");
+      out.push(qg.n + " figure" + (qg.n === 1 ? "" : "s") + " in EODHD's statements for this company " + (qg.n === 1 ? "is" : "are") + " shown as \u2014: the company's own other figures show they cannot be right (" + why + ")."); }
     if (f.qbad && !f.withheld) out.push("EODHD's quarterly figures for this company do not add up to its yearly ones (a half-year or a change of definition among the quarters): the latest year is shown instead of the last twelve months, and the quarterly views are left out.");
     if (v.capcheck && /^pe-vs-eodhd/.test(v.capcheck)) out.push("Our P/E for this company and EODHD's own (its price over its twelve months' earnings per share) are more than a third apart (" + xOf(v.capcheck) + "): the market value and the profit are not on one basis (several share classes, minorities in the profit, or a currency label), so the multiples and the amounts in dollars show — until they agree.");
     else if (v.capcheck) out.push("EODHD's market value for this company disagrees with its own enterprise value less the company's net debt (" + xOf(v.capcheck) + "): no market value is shown until the two agree, and the multiples that need it show —.");
+    if (v.oldyear) out.push("EODHD's statements for this company have no figures after FY" + v.oldyear + ": that year is shown as the latest, and the multiples that need a year's profit, sales or cash flow (P/E, P/S, EV/EBITDA, FCF yield) show \u2014 rather than ones from a year long past.");
     if (co.d && co.d.fin && co.d.fin.conv) out.push("Some of EODHD's recent figures for this company went through a currency conversion and back (their digits no longer match the company's own reports, and such figures were found 0.1% to 6% off): those periods show —, and the summary uses the latest period still whole.");
     return out.length ? '<div class="sa-check" role="note">' + out.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") + "</div>" : "";
   }
@@ -726,7 +737,13 @@
   function shellHeader(r) { return '<div class="sa-hd"><div class="id"><h1>' + esc(r.name || r.id) + '</h1><div class="meta">' + [r.id, r.country, r.sector].filter(Boolean).map(esc).join(" · ") + '</div></div><div class="quote"><span class="chg muted">Market value ' + esc(big(r.cap_usd)) + (r.rank ? " · #" + r.rank + " in the world" : "") + "</span></div></div>"; }
   function renderCompany(el, id, tab) {
     css(); tab = pageOf(tab); var back = '<p class="back"><a href="#stocks">← Stock analysis</a></p>';
-    var shell = function (head, name) { el.innerHTML = back + staffBar(id) + head + '<div class="sa-main">' + sideSel(tab) + '<h2 class="sa-ttl">' + esc(pageName(tab)) + '</h2><div class="sa-wait"><span></span><span></span><span></span></div></div>'; sideNav(id, tab, name || id); var sel = $("#sa-sidesel", el); if (sel) sel.addEventListener("change", function () { location.hash = "#stocks/" + encodeURIComponent(id) + "/" + sel.value; }); };
+    /* a new page says so: its group and name above it, a short fade as it comes, the top of the page in view, its name in the bar at the top */
+    var pageKey = id + "|" + tab, fresh = S.page !== pageKey; S.page = pageKey;
+    var anim = function () { if (!fresh) return ""; fresh = false; return " sa-in"; }, glow = fresh;
+    var title = function () { var g = glow; glow = false; return '<p class="sa-crumb">' + esc(groupName(tab)) + '</p><h2 class="sa-ttl' + (g ? " sa-in2" : "") + '">' + esc(pageName(tab)) + "</h2>"; };
+    var named = function (n) { var crumb = $("#crumb"); if (crumb) crumb.textContent = (n || id) + " \u00b7 " + pageName(tab); document.title = pageName(tab) + " \u00b7 " + (n || id) + " \u00b7 Mr. Wall Street"; };
+    if (fresh && W.scrollY > 0) W.scrollTo(0, 0);
+    var shell = function (head, name) { el.innerHTML = back + staffBar(id) + head + '<div class="sa-main' + anim() + '">' + sideSel(tab) + title() + '<div class="sa-wait"><span></span><span></span><span></span></div></div>'; sideNav(id, tab, name || id); named(name); var sel = $("#sa-sidesel", el); if (sel) sel.addEventListener("change", function () { location.hash = "#stocks/" + encodeURIComponent(id) + "/" + sel.value; }); };
     var full = false;
     if (!S.co[id]) {
       var lr = (S.list || []).filter(function (r) { return r.id === id; })[0];
@@ -736,7 +753,7 @@
     }
     S.onCo = function (id2) { if (id2 === id && el.isConnected && location.hash.indexOf("#stocks/" + encodeURIComponent(id)) === 0) renderCompany(el, id, tab); }; /* a fresher copy arrived */
     function draw(co, extra) {
-      var crumb = $("#crumb"); if (crumb) crumb.textContent = co.u.name || id; document.title = (co.u.name || id) + " · Stock analysis · Mr. Wall Street";
+      named(co.u.name);
       var view = { overview: vSummary, description: vDescription, rank: vRank, dividends: vDividends, ownership: vOwnership, earnings: vEarnings, highlights: vHighlights,
         is: function (c) { return vStmt(c, "is"); }, bs: function (c) { return vStmt(c, "bs"); }, cf: function (c) { return vStmt(c, "cf"); }, multiples: vMultiples, ev: vEV,
         profitability: function (c) { return vRatioPage(c, ["Margins"], "Margins over revenue, computed here from the company's statements. Banks and insurers have no gross, operating or EBITDA margin: their revenue and costs mean other things."); },
@@ -746,7 +763,7 @@
         news: vNews, chart: vChart }[tab];
       var key = [id, tab, co.partial ? "p" : co.at, S.per, S.cur, S.stmt, S.all, S.fg, extra ? extra.length : ""].join("|");
       var body; try { body = co.partial ? (view || vSummary)(co) : memo(key, function () { return tab === "estimates" ? vEstimates(co, extra) : tab === "target" ? vTarget(co, extra) : tab === "filings" ? vFilings(co, extra) : (view || vSummary)(co); }); } catch (e) { body = '<div class="banner bad"><div><b>This part could not be shown.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; if (W.console) console.error(e); }
-      el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-main">' + sideSel(tab) + '<h2 class="sa-ttl">' + esc(pageName(tab)) + "</h2>" + checks(co) + body + (co.partial ? '<div class="sa-wait"><span></span><span></span><span></span></div>' : sources(co)) + "</div>"; sideNav(id, tab, co.u.name || id); wire(el, co, id, tab);
+      el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-main' + anim() + '">' + sideSel(tab) + title() + checks(co) + body + (co.partial ? '<div class="sa-wait"><span></span><span></span><span></span></div>' : sources(co)) + "</div>"; sideNav(id, tab, co.u.name || id); wire(el, co, id, tab);
     }
     loadCompany(id).then(function (co) {
       full = true;
@@ -790,7 +807,7 @@
     var el = $("#sa-page"); if (!el) return; css();
     if (ctx && !ctx.ready) { el.innerHTML = '<p class="small muted">Loading…</p>'; return; }
     var arg = ctx && ctx.arg != null ? ctx.arg : (W.__saArg || ""); var parts = String(arg).split("/"), id = parts[0] ? decodeURIComponent(parts[0]) : "", tab = parts[1] || "summary";
-    var go = function () { if (id) renderCompany(el, id, tab); else { sideNav(null, null); renderList(el); } };
+    var go = function () { if (id) renderCompany(el, id, tab); else { S.page = null; sideNav(null, null); renderList(el); } };
     if (S.ctx.staff || S.ctx.sim) { liveCheck().then(go); return; }
     liveCheck().then(function (live) { if (live && S.ctx.member) go(); else { el.innerHTML = ""; location.replace("#telegram"); } });
   }
@@ -804,6 +821,6 @@
     return true;
   }
   /* leaving a company (another page of the site, or the list): its sections leave the side menu */
-  W.addEventListener("hashchange", function () { if (!/^#stocks\/[^/]+/.test(location.hash)) sideNav(null, null); }); /* another page: the menu stays, nothing marked */
+  W.addEventListener("hashchange", function () { if (!/^#stocks\/[^/]+/.test(location.hash)) { S.page = null; sideNav(null, null); } }); /* another page: the menu stays, nothing marked */
   if (!boot()) { var tries = 0, t = setInterval(function () { if (boot() || ++tries > 40) clearInterval(t); }, 250); }
 })();

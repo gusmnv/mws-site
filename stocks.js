@@ -81,6 +81,7 @@
       ".sa-note{color:var(--fg-3);font-size:12.5px;margin-top:12px;line-height:1.5}.sa-note b{color:var(--fg-2);font-weight:500}.sa-kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:13.5px}.sa-kv span{color:var(--fg-3)}.sa-kv b{font-weight:400;color:var(--fg-2);overflow-wrap:anywhere}",
       ".sa-tv{height:520px;border:1px solid var(--line)}.sa-tv.sm{height:300px}.sa-tvno{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px;text-align:center;color:var(--fg-3);font-size:14px}.sa-tvno p{margin:0;max-width:440px}.sa-staff{border:1px dashed var(--line-2);padding:10px 14px;margin:0 0 14px;font-size:12.5px;color:var(--fg-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}.sa-staff button{background:0 0;border:1px solid var(--line-2);color:var(--fg-2);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;cursor:pointer}.sa-staff button:hover{color:var(--fg);border-color:var(--fg-2)}",
       ".sa-pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-2);padding:2px 6px;color:var(--fg-3);margin-left:6px;vertical-align:2px}.sa-more{margin-top:12px}.sa-more button{background:0 0;border:0;color:var(--fg-2);font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}",
+      ".sa-ptabs{display:flex;gap:2px;border-bottom:1px solid var(--line-2);margin:4px 0 20px;overflow-x:auto;scrollbar-width:none}.sa-ptabs::-webkit-scrollbar{display:none}.sa-ptabs a{flex:none;font-size:13.5px;color:var(--fg-3);text-decoration:none;padding:9px 12px 10px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}.sa-ptabs a:hover{color:var(--fg)}.sa-ptabs a.on{color:var(--fg);font-weight:600;border-bottom-color:var(--fg)}.sa-ptabs a.sa-in2{animation:saTtl .9s var(--ease) both}" +
       ".sa-main{min-width:0}.sa-crumb{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin:2px 0 6px}.sa-ttl{font-size:26px;font-weight:500;letter-spacing:-.015em;margin:0 0 16px}.sa-main.sa-in{animation:saIn .24s var(--ease) both}@keyframes saIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){.sa-main.sa-in,#sa-snav a.flash,.sa-ttl.sa-in2{animation:none}}.sa-h{font-size:15px;font-weight:500;margin:6px 0 10px}.sa-sel{display:none}",
       "@media (max-width:960px){.sa-sel{display:block;width:100%;margin:0 0 14px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font:inherit;font-size:15px;padding:10px 12px;border-radius:0}}",
       "#sa-snav{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}#sa-snav .sa-cn{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-2);padding:10px 10px 2px 28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
@@ -438,15 +439,16 @@
   }
 
   /* ---------- the company page ---------- */
-  /* the side menu, as on Koyfin: snapshots, analysts' estimates, financial analysis, news and filings, graphs (one page each) */
+  /* the sections, as on Koyfin: snapshots, analysts' estimates, financial analysis, filings and transcripts, graphs. The side menu lists the five
+     sections only; a section's pages are a bar of tabs at the top of the page (19 Oct: no scrolling down the menu to reach Highlights or Solvency) */
   var MENU = [
     ["Snapshots", [["overview", "Overview"], ["description", "Description"], ["rank", "Percentile rank"], ["dividends", "Dividends"], ["ownership", "Ownership"], ["earnings", "Earnings history"]]],
     ["Analyst estimates", [["estimates", "Estimates"], ["target", "Price target"]]],
     ["Financial analysis", [["highlights", "Highlights"], ["is", "Income statement"], ["bs", "Balance sheet"], ["cf", "Cash flow"], ["multiples", "Multiples"], ["ev", "Enterprise value"], ["profitability", "Profitability"], ["returns", "Returns (ROE, ROIC)"], ["growth", "Growth"], ["solvency", "Solvency"]]],
-    ["News and filings", [["news", "News"], ["filings", "SEC filings"]]],
+    ["Filings and transcripts", [["filings", "Filings"], ["transcripts", "Transcripts"]]],
     ["Graphs", [["chart", "Price chart"]]]
   ];
-  var ALIAS = { summary: "overview", financials: "is", ratios: "profitability" }; /* the old links keep working */
+  var ALIAS = { summary: "overview", financials: "is", ratios: "profitability", news: "filings" }; /* the old links keep working */
   function pageOf(tab) { tab = ALIAS[tab] || tab; return MENU.some(function (g) { return g[1].some(function (t) { return t[0] === tab; }); }) ? tab : "overview"; }
   function pageName(tab) { var n = "Overview"; MENU.forEach(function (g) { g[1].forEach(function (t) { if (t[0] === tab) n = t[1]; }); }); return n; }
   /* the company's sections live in the site's own side menu, under Stock Analysis (as on Koyfin), not in a second menu beside it.
@@ -455,15 +457,18 @@
     return '<select id="sa-sidesel" class="sa-sel" aria-label="Section">' + MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (t) { return '<option value="' + t[0] + '"' + (t[0] === on ? " selected" : "") + ">" + esc(t[1]) + "</option>"; }).join("") + "</optgroup>"; }).join("") + "</select>";
   }
   function groupName(tab) { var n = ""; MENU.forEach(function (g) { g[1].forEach(function (t) { if (t[0] === tab) n = g[0]; }); }); return n; }
-  /* the menu is always there, under Stock Analysis, in five groups that open and close one at a time, as on Koyfin: opening one closes the
-     others, and a new page opens its own group. The page shown is marked (a bar, a lighter row, its group's name lit), and its name stays
-     under its group's name while that group is closed, so where you are is always written. Without a company open, its links go to the
-     last company seen (else the largest) */
-  function navOpen(box, gi) {
-    box.setAttribute("data-g", String(gi));
-    Array.prototype.forEach.call(box.querySelectorAll(".sa-gh"), function (h) { var me = Number(h.getAttribute("data-g")) === gi, body = h.nextElementSibling;
-      h.setAttribute("aria-expanded", String(me)); h.querySelector("i").textContent = me ? "\u2212" : "+"; if (body) body.hidden = !me; });
+  function groupOf(tab) { var gi = -1; MENU.forEach(function (g, i) { g[1].forEach(function (t) { if (t[0] === tab) gi = i; }); }); return gi; }
+  /* the last page seen in each section: its link in the side menu goes back there */
+  var G_TAB = {};
+  /* the section's pages as tabs at the top of the page, the one shown marked (a line under it, its name bold) */
+  function pageTabs(id, tab, glow) {
+    var gi = groupOf(tab); if (gi < 0) return ""; G_TAB[gi] = tab; var g = MENU[gi];
+    if (g[1].length < 2) return "";
+    return '<nav class="sa-ptabs" aria-label="' + esc(g[0]) + '">' + g[1].map(function (t) { var me = t[0] === tab;
+      return '<a href="#stocks/' + encodeURIComponent(id) + "/" + t[0] + '"' + (me ? ' class="on' + (glow ? " sa-in2" : "") + '" aria-current="page"' : "") + ">" + esc(t[1]) + "</a>"; }).join("") + "</nav>";
   }
+  /* the menu is always there, under Stock Analysis: the company's name and its five sections, the one shown marked (a bar, a lighter row, a dot) and
+     lit for a moment when it changes. Without a company open, its links go to the last company seen (else the largest) */
   function sideNav(id, on, name) {
     var old = document.getElementById("sa-snav"), anchor = document.getElementById("nav-stocks");
     if (!anchor || anchor.hidden) { if (old) old.remove(); return; }
@@ -472,20 +477,14 @@
     if (id) { if (!last || last.id !== id || last.name !== name) LS.set("mws_sa_last", { id: id, name: name || id }); }
     else if (last && last.id) { id = last.id; name = last.name; }
     else { id = "NVDA"; name = "NVIDIA"; }
-    var gOn = -1, onName = ""; MENU.forEach(function (g, gi) { g[1].forEach(function (t) { if (t[0] === on) { gOn = gi; onName = t[1]; } }); });
-    var href = function (t) { return "#stocks/" + encodeURIComponent(id) + "/" + t; };
+    var gOn = groupOf(on);
+    var href = function (gi) { return "#stocks/" + encodeURIComponent(id) + "/" + (G_TAB[gi] || MENU[gi][1][0][0]); };
     var box = old; if (!box) { box = document.createElement("div"); box.id = "sa-snav"; box.className = "sa-snav"; box.setAttribute("role", "navigation"); box.setAttribute("aria-label", "Company sections");
-      box.addEventListener("click", function (e) {
-        var h = e.target.closest && e.target.closest(".sa-gh");
-        if (h) { var gi = Number(h.getAttribute("data-g")); navOpen(box, Number(box.getAttribute("data-g")) === gi ? -1 : gi); return; } /* one group open at a time; its own button closes it */
-        var a = e.target.closest && e.target.closest("a"); if (!a) return; var close = document.getElementById("side-close"); if (close && W.matchMedia && W.matchMedia("(max-width:960px)").matches) setTimeout(function () { close.click(); }, 0); }); }
-    var page = id + "|" + (on || ""), moved = box.getAttribute("data-p") !== page;
-    if (moved) { /* a new page (or company): the menu drawn for it, its group the one open */
-      box.innerHTML = '<span class="sa-cn" title="' + esc(name || id) + '">' + esc(name || id) + "</span>" + MENU.map(function (g, gi) {
-        return '<button type="button" class="sa-gh' + (gi === gOn ? " cur" : "") + '" data-g="' + gi + '" aria-expanded="false"><span class="sa-gn"><span>' + esc(g[0]) + "</span>" + (gi === gOn ? "<em>" + esc(onName) + "</em>" : "") + '</span><i aria-hidden="true">+</i></button>' +
-          '<div class="sa-gb" hidden>' + g[1].map(function (t) { var me = t[0] === on; return '<a href="' + href(t[0]) + '" data-sa="' + t[0] + '"' + (me ? ' class="on" aria-current="page"' : "") + ">" + esc(t[1]) + "</a>"; }).join("") + "</div>"; }).join("");
-      box.setAttribute("data-p", page); navOpen(box, gOn); var lit = box.querySelector("a.on"); if (lit && old) lit.classList.add("flash"); /* a new page: its line in the menu lights up for a moment */
-    } else Array.prototype.forEach.call(box.querySelectorAll("a"), function (a) { var me = a.getAttribute("data-sa") === on; a.classList.toggle("on", me); if (me) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }); /* the site's own router clears every mark in its menu on each page change */
+      box.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a"); if (!a) return; var close = document.getElementById("side-close"); if (close && W.matchMedia && W.matchMedia("(max-width:960px)").matches) setTimeout(function () { close.click(); }, 0); }); }
+    var page = id + "|" + gOn, moved = box.getAttribute("data-p") !== page;
+    box.innerHTML = '<span class="sa-cn" title="' + esc(name || id) + '">' + esc(name || id) + "</span>" + MENU.map(function (g, gi) { var me = gi === gOn;
+      return '<a href="' + href(gi) + '" data-g="' + gi + '"' + (me ? ' class="on' + (moved && old && old.getAttribute("data-p") ? " flash" : "") + '" aria-current="page"' : "") + ">" + esc(g[0]) + "</a>"; }).join("");
+    box.setAttribute("data-p", page); /* drawn on every page: the site's own router clears every mark in its menu on each page change */
     if (box.previousElementSibling !== anchor) anchor.insertAdjacentElement("afterend", box);
     /* the page's section brought into view in the side menu (the menu scrolls, the page does not) */
     var cur = box.querySelector("a.on"), nav = anchor.parentElement; if (moved && cur && nav) { var r = cur.getBoundingClientRect(), nr = nav.getBoundingClientRect(); if (r.bottom > nr.bottom || r.top < nr.top) nav.scrollTop += r.top - nr.top - nr.height / 2; }
@@ -502,13 +501,15 @@
     else if (/^sec-revenue-partial/.test(f.check || "")) out.push("The revenue line in the company's SEC filings is only part of its revenue (" + xOf(f.check) + " of the total): EODHD's twelve-month revenue is shown; net income is the filings'.");
     else if (/^bank-gross/.test(f.check || "")) out.push("EODHD gives this bank's gross income (interest received plus fees): its net revenue, EODHD's own twelve-month figure, is shown.");
     if (co.d && revHidden(co.d)) out.push("No revenue is shown for this company: a bank's or insurer's revenue is not one figure across sources (interest received or net of interest paid, premiums written or earned), and EODHD's switches between them from year to year. Its profit, assets, equity and cash flow are shown; a US company's own 10-K revenue line is kept.");
-    var qg = co.d && co.d.fin && co.d.fin.qg; if (qg && qg.n > 0) { var QGW = { empty: "rows with nothing but a share count", neg: "costs, assets or liabilities below zero", total: "subtotals smaller than a line inside them", part: "lines larger than their subtotal", bs: "assets that liabilities and equity do not make", spike: "balances far off the periods on both sides", dupq: "two quarters with the same figures", qyear: "quarters equal to their whole year", qsum: "quarters more than 10% off their year", receipt: "share counts of a US receipt's record", parent: "a year with the parent company's balance sheet alone", partyear: "part-years among the years", cumq: "quarters holding the year to date", cumq2: "a second quarter holding the half year" };
-      var why = Object.keys(qg.by || {}).sort(function (a, b) { return (qg.by[b] || 0) - (qg.by[a] || 0); }).map(function (k) { return QGW[k] || k; }).slice(0, 4).join("; ");
-      out.push(qg.n + " figure" + (qg.n === 1 ? "" : "s") + " in EODHD's statements for this company " + (qg.n === 1 ? "is" : "are") + " shown as \u2014: the company's own other figures show they cannot be right (" + why + ")."); }
+    var qg = co.d && !(co.d.sec && co.d.sec.annual && co.d.sec.annual.length) && co.d.fin && co.d.fin.qg; if (qg && qg.n > 0) { /* a company with its own SEC filings: its pages show those, not EODHD's rows */ var QGW = { empty: "rows with nothing but a share count", neg: "costs, assets or liabilities below zero", total: "subtotals smaller than a line inside them", part: "lines larger than their subtotal", bs: "assets that liabilities and equity do not make", spike: "balances far off the periods on both sides", dupq: "two quarters with the same figures", qyear: "quarters equal to their whole year", qsum: "quarters more than 10% off their year", receipt: "share counts of a US receipt's record", parent: "a year with the parent company's balance sheet alone", partyear: "part-years among the years", cumq: "quarters holding the year to date", cumq2: "a second quarter holding the half year" };
+      var by = qg.by || {}, rowsN = (by.empty || 0) + (by.partyear || 0), figN = qg.n - rowsN; /* empty rows and part-years are counted as rows, not figures */
+      var why = Object.keys(by).filter(function (k) { return k !== "empty" && k !== "partyear"; }).sort(function (a, b) { return (by[b] || 0) - (by[a] || 0); }).map(function (k) { return QGW[k] || k; }).slice(0, 4).join("; ");
+      if (figN > 0) out.push(figN + " figure" + (figN === 1 ? "" : "s") + " in EODHD's statements for this company " + (figN === 1 ? "is" : "are") + " shown as \u2014: the company's own other figures show they cannot be right (" + why + ").");
+      if (rowsN > 0) out.push(rowsN + " period" + (rowsN === 1 ? "" : "s") + " in EODHD's statements for this company " + (rowsN === 1 ? "is" : "are") + " left out: " + [by.partyear ? "part-years among the years" : "", by.empty ? "rows with nothing but a share count" : ""].filter(Boolean).join(" and ") + "."); }
     if (f.qbad && !f.withheld) out.push("EODHD's quarterly figures for this company do not add up to its yearly ones (a half-year or a change of definition among the quarters): the latest year is shown instead of the last twelve months, and the quarterly views are left out.");
     if (v.capcheck && /^pe-vs-eodhd/.test(v.capcheck)) out.push("Our P/E for this company and EODHD's own (its price over its twelve months' earnings per share) are more than a third apart (" + xOf(v.capcheck) + "): the market value and the profit are not on one basis (several share classes, minorities in the profit, or a currency label), so the multiples and the amounts in dollars show — until they agree.");
     else if (v.capcheck) out.push("EODHD's market value for this company disagrees with its own enterprise value less the company's net debt (" + xOf(v.capcheck) + "): no market value is shown until the two agree, and the multiples that need it show —.");
-    if (v.oldyear) out.push("EODHD's statements for this company have no figures after FY" + v.oldyear + ": that year is shown as the latest, and the multiples that need a year's profit, sales or cash flow (P/E, P/S, EV/EBITDA, FCF yield) show \u2014 rather than ones from a year long past.");
+    if (v.oldyear) out.push("EODHD's statements for this company have no figures after " + date(v.oldyear) + ": that period is shown as the latest, and the multiples that need a year's profit, sales or cash flow (P/E, P/S, EV/EBITDA, FCF yield) show \u2014 rather than ones from a year long past.");
     if (co.d && co.d.fin && co.d.fin.conv) out.push("Some of EODHD's recent figures for this company went through a currency conversion and back (their digits no longer match the company's own reports, and such figures were found 0.1% to 6% off): those periods show —, and the summary uses the latest period still whole.");
     return out.length ? '<div class="sa-check" role="note">' + out.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") + "</div>" : "";
   }
@@ -680,8 +681,23 @@
     var sc = shs.length > 1 && !shsOld ? '<section class="sa-sec"><h3>Shares outstanding over time</h3><p class="sub">Millions; fewer means buybacks</p>' + bars(shs.map(function (x) { return { l: "’" + String(x[0]).slice(2, 4), a: x[1] / 1e6 }; }), { label: "Shares outstanding" }) + "</section>" : "";
     return g + '<div class="sa-cols"><div>' + tbl("Largest institutions", H.inst) + tbl("Largest funds", H.funds) + "</div><div>" + sc + it + "</div></div>" + '<p class="sa-note">From EODHD (institutional filings, 13F, and insiders\' Form 4 for US companies).</p>';
   }
-  var FILING_GROUPS = [["all", "All"], ["periodic", "Annual and quarterly"], ["results", "Results"], ["proxy", "Proxy"], ["owners", "Large holders"], ["other", "Other"]];
-  function filingGroup(f) { var form = f[0], items = String(f[6] || ""); if (/^(10-K|10-Q|20-F|40-F|10-KT|10-QT)/.test(form)) return "periodic"; if (/^8-K/.test(form) && /2\.02/.test(items)) return "results"; if (/^6-K/.test(form)) return "results"; if (/^DEF 14A|^ARS/.test(form)) return "proxy"; if (/13D|13G/.test(form)) return "owners"; return "other"; }
+  var FILING_GROUPS = [["all", "All"], ["periodic", "Annual and quarterly"], ["results", "Results"], ["current", "Other current reports"], ["proxy", "Proxy"], ["owners", "Large holders"], ["insiders", "Insiders"], ["offer", "Offerings"], ["other", "Other"]];
+  function filingGroup(f) { var form = String(f[0] || ""), items = String(f[6] || ""); if (/^(10-K|10-Q|20-F|40-F|10-KT|10-QT)/.test(form)) return "periodic"; if (/^8-K/.test(form) && /2\.02/.test(items)) return "results"; if (/^6-K/.test(form)) return "results"; if (/^8-K/.test(form)) return "current"; if (/^(DEF|DEFA|DEFM|PRE|PRER|DFAN)14|^ARS/.test(form.replace(/ /g, ""))) return "proxy"; if (/13D|13G|13F/.test(form)) return "owners"; if (/^[345](\/A)?$|^144/.test(form)) return "insiders"; if (/^(424B|S-1|S-3|S-4|S-8|F-1|F-3|F-4|F-10|FWP|POS AM|S-11)/.test(form)) return "offer"; return "other"; }
+  /* every filing the company ever made at the SEC, read from the SEC itself when the page opens: its latest thousand, then its older pages one after
+     the other (19 Oct: all of them, as on Koyfin; nothing stored on our side) */
+  var SECF = {};
+  function loadSecFilings(cik) {
+    var c = String(Number(cik)); if (SECF[c]) return SECF[c]; var pad = ("0000000000" + c).slice(-10);
+    var rows = function (R) { var out = [], n = R && R.accessionNumber ? R.accessionNumber.length : 0; for (var i = 0; i < n; i++) out.push([R.form[i] || "", R.filingDate[i] || null, R.reportDate[i] || null, R.accessionNumber[i], R.primaryDocument[i] || null, R.primaryDocDescription[i] || null, R.items ? R.items[i] || null : null]); return out; };
+    var get = function (url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error("SEC " + r.status); return r.json(); }); };
+    SECF[c] = get("https://data.sec.gov/submissions/CIK" + pad + ".json").then(function (j) {
+      var list = rows(j.filings && j.filings.recent), files = (j.filings && j.filings.files) || [], ok = true;
+      return files.reduce(function (p, f) { return p.then(function () { return get("https://data.sec.gov/submissions/" + f.name).then(function (x) { list = list.concat(rows(x)); }, function () { ok = false; }); }); }, Promise.resolve()).then(function () {
+        var seen = {}; list = list.filter(function (f) { if (!f[3] || seen[f[3]]) return false; seen[f[3]] = 1; return true; }).sort(function (a, b) { return String(b[1]).localeCompare(String(a[1])); });
+        return { list: list, complete: ok }; });
+    }); SECF[c].catch(function () { delete SECF[c]; });
+    return SECF[c];
+  }
   /* what a filing is about: an 8-K by its items, the others by their form */
   var ITEM_8K = { "1.01": "Material agreement", "1.02": "Agreement ended", "1.05": "Cybersecurity incident", "2.01": "Acquisition or disposal completed", "2.02": "Results of the quarter", "2.03": "New debt", "2.05": "Restructuring costs", "2.06": "Impairment", "3.02": "Shares sold privately", "3.03": "Rights of holders changed", "4.01": "Auditor changed", "4.02": "Earlier statements not to be relied on", "5.01": "Change of control", "5.02": "Directors or officers changed", "5.03": "Bylaws or fiscal year changed", "5.07": "Shareholder vote", "7.01": "Regulation FD disclosure", "8.01": "Other events" };
   var FORM_WHAT = { "10-K": "Annual report", "10-Q": "Quarterly report", "20-F": "Annual report (foreign issuer)", "40-F": "Annual report (Canadian issuer)", "6-K": "Report of a foreign issuer", "DEF 14A": "Proxy statement", "ARS": "Annual report to shareholders", "11-K": "Employee savings plan report", "SD": "Conflict minerals report", "S-3": "Shelf registration", "S-8": "Employee share plan registration", "SC 13G": "Large holder (passive)", "SC 13D": "Large holder (active)", "SCHEDULE 13G": "Large holder (passive)", "SCHEDULE 13D": "Large holder (active)" };
@@ -693,16 +709,20 @@
   }
   function vFilings(co, rest) {
     var F = co.d.filings, cik = co.u.cik; if (!cik) return '<p class="muted">This company does not file with the SEC. Its reports are on its own website' + (co.d.profile && co.d.profile.web ? ': <a href="' + esc(co.d.profile.web) + '" target="_blank" rel="noopener">' + esc(String(co.d.profile.web).replace(/^https?:\/\//, "")) + "</a>" : "") + ".</p>";
-    if (!F || !F.list) return '<p class="muted">The SEC filings arrive with the next run.</p>';
-    S.fg = S.fg || "all"; var c = String(Number(cik)), list = F.list.filter(function (f) { return S.fg === "all" || filingGroup(f) === S.fg; });
-    var rows = list.slice(0, S.all ? 600 : 60).map(function (f) { var acc = String(f[3]), dir = "https://www.sec.gov/Archives/edgar/data/" + c + "/" + acc.replace(/-/g, "") + "/"; var g = filingGroup(f);
+    var A = co.secAll ? co.secAll.list : F && F.list; if (!A) return '<p class="muted">The SEC filings arrive with the next run.</p>';
+    S.fg = S.fg || "all"; var c = String(Number(cik)), list = A.filter(function (f) { return S.fg === "all" || filingGroup(f) === S.fg; });
+    var cnt = {}; A.forEach(function (f) { var g = filingGroup(f); cnt[g] = (cnt[g] || 0) + 1; });
+    var groups = FILING_GROUPS.filter(function (g) { return g[0] === "all" || cnt[g[0]]; }).map(function (g) { return [g[0], g[1] + " " + fmtNum(g[0] === "all" ? A.length : cnt[g[0]])]; });
+    var shown = S.fshow || 60, rows = list.slice(0, shown).map(function (f) { var acc = String(f[3]), dir = "https://www.sec.gov/Archives/edgar/data/" + c + "/" + acc.replace(/-/g, "") + "/"; var g = filingGroup(f);
       return "<tr><td>" + esc(date(f[1])) + "</td><td><b>" + esc(f[0]) + "</b></td><td>" + esc(filingWhat(f, g)) + "</td><td>" + esc(f[2] ? date(f[2]) : "") + '</td><td><a href="' + esc(f[4] ? dir + f[4] : dir) + '" target="_blank" rel="noopener">Document</a> · <a href="' + esc(dir + acc + "-index.htm") + '" target="_blank" rel="noopener">All files</a></td></tr>'; }).join("");
     var rt = rest && rest.length ? '<section class="sa-sec" style="margin-top:18px"><h3>Restated figures</h3><p class="sub">A later filing changed a figure the company had already published. Both stay here; the statements show the latest.</p><div class="sa-wrap"><table class="pt sa-tbl"><thead><tr><th>Line</th><th>Period</th><th class="num">First filed</th><th class="num">Latest</th><th class="num">Change</th><th>Changed on</th></tr></thead><tbody>' +
       rest.slice(0, S.all ? 1000 : 40).map(function (x) { var d = x.data || {}, ch = fin(d.was) && d.was !== 0 ? d.now / d.was - 1 : null, lbl = LINE_NAME[d.k] || d.k; return "<tr><td>" + esc(lbl) + "</td><td>" + esc(String(d.p || "").replace(/^FY /, "Year to ").replace(/^Q /, "Quarter to ")) + '</td><td class="num">' + fmtNum(d.was, Math.abs(d.was) < 100 ? 2 : 0) + '</td><td class="num">' + fmtNum(d.now, Math.abs(d.now) < 100 ? 2 : 0) + '</td><td class="num ' + cls(ch) + '">' + pctS(ch) + "</td><td>" + esc(date(d.filed)) + "</td></tr>"; }).join("") + "</tbody></table></div></section>" : "";
-    return '<div class="sa-bar">' + chips("sa-fg", FILING_GROUPS, S.fg) + '</div><div class="sa-wrap"><table class="pt sa-tbl"><thead><tr><th>Filed</th><th>Form</th><th>What</th><th>Period</th><th>Links</th></tr></thead><tbody>' + (rows || '<tr><td colspan="5">None.</td></tr>') + "</tbody></table></div>" + (list.length > 60 ? '<div class="sa-more"><button type="button" id="sa-all">' + (S.all ? "Show the last 60 only" : "Show all " + list.length) + "</button></div>" : "") +
-      '<p class="sa-note">The SEC\'s own records' + (F.sicd ? " · industry code: " + esc(F.sicd) : "") + (F.cat ? " · " + esc(F.cat) : "") + (F.insider30 ? " · " + F.insider30 + " insider filings (Forms 3, 4, 5) in the recent list" : "") + ".</p>" + rt;
+    return '<div class="sa-bar">' + chips("sa-fg", groups, S.fg) + '</div><div class="sa-wrap"><table class="pt sa-tbl"><thead><tr><th>Filed</th><th>Form</th><th>What</th><th>Period</th><th>Links</th></tr></thead><tbody>' + (rows || '<tr><td colspan="5">None.</td></tr>') + "</tbody></table></div>" + (list.length > shown ? '<div class="sa-more"><button type="button" id="sa-fmore">Show ' + fmtNum(Math.min(500, list.length - shown)) + " more (" + fmtNum(shown) + " of " + fmtNum(list.length) + " shown)</button></div>" : "") +
+      '<p class="sa-note">' + (co.secAll ? "Every filing at the SEC, " + fmtNum(A.length) + (co.secAll.complete ? "" : " (some older pages could not be read now)") + ", read from the SEC just now" : "The SEC's own records (the full list is being read from the SEC)") + (F && F.sicd ? " · industry code: " + esc(F.sicd) : "") + (F && F.cat ? " · " + esc(F.cat) : "") + ".</p>" + rt;
   }
   var LINE_NAME = {}; ["is", "bs", "cf"].forEach(function (k) { LINES[k].forEach(function (l) { if (typeof l[1] === "string" && l[0] !== "hd") LINE_NAME[l[1]] = l[0]; }); });
+  /* earnings call transcripts: EODHD has none; every call will be listed here once a transcript source is chosen (19 Oct) */
+  function vTranscripts(co) { return '<p class="muted">The transcripts of ' + esc(co.u.name || co.u.id) + "'s earnings calls will be listed here, every call, once a transcript source is connected: EODHD, the source of the figures, does not provide them.</p>"; }
   function vNews(co) { var n = (co.d.news && co.d.news.list) || []; if (!n.length) return '<p class="muted">No headlines yet.</p>'; return '<div class="sa-wrap"><table class="pt sa-tbl"><tbody>' + n.map(function (x) { return "<tr><td>" + esc(date(String(x[0]).slice(0, 10))) + '</td><td style="white-space:normal"><a href="' + esc(x[2]) + '" target="_blank" rel="noopener nofollow">' + esc(x[1]) + '</a> <span class="muted">' + esc(x[3] || "") + "</span></td></tr>"; }).join("") + '</tbody></table></div><p class="sa-note">Headlines and links from EODHD\'s news feed; the articles are on their publishers\' sites.</p>'; }
   function vChart(co) { return co.u.tv ? '<div class="sa-tv" id="sa-tv"></div>' : '<p class="muted">No chart for this listing.</p>'; }
 
@@ -740,7 +760,9 @@
     /* a new page says so: its group and name above it, a short fade as it comes, the top of the page in view, its name in the bar at the top */
     var pageKey = id + "|" + tab, fresh = S.page !== pageKey; S.page = pageKey;
     var anim = function () { if (!fresh) return ""; fresh = false; return " sa-in"; }, glow = fresh;
-    var title = function () { var g = glow; glow = false; return '<p class="sa-crumb">' + esc(groupName(tab)) + '</p><h2 class="sa-ttl' + (g ? " sa-in2" : "") + '">' + esc(pageName(tab)) + "</h2>"; };
+    /* the section's name, then its pages as tabs (the one shown marked); a section of one page keeps its name as the title */
+    var title = function () { var g = glow; glow = false; var tabs = pageTabs(id, tab, g);
+      return '<p class="sa-crumb">' + esc(groupName(tab)) + "</p>" + (tabs || '<h2 class="sa-ttl' + (g ? " sa-in2" : "") + '">' + esc(pageName(tab)) + "</h2>"); };
     var named = function (n) { var crumb = $("#crumb"); if (crumb) crumb.textContent = (n || id) + " \u00b7 " + pageName(tab); document.title = pageName(tab) + " \u00b7 " + (n || id) + " \u00b7 Mr. Wall Street"; };
     if (fresh && W.scrollY > 0) W.scrollTo(0, 0);
     var shell = function (head, name) { el.innerHTML = back + staffBar(id) + head + '<div class="sa-main' + anim() + '">' + sideSel(tab) + title() + '<div class="sa-wait"><span></span><span></span><span></span></div></div>'; sideNav(id, tab, name || id); named(name); var sel = $("#sa-sidesel", el); if (sel) sel.addEventListener("change", function () { location.hash = "#stocks/" + encodeURIComponent(id) + "/" + sel.value; }); };
@@ -760,8 +782,8 @@
         returns: function (c) { return vRatioPage(c, ["Returns"], "Return on equity and on assets: net income over the average of the opening and closing balance. Return on invested capital: operating income after tax (the company's own rate, 21% when unclear) over equity plus debt less cash; not for banks and insurers."); },
         growth: function (c) { return vRatioPage(c, ["Growth, year on year"], "Each period against the same period a year before, in the reported currency."); },
         solvency: function (c) { return vRatioPage(c, ["Balance sheet"], "From the balance sheet at each period's end; interest cover from the period's operating income and interest paid."); },
-        news: vNews, chart: vChart }[tab];
-      var key = [id, tab, co.partial ? "p" : co.at, S.per, S.cur, S.stmt, S.all, S.fg, extra ? extra.length : ""].join("|");
+        news: vNews, transcripts: vTranscripts, chart: vChart }[tab];
+      var key = [id, tab, co.partial ? "p" : co.at, S.per, S.cur, S.stmt, S.all, S.fg, S.fshow, extra ? extra.length : "", co.secAll ? co.secAll.list.length : ""].join("|");
       var body; try { body = co.partial ? (view || vSummary)(co) : memo(key, function () { return tab === "estimates" ? vEstimates(co, extra) : tab === "target" ? vTarget(co, extra) : tab === "filings" ? vFilings(co, extra) : (view || vSummary)(co); }); } catch (e) { body = '<div class="banner bad"><div><b>This part could not be shown.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; if (W.console) console.error(e); }
       el.innerHTML = back + staffBar(id) + header(co) + '<div class="sa-main' + anim() + '">' + sideSel(tab) + title() + checks(co) + body + (co.partial ? '<div class="sa-wait"><span></span><span></span><span></span></div>' : sources(co)) + "</div>"; sideNav(id, tab, co.u.name || id); wire(el, co, id, tab);
     }
@@ -769,14 +791,16 @@
       full = true;
       if (!co) { el.innerHTML = back + "<h1>" + esc(id) + '</h1><p class="muted">This company is not in the list.</p>'; return; }
       if (!el.isConnected || location.hash.indexOf("#stocks/" + encodeURIComponent(id)) !== 0) return;
-      if (tab === "estimates" || tab === "target") loadLog(id, "est").then(function (x) { draw(co, x); }); else if (tab === "filings") loadLog(id, "restated").then(function (x) { draw(co, x); }); else draw(co);
+      if (tab === "estimates" || tab === "target") loadLog(id, "est").then(function (x) { draw(co, x); }); else if (tab === "filings") { loadLog(id, "restated").then(function (x) { draw(co, x); /* the stored list first, then every filing straight from the SEC */
+        if (co.u.cik && !co.secAll) loadSecFilings(co.u.cik).then(function (all) { co.secAll = all; if (el.isConnected && location.hash.indexOf("#stocks/" + encodeURIComponent(id) + "/filings") === 0) draw(co, x); }, function () { /* the stored list stays */ }); }); } else draw(co);
     }, function (e) { full = true; el.innerHTML = back + '<div class="banner bad"><div><b>Could not load this company.</b><p>' + esc(e && e.message || e) + "</p></div></div>"; });
   }
   function wire(el, co, id, tab) {
     var redraw = function () { renderCompany(el, id, tab); };
     var on = function (sel, f) { var b = $(sel, el); if (b) b.addEventListener("click", function (e) { var t = e.target.closest("button"); if (t) f(t.dataset.v, t); }); };
-    on("#sa-st", function (v) { S.stmt = v; redraw(); }); on("#sa-per", function (v) { S.per = v; S.all = false; remember(); redraw(); }); on("#sa-cur", function (v) { S.cur = v; remember(); redraw(); }); on("#sa-fg", function (v) { S.fg = v; S.all = false; redraw(); });
+    on("#sa-st", function (v) { S.stmt = v; redraw(); }); on("#sa-per", function (v) { S.per = v; S.all = false; remember(); redraw(); }); on("#sa-cur", function (v) { S.cur = v; remember(); redraw(); }); on("#sa-fg", function (v) { S.fg = v; S.all = false; S.fshow = 60; redraw(); });
     var all = $("#sa-all", el); if (all) all.addEventListener("click", function () { S.all = !S.all; redraw(); });
+    var fm = $("#sa-fmore", el); if (fm) fm.addEventListener("click", function () { S.fshow = (S.fshow || 60) + 500; redraw(); });
     /* the statements read like the company's: the latest period at the right, in view; older ones a scroll away */
     $$(".sa-wrap", el).forEach(function (w) { if (w.querySelector(".sa-fin")) w.scrollLeft = w.scrollWidth; });
     if (!co.partial) setTimeout(function () { if (tab === "chart") tvWidget($("#sa-tv", el), co.u.tv, false); if (tab === "overview") tvWidget($("#sa-tv-s", el), co.u.tv, true); }, 60); /* the chart (an outside widget) after the page is on screen */

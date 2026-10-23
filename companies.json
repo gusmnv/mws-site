@@ -268,5 +268,38 @@
 "desc":"The Nikkei 225 is Japan's best-known stock index: 225 large companies on the Tokyo Stock Exchange, price-weighted, published by the Nikkei newspaper since 1950.",
 "sector":"Japanese equities",
 "founded":1950
+},
+"GOOG":{
+"name":"Alphabet",
+"kind":"company",
+"site":"https://abc.xyz",
+"desc":"Alphabet is the parent of Google: Search, YouTube, Android and Google Cloud, with its Gemini AI models and its own TPU chips, and Waymo among its other bets.",
+"sector":"Internet · AI",
+"exchange":"Nasdaq",
+"hq":"Mountain View, California",
+"founded":1998,
+"shares":12.1
+},
+"AVGO":{
+"name":"Broadcom",
+"kind":"company",
+"site":"https://www.broadcom.com",
+"desc":"Broadcom designs the networking chips and the custom AI accelerators (XPUs) of the largest cloud companies, and owns VMware's infrastructure software.",
+"sector":"Semiconductors · software",
+"exchange":"Nasdaq",
+"hq":"Palo Alto, California",
+"founded":1961,
+"shares":4.72
+},
+"SKHY":{
+"name":"SK hynix",
+"kind":"company",
+"site":"https://www.skhynix.com",
+"desc":"SK hynix is the world's second-largest memory maker and the leading supplier of high-bandwidth memory (HBM) for Nvidia's AI accelerators. Its ADRs trade on Nasdaq since July 2026 (10 ADSs per share).",
+"sector":"Memory · semiconductors",
+"exchange":"Nasdaq (ADR)",
+"hq":"Icheon, South Korea",
+"founded":1983,
+"shares":7.28
 }
 }
